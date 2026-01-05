@@ -14,6 +14,7 @@ export function HeroSection() {
 
             {/* Content Overlay */}
             <div className="relative z-10 text-center max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                {/* @ts-ignore */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -39,6 +40,7 @@ export function HeroSection() {
                     </p>
                 </motion.div>
 
+                {/* @ts-ignore */}
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}

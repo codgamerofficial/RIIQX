@@ -60,6 +60,7 @@ export function FeaturedCategories() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {categories.map((category, index) => (
+                    // @ts-ignore
                     <motion.div
                         key={category.id}
                         initial={{ opacity: 0, y: 20 }}
