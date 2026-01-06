@@ -21,7 +21,7 @@ export default async function ProductDetailsPage({
         .from("products")
         .select("*")
         .eq("id", id)
-        .single();
+        .single() as any;
 
     if (error || !product) {
         notFound();
@@ -34,8 +34,9 @@ export default async function ProductDetailsPage({
         .eq("product_id", id);
 
     // Extract unique colors/sizes
-    const colors = Array.from(new Set(variants?.map(v => v.color).filter(Boolean)));
-    const sizes = Array.from(new Set(variants?.map(v => v.size).filter(Boolean)));
+    // Extract unique colors/sizes
+    const colors = Array.from(new Set((variants as any[])?.map((v: any) => v.color).filter(Boolean)));
+    const sizes = Array.from(new Set((variants as any[])?.map((v: any) => v.size).filter(Boolean)));
 
     return (
         <div className="min-h-screen bg-background pt-24 pb-12">

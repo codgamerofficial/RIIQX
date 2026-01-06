@@ -9,9 +9,10 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-type NeonButtonProps = React.ComponentProps<typeof motion.button> & {
+type NeonButtonProps = Omit<React.ComponentProps<typeof motion.button>, "children"> & {
     variant?: "primary" | "secondary" | "outline" | "ghost";
     glow?: boolean;
+    children?: React.ReactNode;
 };
 
 export const NeonButton = React.forwardRef<HTMLButtonElement, NeonButtonProps>(

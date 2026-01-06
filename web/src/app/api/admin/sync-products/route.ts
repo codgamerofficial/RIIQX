@@ -36,7 +36,8 @@ export async function POST(req: Request) {
                         images: p.images,
                         is_active: true
                     })
-                    .eq("id", existingProduct.id)
+                    // @ts-ignore
+                    .eq("id", (existingProduct as any).id)
                     .select()
                     .single();
                 productData = data;
@@ -80,7 +81,8 @@ export async function POST(req: Request) {
                             stock: v.stock,
                             price_adjustment: 0
                         })
-                        .eq("id", existingVariant.id);
+                        // @ts-ignore
+                        .eq("id", (existingVariant as any).id);
                 } else {
                     await supabase
                         .from("product_variants")
