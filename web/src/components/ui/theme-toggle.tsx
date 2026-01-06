@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 
-export function ThemeToggle() {
+export function ModeToggle() { // Renamed to ModeToggle to fix reference error
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 

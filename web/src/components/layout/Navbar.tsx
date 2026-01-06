@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Menu, X, User, Search, Zap, ChevronDown } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useCartStore } from "@/store/useCartStore";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ModeToggle } from "@/components/ui/theme-toggle";
 
 export function Navbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -127,7 +127,7 @@ export function Navbar() {
 
                     {/* Actions */}
                     <div className="hidden md:flex items-center space-x-6">
-                        <ThemeToggle />
+                        <ModeToggle />
 
                         <button
                             onClick={() => setIsSearchOpen(true)}
