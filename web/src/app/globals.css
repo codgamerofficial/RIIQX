@@ -1,39 +1,73 @@
 @import "tailwindcss";
 
-:root {
-  /* Cinematic Dark Theme - Deep Space / Avengers Endgame */
-  --background: #020204;
-  --foreground: #e0e0e0;
+@layer base {
+  :root {
+    /* Cinematic Dark Theme - Deep Space / Avengers Endgame */
+    --background: #020204;
+    --foreground: #e0e0e0;
 
-  --card: #0a0a0f;
-  --card-foreground: #e0e0e0;
+    --card: #0a0a0f;
+    --card-foreground: #e0e0e0;
 
-  --popover: #0a0a0f;
-  --popover-foreground: #e0e0e0;
+    --popover: #0a0a0f;
+    --popover-foreground: #e0e0e0;
 
-  --primary: #7c3aed;
-  /* Electric Purple */
-  --primary-foreground: #ffffff;
+    --primary: #7c3aed;
+    /* Electric Purple */
+    --primary-foreground: #ffffff;
 
-  --secondary: #00f0ff;
-  /* Neon Cyan */
-  --secondary-foreground: #000000;
+    --secondary: #00f0ff;
+    /* Neon Cyan */
+    --secondary-foreground: #000000;
 
-  --muted: #1a1a20;
-  --muted-foreground: #a1a1aa;
+    --muted: #1a1a20;
+    --muted-foreground: #a1a1aa;
 
-  --accent: #ff004f;
-  /* Spider-Man Red/Pinkish */
-  --accent-foreground: #ffffff;
+    --accent: #ff004f;
+    /* Spider-Man Red/Pinkish */
+    --accent-foreground: #ffffff;
 
-  --destructive: #7f1d1d;
-  --destructive-foreground: #ffe4e6;
+    --destructive: #7f1d1d;
+    --destructive-foreground: #ffe4e6;
 
-  --border: #272730;
-  --input: #272730;
-  --ring: #7c3aed;
+    --border: #272730;
+    --input: #272730;
+    --ring: #7c3aed;
+    --radius: 0.5rem;
+  }
 
-  --radius: 0.5rem;
+  .light {
+    /* Stark/Iron Man HUD Light Mode - Clean, Technical, High Contrast */
+    --background: #ffffff;
+    --foreground: #09090b;
+
+    --card: #f4f4f5;
+    --card-foreground: #09090b;
+
+    --popover: #ffffff;
+    --popover-foreground: #09090b;
+
+    --primary: #6d28d9;
+    /* Slightly darker purple for visibility on white */
+    --primary-foreground: #ffffff;
+
+    --secondary: #06b6d4;
+    /* Cyan turned Teal for contrast */
+    --secondary-foreground: #ffffff;
+
+    --muted: #f4f4f5;
+    --muted-foreground: #71717a;
+
+    --accent: #e11d48;
+    --accent-foreground: #ffffff;
+
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+
+    --border: #e4e4e7;
+    --input: #e4e4e7;
+    --ring: #7c3aed;
+  }
 }
 
 @theme inline {
