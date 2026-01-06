@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CartSheet } from "@/components/cart/CartSheet";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
+import { MusicPlayer } from "@/components/ui/music-player";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,7 @@ export default function RootLayout({
           <main className="flex-grow">
             {children}
           </main>
+          <MusicPlayer />
           <Footer />
         </SmoothScroll>
         <CartSheet />
