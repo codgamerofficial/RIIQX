@@ -30,22 +30,18 @@ export function DynamicIsland() {
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 const { latitude, longitude } = pos.coords;
                 try {
-                    // Open-Meteo API (No key required)
-                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&daily=weather_code&timezone=auto`);
+                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&timezone=auto`);
                     const data = await res.json();
 
                     const temp = Math.round(data.current.temperature_2m);
                     const code = data.current.weather_code;
                     let condition = "Clear";
 
-                    // Simple WMO code mapping
                     if (code >= 1 && code <= 3) condition = "Cloudy";
                     if (code >= 51 && code <= 67) condition = "Rain";
                     if (code >= 71) condition = "Snow";
                     if (code >= 95) condition = "Storm";
 
-                    // Fetch location name (optional reverse geocoding or just use coords)
-                    // For speed, we'll genericize or use timezone
                     const location = data.timezone.split("/")[1]?.replace("_", " ") || "Earth";
 
                     setWeather({ temp, condition, location });
@@ -66,7 +62,6 @@ export function DynamicIsland() {
         }
     }, [isPlaying]);
 
-    // Icon helper
     const getWeatherIcon = (condition: string) => {
         switch (condition) {
             case "Cloudy": return <Cloud className="w-5 h-5 text-gray-400" />;
@@ -77,44 +72,49 @@ export function DynamicIsland() {
     };
 
     return (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex justify-center">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] flex justify-center w-full pointer-events-none">
             <motion.div
                 layout
                 initial={false}
                 animate={{
-                    width: mode === "idle" ? 200 : 380,
-                    height: mode === "idle" ? 36 : 140,
+                    width: mode === "idle" ? 300 : 420,
+                    height: mode === "idle" ? 48 : 160,
                     borderRadius: 24,
                 }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                className="bg-black border border-white/10 shadow-[0_0_20px_rgba(0,0,0,0.5)] overflow-hidden relative"
+                transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                className="bg-black/90 backdrop-blur-3xl border border-white/10 shadow-[0_0_40px_rgba(124,58,237,0.3)] overflow-hidden relative pointer-events-auto"
                 onClick={() => setMode(mode === "idle" ? (isPlaying ? "music" : "weather") : "idle")}
             >
-                {/* IDLE STATE: Time & Indicators */}
+                {/* IDLE STATE: Dock-like HUD */}
                 {mode === "idle" && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="w-full h-full flex items-center justify-between px-4"
+                        className="w-full h-full flex items-center justify-between px-6"
                     >
-                        <span className="text-xs font-medium text-white/50">{date}</span>
-                        <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-white" />
-                            <span className="text-sm font-bold text-white">{time}</span>
-                        </div>
                         <div className="flex items-center gap-2">
-                            {isPlaying && (
+                            <Clock className="w-4 h-4 text-primary" />
+                            <span className="text-base font-bold text-white tracking-wide">{time}</span>
+                        </div>
+
+                        {/* Center Indicator / Mini Vis */}
+                        <div className="flex gap-1 items-end h-3 mx-4 opacity-50">
+                            {[...Array(5)].map((_, i) => (
                                 <motion.div
-                                    className="flex gap-0.5"
-                                    animate={{ opacity: [0.5, 1, 0.5] }}
-                                    transition={{ duration: 1.5, repeat: Infinity }}
-                                >
-                                    <div className="w-0.5 h-2 bg-primary rounded-full" />
-                                    <div className="w-0.5 h-3 bg-primary rounded-full" />
-                                    <div className="w-0.5 h-1.5 bg-primary rounded-full" />
-                                </motion.div>
-                            )}
-                            <Battery className="w-4 h-4 text-green-500" />
+                                    key={i}
+                                    className="w-1 bg-white rounded-full"
+                                    animate={{ height: isPlaying ? [4, 12, 4] : 4 }}
+                                    transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.1, repeatType: "reverse" }}
+                                />
+                            ))}
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs font-medium text-white/50">{date}</span>
+                            <div className="flex items-center gap-1.5 pl-3 border-l border-white/10">
+                                <Wifi className="w-3.5 h-3.5 text-white/70" />
+                                <Battery className="w-3.5 h-3.5 text-green-500" />
+                            </div>
                         </div>
                     </motion.div>
                 )}
@@ -123,9 +123,9 @@ export function DynamicIsland() {
                 <AnimatePresence mode="wait">
                     {mode !== "idle" && (
                         <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
                             transition={{ delay: 0.1 }}
                             className="p-5 w-full h-full flex flex-col justify-between"
                         >
