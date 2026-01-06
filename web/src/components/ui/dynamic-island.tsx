@@ -88,14 +88,23 @@ export function DynamicIsland() {
         }
     };
 
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
+
     return (
-        <div className="fixed bottom-6 right-6 z-[100] flex justify-end w-auto pointer-events-none">
+        <div className="fixed z-[100] flex pointer-events-none bottom-4 left-4 right-4 justify-center md:bottom-6 md:right-6 md:left-auto md:justify-end md:w-auto">
             <motion.div
                 layout
                 initial={false}
                 animate={{
-                    width: mode === "idle" ? 300 : 480, // Wider for controls
-                    height: mode === "idle" ? 48 : 200, // Taller for controls
+                    width: isMobile ? "100%" : (mode === "idle" ? 300 : 480),
+                    height: mode === "idle" ? 48 : 200,
                     borderRadius: 24,
                 }}
                 transition={{ type: "spring", stiffness: 350, damping: 25 }}
