@@ -72,26 +72,22 @@ export function DynamicIsland() {
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     };
 
-    return (
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-            const file = event.target.files?.[0];
-            if (file) {
-                const url = URL.createObjectURL(file);
-                const newTrack = {
-                    id: crypto.randomUUID(),
-                    title: file.name.replace(/\.[^/.]+$/, ""), // Remove extension
-                    artist: "Local Upload",
-                    url: url
-                };
-                // Add track function from context
-                // Note: We need to cast the context to include addTrack if it was missing in the destructuring
-                // But we can just use the one we have
-                const context = useMusic(); // Re-access to be safe or just use destructured
-                context.addTrack(newTrack);
-            }
-        };
+        const file = event.target.files?.[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            const newTrack = {
+                id: crypto.randomUUID(),
+                title: file.name.replace(/\.[^/.]+$/, ""), // Remove extension
+                artist: "Local Upload",
+                url: url
+            };
+            const context = useMusic();
+            context.addTrack(newTrack);
+        }
+    };
 
     return (
         <div className="fixed bottom-6 right-6 z-[100] flex justify-end w-auto pointer-events-none">
