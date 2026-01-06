@@ -206,20 +206,28 @@ export function RiiqxAssistant() {
             </AnimatePresence>
 
             {/* Floating Orb Trigger */}
+            {/* Floating Orb Trigger */}
             <motion.button
                 onClick={() => setIsOpen(!isOpen)}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="w-14 h-14 rounded-full bg-black border border-primary/50 relative flex items-center justify-center shadow-[0_0_20px_rgba(124,58,237,0.5)] group"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="h-14 px-4 rounded-full bg-black border border-primary/50 relative flex items-center gap-3 shadow-[0_0_20px_rgba(124,58,237,0.5)] group overflow-hidden"
             >
-                {/* Holographic Ring Animation */}
-                <div className="absolute inset-0 rounded-full border border-primary/30 animate-[spin_4s_linear_infinite]" />
-                <div className="absolute inset-1 rounded-full border border-primary/20 animate-[spin_3s_linear_infinite_reverse]" />
+                {/* Holographic Ring Animation - Constrained to icon area */}
+                <div className="absolute left-4 w-10 h-10">
+                    <div className="absolute inset-0 rounded-full border border-primary/30 animate-[spin_4s_linear_infinite]" />
+                    <div className="absolute inset-1 rounded-full border border-primary/20 animate-[spin_3s_linear_infinite_reverse]" />
+                </div>
 
                 {/* Center Core */}
-                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center relative overflow-hidden">
-                    <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                <div className="w-10 h-10 flex-shrink-0 bg-primary/20 rounded-full flex items-center justify-center relative overflow-hidden z-10">
+                    <Sparkles className="w-5 h-5 text-primary animate-pulse" />
                 </div>
+
+                {/* Text Label */}
+                <span className="text-sm font-medium text-white whitespace-nowrap hidden sm:inline-block pr-2">
+                    I am RIIQX, How Can I Help You?
+                </span>
             </motion.button>
         </div>
     );
