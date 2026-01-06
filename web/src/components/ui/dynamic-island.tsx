@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Battery, Wifi, Cloud, Sun, CloudRain, Moon, Music as MusicIcon, Clock, MapPin, Play, Pause, SkipForward, SkipBack, X, Volume2 } from "lucide-react";
+import { Battery, Wifi, Cloud, Sun, CloudRain, Moon, Music as MusicIcon, Clock, MapPin, Play, Pause, SkipForward, SkipBack, X, Volume2, Bell } from "lucide-react";
 import { useMusic } from "@/context/MusicContext";
 
 export function DynamicIsland() {
@@ -103,7 +103,7 @@ export function DynamicIsland() {
                 layout
                 initial={false}
                 animate={{
-                    width: isMobile ? "100%" : (mode === "idle" ? 300 : 480),
+                    width: isMobile ? "100%" : (mode === "idle" ? 440 : 480), // Wider for System Tray
                     height: mode === "idle" ? 48 : 200,
                     borderRadius: 24,
                 }}
@@ -122,39 +122,45 @@ export function DynamicIsland() {
                         className="w-full h-full flex items-center justify-between px-6 cursor-pointer"
                         onClick={() => setMode(isPlaying ? "music" : "weather")}
                     >
-                        <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-primary" />
-                            <span className="text-base font-bold text-white tracking-wide">{time}</span>
+                        {/* LEFT: Language */}
+                        <div className="flex flex-col items-center leading-none mr-4 min-w-[30px]">
+                            <span className="text-[10px] font-bold text-white tracking-widest">ENG</span>
+                            <span className="text-[10px] font-bold text-white/50 tracking-widest">IN</span>
                         </div>
 
-                        {/* Center Indicator / Mini Vis */}
-                        <div className="flex gap-1 items-end h-3 mx-4 opacity-50">
-                            {[...Array(5)].map((_, i) => (
-                                <motion.div
-                                    key={i}
-                                    className="w-1 bg-white rounded-full"
-                                    animate={{ height: isPlaying ? [4, 12, 4] : 4 }}
-                                    transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.1, repeatType: "reverse" }}
-                                />
-                            ))}
+                        {/* CENTER: System Icons */}
+                        <div className="flex items-center gap-3 mr-4">
+                            <Wifi className="w-4 h-4 text-white" />
+                            <div onClick={(e) => { e.stopPropagation(); setVolume(volume === 0 ? 1 : 0); }} className="cursor-pointer hover:text-primary transition-colors">
+                                {volume === 0 ? <Volume2 className="w-4 h-4 text-white/50" /> : <Volume2 className="w-4 h-4 text-white" />}
+                            </div>
+                            <Battery className="w-4 h-4 text-white" />
                         </div>
 
-                        <div className="flex items-center gap-3">
-                            {/* Weather Widget (Exact Design) */}
-                            <div className="flex items-center gap-2 pr-2">
-                                {/* Icon + Badge */}
-                                <div className="relative w-8 h-8 flex items-center justify-center">
-                                    <div className="z-10">{getWeatherIcon(weather?.condition || "Clear")}</div>
-                                    {/* Notification Badge */}
-                                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-pink-400 rounded-full flex items-center justify-center border border-black z-20">
-                                        <span className="text-[8px] font-bold text-black font-sans">9+</span>
-                                    </div>
-                                </div>
+                        {/* Weather Widget (Compact) */}
+                        <div className="flex items-center gap-2 mr-4 pr-4 border-r border-white/10">
+                            <div className="relative w-6 h-6 flex items-center justify-center">
+                                <div className="z-10">{getWeatherIcon(weather?.condition || "Clear")}</div>
+                            </div>
+                            <div className="flex flex-col leading-none">
+                                <span className="text-xs font-bold text-white">{weather?.temp ?? "--"}°</span>
+                                <span className="text-[9px] font-medium text-white/50">{weather?.condition || "Clear"}</span>
+                            </div>
+                        </div>
 
-                                {/* Stacked Text */}
-                                <div className="flex flex-col leading-none">
-                                    <span className="text-sm font-bold text-white tracking-wide">{weather?.temp ?? "--"}°C</span>
-                                    <span className="text-[10px] font-medium text-gray-400">{weather?.condition || "Clear"}</span>
+                        {/* RIGHT: Clock & Notifications */}
+                        <div className="flex items-center gap-4">
+                            {/* Stacked Clock */}
+                            <div className="flex flex-col items-end leading-none min-w-[60px]">
+                                <span className="text-sm font-medium text-white tracking-wide">{time.slice(0, 5)}</span>
+                                <span className="text-[10px] text-white/60">{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}</span>
+                            </div>
+
+                            {/* Notification Bell */}
+                            <div className="relative cursor-pointer group">
+                                <Bell className="w-5 h-5 text-white group-hover:text-primary transition-colors" />
+                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-white text-black rounded-full flex items-center justify-center text-[8px] font-bold border border-black">
+                                    zZ
                                 </div>
                             </div>
                         </div>
