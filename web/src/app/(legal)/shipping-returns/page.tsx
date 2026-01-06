@@ -18,9 +18,9 @@ export default function ShippingReturnsPage() {
                         If we are experiencing a high volume of orders, shipments may be delayed by a few days. Please allow additional days in transit for delivery.
                     </p>
                     <ul className="list-disc pl-6 space-y-2 text-gray-400">
-                        <li>Standard Shipping (3-5 days): Free for orders over $100</li>
-                        <li>Expedited Shipping (2 days): $15.00</li>
-                        <li>Overnight Delivery: $35.00</li>
+                        <li>Standard Shipping (3-5 days): Free for orders over 299 Rupees</li>
+                        <li>Expedited Shipping (2 days): 99 Rupees</li>
+                        <li>Overnight Delivery: 199 Rupees</li>
                     </ul>
                 </section>
 

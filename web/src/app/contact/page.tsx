@@ -22,15 +22,15 @@ export default function ContactPage() {
                             <div className="space-y-4 text-gray-400">
                                 <div className="flex items-start gap-4">
                                     <MapPin className="w-6 h-6 text-primary shrink-0" />
-                                    <p>123 Innovation Drive,<br />Tech City, Future State 90210</p>
+                                    <p>Headquarters<br />Monoharchak Road, Near Sani Temple, Contai,<br />East Medinipur, West Bengal, 721401, INDIA</p>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <Mail className="w-6 h-6 text-primary shrink-0" />
-                                    <p>support@riiqx.com</p>
+                                    <p>thelegacyroars@gmail.com</p>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <Phone className="w-6 h-6 text-primary shrink-0" />
-                                    <p>+1 (555) 123-4567</p>
+                                    <p>+91 8145172429</p>
                                 </div>
                             </div>
                         </div>
@@ -38,7 +38,7 @@ export default function ContactPage() {
                         <div className="bg-linear-to-br from-purple-900/20 to-black border border-purple-500/20 p-8 rounded-3xl">
                             <h3 className="text-xl font-bold text-white mb-2">Support Hours</h3>
                             <p className="text-gray-400">
-                                Mon - Fri: 09:00 - 18:00 (EST)<br />
+                                Mon - Fri: 09:00 - 18:00 (IST)<br />
                                 Sat - Sun: Closed
                             </p>
                         </div>
