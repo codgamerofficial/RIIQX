@@ -5,7 +5,10 @@ import { Database } from "@/types/database.types";
 // Note: Qikink API documentation varies. Assuming standard REST workflow.
 // Often requires Authentication Header.
 
-const QIKINK_API_URL = "https://sandbox.qikink.com/api"; // Updated based on Probe
+const QIKINK_ENV = process.env.QIKINK_ENV || "sandbox";
+const QIKINK_API_URL = QIKINK_ENV === "production"
+    ? "https://api.qikink.com/api"
+    : "https://sandbox.qikink.com/api";
 
 export const syncToQikink = async (order: Database["public"]["Tables"]["orders"]["Row"], items: any[]) => {
     try {
