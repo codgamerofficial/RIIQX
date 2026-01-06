@@ -1,57 +1,107 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { NeonButton } from "@/components/ui/neon-button";
 import { ArrowLeft, MapPin, Plus, Trash2, Home, Briefcase } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Mock Data for now - waiting for DB table to be confirmed
 interface Address {
     id: string;
-    type: "Home" | "Work" | "Other";
+    type: string;
     street: string;
     city: string;
     state: string;
     zip: string;
     country: string;
-    isDefault: boolean;
+    is_default: boolean;
 }
 
 export default function ManageAddressesPage() {
     const router = useRouter();
-    const [addresses, setAddresses] = useState<Address[]>([
-        { id: "1", type: "Home", street: "123 Cyberpunk Avenue", city: "Neo Tokyo", state: "NT", zip: "90210", country: "Japan", isDefault: true }
-    ]);
+    const supabase = createClient();
+    const [addresses, setAddresses] = useState<Address[]>([]);
+    const [loading, setLoading] = useState(true);
     const [showAddForm, setShowAddForm] = useState(false);
 
     // New Address State
-    const [newAddress, setNewAddress] = useState<Partial<Address>>({ type: "Home", country: "India" });
+    const [newAddress, setNewAddress] = useState({ type: "Home", street: "", city: "", state: "", zip: "", country: "", is_default: false });
 
-    const handleAddAddress = (e: React.FormEvent) => {
-        e.preventDefault();
-        // Simulate API call
-        const added: Address = {
-            id: Math.random().toString(),
-            type: newAddress.type as any || "Home",
-            street: newAddress.street || "",
-            city: newAddress.city || "",
-            state: newAddress.state || "",
-            zip: newAddress.zip || "",
-            country: newAddress.country || "",
-            isDefault: addresses.length === 0
-        };
-        setAddresses([...addresses, added]);
-        setShowAddForm(false);
-        setNewAddress({ type: "Home", country: "India" });
-        toast.success("Address added successfully");
+    useEffect(() => {
+        fetchAddresses();
+    }, []);
+
+    const fetchAddresses = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            router.push("/auth");
+            return;
+        }
+
+        const { data, error } = await supabase
+            .from("addresses")
+            .select("*")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false });
+
+        if (error) {
+            console.error(error);
+            toast.error("Failed to load addresses");
+        } else {
+            setAddresses(data || []);
+        }
+        setLoading(false);
     };
 
-    const handleDelete = (id: string) => {
-        setAddresses(addresses.filter(a => a.id !== id));
-        toast.success("Address removed");
+    const handleAddAddress = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // If this is the first address, make it default
+        const isDefault = addresses.length === 0 || newAddress.is_default;
+
+        const { data, error } = await supabase
+            .from("addresses")
+            .insert({
+                user_id: user.id,
+                type: newAddress.type,
+                street: newAddress.street,
+                city: newAddress.city,
+                state: newAddress.state,
+                zip: newAddress.zip,
+                country: newAddress.country,
+                is_default: isDefault
+            })
+            .select()
+            .single();
+
+        if (error) {
+            toast.error("Failed to add address");
+            console.error(error);
+        } else {
+            setAddresses([data, ...addresses]);
+            setShowAddForm(false);
+            setNewAddress({ type: "Home", street: "", city: "", state: "", zip: "", country: "", is_default: false });
+            toast.success("Address added successfully");
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        const { error } = await supabase
+            .from("addresses")
+            .delete()
+            .eq("id", id);
+
+        if (error) {
+            toast.error("Failed to delete address");
+        } else {
+            setAddresses(addresses.filter(a => a.id !== id));
+            toast.success("Address removed");
+        }
     };
 
     return (
@@ -81,7 +131,7 @@ export default function ManageAddressesPage() {
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 className="bg-card border border-white/5 rounded-2xl p-6 relative group overflow-hidden"
                             >
-                                {addr.isDefault && (
+                                {addr.is_default && (
                                     <div className="absolute top-0 right-0 bg-primary/20 text-primary text-xs px-3 py-1 rounded-bl-xl font-medium">
                                         Default
                                     </div>
@@ -109,6 +159,12 @@ export default function ManageAddressesPage() {
                             </motion.div>
                         ))}
                     </AnimatePresence>
+
+                    {!loading && addresses.length === 0 && !showAddForm && (
+                        <div className="col-span-full text-center py-12 text-gray-500">
+                            No addresses found. Add one to get started.
+                        </div>
+                    )}
                 </div>
 
                 {/* Add Form Modal/Section */}
@@ -163,11 +219,21 @@ export default function ManageAddressesPage() {
                                     />
                                 </div>
                                 <div>
+                                    <label className="label">Country</label>
+                                    <input
+                                        required
+                                        className="input-field"
+                                        placeholder="India"
+                                        value={newAddress.country}
+                                        onChange={e => setNewAddress({ ...newAddress, country: e.target.value })}
+                                    />
+                                </div>
+                                <div>
                                     <label className="label">Type</label>
                                     <select
                                         className="input-field"
                                         value={newAddress.type}
-                                        onChange={e => setNewAddress({ ...newAddress, type: e.target.value as any })}
+                                        onChange={e => setNewAddress({ ...newAddress, type: e.target.value })}
                                     >
                                         <option>Home</option>
                                         <option>Work</option>
