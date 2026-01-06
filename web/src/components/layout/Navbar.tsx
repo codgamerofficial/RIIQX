@@ -74,9 +74,14 @@ export function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
                     {/* Logo */}
+                    {/* Logo */}
                     <Link href="/" className="flex-shrink-0 flex items-center space-x-2 group">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-xl shadow-[0_0_15px_rgba(124,58,237,0.5)] group-hover:shadow-[0_0_25px_rgba(0,240,255,0.6)] transition-all duration-300">
-                            R
+                        <div className="relative w-12 h-12">
+                            <img
+                                src="/riiqx-logo.png"
+                                alt="RIIQX Logo"
+                                className="w-full h-full object-contain"
+                            />
                         </div>
                         <span className="text-2xl font-bold tracking-tighter text-white group-hover:text-glow transition-all">
                             RIIQX

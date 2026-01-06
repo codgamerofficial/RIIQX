@@ -25,6 +25,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "RIIQX | Cinematic Print-on-Demand",
   description: "Experience the future of fashion. Original, superhero-inspired apparel.",
+  icons: {
+    icon: "/riiqx-logo.png",
+  },
 };
 
 export default function RootLayout({
