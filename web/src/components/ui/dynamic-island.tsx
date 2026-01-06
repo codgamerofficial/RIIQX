@@ -84,8 +84,7 @@ export function DynamicIsland() {
                 artist: "Local Upload",
                 url: url
             };
-            const context = useMusic();
-            context.addTrack(newTrack);
+            addTrack(newTrack);
         }
     };
 
