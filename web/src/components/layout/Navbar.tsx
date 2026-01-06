@@ -51,6 +51,15 @@ export function Navbar() {
             ]
         },
         {
+            name: "Company",
+            items: [
+                { name: "About Developer", href: "/about" },
+                { name: "Our Story", href: "/story" },
+                { name: "Careers", href: "/careers" },
+                { name: "Blog", href: "/blog" },
+            ]
+        },
+        {
             name: "Support",
             items: [
                 { name: "FAQ", href: "/faq" },
