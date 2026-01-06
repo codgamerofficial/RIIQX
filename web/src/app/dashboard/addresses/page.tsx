@@ -51,7 +51,8 @@ export default function ManageAddressesPage() {
             console.error(error);
             toast.error("Failed to load addresses");
         } else {
-            setAddresses(data || []);
+            const fetched = data as any;
+            setAddresses(fetched || []);
         }
         setLoading(false);
     };
@@ -75,7 +76,7 @@ export default function ManageAddressesPage() {
                 zip: newAddress.zip,
                 country: newAddress.country,
                 is_default: isDefault
-            })
+            } as any)
             .select()
             .single();
 
