@@ -138,7 +138,8 @@ export function RiiqxAssistant() {
                         initial={{ opacity: 0, y: 20, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                        className="mb-4 w-80 sm:w-96 bg-black/80 backdrop-blur-xl border border-primary/40 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(124,58,237,0.2)] flex flex-col h-[500px]"
+                        transition={{ duration: 0.2 }}
+                        className="mb-4 w-80 sm:w-96 bg-black/90 border border-primary/40 rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[500px] will-change-transform"
                     >
                         {/* Header */}
                         <div className="bg-primary/10 p-4 flex justify-between items-center border-b border-white/5">
@@ -156,8 +157,8 @@ export function RiiqxAssistant() {
                             {messages.map((msg, idx) => (
                                 <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                                     <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.role === "user"
-                                            ? "bg-primary text-white rounded-tr-sm"
-                                            : "bg-white/10 text-white/90 rounded-tl-sm border border-white/5"
+                                        ? "bg-primary text-white rounded-tr-sm"
+                                        : "bg-white/10 text-white/90 rounded-tl-sm border border-white/5"
                                         }`}>
                                         {msg.text}
                                     </div>
@@ -216,7 +217,7 @@ export function RiiqxAssistant() {
                 <div className="absolute inset-1 rounded-full border border-primary/20 animate-[spin_3s_linear_infinite_reverse]" />
 
                 {/* Center Core */}
-                <div className="w-8 h-8 bg-primary/20 rounded-full backdrop-blur-sm flex items-center justify-center relative overflow-hidden">
+                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center relative overflow-hidden">
                     <Sparkles className="w-4 h-4 text-primary animate-pulse" />
                 </div>
             </motion.button>
