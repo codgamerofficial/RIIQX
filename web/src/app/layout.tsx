@@ -9,6 +9,8 @@ import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { MusicPlayer } from "@/components/ui/music-player";
 import { RiiqxAssistant } from "@/components/ui/riiqx-assistant";
 import { Toaster } from "sonner";
+import { MusicProvider } from "@/context/MusicContext";
+import { DynamicIsland } from "@/components/ui/dynamic-island";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,18 +37,21 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground min-h-screen flex flex-col`}
       >
-        <SmoothScroll>
-          <ScrollProgress />
-          <Navbar />
-          <main className="flex-grow">
-            {children}
-          </main>
-          <MusicPlayer />
-          <RiiqxAssistant />
-          <Footer />
-        </SmoothScroll>
-        <CartSheet />
-        <Toaster />
+        <MusicProvider>
+          <SmoothScroll>
+            <ScrollProgress />
+            <Navbar />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <MusicPlayer />
+            <RiiqxAssistant />
+            <Footer />
+          </SmoothScroll>
+          <DynamicIsland /> {/* Placeholder for next step */}
+          <CartSheet />
+          <Toaster />
+        </MusicProvider>
       </body>
     </html>
   );

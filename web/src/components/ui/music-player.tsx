@@ -1,81 +1,39 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, SkipForward, SkipBack, Upload, Volume2, VolumeX, Maximize2, Minimize2, Music } from "lucide-react";
-
-interface Track {
-    id: string;
-    title: string;
-    artist: string;
-    url: string;
-}
+import { Play, Pause, SkipForward, SkipBack, Upload, Volume2, VolumeX, Minimize2, Music } from "lucide-react";
+import { useMusic } from "@/context/MusicContext";
 
 export function MusicPlayer() {
     const [isOpen, setIsOpen] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [volume, setVolume] = useState(0.5);
-    const [isMuted, setIsMuted] = useState(false);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [tracks, setTracks] = useState<Track[]>([
-        {
-            id: "default-1",
-            title: "Cyberpunk City",
-            artist: "RIIQX Beats",
-            url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3" // Placeholder royalty-free track
-        }
-    ]);
-    const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
 
-    const audioRef = useRef<HTMLAudioElement | null>(null);
-
-    useEffect(() => {
-        if (audioRef.current) {
-            audioRef.current.volume = isMuted ? 0 : volume;
-        }
-    }, [volume, isMuted]);
-
-    useEffect(() => {
-        if (isPlaying) {
-            audioRef.current?.play().catch(e => console.log("Play failed:", e));
-        } else {
-            audioRef.current?.pause();
-        }
-    }, [isPlaying, currentTrackIndex]);
-
-    const handleTimeUpdate = () => {
-        if (audioRef.current) {
-            setCurrentTime(audioRef.current.currentTime);
-            setDuration(audioRef.current.duration || 0);
-        }
-    };
-
-    const handleTrackEnded = () => {
-        handleNext();
-    };
-
-    const handleNext = () => {
-        setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
-    };
-
-    const handlePrev = () => {
-        setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
-    };
+    // Consume Context
+    const {
+        isPlaying,
+        currentTrack,
+        volume,
+        isMuted,
+        currentTime,
+        duration,
+        togglePlay,
+        nextTrack,
+        prevTrack,
+        toggleMute,
+        addTrack
+    } = useMusic();
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             const url = URL.createObjectURL(file);
-            const newTrack: Track = {
+            const newTrack = {
                 id: `upload-${Date.now()}`,
                 title: file.name.replace(/\.[^/.]+$/, ""),
                 artist: "You",
                 url: url
             };
-            setTracks((prev) => [...prev, newTrack]);
-            setCurrentTrackIndex(tracks.length); // Switch to new track immediately
-            setIsPlaying(true);
+            addTrack(newTrack);
             setIsOpen(true);
         }
     };
@@ -88,13 +46,7 @@ export function MusicPlayer() {
 
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
-            {/* Audio Element */}
-            <audio
-                ref={audioRef}
-                src={tracks[currentTrackIndex]?.url}
-                onTimeUpdate={handleTimeUpdate}
-                onEnded={handleTrackEnded}
-            />
+            {/* Audio logic is now in MusicProvider */}
 
             <div className="pointer-events-auto">
                 <AnimatePresence mode="wait">
@@ -140,8 +92,8 @@ export function MusicPlayer() {
 
                                 {/* Track Info */}
                                 <div className="mb-6">
-                                    <h3 className="text-white font-bold text-lg truncate">{tracks[currentTrackIndex]?.title}</h3>
-                                    <p className="text-muted-foreground text-sm truncate">{tracks[currentTrackIndex]?.artist}</p>
+                                    <h3 className="text-white font-bold text-lg truncate">{currentTrack?.title || "No Track"}</h3>
+                                    <p className="text-muted-foreground text-sm truncate">{currentTrack?.artist || "Unknown"}</p>
                                 </div>
 
                                 {/* Progress Bar */}
@@ -164,21 +116,21 @@ export function MusicPlayer() {
                                     </label>
 
                                     <div className="flex items-center gap-4">
-                                        <button onClick={handlePrev} className="text-white hover:text-primary transition-colors">
+                                        <button onClick={prevTrack} className="text-white hover:text-primary transition-colors">
                                             <SkipBack className="w-6 h-6" />
                                         </button>
                                         <button
-                                            onClick={() => setIsPlaying(!isPlaying)}
+                                            onClick={togglePlay}
                                             className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white hover:bg-primary/80 hover:scale-105 transition-all shadow-[0_0_15px_rgba(124,58,237,0.5)]"
                                         >
                                             {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-1" />}
                                         </button>
-                                        <button onClick={handleNext} className="text-white hover:text-primary transition-colors">
+                                        <button onClick={nextTrack} className="text-white hover:text-primary transition-colors">
                                             <SkipForward className="w-6 h-6" />
                                         </button>
                                     </div>
 
-                                    <button onClick={() => setIsMuted(!isMuted)} className="text-muted-foreground hover:text-white transition-colors">
+                                    <button onClick={toggleMute} className="text-muted-foreground hover:text-white transition-colors">
                                         {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                                     </button>
                                 </div>
