@@ -103,7 +103,7 @@ export function DynamicIsland() {
                 layout
                 initial={false}
                 animate={{
-                    width: isMobile ? "100%" : (mode === "idle" ? 440 : 480), // Wider for System Tray
+                    width: isMobile ? "100%" : (mode === "idle" ? "auto" : 480),
                     height: mode === "idle" ? 48 : 200,
                     borderRadius: 24,
                 }}
