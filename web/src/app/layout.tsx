@@ -7,6 +7,7 @@ import { CartSheet } from "@/components/cart/CartSheet";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { MusicPlayer } from "@/components/ui/music-player";
+import { RiiqxAssistant } from "@/components/ui/riiqx-assistant";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,7 @@ export default function RootLayout({
             {children}
           </main>
           <MusicPlayer />
+          <RiiqxAssistant />
           <Footer />
         </SmoothScroll>
         <CartSheet />
