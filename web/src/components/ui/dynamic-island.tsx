@@ -73,7 +73,7 @@ export function DynamicIsland() {
     };
 
     return (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] flex justify-center w-full pointer-events-none">
+        <div className="fixed bottom-6 right-6 z-[100] flex justify-end w-auto pointer-events-none">
             <motion.div
                 layout
                 initial={false}
