@@ -6,7 +6,7 @@ import { Battery, Wifi, Cloud, Sun, CloudRain, Moon, Music as MusicIcon, Clock, 
 import { useMusic } from "@/context/MusicContext";
 
 export function DynamicIsland() {
-    const { isPlaying, currentTrack, currentTime, duration, togglePlay, nextTrack, prevTrack, seek, volume, setVolume } = useMusic();
+    const { isPlaying, currentTrack, currentTime, duration, togglePlay, nextTrack, prevTrack, seek, volume, setVolume, addTrack } = useMusic();
     const [mode, setMode] = useState<"idle" | "music" | "weather">("idle");
     const [time, setTime] = useState("");
     const [date, setDate] = useState("");
@@ -71,6 +71,27 @@ export function DynamicIsland() {
         const seconds = Math.floor(time % 60);
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     };
+
+    return (
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+            const file = event.target.files?.[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                const newTrack = {
+                    id: crypto.randomUUID(),
+                    title: file.name.replace(/\.[^/.]+$/, ""), // Remove extension
+                    artist: "Local Upload",
+                    url: url
+                };
+                // Add track function from context
+                // Note: We need to cast the context to include addTrack if it was missing in the destructuring
+                // But we can just use the one we have
+                const context = useMusic(); // Re-access to be safe or just use destructured
+                context.addTrack(newTrack);
+            }
+        };
 
     return (
         <div className="fixed bottom-6 right-6 z-[100] flex justify-end w-auto pointer-events-none">
@@ -158,8 +179,23 @@ export function DynamicIsland() {
                                     <div className="flex flex-col gap-4">
                                         <div className="flex items-center gap-4">
                                             {/* Album Art / Visualizer */}
-                                            <div className="w-16 h-16 rounded-xl bg-gradient-to-tr from-primary to-purple-800 flex items-center justify-center shrink-0 shadow-lg shadow-purple-900/20">
+                                            <div className="w-16 h-16 rounded-xl bg-gradient-to-tr from-primary to-purple-800 flex items-center justify-center shrink-0 shadow-lg shadow-purple-900/20 group relative overflow-hidden">
                                                 <MusicIcon className="w-8 h-8 text-white animate-pulse" />
+
+                                                {/* Upload Overlay */}
+                                                <div
+                                                    className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                >
+                                                    <span className="text-xs text-white font-bold">Upload</span>
+                                                </div>
+                                                <input
+                                                    type="file"
+                                                    ref={fileInputRef}
+                                                    className="hidden"
+                                                    accept="audio/*"
+                                                    onChange={handleFileUpload}
+                                                />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <h3 className="text-white font-bold truncate text-lg">{currentTrack?.title || "No Track Selected"}</h3>
