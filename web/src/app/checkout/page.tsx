@@ -31,16 +31,16 @@ export default function CheckoutPage() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // Load Cashfree SDK
+
+    // Load Razorpay SDK
     useEffect(() => {
-        const loadCashfree = async () => {
-            const { load } = await import("@cashfreepayments/cashfree-js");
-            // Assuming environment variable toggles sandbox/prod
-            const mode = process.env.NEXT_PUBLIC_CASHFREE_ENV === "production" ? "production" : "sandbox";
-            // @ts-ignore - The SDK types might interfere with strict check
-            window.cashfree = await load({ mode });
+        const loadRazorpay = () => {
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.async = true;
+            document.body.appendChild(script);
         };
-        loadCashfree();
+        loadRazorpay();
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -48,7 +48,7 @@ export default function CheckoutPage() {
         setLoading(true);
 
         try {
-            // 1. Call our API to create Order & Payment Session
+            // 1. Call our API to create Order
             const response = await fetch("/api/payment/create-order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -62,20 +62,40 @@ export default function CheckoutPage() {
             });
 
             const data = await response.json();
-
             if (!response.ok) throw new Error(data.error || "Payment initialization failed");
 
-            // 2. Open Cashfree Checkout
+            // 2. Open Razorpay Checkout
             // @ts-ignore
-            if (window.cashfree) {
-                // @ts-ignore
-                await window.cashfree.checkout({
-                    paymentSessionId: data.payment_session_id,
-                    returnUrl: `${window.location.origin}/checkout/result?order_id=${data.order_id}`, // Custom result page
-                });
-            } else {
-                throw new Error("Cashfree SDK not loaded");
-            }
+            const options = {
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
+                amount: data.amount,
+                currency: data.currency,
+                name: "RIIQX",
+                description: "Order #" + data.order_id,
+                order_id: data.id, // This is the Razorpay Order ID
+                handler: function (response: any) {
+                    setSuccess(true);
+                    clearCart();
+                    // Optionally verify signature here via API call
+                    console.log("Payment Success:", response);
+                },
+                prefill: {
+                    name: formData.fullName,
+                    email: formData.email,
+                    contact: "9999999999",
+                },
+                theme: {
+                    color: "#A855F7", // Primary color (Purple)
+                },
+            };
+
+            // @ts-ignore
+            const rzp1 = new window.Razorpay(options);
+            rzp1.on("payment.failed", function (response: any) {
+                alert("Payment Failed: " + response.error.description);
+                setLoading(false);
+            });
+            rzp1.open();
 
         } catch (error: any) {
             console.error("Checkout Error:", error);
