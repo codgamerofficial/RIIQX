@@ -131,15 +131,35 @@ export function RiiqxAssistant() {
     };
 
     return (
-        <div className="fixed bottom-6 left-6 z-50 font-sans">
+        <div className="fixed top-24 right-6 z-50 font-sans flex flex-col items-end gap-4">
+            {/* Floating Orb Trigger */}
+            <motion.button
+                onClick={() => setIsOpen(!isOpen)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-14 h-14 rounded-full bg-black/80 backdrop-blur-md border border-primary/50 relative flex items-center justify-center shadow-[0_0_20px_rgba(124,58,237,0.5)] group overflow-hidden"
+            >
+                {/* Holographic Ring Animation */}
+                <div className="absolute inset-0">
+                    <div className="absolute inset-0 rounded-full border border-primary/30 animate-[spin_4s_linear_infinite]" />
+                    <div className="absolute inset-1 rounded-full border border-primary/20 animate-[spin_3s_linear_infinite_reverse]" />
+                </div>
+
+                {/* Center Core */}
+                <div className="w-8 h-8 flex-shrink-0 bg-primary/20 rounded-full flex items-center justify-center relative overflow-hidden z-10">
+                    <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                </div>
+            </motion.button>
+
+            {/* Chat Interface */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                        initial={{ opacity: 0, y: -20, scale: 0.9, originY: 0, originX: 1 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.9 }}
                         transition={{ duration: 0.2 }}
-                        className="mb-4 w-80 sm:w-96 bg-black/90 border border-primary/40 rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[500px] will-change-transform"
+                        className="w-80 sm:w-96 bg-black/90 border border-primary/40 rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[500px] will-change-transform backdrop-blur-xl"
                     >
                         {/* Header */}
                         <div className="bg-primary/10 p-4 flex justify-between items-center border-b border-white/5">
@@ -204,31 +224,6 @@ export function RiiqxAssistant() {
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            {/* Floating Orb Trigger */}
-            {/* Floating Orb Trigger */}
-            <motion.button
-                onClick={() => setIsOpen(!isOpen)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="h-14 px-4 rounded-full bg-black border border-primary/50 relative flex items-center gap-3 shadow-[0_0_20px_rgba(124,58,237,0.5)] group overflow-hidden"
-            >
-                {/* Holographic Ring Animation - Constrained to icon area */}
-                <div className="absolute left-4 w-10 h-10">
-                    <div className="absolute inset-0 rounded-full border border-primary/30 animate-[spin_4s_linear_infinite]" />
-                    <div className="absolute inset-1 rounded-full border border-primary/20 animate-[spin_3s_linear_infinite_reverse]" />
-                </div>
-
-                {/* Center Core */}
-                <div className="w-10 h-10 flex-shrink-0 bg-primary/20 rounded-full flex items-center justify-center relative overflow-hidden z-10">
-                    <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-                </div>
-
-                {/* Text Label */}
-                <span className="text-sm font-medium text-white whitespace-nowrap hidden sm:inline-block pr-2">
-                    I am RIIQX, How Can I Help You?
-                </span>
-            </motion.button>
         </div>
     );
 }
