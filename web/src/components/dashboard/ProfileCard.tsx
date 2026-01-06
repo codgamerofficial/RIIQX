@@ -6,6 +6,7 @@ import { Wallet, Gift, User as UserIcon, LogOut } from "lucide-react";
 import { NeonButton } from "@/components/ui/neon-button";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -79,8 +80,12 @@ export function ProfileCard({ user, profile }: ProfileCardProps) {
             <div className="pt-4 border-t border-white/5">
                 <h3 className="text-sm font-medium text-gray-400 mb-4">Account Actions</h3>
                 <div className="flex flex-wrap gap-3">
-                    <NeonButton variant="secondary" className="text-sm py-2 px-4">Edit Profile</NeonButton>
-                    <NeonButton variant="secondary" className="text-sm py-2 px-4">Manage Addresses</NeonButton>
+                    <Link href="/dashboard/profile">
+                        <NeonButton variant="primary" className="text-sm py-2 px-4 w-full sm:w-auto">Edit Profile</NeonButton>
+                    </Link>
+                    <Link href="/dashboard/addresses">
+                        <NeonButton variant="primary" className="text-sm py-2 px-4 w-full sm:w-auto">Manage Addresses</NeonButton>
+                    </Link>
                 </div>
             </div>
         </div>
