@@ -197,7 +197,7 @@ export default function AuthPage() {
                                 const { error } = await supabase.auth.signInWithOAuth({
                                     provider: "google",
                                     options: {
-                                        redirectTo: `${location.origin}/auth/callback`,
+                                        redirectTo: `https://riiqx.vercel.app/auth/callback`,
                                     },
                                 });
                                 if (error) throw error;
