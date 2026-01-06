@@ -8,6 +8,7 @@ import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { MusicPlayer } from "@/components/ui/music-player";
 import { RiiqxAssistant } from "@/components/ui/riiqx-assistant";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
           <Footer />
         </SmoothScroll>
         <CartSheet />
+        <Toaster />
       </body>
     </html>
   );
