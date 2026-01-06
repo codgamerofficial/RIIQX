@@ -34,8 +34,9 @@ export default function EditProfilePage() {
                 .single();
 
             if (data) {
-                setFullName(data.full_name || "");
-                setAvatarUrl(data.avatar_url || "");
+                const profile = data as any;
+                setFullName(profile.full_name || "");
+                setAvatarUrl(profile.avatar_url || "");
             }
             setLoading(false);
         };
@@ -55,7 +56,7 @@ export default function EditProfilePage() {
                     full_name: fullName,
                     avatar_url: avatarUrl,
                     updated_at: new Date().toISOString(),
-                });
+                } as any);
 
             if (error) {
                 toast.error("Failed to update profile");
