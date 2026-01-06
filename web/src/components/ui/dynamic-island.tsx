@@ -140,10 +140,22 @@ export function DynamicIsland() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <span className="text-xs font-medium text-white/50">{date}</span>
-                            <div className="flex items-center gap-1.5 pl-3 border-l border-white/10">
-                                <Wifi className="w-3.5 h-3.5 text-white/70" />
-                                <Battery className="w-3.5 h-3.5 text-green-500" />
+                            {/* Weather Widget (Exact Design) */}
+                            <div className="flex items-center gap-2 pr-2">
+                                {/* Icon + Badge */}
+                                <div className="relative w-8 h-8 flex items-center justify-center">
+                                    <div className="z-10">{getWeatherIcon(weather?.condition || "Clear")}</div>
+                                    {/* Notification Badge */}
+                                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-pink-400 rounded-full flex items-center justify-center border border-black z-20">
+                                        <span className="text-[8px] font-bold text-black font-sans">9+</span>
+                                    </div>
+                                </div>
+
+                                {/* Stacked Text */}
+                                <div className="flex flex-col leading-none">
+                                    <span className="text-sm font-bold text-white tracking-wide">{weather?.temp ?? "--"}°C</span>
+                                    <span className="text-[10px] font-medium text-gray-400">{weather?.condition || "Clear"}</span>
+                                </div>
                             </div>
                         </div>
                     </motion.div>
