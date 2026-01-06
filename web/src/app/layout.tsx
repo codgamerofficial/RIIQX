@@ -6,7 +6,6 @@ import { Footer } from "@/components/layout/Footer";
 import { CartSheet } from "@/components/cart/CartSheet";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
-import { MusicPlayer } from "@/components/ui/music-player";
 import { RiiqxAssistant } from "@/components/ui/riiqx-assistant";
 import { Toaster } from "sonner";
 import { MusicProvider } from "@/context/MusicContext";
@@ -46,7 +45,7 @@ export default function RootLayout({
               <main className="flex-grow">
                 {children}
               </main>
-              <MusicPlayer />
+              {/* MusicPlayer removed - Integrated into DynamicIsland */}
               <RiiqxAssistant />
               <Footer />
             </SmoothScroll>
