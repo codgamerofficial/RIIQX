@@ -5,36 +5,61 @@ import { NeonButton } from "@/components/ui/neon-button";
 import { HoloCard } from "@/components/ui/holo-card";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
-
-const MotionDiv = motion.div as any;
+import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function AuthPage() {
-    const [email, setEmail] = useState("");
+    const [mode, setMode] = useState<"login" | "signup">("login");
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+        fullName: "",
+    });
+
     const router = useRouter();
     const supabase = createClient();
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setMessage("");
+        setMessage(null);
 
-        const { error } = await supabase.auth.signInWithOtp({
-            email,
-            options: {
-                emailRedirectTo: `${location.origin}/auth/callback`,
-            },
-        });
+        try {
+            if (mode === "signup") {
+                const { data, error } = await supabase.auth.signUp({
+                    email: formData.email,
+                    password: formData.password,
+                    options: {
+                        data: {
+                            full_name: formData.fullName,
+                        },
+                    },
+                });
 
-        if (error) {
-            setMessage("Error sending magic link. Try again.");
-        } else {
-            setMessage("Check your email for the magic link!");
+                if (error) throw error;
+                setMessage({ type: "success", text: "Account created! Please check your email to verify." });
+            } else {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: formData.email,
+                    password: formData.password,
+                });
+
+                if (error) throw error;
+
+                router.push("/dashboard");
+                router.refresh();
+            }
+        } catch (error: any) {
+            setMessage({ type: "error", text: error.message || "Authentication failed" });
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     return (
@@ -46,50 +71,112 @@ export default function AuthPage() {
             </div>
 
             <div className="relative z-10 w-full max-w-md">
-                <HoloCard className="border-primary/30">
+                <HoloCard className="border-primary/30 backdrop-blur-xl bg-black/60">
                     <div className="text-center mb-8">
                         <h1 className="text-3xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary text-glow mb-2">
                             RIIQX ACCESS
                         </h1>
                         <p className="text-muted-foreground text-sm">
-                            Enter your email to receive a secure login link.
+                            {mode === "login" ? "Welcome back, Operator." : "Join the RIIQX Network."}
                         </p>
                     </div>
 
-                    <form onSubmit={handleLogin} className="space-y-6">
+                    {/* Tabs */}
+                    <div className="flex bg-black/40 rounded-lg p-1 mb-8 border border-white/10">
+                        <button
+                            onClick={() => { setMode("login"); setMessage(null); }}
+                            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${mode === "login" ? "bg-primary/20 text-white shadow-lg" : "text-gray-400 hover:text-white"
+                                }`}
+                        >
+                            Login
+                        </button>
+                        <button
+                            onClick={() => { setMode("signup"); setMessage(null); }}
+                            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${mode === "signup" ? "bg-primary/20 text-white shadow-lg" : "text-gray-400 hover:text-white"
+                                }`}
+                        >
+                            Sign Up
+                        </button>
+                    </div>
+
+                    <form onSubmit={handleAuth} className="space-y-4">
+                        <AnimatePresence mode="popLayout">
+                            {mode === "signup" && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="overflow-hidden space-y-2"
+                                >
+                                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider pl-1">Full Name</label>
+                                    <div className="relative">
+                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                        <input
+                                            name="fullName"
+                                            value={formData.fullName}
+                                            onChange={handleInputChange}
+                                            placeholder="John Doe"
+                                            required={mode === "signup"}
+                                            className="w-full bg-black/40 border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                                        />
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
                         <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-medium text-foreground/80 pl-1">
-                                Email Address
-                            </label>
-                            <input
-                                id="email"
-                                type="email"
-                                placeholder="peter.parker@avengers.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                className="w-full bg-black/40 border border-input rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)]"
-                            />
+                            <label className="text-xs font-medium text-gray-400 uppercase tracking-wider pl-1">Email</label>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <input
+                                    name="email"
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    placeholder="cyberpunk@riiqx.com"
+                                    required
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-medium text-gray-400 uppercase tracking-wider pl-1">Password</label>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <input
+                                    name="password"
+                                    type="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    placeholder="••••••••"
+                                    required
+                                    minLength={6}
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                                />
+                            </div>
                         </div>
 
                         {message && (
-                            <MotionDiv
+                            <motion.div
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className={`text-sm text-center p-3 rounded-lg ${message.includes("Error") ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-400"}`}
+                                className={`flex items-center gap-2 p-3 rounded-lg text-sm ${message.type === "error" ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                    }`}
                             >
-                                {message}
-                            </MotionDiv>
+                                {message.type === "error" ? <AlertCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+                                {message.text}
+                            </motion.div>
                         )}
 
-                        <NeonButton type="submit" disabled={loading} className="w-full text-lg" glow={true}>
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Send Magic Link"}
+                        <NeonButton type="submit" disabled={loading} className="w-full py-6 mt-4" glow>
+                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (mode === "login" ? "Authenticate" : "Initialize Account")}
                         </NeonButton>
                     </form>
 
-                    <div className="mt-6 text-center text-xs text-muted-foreground">
-                        By accessing RIIQX, you agree to our Terms of Service.
-                    </div>
+                    <p className="mt-6 text-center text-xs text-muted-foreground">
+                        Protected by RIIQX Secure Protocols.
+                    </p>
                 </HoloCard>
             </div>
         </main>
