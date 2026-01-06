@@ -1,12 +1,20 @@
 import { FeaturedCategories } from "@/components/home/FeaturedCategories";
 import { HeroSection } from "@/components/home/HeroSection";
 import { TrendingCarousel } from "@/components/home/TrendingCarousel";
+import { HorizontalScrollSection } from "@/components/home/HorizontalScrollSection";
+import { ParallaxShowcase } from "@/components/home/ParallaxShowcase";
 
 export default function Home() {
   return (
     <main className="flex flex-col min-h-screen">
       <HeroSection />
+
+      <ParallaxShowcase />
+
       <FeaturedCategories />
+
+      <HorizontalScrollSection />
+
       <TrendingCarousel />
 
       {/* Brand Statement / Spacer */}
