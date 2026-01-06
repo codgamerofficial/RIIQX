@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     try {
         const { message, context } = await req.json();
 
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
         const chat = model.startChat({
             history: [
