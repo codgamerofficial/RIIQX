@@ -1,54 +1,54 @@
-import { createClient } from "@/lib/supabase/server";
-import { ProductCard } from "@/components/shop/ProductCard";
-import { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-    title: "Best Sellers | RIIQX",
-    description: "Our most popular cinematic apparel.",
-};
+import { CinematicHero } from "@/components/ui/CinematicHero";
+import { motion } from "framer-motion";
 
-export const revalidate = 0;
+const products = [
+    { id: 1, name: "Stealth Cargo Pants", price: 95, image: "https://images.unsplash.com/photo-1517445312882-64159f4d896f?q=80&w=2000&auto=format&fit=crop" },
+    { id: 2, name: "Obsidian Bomber", price: 180, image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=2000&auto=format&fit=crop" },
+    { id: 3, name: "Tech Runner", price: 150, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2000&auto=format&fit=crop" },
+];
 
-export default async function BestSellersPage() {
-    const supabase = await createClient();
-
-    // Fetch products sorted by selling_price/popularity
-    // For now using price desc as proxy for "premium/best"
-    const { data: products, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("is_active", true)
-        .order("selling_price", { ascending: false })
-        .limit(12);
-
+export default function BestSellersPage() {
     return (
-        <div className="min-h-screen bg-background pt-24 pb-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="mb-12 text-center">
-                    <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white mb-4">
-                        BEST <span className="text-primary">SELLERS.</span>
-                    </h1>
-                    <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                        The gear that defines the movement. Top-rated items chosen by the community.
-                    </p>
-                </div>
+        <main className="bg-black min-h-screen pb-20">
+            <CinematicHero
+                title="BEST SELLERS"
+                subtitle="Community Favorites"
+            />
 
-                {error ? (
-                    <div className="text-center text-destructive">
-                        Error loading products: {error.message}
-                    </div>
-                ) : products && products.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {products.map((product: any) => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center py-24 border border-dashed border-white/10 rounded-2xl">
-                        <p className="text-muted-foreground text-lg">No best sellers found.</p>
-                    </div>
-                )}
-            </div>
-        </div>
+            <section className="max-w-7xl mx-auto px-4 -mt-20 relative z-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {products.map((product, idx) => (
+                        <motion.div
+                            key={product.id}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: idx * 0.1 }}
+                            viewport={{ once: true }}
+                            className="group relative"
+                        >
+                            <div className="aspect-square overflow-hidden rounded-2xl bg-white/5 border border-white/10 relative">
+                                <div className="absolute top-4 left-4 z-10 bg-primary text-black text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                    Top Rated
+                                </div>
+                                <img
+                                    src={product.image}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                                <div className="absolute inset-x-0 bottom-0 p-6 bg-linear-to-t from-black via-black/80 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                    <h3 className="text-xl font-bold text-white mb-2">{product.name}</h3>
+                                    <div className="flex justify-between items-center">
+                                        <p className="text-primary font-bold text-lg">${product.price}</p>
+                                        <button className="text-sm font-bold text-white border-b border-white">Buy Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            </section>
+        </main>
     );
 }

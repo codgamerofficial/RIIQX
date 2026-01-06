@@ -1,50 +1,42 @@
-import { Metadata } from 'next';
+"use client";
 
-export const metadata: Metadata = {
-    title: 'Terms of Service | RIIQX',
-    description: 'Terms and Conditions for using RIIQX.',
-};
+import { CinematicHero } from "@/components/ui/CinematicHero";
 
 export default function TermsPage() {
     return (
-        <>
-            <h1>Terms of Service</h1>
-            <p className="lead">Last updated: {new Date().toLocaleDateString()}</p>
+        <main className="bg-black min-h-screen pb-20">
+            <CinematicHero
+                title="TERMS OF SERVICE"
+                subtitle="Operational Parameters"
+            />
 
-            <h2>1. Agreement to Terms</h2>
-            <p>
-                These Terms of Use constitute a legally binding agreement made between you, whether personally or on behalf of an entity (“you”) and RIIQX (“we,” “us” or “our”), concerning your access to and use of the RIIQX website as well as any other media form, media channel, mobile website or mobile application related, linked, or otherwise connected thereto (collectively, the “Site”).
-            </p>
+            <article className="max-w-3xl mx-auto px-4 text-gray-300 space-y-12 leading-relaxed">
+                <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">overview</h2>
+                    <p>
+                        This website is operated by RIIQX. Throughout the site, the terms "we", "us" and "our" refer to RIIQX.
+                        RIIQX offers this website, including all information, tools and services available from this site to you, the user,
+                        conditioned upon your acceptance of all terms, conditions, policies and notices stated here.
+                    </p>
+                </section>
 
-            <h2>2. Intellectual Property Rights</h2>
-            <p>
-                Unless otherwise indicated, the Site is our proprietary property and all source code, databases, functionality, software, website designs, audio, video, text, photographs, and graphics on the Site (collectively, the “Content”) and the trademarks, service marks, and logos contained therein (the “Marks”) are owned or controlled by us or licensed to us, and are protected by copyright and trademark laws.
-            </p>
+                <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">section 1 - online store terms</h2>
+                    <p>
+                        By agreeing to these Terms of Service, you represent that you are at least the age of majority in your state or province of residence.
+                        You may not use our products for any illegal or unauthorized purpose nor may you, in the use of the Service, violate any laws in your jurisdiction.
+                    </p>
+                </section>
 
-            <h2>3. User Representations</h2>
-            <p>
-                By using the Site, you represent and warrant that: (1) all registration information you submit will be true, accurate, current, and complete; (2) you will maintain the accuracy of such information and promptly update such registration information as necessary.
-            </p>
-
-            <h2>4. Purchases and Payment</h2>
-            <p>
-                We accept the following forms of payment: Credit/Debit Cards, UPI, Net Banking via Cashfree. You agree to provide current, complete, and accurate purchase and account information for all purchases made via the Site.
-            </p>
-
-            <h2>5. Products</h2>
-            <p>
-                All products are subject to availability. We reserve the right to discontinue any products at any time for any reason. Prices for all products are subject to change.
-            </p>
-
-            <h2>6. Return Policy</h2>
-            <p>
-                Please review our Return Policy posted on the Site prior to making any purchases.
-            </p>
-
-            <h2>7. Contact Us</h2>
-            <p>
-                In order to resolve a complaint regarding the Site or to receive further information regarding use of the Site, please contact us at: support@riiqx.com.
-            </p>
-        </>
+                <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">section 2 - general conditions</h2>
+                    <p>
+                        We reserve the right to refuse service to anyone for any reason at any time.
+                        You understand that your content (not including credit card information), may be transferred unencrypted and involve (a) transmissions over various networks;
+                        and (b) changes to conform and adapt to technical requirements of connecting networks or devices.
+                    </p>
+                </section>
+            </article>
+        </main>
     );
 }

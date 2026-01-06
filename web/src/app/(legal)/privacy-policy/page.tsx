@@ -1,53 +1,47 @@
-import { Metadata } from 'next';
+"use client";
 
-export const metadata: Metadata = {
-    title: 'Privacy Policy | RIIQX',
-    description: 'Privacy Policy for RIIQX - How we handle your data.',
-};
+import { CinematicHero } from "@/components/ui/CinematicHero";
 
-export default function PrivacyPolicyPage() {
+export default function PrivacyPage() {
     return (
-        <>
-            <h1>Privacy Policy</h1>
-            <p className="lead">Last updated: {new Date().toLocaleDateString()}</p>
+        <main className="bg-black min-h-screen pb-20">
+            <CinematicHero
+                title="PRIVACY POLICY"
+                subtitle="Data Protocols"
+            />
 
-            <p>
-                At RIIQX, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclosure, and safeguard your information when you visit our website including any other media form, media channel, mobile website, or mobile application related or connected thereto.
-            </p>
+            <article className="max-w-3xl mx-auto px-4 text-gray-300 space-y-12 leading-relaxed">
+                <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Introduction</h2>
+                    <p>
+                        RIIQX respects the privacy of its users and is committed to protecting the personal information that you share with us.
+                        This privacy policy describes how we collect and use your personal information.
+                    </p>
+                </section>
 
-            <h2>Collection of Data</h2>
-            <p>
-                We collect information that you provide securely via Supabase Auth and Payment Gateways. This includes personal data such as your name, email address, and shipping details required for order fulfillment.
-            </p>
-            <ul>
-                <li><strong>Personal Data:</strong> Name, Email, Shipping Address.</li>
-                <li><strong>Payment Data:</strong> Handled securely by Cashfree. We do not store full card details.</li>
-                <li><strong>Derivative Data:</strong> IP address, browser type, and operating system for analytics.</li>
-            </ul>
+                <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Information We Collect</h2>
+                    <ul className="list-disc pl-6 space-y-2 text-gray-400">
+                        <li>Personal Identification Information (Name, email address, phone number, etc.)</li>
+                        <li>Payment Information (Processed securely by third-party providers)</li>
+                        <li>Usage Data (Browser type, pages visited, time spent on site)</li>
+                    </ul>
+                </section>
 
-            <h2>Use of Your Information</h2>
-            <p>
-                Having accurate information about you permits us to provide you with a smooth, efficient, and customized experience. Specifically, we use information collected about you via the Site to:
-            </p>
-            <ul>
-                <li>Process your orders and deliver products via Qikink.</li>
-                <li>Create and manage your account.</li>
-                <li>Email you regarding your account or order.</li>
-                <li>Fulfill and manage purchases, orders, payments, and other transactions.</li>
-            </ul>
-
-            <h2>Disclosure of Your Information</h2>
-            <p>
-                We may share information we have collected about you in certain situations. Your information may be disclosed as follows:
-            </p>
-            <p>
-                <strong>Third-Party Service Providers:</strong> We share your information with third parties that perform services for us or on our behalf, including payment processing (Cashfree), data analysis, email delivery, hosting services, customer service, and marketing assistance.
-            </p>
-
-            <h2>Contact Us</h2>
-            <p>
-                If you have questions or comments about this Privacy Policy, please contact us at support@riiqx.com.
-            </p>
-        </>
+                <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">How We Use Your Data</h2>
+                    <p>
+                        We use the collected data for various purposes:
+                    </p>
+                    <ul className="list-disc pl-6 space-y-2 text-gray-400 mt-4">
+                        <li>To provide and maintain our Service</li>
+                        <li>To notify you about changes to our Service</li>
+                        <li>To provide customer support</li>
+                        <li>To monitor the usage of our Service</li>
+                        <li>To detect, prevent and address technical issues</li>
+                    </ul>
+                </section>
+            </article>
+        </main>
     );
 }

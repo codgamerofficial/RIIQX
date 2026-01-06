@@ -1,82 +1,92 @@
-'use client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+"use client";
+
+import { CinematicHero } from "@/components/ui/CinematicHero";
+import { motion } from "framer-motion";
+import { Send, MapPin, Mail, Phone } from "lucide-react";
 
 export default function ContactPage() {
-    const [submitted, setSubmitted] = useState(false);
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        // Placeholder submit logic
-        setTimeout(() => setSubmitted(true), 1000);
-    };
-
     return (
-        <div className="min-h-screen bg-background pt-24 pb-12">
-            <div className="max-w-xl mx-auto px-4">
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white mb-4">
-                        GET IN TOUCH
-                    </h1>
-                    <p className="text-muted-foreground">
-                        Questions, collabs, or just want to say hi? We're listening.
-                    </p>
-                </div>
+        <main className="bg-black min-h-screen pb-20">
+            <CinematicHero
+                title="GET IN TOUCH"
+                subtitle="Signals Open"
+                description="Our team is ready to assist you. Send us a transmission directly from the interface below."
+            />
 
-                {submitted ? (
-                    <div className="p-8 rounded-2xl bg-green-500/10 border border-green-500/20 text-center animate-in fade-in zoom-in">
-                        <h3 className="text-2xl font-bold text-green-500 mb-2">Message Sent!</h3>
-                        <p className="text-white/80">We'll get back to you shortly.</p>
-                        <Button
-                            variant="link"
-                            className="mt-4 text-white"
-                            onClick={() => setSubmitted(false)}
-                        >
-                            Send another message
-                        </Button>
+            <section className="max-w-6xl mx-auto px-4 md:px-8 -mt-20 relative z-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
+                    {/* Contact Info */}
+                    <div className="space-y-8">
+                        <div className="bg-zinc-900/50 backdrop-blur-xl border border-white/10 p-8 rounded-3xl space-y-6">
+                            <h3 className="text-2xl font-bold text-white">Headquarters</h3>
+                            <div className="space-y-4 text-gray-400">
+                                <div className="flex items-start gap-4">
+                                    <MapPin className="w-6 h-6 text-primary shrink-0" />
+                                    <p>123 Innovation Drive,<br />Tech City, Future State 90210</p>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <Mail className="w-6 h-6 text-primary shrink-0" />
+                                    <p>support@riiqx.com</p>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <Phone className="w-6 h-6 text-primary shrink-0" />
+                                    <p>+1 (555) 123-4567</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-linear-to-br from-purple-900/20 to-black border border-purple-500/20 p-8 rounded-3xl">
+                            <h3 className="text-xl font-bold text-white mb-2">Support Hours</h3>
+                            <p className="text-gray-400">
+                                Mon - Fri: 09:00 - 18:00 (EST)<br />
+                                Sat - Sun: Closed
+                            </p>
+                        </div>
                     </div>
-                ) : (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-white">Name</label>
-                                <Input placeholder="John Doe" required className="bg-secondary/20 border-white/10" />
+
+                    {/* Contact Form */}
+                    <motion.form
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                        className="bg-black border border-white/10 p-8 md:p-10 rounded-3xl space-y-6 shadow-2xl shadow-purple-900/10"
+                    >
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <InputGroup label="First Name" placeholder="John" />
+                                <InputGroup label="Last Name" placeholder="Doe" />
                             </div>
+                            <InputGroup label="Email" placeholder="john@example.com" type="email" />
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-white">Email</label>
-                                <Input type="email" placeholder="john@example.com" required className="bg-secondary/20 border-white/10" />
+                                <label className="text-xs uppercase tracking-widest text-white/50 font-bold ml-1">Message</label>
+                                <textarea
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-hidden transition-all h-32 resize-none placeholder:text-white/20"
+                                    placeholder="Enter your transmission..."
+                                />
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-white">Subject</label>
-                            <Input placeholder="Order Inquiry" required className="bg-secondary/20 border-white/10" />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-white">Message</label>
-                            <Textarea
-                                placeholder="How can we help?"
-                                className="min-h-[150px] bg-secondary/20 border-white/10"
-                                required
-                            />
-                        </div>
-
-                        <Button type="submit" size="lg" className="w-full font-bold text-lg">
-                            SEND MESSAGE
-                        </Button>
-                    </form>
-                )}
-
-                <div className="mt-12 pt-12 border-t border-white/10 text-center">
-                    <p className="text-muted-foreground mb-4">Or email us directly</p>
-                    <a href="mailto:thelegacyroars@gmail.com" className="text-xl font-bold text-white hover:text-primary transition-colors">
-                        thelegacyroars@gmail.com
-                    </a>
+                        <button className="w-full bg-white text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors group">
+                            <span>Send Message</span>
+                            <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                    </motion.form>
                 </div>
-            </div>
+            </section>
+        </main>
+    );
+}
+
+function InputGroup({ label, placeholder, type = "text" }: { label: string, placeholder: string, type?: string }) {
+    return (
+        <div className="space-y-2">
+            <label className="text-xs uppercase tracking-widest text-white/50 font-bold ml-1">{label}</label>
+            <input
+                type={type}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-hidden transition-all placeholder:text-white/20"
+                placeholder={placeholder}
+            />
         </div>
     );
 }
