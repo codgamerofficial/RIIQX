@@ -1,6 +1,7 @@
 import { getProduct, formatPrice } from "@/lib/shopify";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import { ShopifyAddToCartButton } from "@/components/shop/ShopifyAddToCartButton";
+import { ModelViewer } from "@/components/product/ModelViewer";
 import { ArrowLeft, Truck, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -43,8 +44,30 @@ export default async function ProductDetailsPage({
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
-                    {/* Gallery */}
-                    <ProductGallery images={images} title={product.title} />
+                    {/* Gallery or Model */}
+                    <div className="relative">
+                        {product.media?.edges.find(e => e.node.mediaContentType === 'MODEL_3D') ? (
+                            <div className="space-y-4">
+                                <div className="aspect-square w-full rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-lg">
+                                    <ModelViewer
+                                        src={(product.media.edges.find(e => e.node.mediaContentType === 'MODEL_3D')?.node as any).sources[0]?.url || ''}
+                                        poster={product.featuredImage?.url}
+                                        alt={product.title}
+                                    />
+                                </div>
+                                {/* Thumbnails to switch back to images (Optional simplified version) */}
+                                <div className="grid grid-cols-4 gap-2">
+                                    {images.slice(0, 4).map((img, i) => (
+                                        <div key={i} className="aspect-square rounded-lg bg-white/5 overflow-hidden border border-white/5">
+                                            <img src={img} alt="" className="w-full h-full object-cover opacity-50 hover:opacity-100 transition-opacity" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <ProductGallery images={images} title={product.title} />
+                        )}
+                    </div>
 
                     {/* Info */}
                     <div className="space-y-8">

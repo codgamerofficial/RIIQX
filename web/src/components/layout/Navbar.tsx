@@ -44,10 +44,10 @@ export function Navbar() {
         {
             name: "Shop",
             items: [
-                { name: "All Products", href: "/shop" },
-                { name: "New Arrivals", href: "/new-arrivals" },
-                { name: "Best Sellers", href: "/best-sellers" },
-                { name: "Accessories", href: "/accessories" },
+                { name: "All Products", href: "/products" },
+                { name: "New Arrivals", href: "/collections/new-arrivals" },
+                { name: "Best Sellers", href: "/collections/best-sellers" },
+                { name: "Accessories", href: "/collections/accessories" },
             ]
         },
         {

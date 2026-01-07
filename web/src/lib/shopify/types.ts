@@ -59,7 +59,31 @@ export type Product = {
         name: string;
         values: string[];
     }[];
+    media?: Connection<Media>;
 };
+
+export type Model3dSource = {
+    url: string;
+    mimeType: string;
+    format: string;
+    filesize: number;
+};
+
+export type Model3d = {
+    id: string;
+    alt: string;
+    mediaContentType: 'MODEL_3D';
+    sources: Model3dSource[];
+};
+
+export type MediaImage = {
+    id: string;
+    alt: string;
+    mediaContentType: 'IMAGE';
+    image: Image;
+};
+
+export type Media = Model3d | MediaImage;
 
 export type Collection = {
     id: string;

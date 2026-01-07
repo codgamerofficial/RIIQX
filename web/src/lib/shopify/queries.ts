@@ -102,6 +102,88 @@ export const PRODUCT_BY_HANDLE_QUERY = `
           currencyCode
         }
       }
+      media(first: 10) {
+        edges {
+          node {
+            ... on Model3d {
+              id
+              alt
+              mediaContentType
+              sources {
+                url
+                mimeType
+                format
+                filesize
+              }
+            }
+            ... on MediaImage {
+               id
+               alt
+               mediaContentType
+               image {
+                 url
+                 altText
+                 width
+                 height
+               }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const COLLECTIONS_QUERY = `
+  query getCollections {
+    collections(first: 100, sortKey: TITLE) {
+      edges {
+        node {
+          id
+          title
+          handle
+          description
+        }
+      }
+    }
+  }
+`;
+
+export const COLLECTION_PRODUCTS_QUERY = `
+  query getCollectionProducts($handle: String!, $first: Int = 24, $sortKey: ProductCollectionSortKeys, $reverse: Boolean) {
+    collection(handle: $handle) {
+      products(first: $first, sortKey: $sortKey, reverse: $reverse) {
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        edges {
+          cursor
+          node {
+            id
+            handle
+            title
+            description
+            availableForSale
+            featuredImage {
+              url
+              altText
+              width
+              height
+            }
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+              maxVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+          }
+        }
+      }
     }
   }
 `;

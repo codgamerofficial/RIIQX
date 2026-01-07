@@ -1,5 +1,5 @@
 import { PRODUCTS_QUERY, PRODUCT_BY_HANDLE_QUERY, CART_CREATE_MUTATION } from './queries';
-import { Product, Connection, CartLineInput, Cart } from './types';
+import { Product, Connection, CartLineInput, Cart, Collection } from './types';
 
 import { ShopifyFetchCache } from './types';
 
@@ -133,3 +133,45 @@ export const formatPrice = (amount: string, currencyCode: string) => {
         currency: currencyCode,
     }).format(parseFloat(amount));
 };
+
+/**
+ * Fetch all collections.
+ */
+export async function getCollections(): Promise<Collection[]> {
+    const res = await shopifyFetch<{ collections: Connection<Collection> }>({
+        query: require('./queries').COLLECTIONS_QUERY,
+        revalidate: 3600,
+    });
+
+    return removeEdgesAndNodes(res.collections);
+}
+
+/**
+ * Fetch products for a specific collection.
+ */
+export async function getCollectionProducts({
+    handle,
+    sortKey,
+    reverse,
+    limit = 24,
+}: {
+    handle: string;
+    sortKey?: 'TITLE' | 'PRICE' | 'CREATED' | 'BEST_SELLING';
+    reverse?: boolean;
+    limit?: number;
+}): Promise<{ products: Product[]; pageInfo: Connection<Product>['pageInfo'] }> {
+    const res = await shopifyFetch<{ collection: { products: Connection<Product> } }>({
+        query: require('./queries').COLLECTION_PRODUCTS_QUERY,
+        variables: { handle, first: limit, sortKey, reverse },
+        revalidate: 60,
+    });
+
+    if (!res.collection) {
+        return { products: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } };
+    }
+
+    return {
+        products: removeEdgesAndNodes(res.collection.products),
+        pageInfo: res.collection.products.pageInfo,
+    };
+}
