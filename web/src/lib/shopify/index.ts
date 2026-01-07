@@ -128,9 +128,13 @@ export async function createCart(lines: CartLineInput[]): Promise<Cart> {
 
 // Utility to re-shape price for display
 export const formatPrice = (amount: string, currencyCode: string) => {
-    return new Intl.NumberFormat('en-US', {
+    // Force en-IN for INR, otherwise use default
+    const locale = currencyCode === 'INR' ? 'en-IN' : 'en-US';
+    return new Intl.NumberFormat(locale, {
         style: 'currency',
         currency: currencyCode,
+        minimumFractionDigits: 0, // Common for INR to hide decimals if 0
+        maximumFractionDigits: 2,
     }).format(parseFloat(amount));
 };
 
