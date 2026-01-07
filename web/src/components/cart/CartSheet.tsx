@@ -8,6 +8,7 @@ import { NeonButton } from "@/components/ui/neon-button";
 import Link from "next/link";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { formatPrice } from "@/lib/shopify";
 
 export function CartSheet() {
     const { isOpen, toggleCart, items, getCartTotal, setCartOpen } = useCartStore();
@@ -79,7 +80,7 @@ export function CartSheet() {
                                 <div className="flex items-center justify-between mb-4">
                                     <span className="text-white font-medium">Subtotal</span>
                                     <span className="text-xl font-bold text-white">
-                                        ${getCartTotal().toFixed(2)}
+                                        {formatPrice(getCartTotal().toString(), 'INR')}
                                     </span>
                                 </div>
                                 <p className="text-xs text-muted-foreground mb-6">

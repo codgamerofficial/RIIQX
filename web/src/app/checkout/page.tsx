@@ -4,7 +4,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { NeonButton } from "@/components/ui/neon-button";
 import { Loader2, ShoppingBag } from "lucide-react";
 import { useState, useEffect } from "react";
-import { createCart } from "@/lib/shopify";
+import { createCart, formatPrice } from "@/lib/shopify";
 import { CartLineInput } from "@/lib/shopify/types";
 
 export default function CheckoutPage() {
@@ -66,12 +66,21 @@ export default function CheckoutPage() {
 
                 <div className="space-y-4 mb-8">
                     <div className="flex justify-between text-muted-foreground">
-                        <span>Items ({items.length})</span>
-                        <span>${getCartTotal().toFixed(2)}</span>
+                        <span>Subtotal</span>
+                        <span>{formatPrice(getCartTotal().toString(), 'INR')}</span>
+                    </div>
+                    <div className="flex justify-between text-muted-foreground">
+                        <span>Shipping</span>
+                        <span className="text-green-400">FREE</span>
+                    </div>
+                    <div className="flex justify-between text-muted-foreground flex items-center gap-1">
+                        <span>Estimated taxes (18%)</span>
+                        <span className="text-xs ml-1 opacity-50 block sm:hidden">GST</span>
+                        <span>{formatPrice((getCartTotal() * 0.18).toString(), 'INR')}</span>
                     </div>
                     <div className="flex justify-between text-xl font-bold text-white pt-4 border-t border-white/10">
                         <span>Total</span>
-                        <span>${getCartTotal().toFixed(2)}</span>
+                        <span>{formatPrice((getCartTotal() * 1.18).toString(), 'INR')}</span>
                     </div>
                 </div>
 
