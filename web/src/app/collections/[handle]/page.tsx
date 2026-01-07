@@ -1,8 +1,9 @@
-import { getCollectionProducts, getCollections } from "@/lib/shopify";
+import { getCollectionProducts, getCollections, getProducts } from "@/lib/shopify";
 import { FilterSidebar } from "@/components/shop/FilterSidebar";
 import ProductGridClient from "@/components/shop/ProductGridClient";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Product, Connection } from "@/lib/shopify/types";
 
 export const revalidate = 60;
 
@@ -18,15 +19,29 @@ export default async function CollectionPage({
 
     const sortKey = (queryParams.sort as any) || 'TITLE';
     const reverse = queryParams.reverse === 'true';
-    // Note: getCollectionProducts doesn't support sophisticated filtering in our simplified query yet without `productFilters`.
-    // So validation of price filters here might be client-side only or we'd need to update the query.
-    // For now, we fetch connection.
 
-    const { products, pageInfo } = await getCollectionProducts({
-        handle,
-        sortKey,
-        reverse
-    });
+    let products: Product[] = [];
+    let pageInfo: Connection<Product>['pageInfo'] = { hasNextPage: false, hasPreviousPage: false };
+
+    // Smart Fallbacks for Standard Pages
+    if (handle === 'new-arrivals') {
+        const res = await getProducts({ sortKey: 'CREATED_AT', reverse: true, limit: 24 });
+        products = res.products;
+        pageInfo = res.pageInfo;
+    } else if (handle === 'best-sellers') {
+        const res = await getProducts({ sortKey: 'BEST_SELLING', limit: 24 });
+        products = res.products;
+        pageInfo = res.pageInfo;
+    } else {
+        // Standard Collection Fetch
+        const res = await getCollectionProducts({
+            handle,
+            sortKey,
+            reverse
+        });
+        products = res.products;
+        pageInfo = res.pageInfo;
+    }
 
     const collections = await getCollections();
 
