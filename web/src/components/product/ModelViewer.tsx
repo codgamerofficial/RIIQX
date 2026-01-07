@@ -3,14 +3,6 @@
 import { useEffect, useRef } from "react";
 import "@google/model-viewer";
 
-declare global {
-    namespace JSX {
-        interface IntrinsicElements {
-            "model-viewer": any;
-        }
-    }
-}
-
 interface ModelViewerProps {
     src: string;
     poster?: string;
