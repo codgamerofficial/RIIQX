@@ -14,6 +14,7 @@ export default function AuthPage() {
         email: "",
         password: "",
         fullName: "",
+        referralCode: "",
     });
 
     const router = useRouter();
@@ -33,7 +34,12 @@ export default function AuthPage() {
                 const { error } = await supabase.auth.signUp({
                     email: formData.email,
                     password: formData.password,
-                    options: { data: { full_name: formData.fullName } },
+                    options: {
+                        data: {
+                            full_name: formData.fullName,
+                            referred_by: formData.referralCode ? formData.referralCode.toUpperCase() : null
+                        }
+                    },
                 });
                 if (error) throw error;
                 setMessage({ type: "success", text: "Account created! Check email to verify." });
@@ -99,18 +105,35 @@ export default function AuthPage() {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
+                                    className="space-y-5"
                                 >
-                                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1.5 block">Full Name</label>
-                                    <div className="relative group">
-                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                                        <input
-                                            name="fullName"
-                                            value={formData.fullName}
-                                            onChange={handleInputChange}
-                                            required
-                                            className="w-full bg-secondary/30 border border-white/5 rounded-lg pl-10 pr-4 py-3 text-sm focus:bg-secondary/50 focus:border-primary/50 focus:outline-none transition-all placeholder:text-white/20"
-                                            placeholder="Ex. John Doe"
-                                        />
+                                    <div>
+                                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1.5 block">Full Name</label>
+                                        <div className="relative group">
+                                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                                            <input
+                                                name="fullName"
+                                                value={formData.fullName}
+                                                onChange={handleInputChange}
+                                                required
+                                                className="w-full bg-secondary/30 border border-white/5 rounded-lg pl-10 pr-4 py-3 text-sm focus:bg-secondary/50 focus:border-primary/50 focus:outline-none transition-all placeholder:text-white/20"
+                                                placeholder="Ex. John Doe"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1.5 block">Referral Code <span className="text-[10px] opacity-50 px-1">(OPTIONAL)</span></label>
+                                        <div className="relative group">
+                                            <CheckCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                                            <input
+                                                name="referralCode"
+                                                value={formData.referralCode}
+                                                onChange={handleInputChange}
+                                                className="w-full bg-secondary/30 border border-white/5 rounded-lg pl-10 pr-4 py-3 text-sm focus:bg-secondary/50 focus:border-primary/50 focus:outline-none transition-all placeholder:text-white/20 uppercase tracking-widest"
+                                                placeholder="ex. RIIQX24"
+                                            />
+                                        </div>
                                     </div>
                                 </motion.div>
                             )}
