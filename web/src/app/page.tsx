@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { TrendingCarousel } from "@/components/home/TrendingCarousel";
 import { HorizontalScrollSection } from "@/components/home/HorizontalScrollSection";
 import { ParallaxShowcase } from "@/components/home/ParallaxShowcase";
+import { NewsletterSection } from "@/components/home/NewsletterSection";
 
 export default function Home() {
   return (
@@ -16,6 +17,8 @@ export default function Home() {
       <HorizontalScrollSection />
 
       <TrendingCarousel />
+
+      <NewsletterSection />
 
       {/* Brand Statement / Spacer */}
       <section className="py-24 px-4 text-center">

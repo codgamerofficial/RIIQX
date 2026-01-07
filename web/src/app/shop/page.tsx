@@ -1,9 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
-import { ProductCard } from "@/components/shop/ProductCard";
+import { getProducts } from "@/lib/shopify";
+import { ShopifyProductCard } from "@/components/shop/ShopifyProductCard";
 import { ProductFilters } from "@/components/shop/ProductFilters";
-import { Database } from "@/types/database.types";
 
-export const revalidate = 0; // Ensure fresh data on every request
+export const revalidate = 60; // Cache for 60 seconds
 
 export default async function ShopPage({
     searchParams,
@@ -11,35 +10,35 @@ export default async function ShopPage({
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
     const resolvedSearchParams = await searchParams;
-    const category = resolvedSearchParams.category as string | undefined;
     const sort = resolvedSearchParams.sort as string | undefined;
     const queryParam = resolvedSearchParams.q as string | undefined;
 
-    const supabase = await createClient();
-
-    let query = supabase.from("products").select("*").eq("is_active", true);
-
-    if (category && category !== "All") {
-        query = query.eq("category", category);
-    }
-
-    if (queryParam) {
-        query = query.ilike("title", `%${queryParam}%`);
-    }
+    // Map query params to Shopify sort keys
+    let sortKey: 'TITLE' | 'PRICE' | 'CREATED_AT' | 'BEST_SELLING' | undefined = 'CREATED_AT';
+    let reverse = false;
 
     if (sort === "newest") {
-        query = query.order("created_at", { ascending: false });
+        sortKey = 'CREATED_AT';
+        reverse = true;
     } else if (sort === "best_selling") {
-        // Mock logic: assuming we have a sales_count or just random/popularity
-        // For now, let's sort by price desc as a proxy for "premium" or created_at
-        query = query.order("selling_price", { ascending: false });
+        sortKey = 'BEST_SELLING';
+        reverse = false;
     } else if (sort === "price_low") {
-        query = query.order("selling_price", { ascending: true });
+        sortKey = 'PRICE';
+        reverse = false;
     } else if (sort === "price_high") {
-        query = query.order("selling_price", { ascending: false });
+        sortKey = 'PRICE';
+        reverse = true;
     }
 
-    const { data: products, error } = await query;
+    const cursor = resolvedSearchParams.cursor as string | undefined;
+
+    const { products, pageInfo } = await getProducts({
+        sortKey,
+        reverse,
+        query: queryParam,
+        after: cursor
+    });
 
     return (
         <div className="min-h-screen bg-background pt-24 pb-12">
@@ -47,10 +46,10 @@ export default async function ShopPage({
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-white mb-2 uppercase">
-                        {queryParam ? `Results for "${queryParam}"` : category || sort?.replace("_", " ") || "Collection"}
+                        {queryParam ? `Results for "${queryParam}"` : "All Products"}
                     </h1>
                     <p className="text-muted-foreground">
-                        {products?.length} items found
+                        {products.length} items found
                     </p>
                 </div>
 
@@ -60,19 +59,29 @@ export default async function ShopPage({
 
                     {/* Grid */}
                     <div className="flex-1">
-                        {error ? (
-                            <div className="p-4 bg-destructive/10 text-destructive rounded-lg border border-destructive/20">
-                                Error loading products: {error.message}
-                            </div>
-                        ) : products && products.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {products.map((product: any) => (
-                                    <ProductCard key={product.id} product={product} />
-                                ))}
-                            </div>
+                        {products.length > 0 ? (
+                            <>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                                    {products.map((product) => (
+                                        <ShopifyProductCard key={product.id} product={product} />
+                                    ))}
+                                </div>
+
+                                {/* Pagination */}
+                                {pageInfo?.hasNextPage && (
+                                    <div className="flex justify-center">
+                                        <a
+                                            href={`?cursor=${pageInfo.endCursor}${sort ? `&sort=${sort}` : ''}${queryParam ? `&q=${queryParam}` : ''}`}
+                                            className="px-6 py-3 bg-white/5 border border-white/10 rounded-full text-white font-medium hover:bg-white/10 hover:border-white/30 transition-all flex items-center space-x-2"
+                                        >
+                                            <span>Load More Products</span>
+                                        </a>
+                                    </div>
+                                )}
+                            </>
                         ) : (
                             <div className="text-center py-24 border border-dashed border-white/10 rounded-2xl">
-                                <p className="text-muted-foreground text-lg">No products found in this category.</p>
+                                <p className="text-muted-foreground text-lg">No products found.</p>
                             </div>
                         )}
                     </div>
