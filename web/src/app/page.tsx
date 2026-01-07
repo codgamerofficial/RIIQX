@@ -1,7 +1,6 @@
 import { FeaturedCategories } from "@/components/home/FeaturedCategories";
 import { HeroSection } from "@/components/home/HeroSection";
 import { TrendingCarousel } from "@/components/home/TrendingCarousel";
-import { HorizontalScrollSection } from "@/components/home/HorizontalScrollSection";
 import { ParallaxShowcase } from "@/components/home/ParallaxShowcase";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 
@@ -13,8 +12,6 @@ export default function Home() {
       <ParallaxShowcase />
 
       <FeaturedCategories />
-
-      <HorizontalScrollSection />
 
       <TrendingCarousel />
 

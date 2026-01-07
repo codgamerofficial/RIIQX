@@ -5,6 +5,7 @@ import { ShoppingBag, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/shopify/types";
+import { formatPrice } from "@/lib/shopify";
 
 export function TrendingCarouselClient({ products }: { products: Product[] }) {
     if (!products || products.length === 0) return null;
@@ -62,7 +63,7 @@ export function TrendingCarouselClient({ products }: { products: Product[] }) {
                                         </div>
                                         <div className="flex items-center justify-between mt-4">
                                             <span className="text-lg font-bold text-white">
-                                                ${parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2)}
+                                                {formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode)}
                                             </span>
                                         </div>
                                     </div>
