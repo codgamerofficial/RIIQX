@@ -23,6 +23,7 @@ export function ModelViewer({ src, poster, alt }: ModelViewerProps) {
 
     return (
         <div className="w-full h-full relative group">
+            {/* @ts-ignore */}
             <model-viewer
                 ref={viewerRef}
                 src={src}
