@@ -19,7 +19,7 @@ export function FilterSidebar({ collections, className = "" }: FilterSidebarProp
     // State from URL
     const selectedCollection = searchParams.get("collection");
     const minPrice = searchParams.get("minPrice") || "0";
-    const maxPrice = searchParams.get("maxPrice") || "1000";
+    const maxPrice = searchParams.get("maxPrice") || "10000";
 
     // Local state for slider
     const [priceRange, setPriceRange] = useState([parseInt(minPrice), parseInt(maxPrice)]);
@@ -114,12 +114,12 @@ export function FilterSidebar({ collections, className = "" }: FilterSidebarProp
                         <h3 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">Price Range</h3>
                         <div className="px-2">
                             <div className="flex justify-between text-white text-xs mb-2">
-                                <span>${priceRange[0]}</span>
-                                <span>${priceRange[1]}</span>
+                                <span>₹{priceRange[0]}</span>
+                                <span>₹{priceRange[1]}</span>
                             </div>
                             <input
                                 type="range"
-                                min="0" max="2000" step="10"
+                                min="0" max="10000" step="50"
                                 value={priceRange[1]}
                                 onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
                                 className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-primary"
