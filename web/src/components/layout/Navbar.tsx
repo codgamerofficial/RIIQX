@@ -57,6 +57,7 @@ export function Navbar() {
                 { name: "Our Story", href: "/story" },
                 { name: "Careers", href: "/careers" },
                 { name: "Blog", href: "/blog" },
+                { name: "Refer & Earn", href: "/refer-earn" },
             ]
         },
         {
