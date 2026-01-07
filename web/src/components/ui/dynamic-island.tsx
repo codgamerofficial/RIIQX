@@ -2,16 +2,55 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Battery, Wifi, Cloud, Sun, CloudRain, Moon, Music as MusicIcon, Clock, MapPin, Play, Pause, SkipForward, SkipBack, X, Volume2, Bell } from "lucide-react";
+import { Battery, BatteryCharging, Wifi, WifiOff, Cloud, Sun, CloudRain, Moon, Music as MusicIcon, Clock, MapPin, Play, Pause, SkipForward, SkipBack, X, Volume2, Bell, Globe, Signal } from "lucide-react";
 import { useMusic } from "@/context/MusicContext";
+
+// Types for Battery API
+interface BatteryManager extends EventTarget {
+    charging: boolean;
+    chargingTime: number;
+    dischargingTime: number;
+    level: number;
+    addEventListener(type: string, listener: EventListener | EventListenerObject | null, options?: boolean | AddEventListenerOptions): void;
+    removeEventListener(type: string, listener: EventListener | EventListenerObject | null, options?: boolean | EventListenerOptions): void;
+}
+
+type NavigatorWithBattery = Navigator & {
+    getBattery: () => Promise<BatteryManager>;
+    connection?: {
+        effectiveType: string;
+        rtt: number;
+        downlink: number;
+        saveData: boolean;
+        type?: string;
+    };
+};
 
 export function DynamicIsland() {
     const { isPlaying, currentTrack, currentTime, duration, togglePlay, nextTrack, prevTrack, seek, volume, setVolume, addTrack } = useMusic();
-    const [mode, setMode] = useState<"idle" | "music" | "weather">("idle");
+    const [mode, setMode] = useState<"idle" | "music" | "weather" | "system">("idle");
     const [time, setTime] = useState("");
     const [date, setDate] = useState("");
     const [weather, setWeather] = useState<{ temp: number; condition: string; location: string } | null>(null);
-    const [isHoveringVolume, setIsHoveringVolume] = useState(false);
+    const [battery, setBattery] = useState<{ level: number; charging: boolean } | null>(null);
+    const [language, setLanguage] = useState({ code: "ENG", region: "IN" });
+    const [network, setNetwork] = useState<{ type: string; online: boolean }>({ type: "Fi", online: true });
+
+    // Languages available
+    const languages = [
+        { code: "ENG", region: "IN" },
+        { code: "ENG", region: "US" },
+        { code: "ESP", region: "ES" },
+        { code: "FRA", region: "FR" },
+        { code: "DEU", region: "DE" },
+    ];
+
+    const cycleLanguage = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const currentIndex = languages.findIndex(l => l.code === language.code && l.region === language.region);
+        const nextIndex = (currentIndex + 1) % languages.length;
+        setLanguage(languages[nextIndex]);
+    };
 
     // Clock
     useEffect(() => {
@@ -23,6 +62,51 @@ export function DynamicIsland() {
         updateTime();
         const interval = setInterval(updateTime, 1000);
         return () => clearInterval(interval);
+    }, []);
+
+    // Battery API
+    useEffect(() => {
+        const nav = navigator as NavigatorWithBattery;
+        if (nav.getBattery) {
+            nav.getBattery().then((batt) => {
+                const updateBattery = () => {
+                    setBattery({
+                        level: Math.round(batt.level * 100),
+                        charging: batt.charging
+                    });
+                };
+                updateBattery();
+                batt.addEventListener("levelchange", updateBattery);
+                batt.addEventListener("chargingchange", updateBattery);
+                return () => {
+                    batt.removeEventListener("levelchange", updateBattery);
+                    batt.removeEventListener("chargingchange", updateBattery);
+                };
+            });
+        }
+    }, []);
+
+    // Network Status
+    useEffect(() => {
+        const updateNetwork = () => {
+            const nav = navigator as NavigatorWithBattery;
+            // @ts-ignore - connection is experimental
+            const conn = nav.connection;
+            const type = conn ? (conn.type === 'cellular' ? '5G' : 'WiFi') : 'WiFi';
+            setNetwork({
+                type: type,
+                online: navigator.onLine
+            });
+        };
+
+        window.addEventListener('online', updateNetwork);
+        window.addEventListener('offline', updateNetwork);
+        updateNetwork();
+
+        return () => {
+            window.removeEventListener('online', updateNetwork);
+            window.removeEventListener('offline', updateNetwork);
+        };
     }, []);
 
     // Weather Fetcher
@@ -52,10 +136,6 @@ export function DynamicIsland() {
             });
         }
     }, []);
-
-    // Auto-switch logic: Removed to allow manual control, but maybe keep for initial play?
-    // Let's rely on user click to expand for now, or we can keep it auto-expand on track change if desired.
-    // For now, let's keep it manual/persistent to avoid annoyance.
 
     const getWeatherIcon = (condition: string) => {
         switch (condition) {
@@ -120,25 +200,48 @@ export function DynamicIsland() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         className="w-full h-full flex items-center justify-between px-6 cursor-pointer"
-                        onClick={() => setMode(isPlaying ? "music" : "weather")}
+                        onClick={() => setMode(isPlaying ? "music" : "system")}
                     >
-                        {/* LEFT: Language */}
-                        <div className="flex flex-col items-center leading-none mr-4 min-w-[30px]">
-                            <span className="text-[10px] font-bold text-white tracking-widest">ENG</span>
-                            <span className="text-[10px] font-bold text-white/50 tracking-widest">IN</span>
+                        {/* LEFT: Language (Interactive) */}
+                        <div
+                            className="flex flex-col items-center leading-none mr-4 min-w-[30px] cursor-create hover:text-primary transition-colors"
+                            onClick={cycleLanguage}
+                            title="Click to change language"
+                        >
+                            <span className="text-[10px] font-bold text-white tracking-widest">{language.code}</span>
+                            <span className="text-[10px] font-bold text-white/50 tracking-widest">{language.region}</span>
                         </div>
 
                         {/* CENTER: System Icons */}
                         <div className="flex items-center gap-3 mr-4">
-                            <Wifi className="w-4 h-4 text-white" />
+                            {/* Wifi */}
+                            <div className="relative group" title={network.online ? `Connected: ${network.type}` : "Offline"}>
+                                {network.online ? <Wifi className="w-4 h-4 text-white" /> : <WifiOff className="w-4 h-4 text-red-500" />}
+                                {network.online && <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />}
+                            </div>
+
+                            {/* Volume */}
                             <div onClick={(e) => { e.stopPropagation(); setVolume(volume === 0 ? 1 : 0); }} className="cursor-pointer hover:text-primary transition-colors">
                                 {volume === 0 ? <Volume2 className="w-4 h-4 text-white/50" /> : <Volume2 className="w-4 h-4 text-white" />}
                             </div>
-                            <Battery className="w-4 h-4 text-white" />
+
+                            {/* Battery */}
+                            <div className="flex items-center gap-1">
+                                {battery ? (
+                                    <>
+                                        <div className="relative">
+                                            {battery.charging ? <BatteryCharging className="w-4 h-4 text-green-400" /> : <Battery className={`w-4 h-4 ${battery.level < 20 ? 'text-red-500' : 'text-white'}`} />}
+                                        </div>
+                                        <span className="text-[10px] font-mono text-white/80">{battery.level}%</span>
+                                    </>
+                                ) : (
+                                    <Battery className="w-4 h-4 text-white/50" />
+                                )}
+                            </div>
                         </div>
 
                         {/* Weather Widget (Compact) */}
-                        <div className="flex items-center gap-2 mr-4 pr-4 border-r border-white/10">
+                        <div className="flex items-center gap-2 mr-4 pr-4 border-r border-white/10" onClick={(e) => { e.stopPropagation(); setMode("weather"); }} >
                             <div className="relative w-6 h-6 flex items-center justify-center">
                                 <div className="z-10">{getWeatherIcon(weather?.condition || "Clear")}</div>
                             </div>
@@ -153,14 +256,14 @@ export function DynamicIsland() {
                             {/* Stacked Clock */}
                             <div className="flex flex-col items-end leading-none min-w-[60px]">
                                 <span className="text-sm font-medium text-white tracking-wide">{time.slice(0, 5)}</span>
-                                <span className="text-[10px] text-white/60">{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}</span>
+                                <span className="text-[10px] text-white/60">{date}</span>
                             </div>
 
                             {/* Notification Bell */}
                             <div className="relative cursor-pointer group">
                                 <Bell className="w-5 h-5 text-white group-hover:text-primary transition-colors" />
                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-white text-black rounded-full flex items-center justify-center text-[8px] font-bold border border-black">
-                                    zZ
+                                    3
                                 </div>
                             </div>
                         </div>
@@ -185,19 +288,49 @@ export function DynamicIsland() {
                                 <X className="w-5 h-5" />
                             </button>
 
-                            {/* Top Row: System Status (Hidden in music mode to save space/focus) */}
-                            {mode === "weather" && (
-                                <div className="flex justify-between items-center text-xs text-muted-foreground mb-2">
-                                    <div className="flex items-center gap-1">
-                                        <MapPin className="w-3 h-3" />
-                                        <span>{weather?.location || "Locating..."}</span>
-                                    </div>
-                                </div>
-                            )}
-
                             {/* Middle: Main Content */}
                             <div className="flex-1 flex flex-col justify-center">
-                                {mode === "music" ? (
+                                {/* SYSTEM INFO MODE */}
+                                {mode === "system" && (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center gap-2">
+                                            <div className="text-white/50 text-xs uppercase tracking-widest">Network</div>
+                                            <Wifi className="w-8 h-8 text-green-400" />
+                                            <div className="text-lg font-bold text-white">System WiFi</div>
+                                            <div className="text-xs text-white/50">{network.online ? "Connected" : "Offline"}</div>
+                                        </div>
+                                        <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center gap-2">
+                                            <div className="text-white/50 text-xs uppercase tracking-widest">Battery</div>
+                                            {battery?.charging ? <BatteryCharging className="w-8 h-8 text-green-400" /> : <Battery className="w-8 h-8 text-white" />}
+                                            <div className="text-lg font-bold text-white">{battery?.level ?? "--"}%</div>
+                                            <div className="text-xs text-white/50">{battery?.charging ? "Charging" : "Discharging"}</div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* WEATHER MODE */}
+                                {mode === "weather" && (
+                                    <div className="flex flex-col items-center justify-center">
+                                        <div className="flex items-center gap-2 text-white/50 mb-4">
+                                            <MapPin className="w-4 h-4" />
+                                            <span className="uppercase tracking-widest text-sm">{weather?.location || "Locating..."}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between w-full px-8">
+                                            <div className="flex flex-col items-start">
+                                                <span className="text-7xl font-black text-white tracking-tighter">{weather?.temp ?? "--"}°</span>
+                                                <span className="text-xl text-white/60">{weather?.condition || "Loading..."}</span>
+                                            </div>
+                                            <div className="w-32 h-32 bg-gradient-to-br from-white/10 to-transparent rounded-3xl flex items-center justify-center shadow-2xl">
+                                                {/* Large Icon */}
+                                                <div className="transform scale-[2.5]">
+                                                    {getWeatherIcon(weather?.condition || "Clear")}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {mode === "music" && (
                                     <div className="flex flex-col gap-4">
                                         <div className="flex items-center gap-4">
                                             {/* Album Art / Visualizer */}
@@ -277,19 +410,6 @@ export function DynamicIsland() {
                                             <div className="w-24"></div>
                                         </div>
                                     </div>
-                                ) : (
-                                    <>
-                                        {/* Weather Layout */}
-                                        <div className="flex items-center justify-between w-full px-2 mt-2">
-                                            <div className="flex flex-col">
-                                                <span className="text-5xl font-bold text-white tracking-tighter">{weather?.temp || "--"}°</span>
-                                                <span className="text-lg text-white/60">{weather?.condition || "Loading..."}</span>
-                                            </div>
-                                            <div className="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center">
-                                                {getWeatherIcon(weather?.condition || "")}
-                                            </div>
-                                        </div>
-                                    </>
                                 )}
                             </div>
                         </motion.div>
