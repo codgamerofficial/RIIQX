@@ -76,15 +76,36 @@ export function FilterSidebar({ collections, className = "" }: FilterSidebarProp
                             >
                                 All Products
                             </button>
-                            {collections.map(c => (
-                                <button
-                                    key={c.id}
-                                    onClick={() => handleCollectionClick(c.handle)}
-                                    className={`block w-full text-left text-sm py-1 hover:text-white transition-colors ${selectedCollection === c.handle ? 'text-primary font-bold' : 'text-gray-400'}`}
-                                >
-                                    {c.title}
-                                </button>
-                            ))}
+
+                            {/* Specific Categories requested by user */}
+                            {['T-shirt', 'Hoodies', 'Shirt', 'Jeans', 'Sweatshirt', 'Accessories', 'Mobile Back Case'].map((cat) => {
+                                // Create a URL-friendly handle
+                                const handle = cat.toLowerCase().replace(/\s+/g, '-');
+                                return (
+                                    <button
+                                        key={cat}
+                                        onClick={() => handleCollectionClick(handle)}
+                                        className={`block w-full text-left text-sm py-1 hover:text-white transition-colors ${selectedCollection === handle ? 'text-primary font-bold' : 'text-gray-400'}`}
+                                    >
+                                        {cat}
+                                    </button>
+                                );
+                            })}
+
+                            <div className="w-full h-px bg-white/10 my-4" />
+
+                            {/* Dynamic Collections from Shopify (avoiding duplicates if possible, or just append) */}
+                            {collections
+                                .filter(c => !['new-arrivals', 'best-sellers'].includes(c.handle)) // Filter out functional ones if needed
+                                .map(c => (
+                                    <button
+                                        key={c.id}
+                                        onClick={() => handleCollectionClick(c.handle)}
+                                        className={`block w-full text-left text-sm py-1 hover:text-white transition-colors ${selectedCollection === c.handle ? 'text-primary font-bold' : 'text-gray-400'}`}
+                                    >
+                                        {c.title}
+                                    </button>
+                                ))}
                         </div>
                     </div>
 

@@ -33,7 +33,7 @@ export default async function CollectionPage({
         products = res.products;
         pageInfo = res.pageInfo;
     } else {
-        // Standard Collection Fetch
+        // 1. Try fetching as a standard Collection
         const res = await getCollectionProducts({
             handle,
             sortKey,
@@ -41,6 +41,30 @@ export default async function CollectionPage({
         });
         products = res.products;
         pageInfo = res.pageInfo;
+
+        // 2. If no products found, try fetching by Product Type (smart fallback for sidebar links)
+        if (products.length === 0) {
+            // Convert handle back to readable query (e.g. "mobile-back-case" -> "Mobile Back Case" or "mobile back case")
+            // Shopify search output is somewhat flexible, but exact "product_type:value" is best.
+            // We'll try a few variations or just a general query if type is specific.
+            const queryClean = handle.replace(/-/g, ' ');
+            // Query syntax: product_type:'T-shirt'
+            const typeQuery = `product_type:'${queryClean}' OR tag:'${queryClean}'`;
+
+            console.log(`[CollectionPage] Fallback search for: ${typeQuery}`);
+
+            const searchRes = await getProducts({
+                query: typeQuery,
+                sortKey: sortKey === 'TITLE' ? undefined : (sortKey as any), // Search query sort keys might differ, defaulting for now
+                reverse,
+                limit: 24
+            });
+
+            if (searchRes.products.length > 0) {
+                products = searchRes.products;
+                pageInfo = searchRes.pageInfo;
+            }
+        }
     }
 
     const collections = await getCollections();
