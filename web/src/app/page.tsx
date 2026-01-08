@@ -3,15 +3,17 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { TrendingCarousel } from "@/components/home/TrendingCarousel";
 import { ParallaxShowcase } from "@/components/home/ParallaxShowcase";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
+import { getCollections } from "@/lib/shopify";
 
-export default function Home() {
+export default async function Home() {
+  const collections = await getCollections();
   return (
     <main className="flex flex-col min-h-screen">
       <HeroSection />
 
       <ParallaxShowcase />
 
-      <FeaturedCategories />
+      <FeaturedCategories collections={collections} />
 
       <TrendingCarousel />
 

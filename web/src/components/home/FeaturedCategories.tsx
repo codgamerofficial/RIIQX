@@ -4,43 +4,19 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { Collection } from "@/lib/shopify/types";
 
-const categories = [
-    {
-        id: 1,
-        name: "T-Shirts",
-        description: "Graphic tees and essentials",
-        image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=2000&auto=format&fit=crop",
-        href: "/collections/t-shirt",
-        colSpan: "md:col-span-2",
-    },
-    {
-        id: 2,
-        name: "Hoodies",
-        description: "Premium comfort layers",
-        image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=2000&auto=format&fit=crop",
-        href: "/collections/hoodies",
-        colSpan: "md:col-span-1",
-    },
-    {
-        id: 3,
-        name: "Accessories",
-        description: "Complete your loadout",
-        image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=2000&auto=format&fit=crop",
-        href: "/collections/accessories",
-        colSpan: "md:col-span-1",
-    },
-    {
-        id: 4,
-        name: "Mobile Cases",
-        description: "Protect your tech",
-        image: "https://images.unsplash.com/photo-1586105251261-72a756497a11?q=80&w=2000&auto=format&fit=crop",
-        href: "/collections/mobile-back-case",
-        colSpan: "md:col-span-2",
-    },
-];
+interface FeaturedCategoriesProps {
+    collections: Collection[];
+}
 
-export function FeaturedCategories() {
+export function FeaturedCategories({ collections }: FeaturedCategoriesProps) {
+    // If no collections, don't render or render default/skeleton
+    if (!collections || collections.length === 0) return null;
+
+    // Take first 3-4 collections to display
+    const displayCollections = collections.slice(0, 4);
+
     return (
         <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
@@ -59,43 +35,50 @@ export function FeaturedCategories() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {categories.map((category, index) => (
-                    // @ts-ignore
-                    <motion.div
-                        key={category.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: index * 0.1 }}
-                        className={`group relative h-[400px] overflow-hidden rounded-2xl border border-white/10 ${category.colSpan}`}
-                    >
-                        <Link href={category.href} className="block w-full h-full">
-                            {/* Background Image */}
-                            <div className="absolute inset-0 z-0">
-                                <Image
-                                    src={category.image}
-                                    alt={category.name}
-                                    fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
-                            </div>
+                {displayCollections.map((collection, index) => {
+                    // Determine span based on index for layout variety
+                    const colSpan = index === 0 || index === 3 ? "md:col-span-2" : "md:col-span-1";
 
-                            {/* Content */}
-                            <div className="absolute bottom-0 left-0 w-full p-8 z-10 translate-y-2 group-hover:translate-y-0 transition-transform">
-                                <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
-                                    {category.name}
-                                </h3>
-                                <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <p className="text-sm text-gray-300">{category.description}</p>
-                                    <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
-                                        <ArrowUpRight className="w-4 h-4" />
+                    return (
+                        // @ts-ignore
+                        <motion.div
+                            key={collection.handle}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: index * 0.1 }}
+                            className={`group relative h-[400px] overflow-hidden rounded-2xl border border-white/10 ${colSpan}`}
+                        >
+                            <Link href={`/collections/${collection.handle}`} className="block w-full h-full">
+                                {/* Background Image */}
+                                <div className="absolute inset-0 z-0 bg-neutral-900">
+                                    {collection.image?.url && (
+                                        <Image
+                                            src={collection.image.url}
+                                            alt={collection.title}
+                                            fill
+                                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                        />
+                                    )}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                                </div>
+
+                                {/* Content */}
+                                <div className="absolute bottom-0 left-0 w-full p-8 z-10 translate-y-2 group-hover:translate-y-0 transition-transform">
+                                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
+                                        {collection.title}
+                                    </h3>
+                                    <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <p className="text-sm text-gray-300 line-clamp-1">{collection.description}</p>
+                                        <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+                                            <ArrowUpRight className="w-4 h-4" />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </Link>
-                    </motion.div>
-                ))}
+                            </Link>
+                        </motion.div>
+                    );
+                })}
             </div>
         </section>
     );
