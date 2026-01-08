@@ -143,6 +143,12 @@ export const COLLECTIONS_QUERY = `
           title
           handle
           description
+          image {
+            url
+            altText
+            width
+            height
+          }
         }
       }
     }

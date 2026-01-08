@@ -91,6 +91,7 @@ export type Collection = {
     title: string;
     description: string;
     products: Connection<Product>;
+    image?: Image;
 };
 
 // --- Cart Types ---
