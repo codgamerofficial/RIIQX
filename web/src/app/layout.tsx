@@ -29,6 +29,13 @@ export const metadata: Metadata = {
   icons: {
     icon: "/riiqx-logo.png",
   },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false, // Prevents zooming for app-like feel
+    viewportFit: "cover", // Utilizes notch area
+  },
 };
 
 export default function RootLayout({

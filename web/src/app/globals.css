@@ -125,13 +125,27 @@
   --color-ring: var(--ring);
 }
 
+html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;
+  position: relative;
+  width: 100%;
   cursor: none;
   /* Hide default cursor for standard desktop */
+}
+
+@media (pointer: coarse) {
+  body {
+    cursor: auto;
+    /* Restore cursor on touch devices if needed, though usually hidden anyway */
+  }
 }
 
 /* Custom Glitch Animations */

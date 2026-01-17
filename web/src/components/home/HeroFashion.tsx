@@ -47,9 +47,9 @@ export function HeroFashion() {
             </div>
 
             {/* Content */}
-            <div className="relative z-10 text-center space-y-6">
+            <div className="relative z-10 text-center space-y-6 max-w-full px-4">
                 <div className="overflow-hidden">
-                    <h1 ref={titleRef} className="text-7xl md:text-[10rem] font-serif italic text-white/90 leading-none tracking-tighter mix-blend-overlay">
+                    <h1 ref={titleRef} className="text-5xl sm:text-7xl md:text-[10rem] font-serif italic text-white/90 leading-none tracking-tighter mix-blend-overlay">
                         Astral <span className="font-light not-italic">Fit</span>
                     </h1>
                 </div>
