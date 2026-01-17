@@ -10,7 +10,7 @@ import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { RiiqxAssistant } from "@/components/ui/riiqx-assistant";
 import { Toaster } from "sonner";
 import { MusicProvider } from "@/context/MusicContext";
-import { DynamicIsland } from "@/components/ui/dynamic-island";
+import { DynamicIsland } from "@/components/ui/DynamicIsland/DynamicIsland";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const geistSans = Geist({

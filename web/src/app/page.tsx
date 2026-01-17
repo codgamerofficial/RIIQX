@@ -1,7 +1,7 @@
 import { AdaptiveHero } from "@/components/home/AdaptiveHero";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { DualScrollLayout } from "@/components/shop/DualScrollLayout";
-import { HoloProductCard } from "@/components/shop/HoloProductCard";
+import { DiscoveryZone } from "@/components/shop/DiscoveryZone";
 import { getCollections } from "@/lib/shopify";
 
 // Mock Data for Demo
@@ -37,11 +37,7 @@ export default async function Home() {
               The Fabric of <span className="text-primary">Time</span>
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {FASHION_PRODUCTS.map(p => (
-                <HoloProductCard key={p.id} product={p as any} />
-              ))}
-            </div>
+            <DiscoveryZone products={FASHION_PRODUCTS} className="grid grid-cols-1 md:grid-cols-3 gap-8" />
           </div>
         </section>
 
@@ -58,11 +54,7 @@ export default async function Home() {
               <span className="text-secondary">&lt;</span> System_Upgrades <span className="text-secondary">/&gt;</span>
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {TECH_PRODUCTS.map(p => (
-                <HoloProductCard key={p.id} product={p as any} />
-              ))}
-            </div>
+            <DiscoveryZone products={TECH_PRODUCTS} className="grid grid-cols-1 md:grid-cols-3 gap-8" />
           </div>
         </section>
 

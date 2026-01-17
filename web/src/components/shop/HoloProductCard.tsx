@@ -12,15 +12,29 @@ interface Product {
     category: 'fashion' | 'electronics';
 }
 
-export function HoloProductCard({ product }: { product: Product }) {
+export function HoloProductCard({ product, index = 0, onClick }: { product: Product, index?: number, onClick?: () => void }) {
     const mode = useRealityStore((state) => state.mode);
     const isFashion = mode === 'fashion';
 
     return (
         <motion.div
-            layout // Framer motion layout animation for smooth resizing if needed
+            layoutId={`card-${product.id}`}
+            onClick={onClick}
+            initial={{ y: 0 }}
+            animate={isFashion ? {
+                y: [0, -20, 0],
+                transition: {
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: index * 0.2
+                }
+            } : {
+                y: 0,
+                transition: { duration: 0.5 }
+            }}
             className={cn(
-                "relative group cursor-none overflow-hidden transition-all duration-700",
+                "relative group cursor-none overflow-hidden transition-colors duration-700 h-full",
                 isFashion
                     ? "rounded-3xl hover:shadow-2xl hover:shadow-primary/20 bg-white/5 border border-white/10"
                     : "rounded-none clip-path-polygon border border-primary/50 bg-black/80 hover:bg-black/90"
@@ -28,11 +42,17 @@ export function HoloProductCard({ product }: { product: Product }) {
         >
             {/* Image Container */}
             <div className={cn(
-                "relative aspect-square overflow-hidden",
+                "relative aspect-square overflow-hidden transition-all duration-700",
                 isFashion ? "rounded-t-3xl" : "rounded-none"
             )}>
-                {/* Placeholder Image - Would be real Next/Image */}
-                <div className="w-full h-full bg-neutral-800 animate-pulse" />
+                {/* Visual Placeholder */}
+                <motion.div
+                    layoutId={`image-${product.id}`}
+                    className={cn(
+                        "w-full h-full animate-pulse transition-colors duration-700",
+                        isFashion ? "bg-neutral-800" : "bg-neutral-900"
+                    )}
+                />
 
                 {/* Electronics overlay */}
                 {!isFashion && (
@@ -42,25 +62,31 @@ export function HoloProductCard({ product }: { product: Product }) {
 
             {/* Info Section */}
             <div className="p-6 space-y-2">
-                <h3 className={cn(
-                    "text-xl transition-all",
-                    isFashion
-                        ? "font-serif italic text-white"
-                        : "font-mono uppercase tracking-widest text-primary"
-                )}>
+                <motion.h3
+                    layoutId={`title-${product.id}`}
+                    className={cn(
+                        "text-xl transition-all duration-500",
+                        isFashion
+                            ? "font-serif italic text-white"
+                            : "font-mono uppercase tracking-widest text-primary"
+                    )}
+                >
                     {product.title}
-                </h3>
+                </motion.h3>
 
-                <p className={cn(
-                    "text-sm",
-                    isFashion ? "text-white/60" : "text-white/40 font-mono"
-                )}>
+                <motion.p
+                    layoutId={`price-${product.id}`}
+                    className={cn(
+                        "text-sm transition-all duration-500",
+                        isFashion ? "text-white/60" : "text-white/40 font-mono"
+                    )}
+                >
                     {product.price}
-                </p>
+                </motion.p>
 
                 {/* Adaptive CTA */}
                 <button className={cn(
-                    "w-full mt-4 py-3 transition-all",
+                    "w-full mt-4 py-3 transition-all duration-300 pointer-events-none", // Pointer events none so card click takes precedence
                     isFashion
                         ? "rounded-full bg-white text-black font-serif hover:bg-primary hover:text-white"
                         : "rounded-none border border-primary text-primary hover:bg-primary hover:text-black font-mono uppercase tracking-widest"
