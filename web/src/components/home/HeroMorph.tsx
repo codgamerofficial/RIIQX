@@ -27,7 +27,7 @@ export function HeroMorph() {
 
             const tl = gsap.timeline({
                 scrollTrigger: {
-                    target: containerRef.current,
+                    trigger: containerRef.current,
                     start: "top top",
                     end: "bottom top",
                     scrub: 1,
