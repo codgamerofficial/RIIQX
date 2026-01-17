@@ -36,6 +36,75 @@
     --radius: 0rem;
     /* Sharp, Technical Edges */
   }
+
+  /* DUAL REALITY ENGINE - 2050 */
+
+  /* Fashion Mode: Organic, Soft, Warm, Fluid */
+  [data-mode="fashion"] {
+    --background: #0a0505;
+    /* Deep Warm Black */
+    --foreground: #f8fafc;
+
+    --card: #120a0a;
+    --card-foreground: #f8fafc;
+
+    --primary: #f472b6;
+    /* Soft Pink / Rose Gold */
+    --primary-foreground: #000000;
+
+    --secondary: #fb923c;
+    /* Warm Orange */
+    --secondary-foreground: #000000;
+
+    --accent: #e11d48;
+    /* Passion Red */
+    --accent-foreground: #ffffff;
+
+    --border: #2e1010;
+    --input: #2e1010;
+    --ring: #f472b6;
+
+    --radius: 1rem;
+    /* Soft, Organic Curves */
+
+    /* Custom Physics Tokens */
+    --gravity: 0.5;
+    --fluidity: 1;
+  }
+
+  /* Electronics Mode: Technical, Sharp, Cold, Glitch */
+  [data-mode="electronics"] {
+    --background: #020204;
+    /* Void Black */
+    --foreground: #e0e0e0;
+
+    --card: #0a0a0f;
+    --card-foreground: #e0e0e0;
+
+    --primary: #00f0ff;
+    /* Cyber Cyan */
+    --primary-foreground: #000000;
+
+    --secondary: #7c3aed;
+    /* Electric Purple */
+    --secondary-foreground: #ffffff;
+
+    --accent: #ff003c;
+    /* Glitch Red */
+    --accent-foreground: #ffffff;
+
+    --border: #272730;
+    --input: #1a1a20;
+    --ring: #00f0ff;
+
+    --radius: 0px;
+    /* Sharp, Technical Edges */
+
+    /* Custom Physics Tokens */
+    --gravity: 2;
+    --fluidity: 0;
+  }
+
 }
 
 @theme inline {

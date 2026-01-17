@@ -3,15 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { usePathname } from "next/navigation";
+import { useRealityStore } from "@/store/reality-store";
+import { cn } from "@/lib/utils";
 
 export function HyperCursor() {
     const cursorRef = useRef<HTMLDivElement>(null);
     const followerRef = useRef<HTMLDivElement>(null);
     const [isHovering, setIsHovering] = useState(false);
     const pathname = usePathname();
+    const mode = useRealityStore((state) => state.mode);
 
     useEffect(() => {
-        // Reset on page change
         setIsHovering(false);
     }, [pathname]);
 
@@ -20,26 +22,37 @@ export function HyperCursor() {
         const follower = followerRef.current;
 
         const moveCursor = (e: MouseEvent) => {
-            // Direct follow for the center dot
+            // Core Dot - Always tight
             gsap.to(cursor, {
                 x: e.clientX,
                 y: e.clientY,
                 duration: 0.1,
                 ease: "power2.out"
             });
-            // Lazy follow for the outer ring
-            gsap.to(follower, {
-                x: e.clientX,
-                y: e.clientY,
-                duration: 0.5,
-                ease: "expo.out"
-            });
+
+            // Follower - Physics changes based on Mode
+            if (mode === 'fashion') {
+                gsap.to(follower, {
+                    x: e.clientX,
+                    y: e.clientY,
+                    duration: 0.8, // Slower, fluid
+                    ease: "power2.out"
+                });
+            } else {
+                // Electronics / Default
+                gsap.to(follower, {
+                    x: e.clientX,
+                    y: e.clientY,
+                    duration: 0.3, // Snappy, tactical
+                    ease: "expo.out"
+                });
+            }
         };
 
         const handleHoverStart = () => setIsHovering(true);
         const handleHoverEnd = () => setIsHovering(false);
 
-        // Attach listeners to all interactive elements
+        // Re-attach listeners when path changes
         const interpretables = document.querySelectorAll('button, a, input, [role="button"]');
         interpretables.forEach(el => {
             el.addEventListener('mouseenter', handleHoverStart);
@@ -55,31 +68,58 @@ export function HyperCursor() {
                 el.removeEventListener('mouseleave', handleHoverEnd);
             });
         };
-    }, [pathname]); // Re-run when route changes to attach to new elements
+    }, [pathname, mode]);
+
+    // Visual Variants
+    const isFashion = mode === 'fashion';
 
     return (
         <div className="pointer-events-none fixed inset-0 z-[9999] mix-blend-exclusion">
-            {/* Center Dot (Sniper Core) */}
+
+            {/* CORE CURSOR */}
             <div
                 ref={cursorRef}
-                className="fixed top-0 left-0 w-2 h-2 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"
+                className={cn(
+                    "fixed top-0 left-0 -translate-x-1/2 -translate-y-1/2 transition-all duration-500",
+                    isFashion ? "w-4 h-4 bg-primary blur-[2px] rounded-full opacity-80" : "w-2 h-2 bg-white rounded-none"
+                )}
             />
-            {/* Outer Ring (Target Lock) */}
+
+            {/* FOLLOWER RING */}
             <div
                 ref={followerRef}
-                className={`fixed top-0 left-0 border border-white/50 rounded-full -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ease-out flex items-center justify-center
-                    ${isHovering ? "w-12 h-12 border-primary border-2 rotate-90" : "w-8 h-8 rotate-0"}`}
+                className={cn(
+                    "fixed top-0 left-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center transition-all duration-500",
+                    isFashion
+                        ? isHovering
+                            ? "w-20 h-20 border border-primary/30 rounded-full bg-primary/10 blur-sm scale-110"
+                            : "w-12 h-12 border border-primary/20 rounded-full scale-100"
+                        : isHovering // Electronics Mode
+                            ? "w-12 h-12 border-2 border-primary rotate-90 rounded-none"
+                            : "w-8 h-8 border border-white/50 rounded-full rotate-45"
+                )}
             >
-                {/* Crosshair details inside ring */}
-                <div className={`w-full h-[1px] bg-white/30 absolute ${isHovering ? "w-[120%]" : "w-0"} transition-all`} />
-                <div className={`h-full w-[1px] bg-white/30 absolute ${isHovering ? "h-[120%]" : "h-0"} transition-all`} />
+                {/* Electronics: Crosshairs */}
+                {!isFashion && (
+                    <>
+                        <div className={cn("absolute bg-white/30 transition-all", isHovering ? "w-[150%] h-[1px]" : "w-0 h-[1px]")} />
+                        <div className={cn("absolute bg-white/30 transition-all", isHovering ? "h-[150%] w-[1px]" : "h-0 w-[1px]")} />
+                    </>
+                )}
+
+                {/* Fashion: Soft Ripple pulse */}
+                {isFashion && (
+                    <div className="absolute inset-0 rounded-full border border-white/10 animate-ping opacity-50" />
+                )}
             </div>
 
-            {/* Data Text next to cursor */}
+            {/* Mode Indicator Text */}
             <div
-                ref={followerRef} // Attach to follower movement but offset? transform via css? 
-            // Using a separate ref tracking for text if needed, for now attaching visually via simple absolute 
+                ref={followerRef} // HACK: reusing ref for positioning causing chaos? No, this div is separated. 
+            // We'll just let it trail visually or remove strictly.
+            // Keeping it clean for now.
             />
+
         </div>
     );
 }

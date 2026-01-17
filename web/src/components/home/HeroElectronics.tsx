@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function HeroMorph() {
+export function HeroElectronics() {
     const containerRef = useRef<HTMLDivElement>(null);
     const textRef = useRef<HTMLHeadingElement>(null);
     const panelRef = useRef<HTMLDivElement>(null);
