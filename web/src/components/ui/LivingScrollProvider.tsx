@@ -13,7 +13,8 @@ export function LivingScrollProvider({ children }: { children: React.ReactNode }
     const contentRef = useRef<HTMLDivElement>(null);
 
     // Use Lenis hook to access scroll data
-    useLenis(({ velocity }) => {
+    useLenis((lenis: any) => {
+        const { velocity } = lenis;
         // Velocity comes in pixels per frame roughly.
         // We clamp it to avoid excessive distortion.
         const skewAmount = Math.max(Math.min(velocity * 0.05, 5), -5);
