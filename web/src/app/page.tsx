@@ -1,7 +1,7 @@
 import { FeaturedCategories } from "@/components/home/FeaturedCategories";
 import { HeroSection } from "@/components/home/HeroSection";
 import { TrendingCarousel } from "@/components/home/TrendingCarousel";
-import { ParallaxShowcase } from "@/components/home/ParallaxShowcase";
+import { HeroMorph } from "@/components/home/HeroMorph";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { getCollections } from "@/lib/shopify";
 
@@ -11,7 +11,7 @@ export default async function Home() {
     <main className="flex flex-col min-h-screen">
       <HeroSection />
 
-      <ParallaxShowcase />
+      <HeroMorph />
 
       <FeaturedCategories collections={collections} />
 

@@ -4,7 +4,8 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CartSheet } from "@/components/cart/CartSheet";
-import { SmoothScroll } from "@/components/ui/smooth-scroll";
+import { LivingScrollProvider } from "@/components/ui/LivingScrollProvider";
+import { HyperCursor } from "@/components/ui/HyperCursor";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { RiiqxAssistant } from "@/components/ui/riiqx-assistant";
 import { Toaster } from "sonner";
@@ -42,7 +43,8 @@ export default function RootLayout({
       >
         <MusicProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-            <SmoothScroll>
+            <LivingScrollProvider>
+              <HyperCursor />
               <ScrollProgress />
               <Navbar />
               <main className="flex-grow">
@@ -51,7 +53,7 @@ export default function RootLayout({
               {/* MusicPlayer removed - Integrated into DynamicIsland */}
               <RiiqxAssistant />
               <Footer />
-            </SmoothScroll>
+            </LivingScrollProvider>
             <DynamicIsland /> {/* Placeholder for next step */}
             <CartSheet />
             <Toaster />
