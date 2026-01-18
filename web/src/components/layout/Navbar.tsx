@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Menu, X, User, Search, Zap, ChevronDown, Heart } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+
 import { useCartStore } from "@/store/useCartStore";
 import { ModeToggle } from "@/components/ui/theme-toggle";
 
@@ -16,7 +16,6 @@ export function Navbar() {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const pathname = usePathname();
     const router = useRouter();
-    const [user, setUser] = useState<any>(null);
     const { toggleCart, getItemCount } = useCartStore();
     const itemCount = getItemCount();
 
@@ -25,11 +24,6 @@ export function Navbar() {
             setScrolled(window.scrollY > 20);
         };
         window.addEventListener("scroll", handleScroll);
-
-        const supabase = createClient();
-        supabase.auth.getUser().then(({ data }) => {
-            setUser(data.user);
-        });
 
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
@@ -221,21 +215,9 @@ export function Navbar() {
                             )}
                         </button>
 
-                        {user ? (
-                            <Link href="/dashboard" className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-primary hover:text-black transition-all font-bold text-lg">
-                                {user.email?.[0].toUpperCase()}
-                            </Link>
-                        ) : (
-                            <Link href="/auth">
-                                <motion.div
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="px-6 py-2.5 rounded-full bg-white text-black font-bold text-sm flex items-center space-x-2 hover:bg-primary transition-colors shadow-lg shadow-white/10"
-                                >
-                                    <span>Login</span>
-                                </motion.div>
-                            </Link>
-                        )}
+                        <Link href="/account" className="text-muted-foreground hover:text-primary transition-colors relative group">
+                            <User className="w-6 h-6 group-hover:fill-primary/20" />
+                        </Link>
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -337,15 +319,9 @@ export function Navbar() {
                                 <span>Cart ({itemCount})</span>
                             </Link>
 
-                            {user ? (
-                                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="px-6 py-3 rounded-xl bg-secondary/10 text-secondary border border-secondary/20 text-center font-bold">
-                                    My Dashboard
-                                </Link>
-                            ) : (
-                                <Link href="/auth" onClick={() => setMobileMenuOpen(false)} className="px-6 py-3 rounded-xl bg-white text-black text-center font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-                                    Sign In / Sign Up
-                                </Link>
-                            )}
+                            <Link href="/account" onClick={() => setMobileMenuOpen(false)} className="px-6 py-3 rounded-xl bg-white text-black text-center font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+                                Account
+                            </Link>
                         </div>
                     </motion.div>
                 )}

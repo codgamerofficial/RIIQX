@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Product } from '@/lib/shopify/types';
 
 interface WishlistStore {
@@ -29,7 +30,8 @@ export const useWishlistStore = create<WishlistStore>()(
             clearWishlist: () => set({ items: [] }),
         }),
         {
-            name: 'riiqx-wishlist-storage',
+            name: 'riiqx-mobile-wishlist',
+            storage: createJSONStorage(() => AsyncStorage),
         }
     )
 );

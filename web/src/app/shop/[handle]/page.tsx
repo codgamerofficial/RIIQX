@@ -6,6 +6,7 @@ import { SizeGuide } from "@/components/product/SizeGuide";
 import { ArrowLeft, Truck, ShieldCheck, ChevronDown, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { WishlistButton } from "@/components/shop/WishlistButton";
 
 export const revalidate = 60; // Cache for 1 minute
 
@@ -116,7 +117,12 @@ export default async function ProductDetailsPage({
                             )}
 
                             {/* Add to Cart */}
-                            <ShopifyAddToCartButton product={product} />
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <ShopifyAddToCartButton product={product} />
+                                </div>
+                                <WishlistButton product={product} />
+                            </div>
 
                             {/* Trust Badges */}
                             <div className="grid grid-cols-2 gap-4 py-6 border-y border-white/10">

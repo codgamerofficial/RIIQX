@@ -47,6 +47,8 @@ export type Product = {
     description: string;
     descriptionHtml: string;
     availableForSale: boolean;
+    productType?: string;
+    tags?: string[];
     priceRange: {
         minVariantPrice: Money;
         maxVariantPrice: Money;
@@ -66,7 +68,26 @@ export type Collection = {
     handle: string;
     title: string;
     description: string;
+    image?: Image;
     products: Connection<Product>;
+};
+
+export type ProductSortKeys = 'TITLE' | 'PRICE' | 'BEST_SELLING' | 'CREATED_AT' | 'ID' | 'PRODUCT_TYPE' | 'RELEVANCE';
+
+export type ProductCollectionSortKeys = 'TITLE' | 'PRICE' | 'BEST_SELLING' | 'CREATED' | 'ID' | 'MANUAL' | 'COLLECTION_DEFAULT';
+
+export type ProductFilter = {
+    available?: boolean;
+    variantOption?: {
+        name: string;
+        value: string;
+    };
+    productType?: string;
+    price?: {
+        min?: number;
+        max?: number;
+    };
+    tag?: string;
 };
 
 // --- Cart Types ---
@@ -96,5 +117,58 @@ export type CartItem = {
             title: string;
             handle: string;
         };
+        image?: Image;
     };
 };
+
+export type Customer = {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    displayName?: string;
+    phone?: string;
+    defaultAddress?: MailingAddress;
+    addresses?: Connection<MailingAddress>;
+    orders?: Connection<Order>;
+};
+
+export type MailingAddress = {
+    id: string;
+    address1?: string;
+    address2?: string;
+    city?: string;
+    province?: string;
+    zip?: string;
+    country?: string;
+};
+
+export type Order = {
+    id: string;
+    orderNumber: number;
+    processedAt: string;
+    financialStatus: string;
+    fulfillmentStatus: string;
+    currentTotalPrice: Money;
+    lineItems: Connection<OrderLineItem>;
+};
+
+export type OrderLineItem = {
+    title: string;
+    quantity: number;
+    variant?: {
+        image?: Image;
+    };
+};
+
+export type CustomerAccessToken = {
+    accessToken: string;
+    expiresAt: string;
+};
+
+export type CustomerUserError = {
+    code: string;
+    field: string[];
+    message: string;
+};
+

@@ -12,6 +12,19 @@ interface NewDropsProps {
 }
 
 export function NewDrops({ products = [] }: NewDropsProps) {
+    return (
+        <>
+            <div className="hidden lg:block">
+                <DesktopDrops products={products} />
+            </div>
+            <div className="lg:hidden">
+                <MobileDrops products={products} />
+            </div>
+        </>
+    );
+}
+
+function DesktopDrops({ products }: { products: Product[] }) {
     const targetRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({
         target: targetRef,
@@ -38,49 +51,12 @@ export function NewDrops({ products = [] }: NewDropsProps) {
 
                 <motion.div style={{ x }} className="flex gap-8 pl-[10vw]">
                     {products.map((product) => (
-                        <div
-                            key={product.id}
-                            className="group relative h-[600px] w-[400px] md:w-[500px] flex-shrink-0 bg-neutral-900 border border-white/10 overflow-hidden"
-                        >
-                            {/* Image */}
-                            <div className="absolute inset-0 overflow-hidden">
-                                {product.featuredImage && (
-                                    <img
-                                        src={product.featuredImage.url}
-                                        alt={product.title}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
-                                    />
-                                )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
-                            </div>
-
-                            {/* Content */}
-                            <div className="absolute bottom-0 left-0 w-full p-8">
-                                <div className="space-y-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                                    <h3 className="text-3xl font-black text-white uppercase leading-none">
-                                        {product.title}
-                                    </h3>
-                                    <div className="flex items-center justify-between border-t border-white/20 pt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                                        <span className="text-2xl font-bold text-white">
-                                            {formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode)}
-                                        </span>
-                                        <Link href={`/shop/${product.handle}`}>
-                                            <button className="bg-white text-black p-3 rounded-full hover:bg-primary transition-colors">
-                                                <ArrowRight className="w-5 h-5" />
-                                            </button>
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Neon Border Effect on Hover */}
-                            <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary transition-colors duration-300 pointer-events-none" />
-                        </div>
+                        <ProductCard key={product.id} product={product} />
                     ))}
 
                     {/* View All Card */}
                     <div className="h-[600px] w-[300px] flex-shrink-0 flex items-center justify-center border border-white/10 hover:bg-white/5 transition-colors group cursor-pointer">
-                        <Link href="/collections/new-arrivals" className="text-center group-hover:scale-110 transition-transform">
+                        <Link href="/collections/relevance" className="text-center group-hover:scale-110 transition-transform">
                             <span className="block text-4xl font-black text-white mb-2">VIEW<br />ALL</span>
                             <div className="w-12 h-1 bg-primary mx-auto" />
                         </Link>
@@ -88,5 +64,76 @@ export function NewDrops({ products = [] }: NewDropsProps) {
                 </motion.div>
             </div>
         </section>
+    );
+}
+
+function MobileDrops({ products }: { products: Product[] }) {
+    return (
+        <section className="bg-neutral-950 py-16">
+            <div className="px-4 mb-8">
+                <span className="bg-primary text-black font-bold uppercase px-3 py-1 text-xs tracking-widest">
+                    New Arrivals
+                </span>
+                <h2 className="text-4xl font-black text-white uppercase tracking-tighter mt-4">
+                    Just Dropped
+                </h2>
+            </div>
+
+            <div className="flex overflow-x-auto gap-4 px-4 pb-8 snap-x snap-mandatory">
+                {products.map((product) => (
+                    <div key={product.id} className="snap-center shrink-0 w-[85vw]">
+                        <ProductCard product={product} isMobile />
+                    </div>
+                ))}
+
+                <Link href="/collections/relevance" className="snap-center shrink-0 w-[40vw] flex items-center justify-center border border-white/10 bg-white/5">
+                    <span className="text-white font-black uppercase text-center">View All</span>
+                </Link>
+            </div>
+        </section>
+    );
+}
+
+function ProductCard({ product, isMobile = false }: { product: Product, isMobile?: boolean }) {
+    return (
+        <div
+            className={`group relative ${isMobile ? 'h-[500px] w-full' : 'h-[600px] w-[400px] md:w-[500px]'} flex-shrink-0 bg-neutral-900 border border-white/10 overflow-hidden`}
+        >
+            {/* Image */}
+            <div className="absolute inset-0 overflow-hidden">
+                {product.featuredImage && (
+                    <img
+                        src={product.featuredImage.url}
+                        alt={product.title}
+                        className={`w-full h-full object-cover transition-transform duration-700 ${!isMobile && 'group-hover:scale-110 grayscale group-hover:grayscale-0'}`}
+                    />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+            </div>
+
+            {/* Content */}
+            <div className="absolute bottom-0 left-0 w-full p-8">
+                <div className={`space-y-2 ${!isMobile && 'transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500'}`}>
+                    <h3 className="text-2xl md:text-3xl font-black text-white uppercase leading-none line-clamp-2">
+                        {product.title}
+                    </h3>
+                    <div className={`flex items-center justify-between border-t border-white/20 pt-4 ${!isMobile && 'opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100'}`}>
+                        <span className="text-xl md:text-2xl font-bold text-white">
+                            {formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode)}
+                        </span>
+                        <Link href={`/shop/${product.handle}`}>
+                            <button className="bg-white text-black p-3 rounded-full hover:bg-primary transition-colors">
+                                <ArrowRight className="w-5 h-5" />
+                            </button>
+                        </Link>
+                    </div>
+                </div>
+            </div>
+
+            {/* Neon Border Effect on Hover (Desktop only) */}
+            {!isMobile && (
+                <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary transition-colors duration-300 pointer-events-none" />
+            )}
+        </div>
     );
 }

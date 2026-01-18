@@ -125,3 +125,55 @@ export type CartItem = {
         };
     };
 };
+
+export type Customer = {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    displayName?: string;
+    phone?: string;
+    defaultAddress?: MailingAddress;
+    addresses?: Connection<MailingAddress>;
+    orders?: Connection<Order>;
+};
+
+export type MailingAddress = {
+    id: string;
+    address1?: string;
+    address2?: string;
+    city?: string;
+    province?: string;
+    zip?: string;
+    country?: string;
+};
+
+export type Order = {
+    id: string;
+    orderNumber: number;
+    processedAt: string;
+    financialStatus: string;
+    fulfillmentStatus: string;
+    currentTotalPrice: Money;
+    lineItems: Connection<OrderLineItem>;
+};
+
+export type OrderLineItem = {
+    title: string;
+    quantity: number;
+    variant?: {
+        image?: Image;
+    };
+};
+
+export type CustomerAccessToken = {
+    accessToken: string;
+    expiresAt: string;
+};
+
+export type CustomerUserError = {
+    code: string;
+    field: string[];
+    message: string;
+};
+

@@ -1,5 +1,5 @@
-import { PRODUCTS_QUERY, PRODUCT_BY_HANDLE_QUERY, CART_CREATE_MUTATION } from './queries';
-import { Product, Connection, Cart, CartLineInput } from './types';
+import { PRODUCTS_QUERY, PRODUCT_BY_HANDLE_QUERY, CART_CREATE_MUTATION, COLLECTIONS_QUERY, COLLECTION_PRODUCTS_QUERY, CUSTOMER_CREATE_MUTATION, CUSTOMER_ACCESS_TOKEN_CREATE_MUTATION, CUSTOMER_QUERY, CUSTOMER_RECOVER_MUTATION } from './queries';
+import { Product, Connection, Cart, CartLineInput, Collection, Customer, CustomerAccessToken, CustomerUserError } from './types';
 
 import { ShopifyFetchCache } from './types';
 
@@ -30,7 +30,6 @@ export async function shopifyFetch<T>({
 }: ShopifyFetchParams): Promise<T> {
     if (!domain || !storefrontAccessToken) {
         console.error('Missing Shopify ENV vars:', { domain, storefrontAccessToken });
-        // In dev, we might want to warn. In prod, this will fail.
     }
 
     const endpoint = `https://${domain}/api/2024-01/graphql.json`;
@@ -42,8 +41,7 @@ export async function shopifyFetch<T>({
             'X-Shopify-Storefront-Access-Token': storefrontAccessToken!,
         },
         body: JSON.stringify({ query, variables }),
-        cache: cache as any, // Cast to any for React Native compatibility
-        // revalidate is ignored in RN but kept for compatibility
+        cache: cache as any,
     });
 
     if (!response.ok) {
@@ -115,22 +113,116 @@ export async function getProduct(handle: string): Promise<Product | undefined> {
 }
 
 /**
+ * Fetch all collections.
+ */
+export async function getCollections(): Promise<Collection[]> {
+    const res = await shopifyFetch<{ collections: Connection<Collection> }>({
+        query: COLLECTIONS_QUERY,
+        revalidate: 60,
+    });
+
+    return removeEdgesAndNodes(res.collections);
+}
+
+/**
+ * Fetch products for a specific collection.
+ */
+export async function getCollectionProducts({
+    handle,
+    sortKey,
+    reverse,
+    limit = 24,
+    filters
+}: {
+    handle: string;
+    sortKey?: 'TITLE' | 'PRICE' | 'CREATED' | 'BEST_SELLING';
+    reverse?: boolean;
+    limit?: number;
+    filters?: any[];
+}): Promise<{ products: Product[]; pageInfo: Connection<Product>['pageInfo'] }> {
+    const res = await shopifyFetch<{ collection: { products: Connection<Product> } }>({
+        query: COLLECTION_PRODUCTS_QUERY,
+        variables: { handle, first: limit, sortKey, reverse, filters },
+        revalidate: 60,
+    });
+
+    if (!res.collection) {
+        return { products: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } };
+    }
+
+    return {
+        products: removeEdgesAndNodes(res.collection.products),
+        pageInfo: res.collection.products.pageInfo,
+    };
+}
+
+
+/**
  * Create a cart and return the checkout URL.
  */
-export async function createCart(lines: CartLineInput[]): Promise<Cart> {
+export async function createCart(lines: CartLineInput[], customerAccessToken?: string): Promise<Cart> {
+    const variables: any = { lines };
+    if (customerAccessToken) {
+        variables.buyerIdentity = { customerAccessToken };
+    }
+
     const res = await shopifyFetch<{ cartCreate: { cart: Cart } }>({
         query: CART_CREATE_MUTATION,
-        variables: { lines },
+        variables,
         cache: 'no-store', // Carts should not be cached
     });
 
     return res.cartCreate.cart;
 }
 
-// Utility to re-shape price for display
-export const formatPrice = (amount: string, currencyCode: string) => {
-    return new Intl.NumberFormat('en-US', {
+// --- Auth Functions ---
+
+export async function createCustomer(input: { email: string; password: string; firstName?: string; lastName?: string }) {
+    const res = await shopifyFetch<{ customerCreate: { customer: Customer; customerUserErrors: CustomerUserError[] } }>({
+        query: CUSTOMER_CREATE_MUTATION,
+        variables: { input },
+        cache: 'no-store'
+    });
+
+    return res.customerCreate;
+}
+
+export async function createCustomerAccessToken(input: { email: string; password: string }) {
+    const res = await shopifyFetch<{ customerAccessTokenCreate: { customerAccessToken: CustomerAccessToken; customerUserErrors: CustomerUserError[] } }>({
+        query: CUSTOMER_ACCESS_TOKEN_CREATE_MUTATION,
+        variables: { input },
+        cache: 'no-store'
+    });
+
+    return res.customerAccessTokenCreate;
+}
+
+export async function getCustomer(customerAccessToken: string): Promise<Customer | undefined> {
+    const res = await shopifyFetch<{ customer: Customer }>({
+        query: CUSTOMER_QUERY,
+        variables: { customerAccessToken },
+        cache: 'no-store'
+    });
+
+    return res.customer;
+}
+
+export async function recoverCustomerAccount(email: string) {
+    const res = await shopifyFetch<{ customerRecover: { customerUserErrors: CustomerUserError[] } }>({
+        query: CUSTOMER_RECOVER_MUTATION,
+        variables: { email },
+        cache: 'no-store'
+    });
+
+    return res.customerRecover;
+}
+
+// Utility to re-shape price for display (INR Support)
+export const formatPrice = (amount: string, currencyCode: string = 'INR') => {
+    return new Intl.NumberFormat('en-IN', {
         style: 'currency',
         currency: currencyCode,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
     }).format(parseFloat(amount));
 };

@@ -21,18 +21,30 @@ export function FeaturedSection({ products }: FeaturedSectionProps) {
     return (
         <section className="py-24 bg-neutral-950 border-t border-white/5">
             <div className="max-w-7xl mx-auto px-4">
-                <div className="flex items-center justify-between mb-12">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="flex items-center justify-between mb-12"
+                >
                     <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">
                         Featured <span className="text-[#D9F99D]">Heat</span>
                     </h2>
                     <Link href="/collections/featured" className="text-white/50 hover:text-white uppercase text-xs font-bold tracking-widest flex items-center gap-2 transition-colors">
                         View Collection <ArrowRight className="w-4 h-4" />
                     </Link>
-                </div>
+                </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
                     {/* Hero Feature Card */}
-                    <div className="md:col-span-8 relative group overflow-hidden rounded-3xl bg-neutral-900 border border-white/10 aspect-[4/3] md:aspect-auto">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                        className="md:col-span-8 relative group overflow-hidden rounded-3xl bg-neutral-900 border border-white/10 aspect-[4/3] md:aspect-auto"
+                    >
                         {heroProduct.featuredImage && (
                             <Image
                                 src={heroProduct.featuredImage.url}
@@ -60,28 +72,37 @@ export function FeaturedSection({ products }: FeaturedSectionProps) {
                                 </Link>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* Side Grid */}
                     <div className="md:col-span-4 flex flex-col gap-6">
-                        {gridProducts.map((product) => (
-                            <Link href={`/shop/${product.handle}`} key={product.id} className="flex-1 relative group overflow-hidden rounded-3xl bg-neutral-900 border border-white/10 min-h-[200px]">
-                                {product.featuredImage && (
-                                    <Image
-                                        src={product.featuredImage.url}
-                                        alt={product.title}
-                                        fill
-                                        className="object-cover transition-transform duration-500 group-hover:scale-110 opacity-70 group-hover:opacity-100"
-                                    />
-                                )}
-                                <div className="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-300" />
-                                <div className="absolute bottom-4 left-4 right-4">
-                                    <h4 className="text-white font-bold uppercase truncate">{product.title}</h4>
-                                    <p className="text-[#D9F99D] text-sm font-bold">
-                                        {formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode)}
-                                    </p>
-                                </div>
-                            </Link>
+                        {gridProducts.map((product, idx) => (
+                            <motion.div
+                                key={product.id}
+                                initial={{ opacity: 0, x: 20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                                className="flex-1"
+                            >
+                                <Link href={`/shop/${product.handle}`} className="block h-full relative group overflow-hidden rounded-3xl bg-neutral-900 border border-white/10 min-h-[200px]">
+                                    {product.featuredImage && (
+                                        <Image
+                                            src={product.featuredImage.url}
+                                            alt={product.title}
+                                            fill
+                                            className="object-cover transition-transform duration-500 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                                        />
+                                    )}
+                                    <div className="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-300" />
+                                    <div className="absolute bottom-4 left-4 right-4">
+                                        <h4 className="text-white font-bold uppercase truncate">{product.title}</h4>
+                                        <p className="text-[#D9F99D] text-sm font-bold">
+                                            {formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode)}
+                                        </p>
+                                    </div>
+                                </Link>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
