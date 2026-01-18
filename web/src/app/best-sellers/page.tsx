@@ -27,7 +27,7 @@ export default async function BestSellersPage({
     const maxPriceParam = resolvedSearchParams.max_price as string | undefined;
 
     // Sorting - Default to BEST_SELLING
-    let sortKey: 'TITLE' | 'PRICE' | 'CREATED' | 'BEST_SELLING' | undefined = 'BEST_SELLING';
+    let sortKey: 'TITLE' | 'PRICE' | 'CREATED_AT' | 'BEST_SELLING' | undefined = 'BEST_SELLING';
     let reverse = false;
 
     if (sort === "newest") {
