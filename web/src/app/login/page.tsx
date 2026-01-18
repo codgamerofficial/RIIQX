@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { signIn } from '../actions/auth';
 import Link from 'next/link';
 import { SocialLoginButtons } from "@/components/auth/SocialLoginButtons";
+import { motion } from "framer-motion";
 
 const initialState = {
     message: '',
@@ -13,67 +14,108 @@ export default function LoginPage() {
     const [state, formAction, isPending] = useActionState(signIn, initialState);
 
     return (
-        <div className="min-h-screen pt-24 pb-12 flex flex-col items-center justify-center px-4">
-            <div className="w-full max-w-md bg-zinc-900/50 p-8 rounded-2xl border border-white/10 backdrop-blur-md">
-                <h1 className="text-3xl font-black text-white uppercase tracking-tighter mb-2">
-                    Access <span className="text-primary">Terminal</span>
-                </h1>
-                <p className="text-white/50 mb-8">Sign in to manage your orders.</p>
+        <div className="min-h-screen pt-24 pb-12 flex flex-col items-center justify-center px-4 relative">
+            {/* Subtle Background Pattern */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-black" />
 
-                <form action={formAction} className="space-y-6">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full max-w-md bg-black/80 p-10 rounded-2xl border border-white/5 backdrop-blur-xl relative z-10 shadow-2xl"
+            >
+                {/* Header */}
+                <div className="mb-8">
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="flex items-center space-x-3 mb-3"
+                    >
+                        <span className="h-px w-8 bg-luxury-gold" />
+                        <span className="text-luxury-gold text-xs font-bold uppercase tracking-[0.3em]">
+                            Access
+                        </span>
+                    </motion.div>
+                    <h1 className="text-4xl font-display font-bold text-white tracking-tight">
+                        Welcome Back
+                    </h1>
+                    <p className="text-white/40 mt-2 text-sm">Sign in to continue your journey</p>
+                </div>
+
+                <form action={formAction} className="space-y-5">
+                    {/* Email Input */}
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-white/70 mb-2">
-                            Email Address
+                        <label className="block text-xs font-medium uppercase tracking-widest text-white/50 mb-2">
+                            Email
                         </label>
                         <input
                             name="email"
                             type="email"
                             required
-                            className="w-full bg-zinc-800/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
-                            placeholder="operator@riiqx.com"
+                            className="w-full bg-zinc-900/50 border border-white/5 rounded-lg px-4 py-3.5 text-white placeholder:text-white/20 focus:outline-none focus:border-luxury-gold/50 focus:ring-1 focus:ring-luxury-gold/20 transition-all duration-300"
+                            placeholder="your@email.com"
                         />
                     </div>
 
+                    {/* Password Input */}
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-white/70 mb-2">
+                        <label className="block text-xs font-medium uppercase tracking-widest text-white/50 mb-2">
                             Password
                         </label>
                         <input
                             name="password"
                             type="password"
                             required
-                            className="w-full bg-zinc-800/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
+                            className="w-full bg-zinc-900/50 border border-white/5 rounded-lg px-4 py-3.5 text-white placeholder:text-white/20 focus:outline-none focus:border-luxury-gold/50 focus:ring-1 focus:ring-luxury-gold/20 transition-all duration-300"
                             placeholder="••••••••"
                         />
                     </div>
 
+                    {/* Error Message */}
                     {state?.message && (
-                        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm font-medium">
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="p-3 bg-neon-red/10 border border-neon-red/20 rounded-lg text-neon-red text-sm font-medium"
+                        >
                             {state.message}
-                        </div>
+                        </motion.div>
                     )}
 
+                    {/* Submit Button */}
                     <button
                         type="submit"
                         disabled={isPending}
-                        className="w-full bg-primary text-black font-black uppercase tracking-widest py-4 rounded-full hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-luxury-gold text-black font-display font-bold uppercase tracking-wider py-4 rounded-lg hover:bg-luxury-gold/90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-luxury-gold/20"
                     >
-                        {isPending ? 'Authenticating...' : 'Establish Connection'}
+                        {isPending ? 'Signing In...' : 'Sign In'}
                     </button>
 
-                    <div className="relative">
-                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10"></div></div>
-                        <div className="relative flex justify-center text-xs uppercase"><span className="bg-neutral-900 px-2 text-white/50">Or Access With</span></div>
+                    {/* Divider */}
+                    <div className="relative my-6">
+                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
+                        <div className="relative flex justify-center text-xs uppercase"><span className="bg-black px-3 text-white/30 tracking-widest">Or Continue With</span></div>
                     </div>
 
+                    {/* Social Login - Vertical Layout */}
                     <SocialLoginButtons />
 
-                    <div className="text-center mt-6">
-                        <Link href="/register" className="text-white/50 hover:text-white text-sm transition-colors">
-                            New Operator? <span className="text-primary hover:underline">Request Clearance</span>
-                        </Link>
+                    {/* Register Link */}
+                    <div className="text-center mt-8 pt-6 border-t border-white/5">
+                        <p className="text-white/40 text-sm">
+                            New to RIIQX?{' '}
+                            <Link href="/register" className="text-luxury-gold hover:text-luxury-gold/80 font-medium transition-colors">
+                                Create Account
+                            </Link>
+                        </p>
                     </div>
                 </form>
+            </motion.div>
+
+            {/* Decorative Elements */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/20 text-xs font-mono uppercase tracking-widest z-10">
+                Premium Access Portal
             </div>
         </div>
     );

@@ -1,198 +1,224 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    /* Gen-Z / Streetwear Palette */
-    --background: #121212;
-    /* Jet Black */
-    --foreground: #ffffff;
+:root {
+  /* Premium 2026 Streetwear Palette */
+  --background: #0a0a0a;
+  /* Luxury Black */
+  --foreground: #ffffff;
 
-    --card: #1A1A1A;
-    /* Off-Black */
-    --card-foreground: #ffffff;
+  --card: #121212;
+  --card-foreground: #ffffff;
 
-    --popover: #1A1A1A;
-    --popover-foreground: #ffffff;
+  --popover: #121212;
+  --popover-foreground: #ffffff;
 
-    --primary: #D9F99D;
-    /* Neon Yellow - Energetic */
-    --primary-foreground: #000000;
+  --primary: #C9A24D;
+  /* Luxury Gold */
+  --primary-foreground: #000000;
 
-    --secondary: #ffffff;
-    /* Pure White */
-    --secondary-foreground: #000000;
+  --secondary: #1A1A1A;
+  /* Dark Grey */
+  --secondary-foreground: #ffffff;
 
-    --accent: #FF0000;
-    /* Electric Red - Badges/Offers */
-    --accent-foreground: #ffffff;
+  --muted: #262626;
+  --muted-foreground: #A3A3A3;
 
-    --muted: #262626;
-    --muted-foreground: #A3A3A3;
+  --accent: #C7C7C7;
+  /* Chrome Silver */
+  --accent-foreground: #000000;
 
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
+  --destructive: #FF1F1F;
+  /* Neon Red */
+  --destructive-foreground: #ffffff;
 
-    --border: #262626;
-    --input: #262626;
-    --ring: #D9F99D;
+  --border: #262626;
+  --input: #262626;
+  --ring: #C9A24D;
+  /* Gold Ring */
 
-    --radius: 0.5rem;
-    /* Slight rounding, not fully pill, not sharp */
-  }
+  --radius: 0.25rem;
+  /* Sharp, premium corners */
 
-  @theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
-    --color-popover: var(--popover);
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-destructive: var(--destructive);
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
-  }
+  --luxury-gold: #C9A24D;
+  --luxury-chrome: #C7C7C7;
+  --neon-red: #FF1F1F;
+}
 
-  html {
-    overflow-x: hidden;
-    width: 100%;
-  }
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
+  --color-luxury-gold: var(--luxury-gold);
+  --color-luxury-chrome: var(--luxury-chrome);
+  --color-neon-red: var(--neon-red);
+
+  --font-display: var(--font-oswald), sans-serif;
+  --font-sans: var(--font-inter), sans-serif;
+}
+
+html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
+  cursor: none;
+  /* Hide default cursor for standard desktop */
+}
+
+/* Premium Global Grain Texture */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  /* Subtle Lux Grain */
+  mix-blend-mode: overlay;
+}
+
+@media (pointer: coarse) {
   body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-sans);
-    overflow-x: hidden;
-    position: relative;
-    width: 100%;
-    cursor: none;
-    /* Hide default cursor for standard desktop */
+    cursor: auto;
+    /* Restore cursor on touch devices if needed, though usually hidden anyway */
+  }
+}
+
+/* Custom Glitch Animations */
+@keyframes glitch {
+  0% {
+    transform: translate(0)
   }
 
-  @media (pointer: coarse) {
-    body {
-      cursor: auto;
-      /* Restore cursor on touch devices if needed, though usually hidden anyway */
-    }
+  20% {
+    transform: translate(-2px, 2px)
   }
 
-  /* Custom Glitch Animations */
-  @keyframes glitch {
-    0% {
-      transform: translate(0)
-    }
-
-    20% {
-      transform: translate(-2px, 2px)
-    }
-
-    40% {
-      transform: translate(-2px, -2px)
-    }
-
-    60% {
-      transform: translate(2px, 2px)
-    }
-
-    80% {
-      transform: translate(2px, -2px)
-    }
-
-    100% {
-      transform: translate(0)
-    }
+  40% {
+    transform: translate(-2px, -2px)
   }
 
-  @keyframes glitch-skew {
-    0% {
-      transform: skew(0deg);
-    }
-
-    20% {
-      transform: skew(-10deg);
-      filter: blur(1px);
-    }
-
-    40% {
-      transform: skew(10deg);
-      filter: blur(0px);
-    }
-
-    60% {
-      transform: skew(-5deg);
-      filter: blur(0.5px);
-    }
-
-    80% {
-      transform: skew(5deg);
-    }
-
-    100% {
-      transform: skew(0deg);
-    }
+  60% {
+    transform: translate(2px, 2px)
   }
 
-  .animate-glitch {
-    animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+  80% {
+    transform: translate(2px, -2px)
   }
 
-  .hover-glitch:hover {
-    animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  100% {
+    transform: translate(0)
+  }
+}
+
+@keyframes glitch-skew {
+  0% {
+    transform: skew(0deg);
   }
 
-  /* Hologram / Glassmorphism 2050 */
-  .holo-glass {
-    background: rgba(5, 5, 10, 0.4);
-    backdrop-filter: blur(12px) saturate(180%);
-    border: 1px solid rgba(0, 240, 255, 0.1);
-    box-shadow: 0 0 20px rgba(0, 240, 255, 0.05);
+  20% {
+    transform: skew(-10deg);
+    filter: blur(1px);
   }
 
-  .holo-card {
-    position: relative;
-    overflow: hidden;
+  40% {
+    transform: skew(10deg);
+    filter: blur(0px);
   }
 
-  .holo-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transform: skewX(-25deg);
-    transition: 0.5s;
+  60% {
+    transform: skew(-5deg);
+    filter: blur(0.5px);
   }
 
-  .holo-card:hover::before {
-    left: 200%;
+  80% {
+    transform: skew(5deg);
   }
 
-  /* Custom Scrollbar - Minimal HUD */
-  ::-webkit-scrollbar {
-    width: 4px;
+  100% {
+    transform: skew(0deg);
   }
+}
 
-  ::-webkit-scrollbar-track {
-    background: #000;
-  }
+.animate-glitch {
+  animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+}
 
-  ::-webkit-scrollbar-thumb {
-    background: var(--primary);
-  }
+.hover-glitch:hover {
+  animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
 
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
+/* Hologram / Glassmorphism 2050 */
+.holo-glass {
+  background: rgba(5, 5, 10, 0.4);
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(0, 240, 255, 0.1);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.05);
+}
 
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+.holo-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.holo-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: skewX(-25deg);
+  transition: 0.5s;
+}
+
+.holo-card:hover::before {
+  left: 200%;
+}
+
+/* Custom Scrollbar - Minimal HUD */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

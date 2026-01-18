@@ -1,5 +1,5 @@
+import { Inter, Oswald } from "next/font/google";
 import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -21,10 +21,10 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const poppins = Poppins({
-  variable: "--font-poppins",
-  weight: ["400", "500", "600", "700", "800", "900"],
+const oswald = Oswald({
+  variable: "--font-oswald",
   subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -50,7 +50,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${poppins.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}
+        className={`${inter.variable} ${oswald.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}
       >
         <MusicProvider>
           <ThemeProvider attribute="data-mode" defaultTheme="electronics" enableSystem={false} themes={["fashion", "electronics"]}>
