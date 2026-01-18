@@ -26,66 +26,76 @@ export function ProfileCard({ user, profile }: ProfileCardProps) {
     };
 
     return (
-        <div className="bg-card border border-white/5 rounded-2xl p-6 md:p-8 space-y-6">
-            <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-primary to-secondary p-1">
+        <div className="bg-[#1A1A1A] border border-white/5 rounded-3xl p-6 md:p-8 space-y-8">
+            {/* Avatar & Info */}
+            <div className="flex flex-col items-center text-center space-y-4">
+                <div className="relative group">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-[#D9F99D] to-primary rounded-full blur opacity-40 group-hover:opacity-60 transition-opacity" />
+                    <div className="relative w-24 h-24 rounded-full p-[2px] bg-gradient-to-tr from-[#D9F99D] to-transparent">
                         <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
                             {profile?.avatar_url ? (
                                 <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
-                                <UserIcon className="w-8 h-8 text-muted-foreground" />
+                                <UserIcon className="w-10 h-10 text-white/50" />
                             )}
                         </div>
                     </div>
-                    <div>
-                        <h2 className="text-xl font-bold text-white">{profile?.full_name || "RIIQX User"}</h2>
-                        <p className="text-sm text-gray-400">{user.email}</p>
-                    </div>
                 </div>
-                <button
-                    onClick={handleSignOut}
-                    className="text-muted-foreground hover:text-white transition-colors p-2"
-                    title="Sign Out"
-                >
-                    <LogOut className="w-5 h-5" />
-                </button>
+                <div>
+                    <h2 className="text-2xl font-black text-white uppercase tracking-tight">{profile?.full_name || "RIIQX User"}</h2>
+                    <p className="text-sm font-medium text-white/40">{user.email}</p>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-white/5 rounded-xl p-4 border border-white/5">
-                    <div className="flex items-center space-x-3 mb-2">
-                        <Wallet className="w-5 h-5 text-primary" />
-                        <span className="text-sm font-medium text-gray-300">Wallet Balance</span>
+            <div className="w-full h-px bg-white/5" />
+
+            {/* Quick Stats Grid */}
+            <div className="grid grid-cols-2 gap-4">
+                <div className="bg-black/50 rounded-2xl p-4 border border-white/5 hover:border-[#D9F99D]/30 transition-colors">
+                    <div className="flex items-center space-x-2 mb-2">
+                        <div className="p-1.5 bg-[#D9F99D]/10 rounded-lg">
+                            <Wallet className="w-4 h-4 text-[#D9F99D]" />
+                        </div>
+                        <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">Wallet</span>
                     </div>
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-xl font-black text-white">
                         ${profile?.wallet_balance?.toFixed(2) || "0.00"}
                     </p>
                 </div>
 
-                <div className="bg-white/5 rounded-xl p-4 border border-white/5">
-                    <div className="flex items-center space-x-3 mb-2">
-                        <Gift className="w-5 h-5 text-secondary" />
-                        <span className="text-sm font-medium text-gray-300">Referral Code</span>
+                <div className="bg-black/50 rounded-2xl p-4 border border-white/5 hover:border-[#D9F99D]/30 transition-colors">
+                    <div className="flex items-center space-x-2 mb-2">
+                        <div className="p-1.5 bg-white/10 rounded-lg">
+                            <Gift className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">Referral</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                        <code className="text-lg font-mono font-bold text-white tracking-wider">
-                            {profile?.referral_code || "---"}
-                        </code>
-                        {/* Copy button logic could go here */}
-                    </div>
+                    <code className="text-sm font-mono font-bold text-white break-all">
+                        {profile?.referral_code || "---"}
+                    </code>
                 </div>
             </div>
 
-            <div className="pt-4 border-t border-white/5">
-                <h3 className="text-sm font-medium text-gray-400 mb-4">Account Actions</h3>
-                <div className="flex flex-wrap gap-3">
-                    <Link href="/dashboard/profile">
-                        <NeonButton variant="primary" className="text-sm py-2 px-4 w-full sm:w-auto">Edit Profile</NeonButton>
-                    </Link>
-                    <Link href="/dashboard/addresses">
-                        <NeonButton variant="primary" className="text-sm py-2 px-4 w-full sm:w-auto">Manage Addresses</NeonButton>
-                    </Link>
+            {/* Actions */}
+            <div className="space-y-3">
+                <Link href="/dashboard/profile" className="block">
+                    <button className="w-full bg-white text-black font-black uppercase text-sm py-4 rounded-xl hover:bg-[#D9F99D] transition-colors relative group overflow-hidden">
+                        <span className="relative z-10">Edit Profile</span>
+                    </button>
+                </Link>
+                <Link href="/dashboard/addresses" className="block">
+                    <button className="w-full bg-transparent border border-white/10 text-white font-bold uppercase text-sm py-4 rounded-xl hover:bg-white/5 hover:border-white transition-all">
+                        Manage Addresses
+                    </button>
+                </Link>
+                <div className="pt-4">
+                    <button
+                        onClick={handleSignOut}
+                        className="w-full flex items-center justify-center space-x-2 text-white/30 hover:text-red-500 transition-colors text-xs font-bold uppercase tracking-widest"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        <span>Sign Out</span>
+                    </button>
                 </div>
             </div>
         </div>

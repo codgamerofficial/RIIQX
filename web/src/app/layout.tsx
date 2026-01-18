@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CartSheet } from "@/components/cart/CartSheet";
+import { BottomNav } from "@/components/layout/BottomNav";
 import { LivingScrollProvider } from "@/components/ui/LivingScrollProvider";
 import { HyperCursor } from "@/components/ui/HyperCursor";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
@@ -13,13 +14,16 @@ import { MusicProvider } from "@/context/MusicContext";
 import { DynamicIsland } from "@/components/ui/DynamicIsland/DynamicIsland";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const poppins = Poppins({
+  variable: "--font-poppins",
+  weight: ["400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
 });
 
@@ -46,15 +50,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground min-h-screen flex flex-col`}
+        className={`${inter.variable} ${poppins.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}
       >
         <MusicProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <ThemeProvider attribute="data-mode" defaultTheme="electronics" enableSystem={false} themes={["fashion", "electronics"]}>
             <LivingScrollProvider>
               <HyperCursor />
               <ScrollProgress />
               <Navbar />
-              <main className="flex-grow">
+              <main className="flex-grow pb-24 md:pb-0">
                 {children}
               </main>
               {/* MusicPlayer removed - Integrated into DynamicIsland */}
@@ -63,6 +67,7 @@ export default function RootLayout({
             </LivingScrollProvider>
             <DynamicIsland /> {/* Placeholder for next step */}
             <CartSheet />
+            <BottomNav />
             <Toaster />
           </ThemeProvider>
         </MusicProvider>

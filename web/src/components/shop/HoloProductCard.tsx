@@ -3,14 +3,8 @@
 import { useRealityStore } from "@/store/reality-store";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-
-interface Product {
-    id: string;
-    title: string;
-    price: string;
-    image: string;
-    category: 'fashion' | 'electronics';
-}
+import { Product } from "@/lib/shopify/types";
+import { formatPrice } from "@/lib/shopify";
 
 export function HoloProductCard({ product, index = 0, onClick }: { product: Product, index?: number, onClick?: () => void }) {
     const mode = useRealityStore((state) => state.mode);
@@ -49,9 +43,10 @@ export function HoloProductCard({ product, index = 0, onClick }: { product: Prod
                 <motion.div
                     layoutId={`image-${product.id}`}
                     className={cn(
-                        "w-full h-full animate-pulse transition-colors duration-700",
+                        "w-full h-full animate-pulse transition-colors duration-700 bg-cover bg-center",
                         isFashion ? "bg-neutral-800" : "bg-neutral-900"
                     )}
+                    style={{ backgroundImage: product.featuredImage ? `url(${product.featuredImage.url})` : undefined }}
                 />
 
                 {/* Electronics overlay */}
@@ -81,7 +76,7 @@ export function HoloProductCard({ product, index = 0, onClick }: { product: Prod
                         isFashion ? "text-white/60" : "text-white/40 font-mono"
                     )}
                 >
-                    {product.price}
+                    {formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode)}
                 </motion.p>
 
                 {/* Adaptive CTA */}

@@ -4,18 +4,12 @@ import { useState } from "react";
 import { HoloProductCard } from "./HoloProductCard";
 import { ProductOverlay } from "./ProductOverlay";
 import { AnimatePresence } from "framer-motion";
-
-interface Product {
-    id: string;
-    title: string;
-    price: string;
-    image: string;
-    category: 'fashion' | 'electronics';
-}
+import { Product } from "@/lib/shopify/types";
+import { formatPrice } from "@/lib/shopify";
 
 interface DiscoveryZoneProps {
-    products: readonly Product[];
-    className?: string; // To allow passing grid classes
+    products: Product[];
+    className?: string;
 }
 
 export function DiscoveryZone({ products, className }: DiscoveryZoneProps) {

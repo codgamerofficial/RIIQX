@@ -2,70 +2,123 @@
 
 import { useRef, useEffect } from "react";
 import gsap from "gsap";
-import { cn } from "@/lib/utils";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 /**
  * HeroFashion
- * The "Organic" reality mode.
- * Features: Soft gradients, serif typography, floating cloth simulation (CSS/GSAP), warm lighting.
+ * The "Light/Organic" reality mode.
+ * Features: Parallax Lifestyle Imagery, Mouse-reactive layers, Clean typography.
  */
 export function HeroFashion() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const titleRef = useRef<HTMLHeadingElement>(null);
+    const { scrollY } = useScroll();
+
+    // Mouse Parallax Logic
+    const mouseX = useSpring(0, { stiffness: 50, damping: 20 });
+    const mouseY = useSpring(0, { stiffness: 50, damping: 20 });
 
     useEffect(() => {
-        const ctx = gsap.context(() => {
-            // Soft entry animation
-            gsap.fromTo(titleRef.current,
-                { y: 100, opacity: 0, filter: "blur(20px)" },
-                { y: 0, opacity: 1, filter: "blur(0px)", duration: 2, ease: "power4.out" }
-            );
+        const handleMouseMove = (e: MouseEvent) => {
+            const { innerWidth, innerHeight } = window;
+            const x = e.clientX / innerWidth - 0.5;
+            const y = e.clientY / innerHeight - 0.5;
+            mouseX.set(x);
+            mouseY.set(y);
+        };
+        window.addEventListener("mousemove", handleMouseMove);
+        return () => window.removeEventListener("mousemove", handleMouseMove);
+    }, [mouseX, mouseY]);
 
-            // Floating background blobs
-            gsap.to(".blob", {
-                y: "random(-50, 50)",
-                x: "random(-50, 50)",
-                rotation: "random(-180, 180)",
-                duration: "random(10, 20)",
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut"
-            });
-        }, containerRef);
+    // Parallax transforms
+    const imageX = useTransform(mouseX, [-0.5, 0.5], [20, -20]);
+    const imageY = useTransform(mouseY, [-0.5, 0.5], [20, -20]);
+    const textX = useTransform(mouseX, [-0.5, 0.5], [-40, 40]);
+    const textY = useTransform(mouseY, [-0.5, 0.5], [-40, 40]);
 
-        return () => ctx.revert();
-    }, []);
+    // Scroll Parallax
+    const y1 = useTransform(scrollY, [0, 1000], [0, 400]);
+    const y2 = useTransform(scrollY, [0, 1000], [0, -200]);
 
     return (
-        <section ref={containerRef} className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#0a0505]">
+        <section ref={containerRef} className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#ffffff]">
 
-            {/* Organic Background */}
-            <div className="absolute inset-0 opacity-40 mix-blend-screen">
-                <div className="blob absolute top-1/4 left-1/4 w-96 h-96 bg-primary rounded-full blur-[100px] opacity-60" />
-                <div className="blob absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-secondary rounded-full blur-[120px] opacity-40 animate-pulse" />
-                <div className="blob absolute top-1/2 left-1/2 w-64 h-64 bg-accent rounded-full blur-[80px] opacity-30" />
+            {/* Parallax Background Layers */}
+            <motion.div
+                style={{ x: imageX, y: imageY }}
+                className="absolute inset-0 z-0 opacity-80"
+            >
+                <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-10" />
+                {/* Placeholder for High-Res Lifestyle Image */}
+                <img
+                    src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2670&auto=format&fit=crop"
+                    alt="Fashion Background"
+                    className="w-full h-full object-cover scale-110"
+                />
+            </motion.div>
+
+            {/* Floating Elements (Organic Shapes) */}
+            <div className="absolute inset-0 pointer-events-none z-1 overflow-hidden">
+                <motion.div
+                    style={{ y: y1, x: textX }}
+                    className="absolute top-20 right-20 w-64 h-64 bg-primary/20 rounded-full blur-[80px]"
+                />
+                <motion.div
+                    style={{ y: y2, x: textX }}
+                    className="absolute bottom-20 left-20 w-96 h-96 bg-secondary/20 rounded-full blur-[100px]"
+                />
             </div>
 
             {/* Content */}
-            <div className="relative z-10 text-center space-y-6 max-w-full px-4">
-                <div className="overflow-hidden">
-                    <h1 ref={titleRef} className="text-5xl sm:text-7xl md:text-[10rem] font-serif italic text-white/90 leading-none tracking-tighter mix-blend-overlay">
-                        Astral <span className="font-light not-italic">Fit</span>
-                    </h1>
-                </div>
+            <motion.div
+                style={{ x: textX, y: textY }}
+                className="relative z-10 text-center space-y-8 max-w-full px-4 mix-blend-darken"
+            >
+                <h1 className="text-6xl sm:text-8xl md:text-[8rem] lg:text-[10rem] font-serif italic text-black leading-none tracking-tighter">
+                    <span className="block overflow-hidden">
+                        <motion.span
+                            initial={{ y: "100%" }}
+                            animate={{ y: 0 }}
+                            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+                            className="block"
+                        >
+                            Astral
+                        </motion.span>
+                    </span>
+                    <span className="block overflow-hidden">
+                        <motion.span
+                            initial={{ y: "100%" }}
+                            animate={{ y: 0 }}
+                            transition={{ duration: 1.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                            className="block font-light not-italic text-black/80"
+                        >
+                            Collection
+                        </motion.span>
+                    </span>
+                </h1>
 
-                <p className="font-sans text-white/50 tracking-[0.3em] uppercase text-sm animate-fade-in">
+                <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1, duration: 1 }}
+                    className="font-sans text-black/60 tracking-[0.3em] uppercase text-sm"
+                >
                     Fluidity • Elegance • Emotion
-                </p>
+                </motion.p>
 
-                {/* Fashion CTA - Soft Pill */}
-                <button className="mt-8 px-8 py-3 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 transition-all text-white backdrop-blur-md hover:scale-105 active:scale-95 duration-500">
-                    Explore Collection
-                </button>
-            </div>
-
-            {/* Foregound Atmosphere (Dust motes) */}
-            <div className="absolute inset-0 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-150 contrast-150"></div>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 1.2, duration: 0.8 }}
+                >
+                    <button className="group relative px-10 py-4 overflow-hidden rounded-full bg-black text-white hover:bg-black/90 transition-all shadow-xl">
+                        <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                        <span className="relative font-bold tracking-widest uppercase text-xs flex items-center gap-2">
+                            Explore Collection
+                        </span>
+                    </button>
+                </motion.div>
+            </motion.div>
         </section>
     );
 }
+

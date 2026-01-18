@@ -38,36 +38,43 @@ export function OrderHistory({ orders }: OrderHistoryProps) {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-xl font-bold text-white">Recent Orders</h2>
+            <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Drop History</h2>
+                <button className="text-[10px] font-bold text-white/50 hover:text-white uppercase tracking-widest transition-colors">View All</button>
+            </div>
+
             <div className="space-y-4">
                 {orders.map((order) => (
                     <div
                         key={order.id}
-                        className="bg-card border border-white/5 rounded-xl p-5 hover:border-white/10 transition-colors"
+                        className="group bg-black/40 border border-white/5 rounded-xl p-5 hover:border-[#D9F99D]/50 transition-all duration-300 cursor-pointer"
                     >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                            <div>
-                                <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Order ID</p>
-                                <p className="font-mono text-sm text-white">{order.id.slice(0, 8)}...</p>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-center space-x-4">
+                                <div className="p-3 bg-white/5 rounded-lg group-hover:bg-[#D9F99D]/10 transition-colors">
+                                    <Package className="w-6 h-6 text-white/70 group-hover:text-[#D9F99D] transition-colors" />
+                                </div>
+                                <div>
+                                    <p className="font-mono text-xs text-[#D9F99D] mb-1">#{order.id.slice(0, 8)}</p>
+                                    <p className="text-xs text-white/40 uppercase font-bold tracking-wide">
+                                        {new Date(order.created_at || "").toLocaleDateString()}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Date</p>
-                                <p className="text-sm text-white">
-                                    {new Date(order.created_at || "").toLocaleDateString()}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Total</p>
-                                <p className="text-sm font-bold text-white">${order.total_amount.toFixed(2)}</p>
-                            </div>
-                            <div>
-                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
-                                    {getStatusIcon(order.status)}
-                                    <span className="capitalize">{order.status}</span>
-                                </span>
+
+                            <div className="flex items-center justify-between sm:justify-end gap-6 flex-1">
+                                <div>
+                                    <p className="text-[10px] text-white/30 uppercase font-bold mb-1 pt-2 sm:pt-0">Total</p>
+                                    <p className="text-sm font-bold text-white">${order.total_amount.toFixed(2)}</p>
+                                </div>
+                                <div className="text-right">
+                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest border ${getStatusColor(order.status)}`}>
+                                        {getStatusIcon(order.status)}
+                                        <span className="capitalize">{order.status}</span>
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                        {/* Could add 'View Details' button here linking to dynamic order page */}
                     </div>
                 ))}
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShoppingBag, ArrowRight } from "lucide-react";
+import { X, ShoppingBag, ArrowRight, Trash2 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { CartItem } from "./CartItem";
 import { NeonButton } from "@/components/ui/neon-button";
@@ -29,7 +29,7 @@ export function CartSheet() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setCartOpen(false)}
-                        className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm"
+                        className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md"
                     />
 
                     {/* Drawer */}
@@ -37,32 +37,72 @@ export function CartSheet() {
                         initial={{ x: "100%" }}
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
-                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed top-0 right-0 z-[70] h-full w-full max-w-md bg-card border-l border-white/10 shadow-2xl flex flex-col"
+                        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                        className="fixed top-0 right-0 z-[70] h-full w-full max-w-md bg-[#121212] border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col"
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between p-6 border-b border-white/5">
-                            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                                <ShoppingBag className="w-5 h-5 text-primary" />
-                                Your Cart
+                        <div className="flex items-center justify-between p-6 border-b border-white/10 bg-[#121212]">
+                            <h2 className="text-2xl font-black text-white uppercase tracking-tighter flex items-center gap-2">
+                                <span className="text-primary">///</span> Your Cart
+                                <span className="bg-white/10 text-white text-xs font-bold px-2 py-1 rounded-full ml-2">
+                                    {items.length}
+                                </span>
                             </h2>
                             <button
                                 onClick={() => setCartOpen(false)}
-                                className="p-2 text-muted-foreground hover:text-white transition-colors"
+                                className="p-2 text-white/50 hover:text-primary transition-colors hover:rotate-90 duration-300"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="w-6 h-6" />
                             </button>
                         </div>
 
+                        {/* Free Shipping Progress */}
+                        <div className="px-6 pb-2 pt-6 bg-[#121212]">
+                            <div className="bg-neutral-900 rounded-none border border-white/10 p-5 relative overflow-hidden group">
+                                {(() => {
+                                    const total = getCartTotal();
+                                    const threshold = 5000;
+                                    const progress = Math.min((total / threshold) * 100, 100);
+                                    const remaining = threshold - total;
+
+                                    return (
+                                        <div className="space-y-3 relative z-10">
+                                            <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
+                                                <span className="text-white/70">
+                                                    {remaining > 0 ? `Add ${formatPrice(remaining.toString(), 'INR')} for Free Shipping` : "Free Shipping Unlocked!"}
+                                                </span>
+                                                <span className="text-primary">{Math.round(progress)}%</span>
+                                            </div>
+                                            <div className="h-1.5 w-full bg-white/10 overflow-hidden">
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${progress}%` }}
+                                                    transition={{ duration: 1, ease: "easeOut" }}
+                                                    className={`h-full ${remaining <= 0 ? 'bg-primary shadow-[0_0_10px_#D9F99D]' : 'bg-white'}`}
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+                            </div>
+                        </div>
+
                         {/* Items */}
-                        <div className="flex-1 overflow-y-auto p-6 space-y-2">
+                        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 bg-[#121212] custom-scrollbar">
                             {items.length === 0 ? (
-                                <div className="h-full flex flex-col items-center justify-center text-center space-y-4 pt-12 text-muted-foreground">
-                                    <ShoppingBag className="w-12 h-12 opacity-20" />
-                                    <p>Your cart is empty.</p>
+                                <div className="h-full flex flex-col items-center justify-center text-center space-y-6 pt-12 text-muted-foreground">
+                                    <div className="w-24 h-24 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center animate-pulse">
+                                        <ShoppingBag className="w-10 h-10 opacity-30" />
+                                    </div>
+                                    <div>
+                                        <p className="text-2xl font-black text-white uppercase tracking-tight mb-2">Cart is Empty</p>
+                                        <p className="text-sm text-white/50 max-w-[200px] mx-auto">
+                                            Your bag is looking a little light. Check out the latest drops to fix that.
+                                        </p>
+                                    </div>
                                     <button
                                         onClick={() => setCartOpen(false)}
-                                        className="text-primary hover:underline text-sm"
+                                        className="mt-4 px-8 py-3 bg-white text-black font-black uppercase tracking-widest hover:bg-primary transition-colors text-xs"
                                     >
                                         Start Shopping
                                     </button>
@@ -76,21 +116,25 @@ export function CartSheet() {
 
                         {/* Footer */}
                         {items.length > 0 && (
-                            <div className="p-6 border-t border-white/5 bg-background/50 backdrop-blur-sm">
-                                <div className="flex items-center justify-between mb-4">
-                                    <span className="text-white font-medium">Subtotal</span>
-                                    <span className="text-xl font-bold text-white">
-                                        {formatPrice(getCartTotal().toString(), 'INR')}
-                                    </span>
+                            <div className="p-6 border-t border-white/10 bg-[#121212]">
+                                <div className="space-y-2 mb-6">
+                                    <div className="flex items-center justify-between text-sm text-white/60">
+                                        <span>Subtotal</span>
+                                        <span>{formatPrice(getCartTotal().toString(), 'INR')}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-2xl font-black text-white uppercase">
+                                        <span>Total</span>
+                                        <span>{formatPrice(getCartTotal().toString(), 'INR')}</span>
+                                    </div>
+                                    <p className="text-[10px] text-white/40 uppercase tracking-widest text-right">
+                                        Shipping & Taxes Calculated at Checkout
+                                    </p>
                                 </div>
-                                <p className="text-xs text-muted-foreground mb-6">
-                                    Shipping and taxes calculated at checkout.
-                                </p>
-                                <Link href="/checkout">
-                                    <NeonButton className="w-full py-4 text-base" glow>
-                                        <span className="mr-2">Checkout</span>
-                                        <ArrowRight className="w-4 h-4" />
-                                    </NeonButton>
+                                <Link href="/checkout" className="block">
+                                    <button className="w-full py-4 bg-primary text-black font-black uppercase tracking-widest hover:bg-white transition-colors flex items-center justify-center space-x-2 group">
+                                        <span>Secure Checkout</span>
+                                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                    </button>
                                 </Link>
                             </div>
                         )}

@@ -3,14 +3,18 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
-import { Hero3D } from "./Hero3D";
+
 import { NeonButton } from "@/components/ui/neon-button";
 
 export function HeroSection() {
     return (
         <section className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-background">
-            {/* 3D Background */}
-            <Hero3D />
+            {/* 2D Background */}
+            <div className="absolute inset-0 z-0">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 via-[#0a0505] to-black" />
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1535498730771-e735b998cd64?q=80&w=2568&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-overlay" />
+                <div className="absolute inset-0 bg-black/60" />
+            </div>
 
             {/* Content Overlay */}
             <div className="relative z-10 text-center max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
