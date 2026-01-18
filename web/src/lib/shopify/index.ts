@@ -158,15 +158,17 @@ export async function getCollectionProducts({
     sortKey,
     reverse,
     limit = 24,
+    filters
 }: {
     handle: string;
     sortKey?: 'TITLE' | 'PRICE' | 'CREATED' | 'BEST_SELLING';
     reverse?: boolean;
     limit?: number;
+    filters?: any[];
 }): Promise<{ products: Product[]; pageInfo: Connection<Product>['pageInfo'] }> {
     const res = await shopifyFetch<{ collection: { products: Connection<Product> } }>({
         query: require('./queries').COLLECTION_PRODUCTS_QUERY,
-        variables: { handle, first: limit, sortKey, reverse },
+        variables: { handle, first: limit, sortKey, reverse, filters },
         revalidate: 60,
     });
 

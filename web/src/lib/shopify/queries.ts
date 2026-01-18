@@ -15,11 +15,18 @@ export const PRODUCTS_QUERY = `
           title
           description
           availableForSale
+          productType
+          tags
           featuredImage {
             url
             altText
             width
             height
+          }
+          options {
+            id
+            name
+            values
           }
           priceRange {
             minVariantPrice {
@@ -156,9 +163,9 @@ export const COLLECTIONS_QUERY = `
 `;
 
 export const COLLECTION_PRODUCTS_QUERY = `
-  query getCollectionProducts($handle: String!, $first: Int = 24, $sortKey: ProductCollectionSortKeys, $reverse: Boolean) {
+  query getCollectionProducts($handle: String!, $first: Int = 24, $sortKey: ProductCollectionSortKeys, $reverse: Boolean, $filters: [ProductFilter!]) {
     collection(handle: $handle) {
-      products(first: $first, sortKey: $sortKey, reverse: $reverse) {
+      products(first: $first, sortKey: $sortKey, reverse: $reverse, filters: $filters) {
         pageInfo {
           hasNextPage
           endCursor
@@ -176,6 +183,12 @@ export const COLLECTION_PRODUCTS_QUERY = `
               altText
               width
               height
+            }
+            productType
+            options {
+              id
+              name
+              values
             }
             priceRange {
               minVariantPrice {

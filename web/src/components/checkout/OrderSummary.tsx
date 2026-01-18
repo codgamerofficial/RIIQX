@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from 'next/image';
 import { useCartStore } from '@/store/useCartStore';
@@ -9,10 +9,10 @@ export function OrderSummary() {
     const { items, getCartTotal } = useCartStore();
     const subtotal = getCartTotal();
 
-    // Mock calculations for now
-    const shippingThreshold = 200;
+    // India Friendly Thresholds
+    const shippingThreshold = 1499;
     const isFreeShipping = subtotal >= shippingThreshold;
-    const shippingCost = isFreeShipping ? 0 : 20;
+    const shippingCost = isFreeShipping ? 0 : 99; // Standard domestic shipping
     const total = subtotal + shippingCost;
 
     return (
@@ -93,7 +93,7 @@ export function OrderSummary() {
                 <div className="flex justify-between text-lg font-bold text-white pt-2 border-t border-white/10 mt-2">
                     <span>Total</span>
                     <span className="flex items-baseline gap-2">
-                        <span className="text-xs text-muted-foreground font-normal uppercase">USD</span>
+                        <span className="text-xs text-muted-foreground font-normal uppercase">INR</span>
                         {formatPrice(total)}
                     </span>
                 </div>

@@ -37,8 +37,8 @@ export function CategoryCircles({ collections }: CategoryCirclesProps) {
                                 whileHover={{ scale: 1.1, rotate: 5 }}
                                 whileTap={{ scale: 0.95 }}
                                 className={`w-20 h-20 md:w-24 md:h-24 rounded-full p-1 border-2 transition-colors relative ${isSale ? 'border-red-500 group-hover:border-red-400' :
-                                        isNew ? 'border-[#D9F99D] group-hover:border-white' :
-                                            'border-transparent group-hover:border-white'
+                                    isNew ? 'border-[#D9F99D] group-hover:border-white' :
+                                        'border-transparent group-hover:border-white'
                                     }`}
                             >
                                 <div className="w-full h-full rounded-full overflow-hidden relative bg-neutral-900">

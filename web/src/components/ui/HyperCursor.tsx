@@ -8,61 +8,52 @@ import { cn } from "@/lib/utils";
 
 export function HyperCursor() {
     const cursorRef = useRef<HTMLDivElement>(null);
-    const followerRef = useRef<HTMLDivElement>(null);
     const [isHovering, setIsHovering] = useState(false);
+    const [isClicking, setIsClicking] = useState(false);
     const pathname = usePathname();
     const mode = useRealityStore((state) => state.mode);
 
+    // Reset interactions on route change
     useEffect(() => {
         setIsHovering(false);
+        setIsClicking(false);
     }, [pathname]);
 
     useEffect(() => {
         const cursor = cursorRef.current;
-        const follower = followerRef.current;
 
         const moveCursor = (e: MouseEvent) => {
-            // Core Dot - Always tight
+            // Instant tracking for Arrow
+            // Using slightly smoothed but very fast duration for premium feel
             gsap.to(cursor, {
                 x: e.clientX,
                 y: e.clientY,
-                duration: 0.1,
-                ease: "power2.out"
+                duration: 0.05,
+                ease: "none"
             });
-
-            // Follower - Physics changes based on Mode
-            if (mode === 'fashion') {
-                gsap.to(follower, {
-                    x: e.clientX,
-                    y: e.clientY,
-                    duration: 0.8, // Slower, fluid
-                    ease: "power2.out"
-                });
-            } else {
-                // Electronics / Default
-                gsap.to(follower, {
-                    x: e.clientX,
-                    y: e.clientY,
-                    duration: 0.3, // Snappy, tactical
-                    ease: "expo.out"
-                });
-            }
         };
 
         const handleHoverStart = () => setIsHovering(true);
         const handleHoverEnd = () => setIsHovering(false);
+        const handleMouseDown = () => setIsClicking(true);
+        const handleMouseUp = () => setIsClicking(false);
 
         // Re-attach listeners when path changes
-        const interpretables = document.querySelectorAll('button, a, input, [role="button"]');
+        const interpretables = document.querySelectorAll('button, a, input, [role="button"], .clickable');
         interpretables.forEach(el => {
             el.addEventListener('mouseenter', handleHoverStart);
             el.addEventListener('mouseleave', handleHoverEnd);
         });
 
         window.addEventListener("mousemove", moveCursor);
+        window.addEventListener("mousedown", handleMouseDown);
+        window.addEventListener("mouseup", handleMouseUp);
 
         return () => {
             window.removeEventListener("mousemove", moveCursor);
+            window.removeEventListener("mousedown", handleMouseDown);
+            window.removeEventListener("mouseup", handleMouseUp);
+
             interpretables.forEach(el => {
                 el.removeEventListener('mouseenter', handleHoverStart);
                 el.removeEventListener('mouseleave', handleHoverEnd);
@@ -70,56 +61,39 @@ export function HyperCursor() {
         };
     }, [pathname, mode]);
 
-    // Visual Variants
-    const isFashion = mode === 'fashion';
-
     return (
         <div className="pointer-events-none fixed inset-0 z-[9999] mix-blend-exclusion">
-
-            {/* CORE CURSOR */}
             <div
                 ref={cursorRef}
                 className={cn(
-                    "fixed top-0 left-0 -translate-x-1/2 -translate-y-1/2 transition-all duration-500",
-                    isFashion ? "w-4 h-4 bg-primary blur-[2px] rounded-full opacity-80" : "w-2 h-2 bg-white rounded-none"
+                    "fixed top-0 left-0 transition-transform duration-200 ease-out origin-top-left",
+                    isClicking ? "scale-90" : "scale-100",
+                    isHovering ? "scale-110" : "scale-100"
                 )}
-            />
-
-            {/* FOLLOWER RING */}
-            <div
-                ref={followerRef}
-                className={cn(
-                    "fixed top-0 left-0 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center transition-all duration-500",
-                    isFashion
-                        ? isHovering
-                            ? "w-20 h-20 border border-primary/30 rounded-full bg-primary/10 blur-sm scale-110"
-                            : "w-12 h-12 border border-primary/20 rounded-full scale-100"
-                        : isHovering // Electronics Mode
-                            ? "w-12 h-12 border-2 border-primary rotate-90 rounded-none"
-                            : "w-8 h-8 border border-white/50 rounded-full rotate-45"
-                )}
+                style={{ willChange: "transform" }}
             >
-                {/* Electronics: Crosshairs */}
-                {!isFashion && (
-                    <>
-                        <div className={cn("absolute bg-white/30 transition-all", isHovering ? "w-[150%] h-[1px]" : "w-0 h-[1px]")} />
-                        <div className={cn("absolute bg-white/30 transition-all", isHovering ? "h-[150%] w-[1px]" : "h-0 w-[1px]")} />
-                    </>
-                )}
-
-                {/* Fashion: Soft Ripple pulse */}
-                {isFashion && (
-                    <div className="absolute inset-0 rounded-full border border-white/10 animate-ping opacity-50" />
-                )}
+                {/* Custom Arrow SVG */}
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]"
+                >
+                    <path
+                        d="M3 3L10.07 19.97L12.58 12.58L19.97 10.07L3 3Z"
+                        fill={mode === 'fashion' ? 'currentColor' : '#D9F99D'} // Primary color or custom
+                        className={cn(
+                            "transition-colors duration-300",
+                            mode === 'fashion' ? "text-primary" : "text-primary"
+                        )}
+                        stroke="white"
+                        strokeWidth="1.5"
+                        strokeLinejoin="round"
+                    />
+                </svg>
             </div>
-
-            {/* Mode Indicator Text */}
-            <div
-                ref={followerRef} // HACK: reusing ref for positioning causing chaos? No, this div is separated. 
-            // We'll just let it trail visually or remove strictly.
-            // Keeping it clean for now.
-            />
-
         </div>
     );
 }

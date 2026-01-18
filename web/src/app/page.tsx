@@ -3,29 +3,34 @@ import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { NewDrops } from "@/components/home/NewDrops";
 import { TrendingGrid } from "@/components/home/TrendingGrid";
 import { CategoryCircles } from "@/components/home/CategoryCircles";
+import { FeaturedSection } from "@/components/home/FeaturedSection";
 import { getCollectionProducts, getCollections } from "@/lib/shopify";
 
 export default async function Home() {
   const collections = await getCollections();
-  const fashionData = await getCollectionProducts({ handle: 'fashion', limit: 3 });
-  const electronicsData = await getCollectionProducts({ handle: 'electronics', limit: 10 });
 
-  const fashionProducts = fashionData.products;
-  const electronicsProducts = electronicsData.products;
+  // Confirmed Handles: new-arrivals, featured, streetwear
+  const newArrivalsData = await getCollectionProducts({ handle: 'new-arrivals', limit: 8 });
+  const featuredData = await getCollectionProducts({ handle: 'featured', limit: 4 });
+  const streetwearData = await getCollectionProducts({ handle: 'streetwear', limit: 30 }); // Using streetwear as "Trending" source for now
 
   return (
     <main className="flex flex-col min-h-screen">
-      {/* 1. Adaptive Entry Point - Starts Mixed/Electronics */}
+      {/* 1. Adaptive Entry Point */}
       <AdaptiveHero />
 
-      {/* 2. Category Circles (Real Data) */}
+      {/* 2. Category Circles (Real Collections) */}
       <CategoryCircles collections={collections} />
 
-      {/* 3. New Drops (Horizontal Scroll) */}
-      <NewDrops products={fashionProducts} />
+      {/* 3. New Drops (Horizontal Scroll from 'new-arrivals') */}
+      <NewDrops products={newArrivalsData.products} />
 
-      {/* 3. Trending Grid (Bento Layout) */}
-      <TrendingGrid products={electronicsProducts} />
+      {/* 4. Featured Section (High Impact Grid from 'featured') */}
+      <FeaturedSection products={featuredData.products} />
+
+      {/* 5. Trending Grid (Bento Layout from 'streetwear' or fallback) */}
+      {/* If 'streetwear' is large, we can use it here, or distinct 'trending' if available */}
+      <TrendingGrid products={streetwearData.products} />
 
       <NewsletterSection />
 

@@ -6,11 +6,11 @@ import { SortSelect } from "@/components/shop/SortSelect";
 import { Product } from "@/lib/shopify/types";
 
 export const metadata = {
-    title: 'New Arrivals | RIIQX',
-    description: 'The latest drops from RIIQX. Be the first to own the future.',
+    title: 'Streetwear | RIIQX',
+    description: 'Urban combat ready apparel.',
 };
 
-export default async function NewArrivalsPage({
+export default async function StreetwearPage({
     searchParams,
 }: {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -43,11 +43,8 @@ export default async function NewArrivalsPage({
         reverse = true;
     }
 
-    // specific to new arrivals, we default to CREATED desc if not specified? 
-    // Yes, but let's allow override.
-
     // Build Filters
-    const filters: any[] = []; // ProductFilter[]
+    const filters: any[] = [];
     if (colorParam) filters.push({ variantOption: { name: 'Color', value: colorParam } });
     if (sizeParam) filters.push({ variantOption: { name: 'Size', value: sizeParam } });
     if (typeParam) filters.push({ productType: typeParam });
@@ -60,21 +57,19 @@ export default async function NewArrivalsPage({
         });
     }
 
-    // Fetch Products with Filters
     const { products } = await getCollectionProducts({
-        handle: 'new-arrivals',
+        handle: 'streetwear',
         sortKey,
         reverse,
         filters
     });
 
-    // Fetch All for Sidebar Aggregation
+    // Aggregation
     const { products: allCollectionProducts } = await getCollectionProducts({
-        handle: 'new-arrivals',
+        handle: 'streetwear',
         limit: 100
     });
 
-    // Helper to extract options
     const extractOptions = (products: Product[], optionName: string) => {
         const values = new Set<string>();
         products.forEach(p => {
@@ -90,7 +85,6 @@ export default async function NewArrivalsPage({
     const availableColors = extractOptions(allCollectionProducts, 'Color');
     const availableSizes = extractOptions(allCollectionProducts, 'Size');
 
-    // Price Range
     const prices = allCollectionProducts.flatMap(p => [
         parseFloat(p.priceRange.minVariantPrice.amount),
         parseFloat(p.priceRange.maxVariantPrice.amount)
@@ -98,15 +92,13 @@ export default async function NewArrivalsPage({
     const minPrice = prices.length ? Math.min(...prices) : 0;
     const maxPrice = prices.length ? Math.max(...prices) : 10000;
 
-
     return (
         <div className="min-h-screen bg-background pt-24 pb-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header */}
                 <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white uppercase mb-2">
-                            New <span className="text-primary">Drops</span>
+                        <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-4">
+                            Street <span className="text-primary">Ops</span>
                         </h1>
                         <p className="text-white/50 text-lg font-medium">
                             {products.length} Items Found
@@ -120,7 +112,6 @@ export default async function NewArrivalsPage({
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-8">
-                    {/* Sidebar */}
                     <ProductFilters
                         availableTypes={availableTypes}
                         availableColors={availableColors}
@@ -129,15 +120,14 @@ export default async function NewArrivalsPage({
                         maxPrice={maxPrice}
                     />
 
-                    {/* Grid */}
                     <div className="flex-1">
                         <Suspense fallback={<div className="text-center py-20">Loading Grid...</div>}>
                             {products.length > 0 ? (
                                 <ProductGrid products={products} />
                             ) : (
                                 <div className="text-center py-24 border border-dashed border-white/10 rounded-2xl">
-                                    <p className="text-muted-foreground text-lg">No new drops matching your filters.</p>
-                                    <a href="/new-arrivals" className="text-[#D9F99D] underline mt-2 inline-block">Clear all filters</a>
+                                    <p className="text-muted-foreground text-lg">No street ops found.</p>
+                                    <a href="/streetwear" className="text-[#D9F99D] underline mt-2 inline-block">Clear all filters</a>
                                 </div>
                             )}
                         </Suspense>

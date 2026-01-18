@@ -1,49 +1,139 @@
-"use client";
+import { ProductGrid } from "@/components/shop/ProductGrid";
+import { getCollectionProducts } from "@/lib/shopify";
+import { Suspense } from "react";
+import { ProductFilters } from "@/components/shop/ProductFilters";
+import { SortSelect } from "@/components/shop/SortSelect";
+import { Product } from "@/lib/shopify/types";
 
-import { CinematicHero } from "@/components/ui/CinematicHero";
-import { motion } from "framer-motion";
+export const metadata = {
+    title: 'Accessories | RIIQX',
+    description: 'Cybernetic enhancements and storage modules.',
+};
 
-const products = [
-    { id: 1, name: "Neural Link Cap", price: 35, image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=2000&auto=format&fit=crop" },
-    { id: 2, name: "Cyber Visor", price: 65, image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=2000&auto=format&fit=crop" },
-    { id: 3, name: "Holo Watch", price: 250, image: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=2000&auto=format&fit=crop" },
-    { id: 4, name: "Utility Belt", price: 55, image: "https://images.unsplash.com/photo-1627384113743-6bd5a479fffd?q=80&w=2000&auto=format&fit=crop" },
-];
+export default async function AccessoriesPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+    const resolvedSearchParams = await searchParams;
+    const sort = resolvedSearchParams.sort as string | undefined;
 
-export default function AccessoriesPage() {
+    // Filters
+    const colorParam = resolvedSearchParams.color as string | undefined;
+    const sizeParam = resolvedSearchParams.size as string | undefined;
+    const minPriceParam = resolvedSearchParams.min_price as string | undefined;
+    const maxPriceParam = resolvedSearchParams.max_price as string | undefined;
+    const typeParam = resolvedSearchParams.category as string | undefined;
+
+    // Map Sort
+    let sortKey: 'TITLE' | 'PRICE' | 'CREATED' | 'BEST_SELLING' | undefined = 'CREATED';
+    let reverse = true;
+
+    if (sort === "best_selling") {
+        sortKey = 'BEST_SELLING';
+        reverse = false;
+    } else if (sort === "price_low") {
+        sortKey = 'PRICE';
+        reverse = false;
+    } else if (sort === "price_high") {
+        sortKey = 'PRICE';
+        reverse = true;
+    } else if (sort === "newest") {
+        sortKey = 'CREATED';
+        reverse = true;
+    }
+
+    // Build Filters
+    const filters: any[] = [];
+    if (colorParam) filters.push({ variantOption: { name: 'Color', value: colorParam } });
+    if (sizeParam) filters.push({ variantOption: { name: 'Size', value: sizeParam } });
+    if (typeParam) filters.push({ productType: typeParam });
+    if (minPriceParam || maxPriceParam) {
+        filters.push({
+            price: {
+                min: minPriceParam ? parseFloat(minPriceParam) : undefined,
+                max: maxPriceParam ? parseFloat(maxPriceParam) : undefined
+            }
+        });
+    }
+
+    const { products } = await getCollectionProducts({
+        handle: 'accessories',
+        sortKey,
+        reverse,
+        filters
+    });
+
+    // Aggregation
+    const { products: allCollectionProducts } = await getCollectionProducts({
+        handle: 'accessories',
+        limit: 100
+    });
+
+    const extractOptions = (products: Product[], optionName: string) => {
+        const values = new Set<string>();
+        products.forEach(p => {
+            const option = p.options?.find(o => o.name.toLowerCase() === optionName.toLowerCase() || o.name.toLowerCase() === optionName.toLowerCase() + 's');
+            if (option) {
+                option.values.forEach(v => values.add(v));
+            }
+        });
+        return Array.from(values);
+    };
+
+    const availableTypes = Array.from(new Set(allCollectionProducts.map(p => p.productType).filter(Boolean)));
+    const availableColors = extractOptions(allCollectionProducts, 'Color');
+    const availableSizes = extractOptions(allCollectionProducts, 'Size');
+
+    const prices = allCollectionProducts.flatMap(p => [
+        parseFloat(p.priceRange.minVariantPrice.amount),
+        parseFloat(p.priceRange.maxVariantPrice.amount)
+    ]);
+    const minPrice = prices.length ? Math.min(...prices) : 0;
+    const maxPrice = prices.length ? Math.max(...prices) : 10000;
+
     return (
-        <main className="bg-black min-h-screen pb-20">
-            <CinematicHero
-                title="ACCESSORIES"
-                subtitle="Upgrade Your Loadout"
-            />
+        <div className="min-h-screen bg-background pt-24 pb-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div>
+                        <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-4">
+                            <span className="text-primary">Loadout</span> / Accessories
+                        </h1>
+                        <p className="text-white/50 text-lg font-medium">
+                            {products.length} Items Found
+                        </p>
+                    </div>
 
-            <section className="max-w-7xl mx-auto px-4 -mt-20 relative z-20">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-                    {products.map((product, idx) => (
-                        <motion.div
-                            key={product.id}
-                            initial={{ opacity: 0 }}
-                            whileInView={{ opacity: 1 }}
-                            transition={{ delay: idx * 0.1 }}
-                            viewport={{ once: true }}
-                            className="group relative bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 transition-colors"
-                        >
-                            <div className="aspect-square relative">
-                                <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                            <div className="p-4">
-                                <h3 className="text-sm md:text-md font-bold text-white truncate">{product.name}</h3>
-                                <p className="text-xs md:text-sm text-gray-400 mt-1">${product.price}</p>
-                            </div>
-                        </motion.div>
-                    ))}
+                    <div className="flex items-center space-x-4">
+                        <span className="text-xs font-bold text-white/50 uppercase tracking-widest hidden md:block">Sort By:</span>
+                        <SortSelect />
+                    </div>
                 </div>
-            </section>
-        </main>
+
+                <div className="flex flex-col md:flex-row gap-8">
+                    <ProductFilters
+                        availableTypes={availableTypes}
+                        availableColors={availableColors}
+                        availableSizes={availableSizes}
+                        minPrice={minPrice}
+                        maxPrice={maxPrice}
+                    />
+
+                    <div className="flex-1">
+                        <Suspense fallback={<div className="text-center py-20">Loading Grid...</div>}>
+                            {products.length > 0 ? (
+                                <ProductGrid products={products} />
+                            ) : (
+                                <div className="text-center py-24 border border-dashed border-white/10 rounded-2xl">
+                                    <p className="text-muted-foreground text-lg">No accessories found.</p>
+                                    <a href="/accessories" className="text-[#D9F99D] underline mt-2 inline-block">Clear all filters</a>
+                                </div>
+                            )}
+                        </Suspense>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }

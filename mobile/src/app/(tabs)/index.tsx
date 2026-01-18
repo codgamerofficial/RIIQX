@@ -1,20 +1,26 @@
 import { View, Text, ScrollView, Image, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
 import { Link, Stack } from "expo-router";
 import { useEffect, useState } from "react";
-import { getProducts } from "@/lib/shopify";
+import { getProducts, getCollectionProducts } from "@/lib/shopify";
 import { Product } from "@/lib/shopify/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowRight } from "lucide-react-native";
 
 export default function HomeScreen() {
-    const [products, setProducts] = useState<Product[]>([]);
+    const [newDrops, setNewDrops] = useState<Product[]>([]);
+    const [trending, setTrending] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function loadData() {
             try {
-                const { products: fetchedProducts } = await getProducts({ limit: 4 });
-                setProducts(fetchedProducts);
+                // Fetch New Arrivals for "Latest Drops"
+                const { products: newArrivalsData } = await getCollectionProducts({ handle: 'new-arrivals', limit: 8 });
+                setNewDrops(newArrivalsData);
+
+                // Fetch Streetwear for "Trending"
+                const { products: trendingData } = await getCollectionProducts({ handle: 'streetwear', limit: 4 });
+                setTrending(trendingData);
             } catch (e) {
                 console.error(e);
             } finally {
@@ -24,7 +30,7 @@ export default function HomeScreen() {
         loadData();
     }, []);
 
-    const renderProduct = ({ item }: { item: Product }) => (
+    const renderCard = ({ item }: { item: Product }) => (
         <Link href="/shop" asChild>
             <TouchableOpacity className="mr-4 w-60 group">
                 <View className="aspect-[4/5] bg-muted rounded-2xl overflow-hidden border border-white/5 relative">
@@ -60,7 +66,7 @@ export default function HomeScreen() {
                         Digital streetwear for the metaverse generation. Limited drops available now.
                     </Text>
 
-                    <Link href="/shop" asChild>
+                    <Link href="/collections/new-arrivals" asChild>
                         <TouchableOpacity className="bg-[#D9F99D] self-start px-8 py-3 rounded-full flex-row items-center">
                             <Text className="text-black font-black uppercase tracking-widest mr-2">Shop Drops</Text>
                             <ArrowRight color="#000" size={16} />
@@ -72,7 +78,7 @@ export default function HomeScreen() {
                 <View className="pl-6 mb-8">
                     <View className="flex-row items-center justify-between pr-6 mb-4">
                         <Text className="text-white text-xl font-bold uppercase tracking-tight">Latest Drops</Text>
-                        <Link href="/shop" asChild>
+                        <Link href="/collections/new-arrivals" asChild>
                             <TouchableOpacity>
                                 <Text className="text-[#D9F99D] text-xs font-bold uppercase tracking-widest">View All</Text>
                             </TouchableOpacity>
@@ -83,8 +89,8 @@ export default function HomeScreen() {
                         <ActivityIndicator color="#D9F99D" />
                     ) : (
                         <FlatList
-                            data={products}
-                            renderItem={renderProduct}
+                            data={newDrops}
+                            renderItem={renderCard}
                             keyExtractor={(item) => item.id}
                             horizontal
                             showsHorizontalScrollIndicator={false}
@@ -93,12 +99,40 @@ export default function HomeScreen() {
                     )}
                 </View>
 
-                {/* Categories / Trending Grid placeholder */}
+                {/* Categories / Trending Grid */}
                 <View className="px-6">
-                    <Text className="text-white text-xl font-bold uppercase tracking-tight mb-4">Trending Now</Text>
-                    <View className="h-40 bg-muted/50 rounded-2xl border border-white/5 items-center justify-center">
-                        <Text className="text-white/30 font-bold uppercase">Trending Grid Loading...</Text>
+                    <View className="flex-row items-center justify-between mb-4">
+                        <Text className="text-white text-xl font-bold uppercase tracking-tight">Trending Heat</Text>
+                        <Link href="/collections/streetwear" asChild>
+                            <TouchableOpacity>
+                                <Text className="text-[#D9F99D] text-xs font-bold uppercase tracking-widest">View All</Text>
+                            </TouchableOpacity>
+                        </Link>
                     </View>
+
+                    {loading ? (
+                        <ActivityIndicator color="#D9F99D" />
+                    ) : (
+                        <View className="flex-row flex-wrap justify-between">
+                            {trending.map((item) => (
+                                <Link key={item.id} href="/shop" asChild>
+                                    <TouchableOpacity className="w-[48%] mb-4">
+                                        <View className="aspect-square bg-muted rounded-xl overflow-hidden border border-white/5 mb-2">
+                                            <Image
+                                                source={{ uri: item.featuredImage?.url }}
+                                                className="w-full h-full"
+                                                resizeMode="cover"
+                                            />
+                                        </View>
+                                        <Text className="text-white font-bold text-xs uppercase truncate">{item.title}</Text>
+                                        <Text className="text-white/50 text-[10px] font-bold">
+                                            {Number(item.priceRange.minVariantPrice.amount).toLocaleString('en-US', { style: 'currency', currency: item.priceRange.minVariantPrice.currencyCode })}
+                                        </Text>
+                                    </TouchableOpacity>
+                                </Link>
+                            ))}
+                        </View>
+                    )}
                 </View>
             </ScrollView>
         </SafeAreaView>

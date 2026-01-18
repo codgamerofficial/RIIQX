@@ -59,6 +59,8 @@ export type Product = {
         name: string;
         values: string[];
     }[];
+    productType: string;
+    tags: string[];
     media?: Connection<Media>;
 };
 

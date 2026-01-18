@@ -80,7 +80,7 @@ export function NewDrops({ products = [] }: NewDropsProps) {
 
                     {/* View All Card */}
                     <div className="h-[600px] w-[300px] flex-shrink-0 flex items-center justify-center border border-white/10 hover:bg-white/5 transition-colors group cursor-pointer">
-                        <Link href="/shop" className="text-center group-hover:scale-110 transition-transform">
+                        <Link href="/collections/new-arrivals" className="text-center group-hover:scale-110 transition-transform">
                             <span className="block text-4xl font-black text-white mb-2">VIEW<br />ALL</span>
                             <div className="w-12 h-1 bg-primary mx-auto" />
                         </Link>

@@ -1,9 +1,6 @@
-import { getCollectionProducts, getCollections, getProducts } from "@/lib/shopify";
-import { FilterSidebar } from "@/components/shop/FilterSidebar";
-import ProductGridClient from "@/components/shop/ProductGridClient";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Product, Connection } from "@/lib/shopify/types";
+import { getCollectionProducts } from "@/lib/shopify";
+import { ProductGrid } from "@/components/shop/ProductGrid";
+import { ProductFilters } from "@/components/shop/ProductFilters";
 
 export const revalidate = 60;
 
@@ -15,94 +12,140 @@ export default async function CollectionPage({
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
     const { handle } = await params;
-    const queryParams = await searchParams;
+    const resolvedSearchParams = await searchParams;
+    const sort = resolvedSearchParams.sort as string | undefined;
 
-    const sortKey = (queryParams.sort as any) || 'TITLE';
-    const reverse = queryParams.reverse === 'true';
+    let sortKey: 'TITLE' | 'PRICE' | 'CREATED' | 'BEST_SELLING' | undefined = undefined;
+    let reverse = false;
 
-    let products: Product[] = [];
-    let pageInfo: Connection<Product>['pageInfo'] = { hasNextPage: false, hasPreviousPage: false };
+    if (sort === "newest") {
+        sortKey = 'CREATED';
+        reverse = true;
+    } else if (sort === "best_selling") {
+        sortKey = 'BEST_SELLING';
+        reverse = false;
+    } else if (sort === "price_low") {
+        sortKey = 'PRICE';
+        reverse = false;
+    } else if (sort === "price_high") {
+        sortKey = 'PRICE';
+        reverse = true;
+    }
 
-    // Smart Fallbacks for Standard Pages
-    if (handle === 'new-arrivals') {
-        const res = await getProducts({ sortKey: 'CREATED_AT', reverse: true, limit: 24 });
-        products = res.products;
-        pageInfo = res.pageInfo;
-    } else if (handle === 'best-sellers') {
-        const res = await getProducts({ sortKey: 'BEST_SELLING', limit: 24 });
-        products = res.products;
-        pageInfo = res.pageInfo;
-    } else {
-        // 1. Try fetching as a standard Collection
-        const res = await getCollectionProducts({
-            handle,
-            sortKey,
-            reverse
+    // 1. Fetch products (max 100 for client filtering)
+    const { products } = await getCollectionProducts({
+        handle,
+        sortKey,
+        reverse,
+        limit: 100
+    });
+
+    const categoryParam = resolvedSearchParams.category as string | undefined;
+    const colorParam = resolvedSearchParams.color as string | undefined;
+    const sizeParam = resolvedSearchParams.size as string | undefined;
+    const minPriceParam = resolvedSearchParams.min_price ? parseFloat(resolvedSearchParams.min_price as string) : undefined;
+    const maxPriceParam = resolvedSearchParams.max_price ? parseFloat(resolvedSearchParams.max_price as string) : undefined;
+
+    // 2. Filter Logic (Client-Side for Collection Context)
+    let displayProducts = products;
+
+    if (categoryParam) {
+        displayProducts = displayProducts.filter(p => p.productType === categoryParam);
+    }
+
+    if (colorParam) {
+        displayProducts = displayProducts.filter(p =>
+            p.options.some(o =>
+                (o.name.toLowerCase() === 'color' || o.name.toLowerCase() === 'colour') &&
+                o.values.includes(colorParam)
+            )
+        );
+    }
+
+    if (sizeParam) {
+        displayProducts = displayProducts.filter(p =>
+            p.options.some(o =>
+                o.name.toLowerCase() === 'size' &&
+                o.values.includes(sizeParam)
+            )
+        );
+    }
+
+    if (minPriceParam !== undefined) {
+        displayProducts = displayProducts.filter(p =>
+            parseFloat(p.priceRange.minVariantPrice.amount) >= minPriceParam
+        );
+    }
+
+    if (maxPriceParam !== undefined) {
+        displayProducts = displayProducts.filter(p =>
+            parseFloat(p.priceRange.minVariantPrice.amount) <= maxPriceParam
+        );
+    }
+
+
+    // 3. Extract Available Options (from the FULL set, so filters don't disappear)
+    const availableTypes = Array.from(new Set(products.map(p => p.productType).filter(Boolean)));
+
+    // Aggregation Helper
+    const extractOptions = (items: typeof products, optionName: string) => {
+        const values = new Set<string>();
+        items.forEach(p => {
+            const option = p.options?.find(o => o.name.toLowerCase() === optionName.toLowerCase() || o.name.toLowerCase() === optionName.toLowerCase() + 's');
+            if (option) option.values.forEach(v => values.add(v));
         });
-        products = res.products;
-        pageInfo = res.pageInfo;
+        return Array.from(values);
+    };
 
-        // 2. If no products found, try fetching by Product Type (smart fallback for sidebar links)
-        if (products.length === 0) {
-            // Convert handle back to readable query (e.g. "mobile-back-case" -> "Mobile Back Case" or "mobile back case")
-            // Shopify search output is somewhat flexible, but exact "product_type:value" is best.
-            // We'll try a few variations or just a general query if type is specific.
-            const queryClean = handle.replace(/-/g, ' ');
-            // Query syntax: product_type:'T-shirt'
-            const typeQuery = `product_type:'${queryClean}' OR tag:'${queryClean}'`;
+    const availableColors = extractOptions(products, 'Color');
+    const availableSizes = extractOptions(products, 'Size');
 
-            console.log(`[CollectionPage] Fallback search for: ${typeQuery}`);
+    const prices = products.flatMap(p => [
+        parseFloat(p.priceRange.minVariantPrice.amount),
+        parseFloat(p.priceRange.maxVariantPrice.amount)
+    ]);
+    const minPrice = prices.length ? Math.min(...prices) : 0;
+    const maxPrice = prices.length ? Math.max(...prices) : 1000;
 
-            const searchRes = await getProducts({
-                query: typeQuery,
-                sortKey: sortKey === 'TITLE' ? undefined : (sortKey as any), // Search query sort keys might differ, defaulting for now
-                reverse,
-                limit: 24
-            });
 
-            if (searchRes.products.length > 0) {
-                products = searchRes.products;
-                pageInfo = searchRes.pageInfo;
-            }
-        }
-    }
-
-    const collections = await getCollections();
-
-    const currentCollection = collections.find(c => c.handle === handle);
-
-    if (!currentCollection && products.length === 0) {
-        // If collection doesn't exist in list AND returns no products, it might be invalid.
-        // But getCollectionProducts returns empty array if not found.
-        // We can check if `currentCollection` is found or handle 404.
-    }
+    // Formatting handle for title (e.g., "new-arrivals" -> "New Arrivals")
+    const title = handle.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
     return (
         <div className="min-h-screen bg-background pt-24 pb-12">
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Header */}
+                <div className="mb-12 border-b border-white/10 pb-6">
+                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white uppercase mb-2">
+                        {categoryParam ? `${title} / ${categoryParam}` : title}
+                    </h1>
+                    <p className="text-white/50 text-lg font-medium">
+                        {displayProducts.length} Items
+                    </p>
+                </div>
+
                 <div className="flex flex-col md:flex-row gap-8">
-                    {/* Left Sidebar */}
-                    <aside className="w-full md:w-64 shrink-0">
-                        <FilterSidebar collections={collections} />
-                    </aside>
+                    {/* Sidebar */}
+                    <ProductFilters
+                        availableTypes={availableTypes}
+                        availableColors={availableColors}
+                        availableSizes={availableSizes}
+                        minPrice={minPrice}
+                        maxPrice={maxPrice}
+                    />
 
-                    {/* Main Content */}
+                    {/* Grid */}
                     <div className="flex-1">
-                        {/* Header */}
-                        <div className="flex items-end justify-between mb-8 border-b border-white/10 pb-4">
-                            <div>
-                                <p className="text-secondary text-xs uppercase tracking-widest mb-2 font-bold">Collection</p>
-                                <h1 className="text-4xl font-black text-white mb-2 capitalize">{currentCollection?.title || handle.replace('-', ' ')}</h1>
-                                <p className="text-white/60 text-sm max-w-2xl">{currentCollection?.description}</p>
+                        {displayProducts.length > 0 ? (
+                            <ProductGrid products={displayProducts} />
+                        ) : (
+                            <div className="text-center py-24 border border-dashed border-white/10 rounded-2xl">
+                                <p className="text-muted-foreground text-lg">
+                                    No products found matching your filters.
+                                </p>
+                                <a href={`/collections/${handle}`} className="text-[#D9F99D] underline mt-2 inline-block">Clear all filters</a>
                             </div>
-                            <div className="flex gap-2">
-                                <Link href="?sort=BEST_SELLING" className="text-xs text-white/60 hover:text-white">Best Selling</Link>
-                                <Link href="?sort=PRICE&reverse=false" className="text-xs text-white/60 hover:text-white">Price: Low-High</Link>
-                                <Link href="?sort=PRICE&reverse=true" className="text-xs text-white/60 hover:text-white">Price: High-Low</Link>
-                            </div>
-                        </div>
-
-                        <ProductGridClient initialProducts={products} pageInfo={pageInfo} />
+                        )}
                     </div>
                 </div>
             </div>
