@@ -4,14 +4,9 @@ import { motion } from "framer-motion";
 import { useRealityStore } from "@/store/reality-store";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
-
-interface Product {
-    id: string;
-    title: string;
-    price: string;
-    image: string;
-    category: 'fashion' | 'electronics';
-}
+import { Product } from "@/lib/shopify/types";
+import { formatPrice } from "@/lib/shopify";
+import Image from "next/image";
 
 interface ProductOverlayProps {
     product: Product;
@@ -21,6 +16,8 @@ interface ProductOverlayProps {
 export function ProductOverlay({ product, onClose }: ProductOverlayProps) {
     const mode = useRealityStore((state) => state.mode);
     const isFashion = mode === 'fashion';
+
+    const price = formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode);
 
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-10 pointer-events-none">
@@ -59,8 +56,17 @@ export function ProductOverlay({ product, onClose }: ProductOverlayProps) {
                     {/* Placeholder for Big Image */}
                     <motion.div
                         layoutId={`image-${product.id}`}
-                        className="w-full h-full bg-neutral-700"
-                    />
+                        className="w-full h-full relative"
+                    >
+                        {product.featuredImage && (
+                            <Image
+                                src={product.featuredImage.url}
+                                alt={product.featuredImage.altText || product.title}
+                                fill
+                                className="object-cover"
+                            />
+                        )}
+                    </motion.div>
 
                     {/* Electronics Overlay */}
                     {!isFashion && (
@@ -87,7 +93,7 @@ export function ProductOverlay({ product, onClose }: ProductOverlayProps) {
                                 isFashion ? "text-white/60" : "text-secondary font-mono"
                             )}
                         >
-                            {product.price}
+                            {price}
                         </motion.p>
                     </div>
 
@@ -101,8 +107,7 @@ export function ProductOverlay({ product, onClose }: ProductOverlayProps) {
                             "text-lg leading-relaxed max-w-md",
                             isFashion ? "text-white/80 font-serif" : "text-white/60 font-mono text-sm"
                         )}>
-                            Start walking in the future. This item features adaptive material technology that responds to your environment.
-                            {isFashion ? " Fluid drape, organic texture." : " High-tensile strength, data-integrated weave."}
+                            {product.description || "Start walking in the future. This item features adaptive material technology that responds to your environment."}
                         </p>
 
                         <div className="flex gap-4">
