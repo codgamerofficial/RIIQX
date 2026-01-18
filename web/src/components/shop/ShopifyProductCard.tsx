@@ -111,20 +111,12 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
                             if (isInWishlist(product.id)) {
                                 removeFromWishlist(product.id);
                             } else {
-                                addToWishlist({
-                                    id: product.id,
-                                    handle: product.handle,
-                                    title: product.title,
-                                    image: mainImage,
-                                    price: price.amount,
-                                    currencyCode: price.currencyCode,
-                                    variantId: product.variants?.edges?.[0]?.node.id
-                                });
+                                addToWishlist(product);
                             }
                         }}
                         className={`absolute top-4 left-4 z-20 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 backdrop-blur-md border -translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 ${isInWishlist(product.id)
-                                ? "bg-red-500/20 border-red-500 text-red-500"
-                                : "bg-black/40 border-white/10 text-white hover:bg-white hover:text-black"
+                            ? "bg-red-500/20 border-red-500 text-red-500"
+                            : "bg-black/40 border-white/10 text-white hover:bg-white hover:text-black"
                             }`}
                         title="Add to Wishlist"
                     >
