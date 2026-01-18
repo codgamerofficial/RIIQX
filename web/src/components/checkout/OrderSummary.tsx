@@ -44,7 +44,9 @@ export function OrderSummary() {
                         <div className="flex-1 min-w-0">
                             <h4 className="text-sm font-medium truncate">{item.title}</h4>
                             <p className="text-xs text-muted-foreground">
-                                {item.selectedOptions?.map(opt => opt.value).join(' / ')}
+                                {item.color && <span>{item.color}</span>}
+                                {item.color && item.size && <span> / </span>}
+                                {item.size && <span>{item.size}</span>}
                             </p>
                         </div>
 
