@@ -105,14 +105,14 @@ export default function CartPage() {
                                     <div className="flex items-center justify-between mt-4">
                                         <div className="flex items-center gap-3">
                                             <button
-                                                onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                                                onClick={() => updateQuantity(item.id, item.variantId, Math.max(1, item.quantity - 1))}
                                                 className="w-8 h-8 border border-white/20 rounded-lg flex items-center justify-center hover:border-white transition-colors"
                                             >
                                                 <Minus className="w-4 h-4 text-white" />
                                             </button>
                                             <span className="text-white font-bold w-8 text-center">{item.quantity}</span>
                                             <button
-                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                onClick={() => updateQuantity(item.id, item.variantId, item.quantity + 1)}
                                                 className="w-8 h-8 border border-white/20 rounded-lg flex items-center justify-center hover:border-white transition-colors"
                                             >
                                                 <Plus className="w-4 h-4 text-white" />
@@ -120,7 +120,7 @@ export default function CartPage() {
                                         </div>
 
                                         <button
-                                            onClick={() => removeItem(item.id)}
+                                            onClick={() => removeItem(item.id, item.variantId)}
                                             className="text-neon-red hover:text-red-400 transition-colors flex items-center gap-2 text-sm font-bold"
                                         >
                                             <Trash2 className="w-4 h-4" />
