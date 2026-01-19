@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Bell, Lock, Trash2, Smartphone, Moon } from "lucide-react";
-import { Switch } from "@/components/ui/switch"; // Assuming we have or can use a switch, otherwise I'll use standard checkbox
+
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
