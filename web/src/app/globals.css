@@ -42,6 +42,14 @@
   --luxury-gold: #C9A24D;
   --luxury-chrome: #C7C7C7;
   --neon-red: #FF1F1F;
+
+  /* Bewakoof-Inspired Colors */
+  --bewakoof-yellow: #fdd835;
+  --bewakoof-green: #00b852;
+  --bewakoof-light-bg: #f5f5f5;
+  --bewakoof-white: #ffffff;
+  --bewakoof-dark-grey: #424242;
+  --bewakoof-light-grey: #9e9e9e;
 }
 
 @theme inline {
@@ -65,8 +73,17 @@
   --color-luxury-chrome: var(--luxury-chrome);
   --color-neon-red: var(--neon-red);
 
+  /* Bewakoof Colors */
+  --color-bewakoof-yellow: var(--bewakoof-yellow);
+  --color-bewakoof-green: var(--bewakoof-green);
+  --color-bewakoof-light-bg: var(--bewakoof-light-bg);
+  --color-bewakoof-white: var(--bewakoof-white);
+  --color-bewakoof-dark-grey: var(--bewakoof-dark-grey);
+  --color-bewakoof-light-grey: var(--bewakoof-light-grey);
+
   --font-display: var(--font-oswald), sans-serif;
   --font-sans: var(--font-inter), sans-serif;
+  --font-montserrat: var(--font-montserrat), sans-serif;
 }
 
 html {
@@ -221,4 +238,172 @@ body::before {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ===== Bewakoof-Inspired Utility Classes ===== */
+
+/* Product Badge Styles */
+.bewakoof-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 0.25rem;
+}
+
+.bewakoof-badge-default {
+  background-color: var(--bewakoof-dark-grey);
+  color: var(--bewakoof-white);
+}
+
+.bewakoof-badge-offer {
+  background-color: var(--bewakoof-green);
+  color: var(--bewakoof-white);
+}
+
+.bewakoof-badge-new {
+  background-color: var(--bewakoof-yellow);
+  color: #000000;
+}
+
+/* Rating Pill */
+.bewakoof-rating-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #000000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bewakoof-rating-star {
+  color: var(--bewakoof-yellow);
+}
+
+/* Bewakoof Button Styles */
+.bewakoof-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.bewakoof-btn-primary {
+  background-color: var(--bewakoof-yellow);
+  color: #000000;
+}
+
+.bewakoof-btn-primary:hover {
+  background-color: #fbc02d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(253, 216, 53, 0.3);
+}
+
+.bewakoof-btn-secondary {
+  background-color: var(--bewakoof-white);
+  color: #000000;
+  border: 2px solid var(--bewakoof-dark-grey);
+}
+
+.bewakoof-btn-secondary:hover {
+  background-color: var(--bewakoof-dark-grey);
+  color: var(--bewakoof-white);
+}
+
+/* Section Header Styles */
+.bewakoof-section-header {
+  font-family: var(--font-montserrat);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+/* Product Card Hover Effects */
+.bewakoof-product-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  background-color: var(--bewakoof-white);
+  border-radius: 0.5rem;
+}
+
+.bewakoof-product-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+.bewakoof-product-card img {
+  transition: transform 0.5s ease;
+}
+
+.bewakoof-product-card:hover img {
+  transform: scale(1.05);
+}
+
+/* Discount Text */
+.bewakoof-discount {
+  color: var(--bewakoof-green);
+  font-weight: 700;
+}
+
+/* Price Display */
+.bewakoof-price-original {
+  text-decoration: line-through;
+  color: var(--bewakoof-light-grey);
+  font-size: 0.875rem;
+}
+
+.bewakoof-price-current {
+  font-weight: 700;
+  color: #000000;
+  font-size: 1.125rem;
+}
+
+/* Sticky Header */
+.bewakoof-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--bewakoof-white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* Category Grid */
+.bewakoof-category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .bewakoof-category-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .bewakoof-category-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+/* Montserrat Font Utility */
+.font-montserrat {
+  font-family: var(--font-montserrat);
 }

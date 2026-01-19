@@ -4,7 +4,10 @@ import { NewDrops } from "@/components/home/NewDrops";
 import { TrendingGrid } from "@/components/home/TrendingGrid";
 import { CategoryCircles } from "@/components/home/CategoryCircles";
 import { FeaturedSection } from "@/components/home/FeaturedSection";
+import { PromotionalBanner } from "@/components/home/PromotionalBanner";
+import { TrendingCategories } from "@/components/home/TrendingCategories";
 import { getCollectionProducts, getCollections, getProducts } from "@/lib/shopify";
+import { ShoppingBag } from "lucide-react";
 
 export default async function Home() {
   const collections = await getCollections();
@@ -26,19 +29,28 @@ export default async function Home() {
 
   return (
     <main className="flex flex-col min-h-screen">
+      {/* Promotional Banner */}
+      <PromotionalBanner
+        message="2 Crore+ Customers Trust RIIQX"
+        icon={<ShoppingBag className="w-5 h-5" />}
+      />
+
       {/* 1. Adaptive Entry Point */}
       <AdaptiveHero />
 
-      {/* 2. Category Circles (Real Collections) */}
+      {/* 2. Trending Categories (Bewakoof-style) */}
+      <TrendingCategories collections={collections} />
+
+      {/* 3. Category Circles (Real Collections) */}
       <CategoryCircles collections={collections} />
 
-      {/* 3. New Drops (Horizontal Scroll - First 8 products) */}
+      {/* 4. New Drops (Horizontal Scroll - First 8 products) */}
       <NewDrops products={newArrivalsProducts} />
 
-      {/* 4. Featured Section (High Impact Grid - Next 4 products) */}
+      {/* 5. Featured Section (High Impact Grid - Next 4 products) */}
       <FeaturedSection products={featuredProducts} />
 
-      {/* 5. Trending Grid (Bento Layout - Next 12 products) */}
+      {/* 6. Trending Grid (Bento Layout - Next 12 products) */}
       <TrendingGrid products={trendingProducts} />
 
       <NewsletterSection />

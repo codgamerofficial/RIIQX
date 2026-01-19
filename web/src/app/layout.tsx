@@ -1,4 +1,4 @@
-import { Inter, Oswald } from "next/font/google";
+import { Inter, Oswald, Montserrat } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
@@ -27,6 +27,12 @@ const oswald = Oswald({
   weight: ["200", "300", "400", "500", "600", "700"],
 });
 
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
 export const metadata: Metadata = {
   title: "RIIQX | Cinematic Print-on-Demand",
   description: "Experience the future of fashion. Original, superhero-inspired apparel.",
@@ -50,7 +56,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${oswald.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}
+        className={`${inter.variable} ${oswald.variable} ${montserrat.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}
       >
         <MusicProvider>
           <ThemeProvider attribute="data-mode" defaultTheme="electronics" enableSystem={false} themes={["fashion", "electronics"]}>
