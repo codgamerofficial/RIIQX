@@ -13,9 +13,10 @@ interface TrendingGridProps {
 export function TrendingGrid({ products = [] }: TrendingGridProps) {
     if (!products.length) return null;
 
-    // Use first 5 products for a Bento Grid layout
+    // Use up to 12 products for a Bento Grid layout
     const featured = products[0];
-    const rest = products.slice(1, 5);
+    const rest = products.slice(1, 12); // Show up to 11 more products
+
 
     return (
         <section className="py-24 bg-black px-4 max-w-7xl mx-auto">

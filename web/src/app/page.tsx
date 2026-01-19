@@ -4,15 +4,25 @@ import { NewDrops } from "@/components/home/NewDrops";
 import { TrendingGrid } from "@/components/home/TrendingGrid";
 import { CategoryCircles } from "@/components/home/CategoryCircles";
 import { FeaturedSection } from "@/components/home/FeaturedSection";
-import { getCollectionProducts, getCollections } from "@/lib/shopify";
+import { getCollectionProducts, getCollections, getProducts } from "@/lib/shopify";
 
 export default async function Home() {
   const collections = await getCollections();
 
-  // Confirmed Handles: new-arrivals, featured, streetwear
-  const newArrivalsData = await getCollectionProducts({ handle: 'new-arrivals', limit: 8 });
-  const featuredData = await getCollectionProducts({ handle: 'featured', limit: 4 });
-  const streetwearData = await getCollectionProducts({ handle: 'streetwear', limit: 30 }); // Using streetwear as "Trending" source for now
+  // Since specific collections are empty, fetch from frontpage and all products
+  // Fetch more products to fill all sections
+  const frontpageData = await getCollectionProducts({ handle: 'frontpage', limit: 50 });
+  const allProductsData = await getProducts({ limit: 50 });
+
+  // Use frontpage products if available, otherwise use all products
+  const availableProducts = frontpageData.products.length > 0
+    ? frontpageData.products
+    : allProductsData.products;
+
+  // Distribute products across sections
+  const newArrivalsProducts = availableProducts.slice(0, 8);
+  const featuredProducts = availableProducts.slice(8, 12);
+  const trendingProducts = availableProducts.slice(12); // All remaining products
 
   return (
     <main className="flex flex-col min-h-screen">
@@ -22,15 +32,14 @@ export default async function Home() {
       {/* 2. Category Circles (Real Collections) */}
       <CategoryCircles collections={collections} />
 
-      {/* 3. New Drops (Horizontal Scroll from 'new-arrivals') */}
-      <NewDrops products={newArrivalsData.products} />
+      {/* 3. New Drops (Horizontal Scroll - First 8 products) */}
+      <NewDrops products={newArrivalsProducts} />
 
-      {/* 4. Featured Section (High Impact Grid from 'featured') */}
-      <FeaturedSection products={featuredData.products} />
+      {/* 4. Featured Section (High Impact Grid - Next 4 products) */}
+      <FeaturedSection products={featuredProducts} />
 
-      {/* 5. Trending Grid (Bento Layout from 'streetwear' or fallback) */}
-      {/* If 'streetwear' is large, we can use it here, or distinct 'trending' if available */}
-      <TrendingGrid products={streetwearData.products} />
+      {/* 5. Trending Grid (Bento Layout - Next 12 products) */}
+      <TrendingGrid products={trendingProducts} />
 
       <NewsletterSection />
 
