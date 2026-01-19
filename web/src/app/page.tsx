@@ -58,7 +58,7 @@ export default async function Home() {
       <AdaptiveHero />
 
       {/* 2. Trending Categories (Bewakoof-style) */}
-      <TrendingCategories collections={collections} />
+      <TrendingCategories products={trendingProducts} />
 
       {/* 3. Category Circles (Real Collections) */}
       <CategoryCircles collections={collections} />

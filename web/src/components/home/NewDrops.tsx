@@ -38,27 +38,27 @@ function DesktopDrops({ products }: { products: Product[] }) {
             <div className="sticky top-0 flex h-screen items-center overflow-hidden">
 
                 {/* Title Overlay */}
-                <div className="absolute top-10 left-10 z-10">
-                    <h2 className="text-8xl md:text-9xl font-black text-white/5 uppercase tracking-tighter">
-                        New Drops
+                <div className="absolute top-[10%] left-[5%] z-10 pointer-events-none select-none">
+                    <h2 className="text-[12vw] md:text-[14vw] font-black text-[#1A1A1A] uppercase tracking-tighter leading-none opacity-50">
+                        NEW DROPS
                     </h2>
-                    <div className="absolute top-1/2 left-2 -translate-y-1/2">
-                        <span className="bg-primary text-black font-bold uppercase px-4 py-1 text-sm tracking-widest">
+                    <div className="absolute top-[60%] left-2">
+                        <span className="bg-[#C9A24D] text-black font-bold uppercase px-4 py-1 text-sm tracking-[0.2em]">
                             Limited Edition
                         </span>
                     </div>
                 </div>
 
-                <motion.div style={{ x }} className="flex gap-8 pl-[10vw]">
+                <motion.div style={{ x }} className="flex gap-8 pl-[20vw] items-center relative z-20">
                     {products.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
 
                     {/* View All Card */}
-                    <div className="h-[600px] w-[300px] flex-shrink-0 flex items-center justify-center border border-white/10 hover:bg-white/5 transition-colors group cursor-pointer">
-                        <Link href="/collections/relevance" className="text-center group-hover:scale-110 transition-transform">
-                            <span className="block text-4xl font-black text-white mb-2">VIEW<br />ALL</span>
-                            <div className="w-12 h-1 bg-primary mx-auto" />
+                    <div className="h-[400px] w-[200px] flex-shrink-0 flex items-center justify-center group cursor-pointer">
+                        <Link href="/collections/new-arrivals" className="text-center group-hover:scale-110 transition-transform">
+                            <span className="block text-4xl font-black text-white mb-4 uppercase leading-none">VIEW<br />ALL</span>
+                            <div className="w-16 h-1 bg-[#C9A24D] mx-auto" />
                         </Link>
                     </div>
                 </motion.div>
