@@ -125,15 +125,35 @@ export default async function AccessoriesPage({
                             {products.length > 0 ? (
                                 <ProductGrid products={products} />
                             ) : (
-                                <div className="text-center py-24 border border-dashed border-white/10 rounded-2xl">
-                                    <p className="text-muted-foreground text-lg">No accessories found.</p>
-                                    <a href="/accessories" className="text-[#D9F99D] underline mt-2 inline-block">Clear all filters</a>
+                                <div className="space-y-12">
+                                    <div className="text-center py-12 border border-dashed border-white/10 rounded-2xl">
+                                        <p className="text-muted-foreground text-lg mb-2">No accessories found.</p>
+                                        <a href="/accessories" className="text-[#D9F99D] underline mt-2 inline-block mb-8">Clear all filters</a>
+                                        <h3 className="text-2xl font-bold text-white uppercase tracking-tight">
+                                            Essentials
+                                        </h3>
+                                    </div>
+                                    <RecommendedFallback />
                                 </div>
                             )}
                         </Suspense>
                     </div>
                 </div>
             </div>
+        </div>
+    );
+}
+
+// Fallback Component
+import { getProducts } from "@/lib/shopify";
+
+async function RecommendedFallback() {
+    const { products } = await getProducts({ sortKey: 'BEST_SELLING', limit: 8 });
+    if (!products.length) return null;
+
+    return (
+        <div>
+            <ProductGrid products={products} />
         </div>
     );
 }

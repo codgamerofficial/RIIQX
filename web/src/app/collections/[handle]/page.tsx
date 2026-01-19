@@ -1,4 +1,4 @@
-import { getCollectionProducts } from "@/lib/shopify";
+import { getCollectionProducts, getProducts } from "@/lib/shopify";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 import { ProductFilters } from "@/components/shop/ProductFilters";
 
@@ -139,16 +139,32 @@ export default async function CollectionPage({
                         {displayProducts.length > 0 ? (
                             <ProductGrid products={displayProducts} />
                         ) : (
-                            <div className="text-center py-24 border border-dashed border-white/10 rounded-2xl">
-                                <p className="text-muted-foreground text-lg">
-                                    No products found matching your filters.
-                                </p>
-                                <a href={`/collections/${handle}`} className="text-[#D9F99D] underline mt-2 inline-block">Clear all filters</a>
+                            <div className="space-y-12">
+                                <div className="text-center py-12 border border-dashed border-white/10 rounded-2xl">
+                                    <p className="text-muted-foreground text-lg mb-2">
+                                        This collection is currently empty or loading.
+                                    </p>
+                                    <h3 className="text-2xl font-bold text-white uppercase tracking-tight">
+                                        Check Out Our Best Sellers
+                                    </h3>
+                                </div>
+                                <RecommendedFallback />
                             </div>
                         )}
                     </div>
                 </div>
             </div>
+        </div>
+    );
+}
+
+async function RecommendedFallback() {
+    const { products } = await getProducts({ sortKey: 'BEST_SELLING', limit: 8 });
+    if (!products.length) return null;
+
+    return (
+        <div>
+            <ProductGrid products={products} />
         </div>
     );
 }
