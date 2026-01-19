@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import Script from "next/script";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronRight, CreditCard, Truck, Package } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
@@ -54,23 +55,76 @@ export default function CheckoutPage() {
 
     const handlePlaceOrder = async () => {
         try {
-            // Create Shopify checkout
-            const response = await fetch('/api/checkout', {
+            // 1. Create Razorpay Order
+            const response = await fetch('/api/razorpay/order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ items }),
+                body: JSON.stringify({
+                    amount: total * 100, // Amount in paise
+                    currency: "INR",
+                }),
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || 'Failed to create checkout');
+                throw new Error(data.error || 'Failed to create order');
             }
 
-            // Redirect to Shopify checkout
-            window.location.href = data.checkoutUrl;
+            // 2. Initialize Razorpay Checkout
+            const options = {
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                amount: data.amount,
+                currency: data.currency,
+                name: "RIIQX Store",
+                description: "Purchase from RIIQX",
+                // image: "/logo.png", // Add your logo here
+                order_id: data.id,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                handler: async function (response: any) {
+                    try {
+                        // 3. Verify Payment
+                        const verifyResponse = await fetch('/api/razorpay/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                            }),
+                        });
+
+                        const verifyData = await verifyResponse.json();
+
+                        if (!verifyResponse.ok) {
+                            throw new Error(verifyData.error || 'Payment verification failed');
+                        }
+
+                        // 4. Success
+                        clearCart();
+                        // alert("Payment Successful!");
+                        router.push('/shop'); // Or a success page
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    } catch (error: any) {
+                        alert(error.message || 'Payment verification failed');
+                    }
+                },
+                prefill: {
+                    name: address.name,
+                    email: "user@example.com", // You might want to collect email
+                    contact: address.phone,
+                },
+                theme: {
+                    color: "#F4C753", // Bewakoof Yellow or your brand color
+                },
+            };
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const rzp1 = new (window as any).Razorpay(options);
+            rzp1.open();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-            alert(error.message || 'Failed to proceed to checkout');
+            alert(error.message || 'Failed to initiate payment');
         }
     };
 
@@ -93,6 +147,7 @@ export default function CheckoutPage() {
 
     return (
         <div className="min-h-screen bg-background pt-24 pb-12">
+            <Script src="https://checkout.razorpay.com/v1/checkout.js" />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-12">
