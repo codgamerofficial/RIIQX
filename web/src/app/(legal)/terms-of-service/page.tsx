@@ -36,6 +36,14 @@ export default function TermsPage() {
                         and (b) changes to conform and adapt to technical requirements of connecting networks or devices.
                     </p>
                 </section>
+
+                <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">section 3 - governing law & jurisdiction</h2>
+                    <p>
+                        These Terms of Service and any separate agreements whereby we provide you Services shall be governed by and construed in accordance with the laws of India.
+                        Any disputes arising out of or in connection with these terms shall be subject to the exclusive jurisdiction of the courts in Contai, West Bengal.
+                    </p>
+                </section>
             </article>
         </main>
     );
