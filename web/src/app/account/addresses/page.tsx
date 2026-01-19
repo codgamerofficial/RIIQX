@@ -81,7 +81,7 @@ export default function ManageAddressesPage() {
             .single();
 
         if (error) {
-            toast.error("Failed to add address");
+            toast.error(error.message || "Failed to add address");
             console.error(error);
         } else {
             setAddresses([data, ...addresses]);
