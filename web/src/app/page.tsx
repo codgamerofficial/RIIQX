@@ -6,26 +6,45 @@ import { CategoryCircles } from "@/components/home/CategoryCircles";
 import { FeaturedSection } from "@/components/home/FeaturedSection";
 import { PromotionalBanner } from "@/components/home/PromotionalBanner";
 import { TrendingCategories } from "@/components/home/TrendingCategories";
+import { CollectionSection } from "@/components/home/CollectionSection";
 import { getCollectionProducts, getCollections, getProducts } from "@/lib/shopify";
 import { ShoppingBag } from "lucide-react";
 
 export default async function Home() {
   const collections = await getCollections();
 
-  // Since specific collections are empty, fetch from frontpage and all products
-  // Fetch more products to fill all sections
-  const frontpageData = await getCollectionProducts({ handle: 'frontpage', limit: 50 });
-  const allProductsData = await getProducts({ limit: 50 });
+  // 1. New Arrivals (Handle: new-arrivals)
+  const newArrivals = await getCollectionProducts({ handle: 'new-arrivals', limit: 8 });
 
-  // Use frontpage products if available, otherwise use all products
-  const availableProducts = frontpageData.products.length > 0
-    ? frontpageData.products
-    : allProductsData.products;
+  // 2. Best Sellers (Sorted by BEST_SELLING)
+  const bestSellers = await getProducts({ sortKey: 'BEST_SELLING', limit: 8 });
 
-  // Distribute products across sections
-  const newArrivalsProducts = availableProducts.slice(0, 8);
-  const featuredProducts = availableProducts.slice(8, 12);
-  const trendingProducts = availableProducts.slice(12); // All remaining products
+  // 3. Streetwear (Handle: streetwear)
+  const streetwear = await getCollectionProducts({ handle: 'streetwear', limit: 8 });
+
+  // 4. Accessories (Handle: accessories)
+  const accessories = await getCollectionProducts({ handle: 'accessories', limit: 8 });
+
+  // 5. Summer Collection (Handle: summer-collection) - Fallback to generic if empty
+  const summer = await getCollectionProducts({ handle: 'summer-collection', limit: 8 });
+
+  // 6. Limited Edition (Handle: limited-edition)
+  const limited = await getCollectionProducts({ handle: 'limited-edition', limit: 8 });
+
+  // 7. Collaborations (Handle: collaboration)
+  const collaboration = await getCollectionProducts({ handle: 'collaboration', limit: 8 });
+
+
+  // Featured Section Logic: Use specific products from 'frontpage' or 'featured' or just the first few best sellers
+  // Let's use the 'frontpage' collection for the high-impact "Featured Heat" section
+  const featured = await getCollectionProducts({ handle: 'frontpage', limit: 4 });
+  const featuredProducts = featured.products.length > 0 ? featured.products : bestSellers.products.slice(0, 4);
+
+  // Trending Grid Logic: Use remaining best sellers or 'trending' collection
+  // Let's use a "trending" collection if it exists, otherwise best sellers 8-20
+  const trending = await getCollectionProducts({ handle: 'trending', limit: 12 });
+  const trendingProducts = trending.products.length > 0 ? trending.products : (await getProducts({ sortKey: 'BEST_SELLING', limit: 12 })).products;
+
 
   return (
     <main className="flex flex-col min-h-screen">
@@ -44,14 +63,71 @@ export default async function Home() {
       {/* 3. Category Circles (Real Collections) */}
       <CategoryCircles collections={collections} />
 
-      {/* 4. New Drops (Horizontal Scroll - First 8 products) */}
-      <NewDrops products={newArrivalsProducts} />
+      {/* 4. New Drops (Horizontal Parallax) - "New Arrivals" */}
+      <NewDrops products={newArrivals.products} />
 
-      {/* 5. Featured Section (High Impact Grid - Next 4 products) */}
+      {/* 5. Best Sellers (Collection Section) */}
+      <CollectionSection
+        title="Best Sellers"
+        subtitle="Global Favorites"
+        products={bestSellers.products}
+        link="/best-sellers"
+      />
+
+      {/* 6. Featured Section (High Impact Grid) */}
       <FeaturedSection products={featuredProducts} />
 
-      {/* 6. Trending Grid (Bento Layout - Next 12 products) */}
+      {/* 7. Accessories (Collection Section) */}
+      <CollectionSection
+        title="Accessories"
+        subtitle="Loadout"
+        products={accessories.products}
+        link="/accessories"
+        dark
+      />
+
+      {/* 8. Streetwear (Collection Section) */}
+      <CollectionSection
+        title="Streetwear"
+        subtitle="Urban Ops"
+        products={streetwear.products}
+        link="/streetwear"
+      />
+
+      {/* 9. Summer Collection (Collection Section) */}
+      {summer.products.length > 0 && (
+        <CollectionSection
+          title="Summer Collection"
+          subtitle="Heat Wave"
+          products={summer.products}
+          link="/collections/summer-collection"
+          dark
+        />
+      )}
+
+      {/* 10. Trending Grid (Bento Layout) */}
       <TrendingGrid products={trendingProducts} />
+
+      {/* 11. Limited Edition */}
+      {limited.products.length > 0 && (
+        <CollectionSection
+          title="Limited Edition"
+          subtitle="Secure The Bag"
+          products={limited.products}
+          link="/collections/limited-edition"
+        />
+      )}
+
+      {/* 12. Collaborations */}
+      {collaboration.products.length > 0 && (
+        <CollectionSection
+          title="Collaborations"
+          subtitle="RIIQX x UNIVERSE"
+          products={collaboration.products}
+          link="/collections/collaboration"
+          dark
+        />
+      )}
 
       <NewsletterSection />
 
