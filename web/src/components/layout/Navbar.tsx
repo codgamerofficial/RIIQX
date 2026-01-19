@@ -42,19 +42,19 @@ export function Navbar() {
                 {
                     label: "Categories",
                     links: [
-                        { name: "All Products", href: "/products" },
-                        { name: "New Arrivals", href: "/collections/new-arrivals" },
-                        { name: "Best Sellers", href: "/collections/best-sellers" },
-                        { name: "Accessories", href: "/collections/accessories" },
-                        { name: "Streetwear", href: "/collections/streetwear" },
+                        { name: "All Products", href: "/shop" },
+                        { name: "New Arrivals", href: "/new-arrivals" },
+                        { name: "Best Sellers", href: "/best-sellers" },
+                        { name: "Accessories", href: "/accessories" },
+                        { name: "Streetwear", href: "/streetwear" },
                     ]
                 },
                 {
                     label: "Featured",
                     links: [
-                        { name: "Summer Collection", href: "/collections/summer" },
-                        { name: "Limited Edition", href: "/collections/limited" },
-                        { name: "Collaborations", href: "/collections/collabs" },
+                        { name: "Summer Collection", href: "/collections/summer-collection" },
+                        { name: "Limited Edition", href: "/collections/limited-edition" },
+                        { name: "Collaborations", href: "/collections/collaboration" },
                     ]
                 }
             ],
