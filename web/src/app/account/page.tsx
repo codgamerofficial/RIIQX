@@ -43,7 +43,7 @@ export default function AccountPage() {
     const menuItems = [
         { icon: User, label: "My Profile", href: "/account/profile", description: "Manage your personal information" },
         { icon: Package, label: "My Orders", href: "/account/orders", description: "Track and manage your orders" },
-        { icon: Heart, label: "Wishlist", href: "/account/wishlist", description: "View your saved products" },
+        { icon: Heart, label: "Wishlist", href: "/wishlist", description: "View your saved products" },
         { icon: MapPin, label: "Addresses", href: "/account/addresses", description: "Manage delivery addresses" },
         { icon: Settings, label: "Settings", href: "/account/settings", description: "Account preferences" },
     ];
