@@ -93,10 +93,34 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     {/* Image Gallery */}
-                    <div className="space-y-4">
+                    {/* Image Gallery */}
+                    <div className="flex flex-col-reverse lg:flex-row gap-4 sticky top-24 h-fit">
+                        {/* Thumbnails */}
+                        {images.length > 0 && (
+                            <div className="flex flex-row lg:flex-col gap-4 overflow-x-auto lg:overflow-y-auto lg:w-24 lg:h-[600px] no-scrollbar shrink-0">
+                                {images.map((img, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setSelectedImage(idx)}
+                                        className={cn(
+                                            "relative w-20 h-24 shrink-0 bg-neutral-900 rounded-lg overflow-hidden border-2 transition-all",
+                                            selectedImage === idx ? "border-bewakoof-yellow ring-2 ring-bewakoof-yellow/20" : "border-transparent hover:border-white/30"
+                                        )}
+                                    >
+                                        <Image
+                                            src={img.url}
+                                            alt={img.altText || `Product image ${idx + 1}`}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
                         {/* Main Image */}
                         <motion.div
-                            className="relative aspect-[3/4] bg-neutral-900 overflow-hidden rounded-2xl"
+                            className="relative flex-1 aspect-[3/4] bg-neutral-900 overflow-hidden rounded-2xl"
                             layoutId={`product-image-${product.id}`}
                         >
                             <Image
@@ -112,42 +136,24 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                                 <>
                                     <button
                                         onClick={() => setSelectedImage(prev => prev === 0 ? images.length - 1 : prev - 1)}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-all z-10"
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-all z-10 opacity-0 group-hover:opacity-100"
                                     >
                                         <ChevronLeft className="w-5 h-5 text-black" />
                                     </button>
                                     <button
                                         onClick={() => setSelectedImage(prev => prev === images.length - 1 ? 0 : prev + 1)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-all z-10"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-all z-10 opacity-0 group-hover:opacity-100"
                                     >
                                         <ChevronRight className="w-5 h-5 text-black" />
                                     </button>
                                 </>
                             )}
-                        </motion.div>
 
-                        {/* Thumbnail Strip */}
-                        {images.length > 1 && (
-                            <div className="grid grid-cols-4 gap-4">
-                                {images.slice(0, 4).map((img, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setSelectedImage(idx)}
-                                        className={cn(
-                                            "relative aspect-square bg-neutral-900 rounded-lg overflow-hidden border-2 transition-all",
-                                            selectedImage === idx ? "border-bewakoof-yellow" : "border-transparent hover:border-white/30"
-                                        )}
-                                    >
-                                        <Image
-                                            src={img.url}
-                                            alt={img.altText || `Product image ${idx + 1}`}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                    </button>
-                                ))}
+                            {/* Zoom Hint / Badge */}
+                            <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium text-white pointer-events-none">
+                                View Full Screen
                             </div>
-                        )}
+                        </motion.div>
                     </div>
 
                     {/* Product Info */}
