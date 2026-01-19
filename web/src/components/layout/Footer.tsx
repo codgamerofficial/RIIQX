@@ -129,24 +129,24 @@ export function Footer() {
                     <div>
                         <h4 className="text-white font-bold text-sm mb-4 uppercase">Men's Clothing</h4>
                         <ul className="space-y-1">
-                            <li><Link href="/shop/men-top-wear" className="hover:text-bewakoof-yellow">Top Wear</Link></li>
-                            <li><Link href="/shop/men-new-arrivals" className="hover:text-bewakoof-yellow">Men's New Arrivals</Link></li>
-                            <li><Link href="/shop/men-t-shirts" className="hover:text-bewakoof-yellow">Men's T-Shirts</Link></li>
-                            <li><Link href="/shop/men-hoodies" className="hover:text-bewakoof-yellow">Men's Hoodies & Sweatshirts</Link></li>
-                            <li><Link href="/shop/oversized-t-shirts" className="hover:text-bewakoof-yellow">Oversized T-Shirts for Men</Link></li>
-                            <li><Link href="/shop/men-long-sleeve" className="hover:text-bewakoof-yellow">Men's Long Sleeve T-shirts</Link></li>
-                            <li><Link href="/shop/men-plain-t-shirts" className="hover:text-bewakoof-yellow">Men's Plain T-shirts</Link></li>
-                            <li><Link href="/shop/men-vests" className="hover:text-bewakoof-yellow">Men's Vests</Link></li>
-                            <li><Link href="/shop/men-polo-t-shirts" className="hover:text-bewakoof-yellow">Men's Polo T-Shirts</Link></li>
-                            <li><Link href="/shop/men-combo-t-shirts" className="hover:text-bewakoof-yellow">Men's Combo T-Shirts</Link></li>
-                            <li><Link href="/shop/men-shirts" className="hover:text-bewakoof-yellow">Men's Shirts</Link></li>
-                            <li><Link href="/shop/men-innerwear" className="hover:text-bewakoof-yellow">Men's Innerwear</Link></li>
-                            <li><Link href="/shop/men-bottom-wear" className="hover:text-bewakoof-yellow mt-4 block text-white font-bold uppercase">Bottom Wear</Link></li>
-                            <li><Link href="/shop/men-track-pants" className="hover:text-bewakoof-yellow">Men's Track Pants</Link></li>
-                            <li><Link href="/shop/men-jeans" className="hover:text-bewakoof-yellow">Men's Jeans</Link></li>
-                            <li><Link href="/shop/men-joggers" className="hover:text-bewakoof-yellow">Men's Joggers</Link></li>
-                            <li><Link href="/shop/men-shorts" className="hover:text-bewakoof-yellow">Men's Shorts</Link></li>
-                            <li><Link href="/shop/men-boxers" className="hover:text-bewakoof-yellow">Men's Boxer Shorts</Link></li>
+                            <li><Link href="/collections/men-top-wear" className="hover:text-bewakoof-yellow">Top Wear</Link></li>
+                            <li><Link href="/collections/men-new-arrivals" className="hover:text-bewakoof-yellow">Men's New Arrivals</Link></li>
+                            <li><Link href="/collections/men-t-shirts" className="hover:text-bewakoof-yellow">Men's T-Shirts</Link></li>
+                            <li><Link href="/collections/men-hoodies" className="hover:text-bewakoof-yellow">Men's Hoodies & Sweatshirts</Link></li>
+                            <li><Link href="/collections/oversized-t-shirts" className="hover:text-bewakoof-yellow">Oversized T-Shirts for Men</Link></li>
+                            <li><Link href="/collections/men-long-sleeve" className="hover:text-bewakoof-yellow">Men's Long Sleeve T-shirts</Link></li>
+                            <li><Link href="/collections/men-plain-t-shirts" className="hover:text-bewakoof-yellow">Men's Plain T-shirts</Link></li>
+                            <li><Link href="/collections/men-vests" className="hover:text-bewakoof-yellow">Men's Vests</Link></li>
+                            <li><Link href="/collections/men-polo-t-shirts" className="hover:text-bewakoof-yellow">Men's Polo T-Shirts</Link></li>
+                            <li><Link href="/collections/men-combo-t-shirts" className="hover:text-bewakoof-yellow">Men's Combo T-Shirts</Link></li>
+                            <li><Link href="/collections/men-shirts" className="hover:text-bewakoof-yellow">Men's Shirts</Link></li>
+                            <li><Link href="/collections/men-innerwear" className="hover:text-bewakoof-yellow">Men's Innerwear</Link></li>
+                            <li><Link href="/collections/men-bottom-wear" className="hover:text-bewakoof-yellow mt-4 block text-white font-bold uppercase">Bottom Wear</Link></li>
+                            <li><Link href="/collections/men-track-pants" className="hover:text-bewakoof-yellow">Men's Track Pants</Link></li>
+                            <li><Link href="/collections/men-jeans" className="hover:text-bewakoof-yellow">Men's Jeans</Link></li>
+                            <li><Link href="/collections/men-joggers" className="hover:text-bewakoof-yellow">Men's Joggers</Link></li>
+                            <li><Link href="/collections/men-shorts" className="hover:text-bewakoof-yellow">Men's Shorts</Link></li>
+                            <li><Link href="/collections/men-boxers" className="hover:text-bewakoof-yellow">Men's Boxer Shorts</Link></li>
                         </ul>
                     </div>
 
@@ -154,21 +154,21 @@ export function Footer() {
                     <div>
                         <h4 className="text-white font-bold text-sm mb-4 uppercase">Women's Clothing</h4>
                         <ul className="space-y-1">
-                            <li><Link href="/shop/women-top-wear" className="hover:text-bewakoof-yellow">Women's Top Wear</Link></li>
-                            <li><Link href="/shop/women-new-arrivals" className="hover:text-bewakoof-yellow">Women's New Arrivals</Link></li>
-                            <li><Link href="/shop/women-t-shirts" className="hover:text-bewakoof-yellow">Women's T-Shirts</Link></li>
-                            <li><Link href="/shop/women-fashion-tops" className="hover:text-bewakoof-yellow">Women's Fashion Tops</Link></li>
-                            <li><Link href="/shop/women-loose-t-shirts" className="hover:text-bewakoof-yellow">Women's Loose T-shirts</Link></li>
-                            <li><Link href="/shop/women-tank-tops" className="hover:text-bewakoof-yellow">Women's Tank Tops</Link></li>
-                            <li><Link href="/shop/women-hoodies" className="hover:text-bewakoof-yellow">Women's Hoodies & Sweatshirts</Link></li>
-                            <li><Link href="/shop/women-dresses" className="hover:text-bewakoof-yellow">Women's Dresses</Link></li>
-                            <li><Link href="/shop/women-kurtis" className="hover:text-bewakoof-yellow">Women's Kurtis</Link></li>
-                            <li><Link href="/shop/women-nightwear" className="hover:text-bewakoof-yellow">Women's Nightwear</Link></li>
-                            <li><Link href="/shop/women-plus-size" className="hover:text-bewakoof-yellow">Women's Plus Size Store</Link></li>
-                            <li><Link href="/shop/women-bottom-wear" className="hover:text-bewakoof-yellow mt-4 block text-white font-bold uppercase">Women's Bottom Wear</Link></li>
-                            <li><Link href="/shop/women-joggers" className="hover:text-bewakoof-yellow">Women's Joggers</Link></li>
-                            <li><Link href="/shop/women-jeans" className="hover:text-bewakoof-yellow">Women's Jeans</Link></li>
-                            <li><Link href="/shop/women-shorts" className="hover:text-bewakoof-yellow">Women's Shorts</Link></li>
+                            <li><Link href="/collections/women-top-wear" className="hover:text-bewakoof-yellow">Women's Top Wear</Link></li>
+                            <li><Link href="/collections/women-new-arrivals" className="hover:text-bewakoof-yellow">Women's New Arrivals</Link></li>
+                            <li><Link href="/collections/women-t-shirts" className="hover:text-bewakoof-yellow">Women's T-Shirts</Link></li>
+                            <li><Link href="/collections/women-fashion-tops" className="hover:text-bewakoof-yellow">Women's Fashion Tops</Link></li>
+                            <li><Link href="/collections/women-loose-t-shirts" className="hover:text-bewakoof-yellow">Women's Loose T-shirts</Link></li>
+                            <li><Link href="/collections/women-tank-tops" className="hover:text-bewakoof-yellow">Women's Tank Tops</Link></li>
+                            <li><Link href="/collections/women-hoodies" className="hover:text-bewakoof-yellow">Women's Hoodies & Sweatshirts</Link></li>
+                            <li><Link href="/collections/women-dresses" className="hover:text-bewakoof-yellow">Women's Dresses</Link></li>
+                            <li><Link href="/collections/women-kurtis" className="hover:text-bewakoof-yellow">Women's Kurtis</Link></li>
+                            <li><Link href="/collections/women-nightwear" className="hover:text-bewakoof-yellow">Women's Nightwear</Link></li>
+                            <li><Link href="/collections/women-plus-size" className="hover:text-bewakoof-yellow">Women's Plus Size Store</Link></li>
+                            <li><Link href="/collections/women-bottom-wear" className="hover:text-bewakoof-yellow mt-4 block text-white font-bold uppercase">Women's Bottom Wear</Link></li>
+                            <li><Link href="/collections/women-joggers" className="hover:text-bewakoof-yellow">Women's Joggers</Link></li>
+                            <li><Link href="/collections/women-jeans" className="hover:text-bewakoof-yellow">Women's Jeans</Link></li>
+                            <li><Link href="/collections/women-shorts" className="hover:text-bewakoof-yellow">Women's Shorts</Link></li>
                         </ul>
                     </div>
 
@@ -176,19 +176,19 @@ export function Footer() {
                     <div>
                         <h4 className="text-white font-bold text-sm mb-4 uppercase">Mobile Covers</h4>
                         <ul className="space-y-1">
-                            <li><Link href="/shop/apple-cases" className="hover:text-bewakoof-yellow">Apple</Link></li>
-                            <li><Link href="/shop/realme-cases" className="hover:text-bewakoof-yellow">Realme</Link></li>
-                            <li><Link href="/shop/samsung-cases" className="hover:text-bewakoof-yellow">Samsung</Link></li>
-                            <li><Link href="/shop/xiaomi-cases" className="hover:text-bewakoof-yellow">Xiaomi</Link></li>
-                            <li><Link href="/shop/oneplus-cases" className="hover:text-bewakoof-yellow">Oneplus</Link></li>
-                            <li><Link href="/shop/vivo-cases" className="hover:text-bewakoof-yellow">Vivo</Link></li>
-                            <li><Link href="/shop/oppo-cases" className="hover:text-bewakoof-yellow">Oppo</Link></li>
+                            <li><Link href="/collections/apple-cases" className="hover:text-bewakoof-yellow">Apple</Link></li>
+                            <li><Link href="/collections/realme-cases" className="hover:text-bewakoof-yellow">Realme</Link></li>
+                            <li><Link href="/collections/samsung-cases" className="hover:text-bewakoof-yellow">Samsung</Link></li>
+                            <li><Link href="/collections/xiaomi-cases" className="hover:text-bewakoof-yellow">Xiaomi</Link></li>
+                            <li><Link href="/collections/oneplus-cases" className="hover:text-bewakoof-yellow">Oneplus</Link></li>
+                            <li><Link href="/collections/vivo-cases" className="hover:text-bewakoof-yellow">Vivo</Link></li>
+                            <li><Link href="/collections/oppo-cases" className="hover:text-bewakoof-yellow">Oppo</Link></li>
                             <li className="mt-4"><h4 className="text-white font-bold text-sm uppercase">Bags</h4></li>
-                            <li><Link href="/shop/laptop-bags" className="hover:text-bewakoof-yellow">Laptop Bags</Link></li>
-                            <li><Link href="/shop/small-backpacks" className="hover:text-bewakoof-yellow">Small Backpacks</Link></li>
+                            <li><Link href="/collections/laptop-bags" className="hover:text-bewakoof-yellow">Laptop Bags</Link></li>
+                            <li><Link href="/collections/small-backpacks" className="hover:text-bewakoof-yellow">Small Backpacks</Link></li>
                             <li className="mt-4"><h4 className="text-white font-bold text-sm uppercase">Featured</h4></li>
-                            <li><Link href="/shop/sliders" className="hover:text-bewakoof-yellow">Women's Slides</Link></li>
-                            <li><Link href="/shop/flip-flops" className="hover:text-bewakoof-yellow">Women's Flip Flops</Link></li>
+                            <li><Link href="/collections/sliders" className="hover:text-bewakoof-yellow">Women's Slides</Link></li>
+                            <li><Link href="/collections/flip-flops" className="hover:text-bewakoof-yellow">Women's Flip Flops</Link></li>
                         </ul>
                     </div>
 
