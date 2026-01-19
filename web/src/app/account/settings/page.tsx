@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Bell, Lock, Trash2, Smartphone, Moon } from "lucide-react";
 
@@ -17,19 +17,79 @@ export default function SettingsPage() {
         orderUpdates: true,
         darkMode: true,
     });
+    const [loading, setLoading] = useState(true);
 
-    const handleToggle = (key: keyof typeof preferences) => {
-        setPreferences(prev => ({ ...prev, [key]: !prev[key] }));
-        toast.success("Preference updated");
-        // In real app, save to DB
+    useEffect(() => {
+        const fetchSettings = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                router.push("/login");
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from("user_settings")
+                .select("*")
+                .eq("user_id", user.id)
+                .single();
+
+            if (data) {
+                setPreferences({
+                    marketingEmails: data.marketing_emails ?? true,
+                    orderUpdates: data.order_updates ?? true,
+                    darkMode: true, // Always true for this app
+                });
+            } else if (error && error.code === 'PGRST116') {
+                // No settings found, create default
+                await supabase.from("user_settings").insert({
+                    user_id: user.id,
+                    marketing_emails: true,
+                    order_updates: true
+                } as any);
+            }
+            setLoading(false);
+        };
+        fetchSettings();
+    }, [router, supabase]);
+
+    const handleToggle = async (key: 'marketingEmails' | 'orderUpdates') => {
+        const newValue = !preferences[key];
+        setPreferences(prev => ({ ...prev, [key]: newValue }));
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            const dbKey = key === 'marketingEmails' ? 'marketing_emails' : 'order_updates';
+            const { error } = await supabase
+                .from("user_settings")
+                .upsert({
+                    user_id: user.id,
+                    [dbKey]: newValue,
+                    updated_at: new Date().toISOString()
+                } as any);
+
+            if (error) {
+                toast.error("Failed to save preference");
+                // revert
+                setPreferences(prev => ({ ...prev, [key]: !newValue }));
+            } else {
+                toast.success("Preference updated");
+            }
+        }
     };
 
     const handleDeleteAccount = async () => {
         if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-            toast.error("Contact support to delete account for security reasons.");
-            // Real implementation would allow deletion or mark for deletion
+            toast.error("Please contact support at support@riiqx.com to process account deletion.");
         }
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-background pt-24 pb-12 flex items-center justify-center">
+                <div className="text-white">Loading settings...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-background pt-24 pb-12 px-4 sm:px-6">
@@ -110,12 +170,14 @@ export default function SettingsPage() {
                             </h3>
                         </div>
                         <div className="p-6 space-y-6">
-                            <button className="w-full text-left flex items-center justify-between group">
-                                <div>
-                                    <p className="text-white font-medium group-hover:text-primary transition-colors">Change Password</p>
-                                </div>
-                                <ArrowLeft className="w-4 h-4 text-muted-foreground rotate-180" />
-                            </button>
+                            <Link href="/forgot-password">
+                                <button className="w-full text-left flex items-center justify-between group">
+                                    <div>
+                                        <p className="text-white font-medium group-hover:text-primary transition-colors">Change Password</p>
+                                    </div>
+                                    <ArrowLeft className="w-4 h-4 text-muted-foreground rotate-180" />
+                                </button>
+                            </Link>
 
                             <div className="pt-4 border-t border-white/5">
                                 <button

@@ -1,5 +1,5 @@
 import { Inter, Oswald, Montserrat } from "next/font/google";
-import type { Metadata } from "next";
+
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -33,19 +33,23 @@ const montserrat = Montserrat({
   weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
+import type { Metadata, Viewport } from "next";
+
 export const metadata: Metadata = {
   title: "RIIQX | Cinematic Print-on-Demand",
   description: "Experience the future of fashion. Original, superhero-inspired apparel.",
   icons: {
     icon: "/riiqx-logo.png",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false, // Prevents zooming for app-like feel
-    viewportFit: "cover", // Utilizes notch area
-  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false, // Prevents zooming for app-like feel
+  viewportFit: "cover", // Utilizes notch area
+  themeColor: "#000000",
 };
 
 export default function RootLayout({

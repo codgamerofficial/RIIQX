@@ -43,6 +43,64 @@ export interface Database {
                     referral_code?: string | null
                     referred_by?: string | null
                 }
+            },
+            addresses: {
+                Row: {
+                    id: string
+                    user_id: string
+                    type: string
+                    street: string
+                    city: string
+                    state: string
+                    zip: string
+                    country: string
+                    is_default: boolean
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    type: string
+                    street: string
+                    city: string
+                    state: string
+                    zip: string
+                    country: string
+                    is_default?: boolean
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    type?: string
+                    street?: string
+                    city?: string
+                    state?: string
+                    zip?: string
+                    country?: string
+                    is_default?: boolean
+                    created_at?: string
+                }
+            },
+            user_settings: {
+                Row: {
+                    user_id: string
+                    marketing_emails: boolean
+                    order_updates: boolean
+                    updated_at: string
+                }
+                Insert: {
+                    user_id: string
+                    marketing_emails?: boolean
+                    order_updates?: boolean
+                    updated_at?: string
+                }
+                Update: {
+                    user_id?: string
+                    marketing_emails?: boolean
+                    order_updates?: boolean
+                    updated_at?: string
+                }
             }
             products: {
                 Row: {
