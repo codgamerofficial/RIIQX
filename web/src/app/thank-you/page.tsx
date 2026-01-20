@@ -1,3 +1,5 @@
+"use client";
+
 import { ThankYouSection } from "@/components/shared/ThankYouSection";
 import Link from "next/link";
 import { motion } from "framer-motion";
