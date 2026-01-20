@@ -91,7 +91,7 @@ export async function getProducts({
     const res = await shopifyFetch<{ products: Connection<Product> }>({
         query: PRODUCTS_QUERY,
         variables: { sortKey, reverse, query, first: limit, after },
-        revalidate: 60,
+        revalidate: 0,
     });
 
     return {
@@ -107,7 +107,7 @@ export async function getProduct(handle: string): Promise<Product | undefined> {
     const res = await shopifyFetch<{ product: Product }>({
         query: PRODUCT_BY_HANDLE_QUERY,
         variables: { handle },
-        revalidate: 60,
+        revalidate: 0,
     });
 
     return res.product;
@@ -216,7 +216,7 @@ export async function getCollectionProducts({
     const res = await shopifyFetch<{ collection: { products: Connection<Product> } }>({
         query: require('./queries').COLLECTION_PRODUCTS_QUERY,
         variables: { handle, first: limit, sortKey, reverse, filters },
-        revalidate: 60,
+        revalidate: 0,
     });
 
     if (!res.collection) {

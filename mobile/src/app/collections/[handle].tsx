@@ -1,4 +1,5 @@
 import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from "react-native";
+import { DesignStreetwearHero } from "@/components/marketing/DesignStreetwearHero";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import { getCollectionProducts } from "@/lib/shopify";
@@ -135,6 +136,13 @@ export default function CollectionScreen() {
                     numColumns={2}
                     contentContainerStyle={{ padding: 8, paddingBottom: 100 }}
                     columnWrapperStyle={{ justifyContent: 'space-between' }}
+                    ListHeaderComponent={
+                        handle === 'streetwear' ? (
+                            <View className="mb-6">
+                                <DesignStreetwearHero />
+                            </View>
+                        ) : null
+                    }
                     ListEmptyComponent={
                         <View className="py-20 items-center">
                             <Text className="text-white/50">No items found.</Text>

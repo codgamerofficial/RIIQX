@@ -1,4 +1,5 @@
 import { ProductGrid } from "@/components/shop/ProductGrid";
+import { DesignStreetwearHero } from "@/components/marketing/DesignStreetwearHero";
 import { getCollectionProducts } from "@/lib/shopify";
 import { Suspense } from "react";
 import { ProductFilters } from "@/components/shop/ProductFilters";
@@ -95,19 +96,21 @@ export default async function StreetwearPage({
     return (
         <div className="min-h-screen bg-background pt-24 pb-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div>
-                        <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-4">
-                            Street <span className="text-primary">Ops</span>
-                        </h1>
-                        <p className="text-white/50 text-lg font-medium">
-                            {products.length} Items Found
-                        </p>
-                    </div>
+                <div className="mb-12">
+                    {/* [NEW] Design 2: Streetwear Hero */}
+                    <DesignStreetwearHero />
 
-                    <div className="flex items-center space-x-4">
-                        <span className="text-xs font-bold text-white/50 uppercase tracking-widest hidden md:block">Sort By:</span>
-                        <SortSelect />
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mt-8">
+                        <div>
+                            <p className="text-white/50 text-lg font-medium">
+                                {products.length} Items Found
+                            </p>
+                        </div>
+
+                        <div className="flex items-center space-x-4">
+                            <span className="text-xs font-bold text-white/50 uppercase tracking-widest hidden md:block">Sort By:</span>
+                            <SortSelect />
+                        </div>
                     </div>
                 </div>
 

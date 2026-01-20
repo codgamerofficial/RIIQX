@@ -5,6 +5,11 @@ import { getProducts, getCollectionProducts } from "@/lib/shopify";
 import { Product } from "@/lib/shopify/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowRight } from "lucide-react-native";
+import { DesignFeaturedStory } from "@/components/marketing/DesignFeaturedStory";
+import { HeroCarousel } from "@/components/home/HeroCarousel";
+
+import { DesignFearlessPromo } from "@/components/marketing/DesignFearlessPromo";
+import { DesignNewArrivalsBanner } from "@/components/marketing/DesignNewArrivalsBanner";
 
 export default function HomeScreen() {
     const [newDrops, setNewDrops] = useState<Product[]>([]);
@@ -56,23 +61,16 @@ export default function HomeScreen() {
     return (
         <SafeAreaView className="flex-1 bg-background">
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-                {/* Hero Section */}
-                <View className="px-6 pt-6 pb-8">
-                    <Text className="text-[#D9F99D] text-sm font-bold tracking-widest uppercase mb-2">Welcome to RIIQX</Text>
-                    <Text className="text-white text-5xl font-black tracking-tighter leading-tight mb-4">
-                        WEAR YOUR <Text className="text-transparent" style={{ color: 'transparent', textShadowColor: '#fff', textShadowRadius: 1 }}>REALITY</Text>
-                    </Text>
-                    <Text className="text-white/50 text-base mb-6 max-w-[80%]">
-                        Digital streetwear for the metaverse generation. Limited drops available now.
-                    </Text>
+                {/* Hero Carousel v2 - Premium Redesign */}
+                <HeroCarousel />
 
-                    <Link href="/collections/new-arrivals" asChild>
-                        <TouchableOpacity className="bg-[#D9F99D] self-start px-8 py-3 rounded-full flex-row items-center">
-                            <Text className="text-black font-black uppercase tracking-widest mr-2">Shop Drops</Text>
-                            <ArrowRight color="#000" size={16} />
-                        </TouchableOpacity>
-                    </Link>
+                {/* [NEW] Design 4: Fearless Promo */}
+                <View className="px-6 mb-8">
+                    <DesignFearlessPromo />
                 </View>
+
+                {/* [NEW] Design 3: New Arrivals Banner */}
+                <DesignNewArrivalsBanner />
 
                 {/* New Drops Horizontal Scroll */}
                 <View className="pl-6 mb-8">
@@ -97,6 +95,11 @@ export default function HomeScreen() {
                             contentContainerStyle={{ paddingRight: 24 }}
                         />
                     )}
+                </View>
+
+                {/* [NEW] Design 1: Featured Story */}
+                <View className="px-6 mb-8">
+                    <DesignFeaturedStory />
                 </View>
 
                 {/* Categories / Trending Grid */}

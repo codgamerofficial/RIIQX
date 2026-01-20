@@ -4,7 +4,7 @@ import { ProductGrid } from "@/components/shop/ProductGrid";
 import { Product } from "@/lib/shopify/types";
 import { SortSelect } from "@/components/shop/SortSelect";
 
-export const revalidate = 60; // Cache for 60 seconds
+export const revalidate = 0; // No cache - always fetch fresh data
 
 export default async function ShopPage({
     searchParams,
@@ -67,8 +67,8 @@ export default async function ShopPage({
 
     // --- Aggregation Step ---
     // Extract available filters (Types, Colors, Sizes) from a larger batch to show what's possible
-    // Ideally this is a separate cached query or configured list.
-    const { products: allProducts } = await getProducts({ limit: 100 });
+    // Fetch all products for filter aggregation (46 products total)
+    const { products: allProducts } = await getProducts({ limit: 50 });
 
     const availableTypes = Array.from(new Set(allProducts.map(p => p.productType).filter(Boolean)));
 

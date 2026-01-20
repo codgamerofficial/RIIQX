@@ -1,6 +1,7 @@
 "use client";
 
 import { CinematicHero } from "@/components/ui/CinematicHero";
+import { ContactSection } from "@/components/contact/ContactSection";
 import { motion } from "framer-motion";
 import { Send, MapPin, Mail, Phone } from "lucide-react";
 
@@ -12,6 +13,9 @@ export default function ContactPage() {
                 subtitle="Signals Open"
                 description="Our team is ready to assist you. Send us a transmission directly from the interface below."
             />
+
+            {/* Premium Contact Section */}
+            <ContactSection />
 
             <section className="max-w-6xl mx-auto px-4 md:px-8 -mt-20 relative z-20">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
