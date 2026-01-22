@@ -1,29 +1,84 @@
-import React from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, ScrollView, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { CashbackTooltip } from '../../components/product/CashbackTooltip';
+import { useCartStore } from '../../store/useCartStore';
 
 const { width } = Dimensions.get('window');
 
 export default function ProductDetailScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
+    const { addItem } = useCartStore();
+    const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
     // Mock Data based on ID (simplified)
     const product = {
+        id: id as string,
         name: "Oversized Wool Blazer",
         brand: "Zara",
-        price: "$89.90",
+        price: 89.90,
         cashback: "10%",
         description: "Relaxed fit blazer made of wool blend fabric. Lapel collar and long sleeves with shoulder pads. Front flap pockets. Front button closure.",
         images: [
             "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1936&auto=format&fit=crop",
             "https://plus.unsplash.com/premium_photo-1673356301535-21a2d44933a0?q=80&w=1887&auto=format&fit=crop"
         ]
+    };
+
+    const handleAddToBag = () => {
+        if (!selectedSize) {
+            Alert.alert('Select Size', 'Please select a size before adding to bag');
+            return;
+        }
+
+        addItem({
+            id: product.id,
+            variantId: `${product.id}-${selectedSize}`,
+            productId: product.id,
+            title: product.name,
+            price: product.price.toString(),
+            image: product.images[0],
+            quantity: 1,
+            size: selectedSize,
+            currencyCode: 'USD',
+        });
+
+        Alert.alert(
+            'Added to Bag!',
+            `${product.name} (Size: ${selectedSize}) has been added to your bag.`,
+            [
+                { text: 'Continue Shopping', style: 'cancel' },
+                { text: 'View Bag', onPress: () => router.push('/(tabs)/bag') }
+            ]
+        );
+    };
+
+    const handleBuyNow = () => {
+        if (!selectedSize) {
+            Alert.alert('Select Size', 'Please select a size before proceeding');
+            return;
+        }
+
+        // Add to cart first
+        addItem({
+            id: product.id,
+            variantId: `${product.id}-${selectedSize}`,
+            productId: product.id,
+            title: product.name,
+            price: product.price.toString(),
+            image: product.images[0],
+            quantity: 1,
+            size: selectedSize,
+            currencyCode: 'USD',
+        });
+
+        // Navigate to checkout
+        router.push('/checkout');
     };
 
     return (
@@ -76,7 +131,7 @@ export default function ProductDetailScreen() {
                             <Text className="text-white text-3xl font-bold w-64">{product.name}</Text>
                         </View>
                         <View>
-                            <Text className="text-white text-2xl font-bold">{product.price}</Text>
+                            <Text className="text-white text-2xl font-bold">${product.price}</Text>
                         </View>
                     </View>
 
@@ -86,12 +141,21 @@ export default function ProductDetailScreen() {
                         {product.description}
                     </Text>
 
-                    {/* Size Selector Mockup */}
-                    <Text className="text-white font-bold mb-4">Select Size</Text>
+                    {/* Size Selector */}
+                    <Text className="text-white font-bold mb-4">Select Size {selectedSize && <Text className="text-cherry">({selectedSize})</Text>}</Text>
                     <View className="flex-row gap-4 mb-24">
                         {['XS', 'S', 'M', 'L'].map((size) => (
-                            <TouchableOpacity key={size} className="w-12 h-12 rounded-full border border-gray-700 items-center justify-center bg-gray-900">
-                                <Text className="text-gray-300 font-medium">{size}</Text>
+                            <TouchableOpacity
+                                key={size}
+                                onPress={() => setSelectedSize(size)}
+                                className={`w-12 h-12 rounded-full items-center justify-center ${selectedSize === size
+                                    ? 'bg-cherry border-2 border-cherry'
+                                    : 'border border-gray-700 bg-gray-900'
+                                    }`}
+                            >
+                                <Text className={`font-medium ${selectedSize === size ? 'text-white' : 'text-gray-300'}`}>
+                                    {size}
+                                </Text>
                             </TouchableOpacity>
                         ))}
                     </View>
@@ -101,10 +165,16 @@ export default function ProductDetailScreen() {
 
             {/* Sticky Bottom Bar */}
             <View className="absolute bottom-0 w-full bg-black/90 px-6 pt-4 pb-10 border-t border-gray-800 flex-row gap-4">
-                <TouchableOpacity className="flex-1 bg-white h-14 rounded-full items-center justify-center">
+                <TouchableOpacity
+                    onPress={handleBuyNow}
+                    className="flex-1 bg-white h-14 rounded-full items-center justify-center"
+                >
                     <Text className="text-black font-bold text-lg">Buy Now</Text>
                 </TouchableOpacity>
-                <TouchableOpacity className="flex-1 bg-cherry h-14 rounded-full items-center justify-center shadow-lg shadow-cherry/30">
+                <TouchableOpacity
+                    onPress={handleAddToBag}
+                    className="flex-1 bg-cherry h-14 rounded-full items-center justify-center shadow-lg shadow-cherry/30"
+                >
                     <Text className="text-white font-bold text-lg">Add to Bag</Text>
                 </TouchableOpacity>
             </View>
