@@ -1,12 +1,46 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
+import { useCartStore } from '@/store/useCartStore';
+import { createRazorpayOrder, initiateRazorpayPayment } from '@/lib/razorpay';
 
 export default function CheckoutScreen() {
     const router = useRouter();
+    const { items, getTotalPrice } = useCartStore();
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    const totalAmount = getTotalPrice();
+    const cashbackAmount = totalAmount * 0.1; // 10% cashback
+
+    const handlePayment = async () => {
+        if (items.length === 0) {
+            Alert.alert('Empty Cart', 'Please add items to cart before checkout');
+            return;
+        }
+
+        setIsProcessing(true);
+        try {
+            // Create Razorpay order
+            const order = await createRazorpayOrder(totalAmount, 'INR');
+
+            if (order) {
+                // Initiate payment
+                await initiateRazorpayPayment(
+                    order.id,
+                    order.amount,
+                    order.currency
+                );
+            }
+        } catch (error) {
+            console.error('Payment Error:', error);
+            Alert.alert('Error', 'Payment failed. Please try again.');
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-black">
@@ -41,8 +75,8 @@ export default function CheckoutScreen() {
                         <Ionicons name="card-outline" size={24} color="white" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-white font-bold">Apple Pay</Text>
-                        <Text className="text-gray-400 text-sm">Ending in 4242</Text>
+                        <Text className="text-white font-bold">Razorpay</Text>
+                        <Text className="text-gray-400 text-sm">UPI, Cards, Wallets & More</Text>
                     </View>
                     <Ionicons name="chevron-forward" size={24} color="#666" />
                 </TouchableOpacity>
@@ -52,16 +86,16 @@ export default function CheckoutScreen() {
                 <View className="bg-gray-900 p-6 rounded-2xl mb-6 border border-gray-800">
                     <View className="flex-row justify-between mb-2">
                         <Text className="text-gray-400">Subtotal</Text>
-                        <Text className="text-white font-medium">$89.90</Text>
+                        <Text className="text-white font-medium">₹{totalAmount.toFixed(2)}</Text>
                     </View>
                     <View className="flex-row justify-between mb-4">
                         <Text className="text-gray-400">Shipping</Text>
-                        <Text className="text-white font-medium">$0.00</Text>
+                        <Text className="text-white font-medium">₹0.00</Text>
                     </View>
                     <View className="h-[1px] bg-gray-800 mb-4" />
                     <View className="flex-row justify-between items-end">
                         <Text className="text-white font-bold text-lg">Total</Text>
-                        <Text className="text-white font-bold text-2xl">$89.90</Text>
+                        <Text className="text-white font-bold text-2xl">₹{totalAmount.toFixed(2)}</Text>
                     </View>
                 </View>
 
@@ -72,7 +106,7 @@ export default function CheckoutScreen() {
                             <Ionicons name="sparkles" size={20} color="#E31C79" className="mr-2" />
                             <Text className="text-white font-bold">Cashback You'll Earn</Text>
                         </View>
-                        <Text className="text-cherry font-bold text-xl">$8.99</Text>
+                        <Text className="text-cherry font-bold text-xl">₹{cashbackAmount.toFixed(2)}</Text>
                     </View>
                 </View>
 
@@ -81,8 +115,16 @@ export default function CheckoutScreen() {
             <View className="p-6 border-t border-gray-800 bg-black">
                 <TouchableOpacity
                     className="w-full h-14 bg-white rounded-full items-center justify-center"
+                    onPress={handlePayment}
+                    disabled={isProcessing || items.length === 0}
                 >
-                    <Text className="text-black font-bold text-lg">Pay & Earn $8.99</Text>
+                    {isProcessing ? (
+                        <ActivityIndicator color="#000" />
+                    ) : (
+                        <Text className="text-black font-bold text-lg">
+                            Pay ₹{totalAmount.toFixed(2)} & Earn ₹{cashbackAmount.toFixed(2)}
+                        </Text>
+                    )}
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
