@@ -35,6 +35,15 @@ CREATE INDEX IF NOT EXISTS idx_reviews_created_at ON reviews(created_at DESC);
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE review_votes ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Reviews are viewable by everyone" ON reviews;
+DROP POLICY IF EXISTS "Authenticated users can create reviews" ON reviews;
+DROP POLICY IF EXISTS "Users can update own reviews" ON reviews;
+DROP POLICY IF EXISTS "Users can delete own reviews" ON reviews;
+DROP POLICY IF EXISTS "Anyone can read review votes" ON review_votes;
+DROP POLICY IF EXISTS "Authenticated users can vote" ON review_votes;
+DROP POLICY IF EXISTS "Users can update their votes" ON review_votes;
+
 -- Anyone can read reviews
 CREATE POLICY "Reviews are viewable by everyone" ON reviews
   FOR SELECT USING (true);
@@ -60,6 +69,10 @@ CREATE POLICY "Authenticated users can vote" ON review_votes
 
 CREATE POLICY "Users can update their votes" ON review_votes
   FOR UPDATE USING (auth.uid() = user_id);
+
+-- Drop existing function and trigger if they exist
+DROP TRIGGER IF EXISTS update_review_helpful_count_trigger ON review_votes;
+DROP FUNCTION IF EXISTS update_review_helpful_count();
 
 -- Function to update helpful count
 CREATE OR REPLACE FUNCTION update_review_helpful_count()
