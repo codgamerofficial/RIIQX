@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Menu, X, User, Search, Zap, ChevronDown, Heart } from "lucide-react";
 
 import { useCartStore } from "@/store/useCartStore";
-import { ModeToggle } from "@/components/ui/theme-toggle";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { PredictiveSearch } from "@/components/search/PredictiveSearch";
 
 export function Navbar() {
@@ -197,6 +197,7 @@ export function Navbar() {
 
                     {/* Desktop Actions */}
                     <div className="hidden md:flex items-center space-x-6">
+                        <ThemeToggle />
                         {/* Navigation Links (Moved to right or integrated? Plan said Clean row... maybe kept simple) */}
                         {/* We can keep navGroups as dropdowns next to actions or separate. Let's keep distinct Actions first */}
 

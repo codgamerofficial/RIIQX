@@ -129,6 +129,7 @@ export default function RootLayout({
             <CartSheet />
             <BottomNav />
             <Toaster />
+            <SocialProofNotifications />
           </ThemeProvider>
         </MusicProvider>
       </body>

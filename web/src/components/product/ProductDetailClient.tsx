@@ -11,6 +11,9 @@ import { formatPrice } from "@/lib/shopify";
 import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { cn } from "@/lib/utils";
+import { ReviewSection } from "./ReviewSection";
+import { ProductActivity } from "./ProductActivity";
+import { LowStockWarning } from "./LowStockWarning";
 
 interface ProductDetailClientProps {
     product: Product;
@@ -167,6 +170,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
                     {/* Product Info */}
                     <div className="space-y-10 py-4">
+                        <ProductActivity productId={product.id} initialViews={Math.floor(Math.random() * 50) + 120} />
                         {/* Title & Rating */}
                         <div>
                             <h1 className="text-4xl md:text-5xl font-black font-display text-white mb-4 uppercase tracking-tighter leading-tight">
@@ -251,6 +255,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
                             {/* Quantity */}
                             <div className="space-y-4">
+                                <LowStockWarning stock={12} />
                                 <h3 className="text-xs font-bold text-white/50 uppercase tracking-widest">Quantity</h3>
                                 <div className="flex items-center gap-4 bg-white/5 w-fit p-1.5 rounded-full border border-white/10">
                                     <button
@@ -312,6 +317,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                         </div>
                     </div>
 
+                </div>
+
+                <div className="mt-24 border-t border-white/10 pt-16">
+                    <ReviewSection productId={product.id} />
                 </div>
             </div>
 
