@@ -8,6 +8,7 @@ import { ShoppingBag, Menu, X, User, Search, Zap, ChevronDown, Heart } from "luc
 
 import { useCartStore } from "@/store/useCartStore";
 import { ModeToggle } from "@/components/ui/theme-toggle";
+import { PredictiveSearch } from "@/components/search/PredictiveSearch";
 
 export function Navbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -326,77 +327,8 @@ export function Navbar() {
                     </motion.div>
                 )}
             </AnimatePresence>
-            {/* Search Overlay */}
-            <AnimatePresence>
-                {isSearchOpen && (
-                    // @ts-ignore
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex items-center justify-center p-4"
-                    >
-                        <div className="w-full max-w-3xl relative">
-                            <button
-                                onClick={() => setIsSearchOpen(false)}
-                                className="absolute -top-16 right-0 p-2 text-white/50 hover:text-white transition-colors"
-                            >
-                                <X className="w-8 h-8" />
-                            </button>
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    const form = e.target as HTMLFormElement;
-                                    const input = form.elements.namedItem('search') as HTMLInputElement;
-                                    if (input.value.trim()) {
-                                        router.push(`/shop?q=${encodeURIComponent(input.value.trim())}`);
-                                        setIsSearchOpen(false);
-                                    }
-                                }}
-                                className="relative group"
-                            >
-                                <input
-                                    type="text"
-                                    name="search"
-                                    autoFocus
-                                    placeholder="Search products..."
-                                    className="w-full bg-transparent border-b-2 border-white/10 text-4xl md:text-6xl font-black text-white placeholder-white/10 py-8 pr-20 focus:outline-none focus:border-primary transition-colors uppercase tracking-tight"
-                                />
-                                <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center space-x-4">
-                                    <button type="button" className="p-2 text-white/30 hover:text-primary transition-colors" title="Voice Search">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" /></svg>
-                                    </button>
-                                    <button type="submit" className="p-2 text-white/30 hover:text-primary transition-colors">
-                                        <Search className="w-10 h-10" />
-                                    </button>
-                                </div>
-                            </form>
-
-                            {/* Trending Searches */}
-                            <div className="mt-12">
-                                <h4 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-6">Trending Now</h4>
-                                <div className="flex flex-wrap gap-4">
-                                    {["Cyberpunk Jacket", "Neon Accessories", "Holo-Visor", "Techwear Pants"].map((term) => (
-                                        <button
-                                            key={term}
-                                            onClick={() => {
-                                                router.push(`/shop?q=${encodeURIComponent(term)}`);
-                                                setIsSearchOpen(false);
-                                            }}
-                                            className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-primary transition-all text-sm font-medium"
-                                        >
-                                            {term}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            <p className="mt-6 text-center text-white/30 text-sm tracking-widest uppercase">
-                                Press Enter to search
-                            </p>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* Predictive Search Overlay */}
+            <PredictiveSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
         </motion.nav>
     );
 }

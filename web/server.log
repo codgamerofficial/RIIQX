@@ -1,0 +1,74 @@
+
+> web@0.1.0 dev
+> next dev
+
+ΓÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\saswa\pnpm-lock.yaml as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\saswa\OneDrive\Desktop\Eccomerce Store\RIIQX\web\package-lock.json
+
+Γû▓ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.63.143.88:3000
+- Environments: .env.local
+
+Γ£ô Starting...
+Γ£ô Ready in 1975ms
+Γ¿» ./OneDrive/Desktop/Eccomerce Store/RIIQX/web/src/app/globals.css
+Error evaluating Node.js code
+Error: Cannot find module '@tailwindcss/postcss'
+Require stack:
+- C:\Users\saswa\OneDrive\Desktop\Eccomerce Store\RIIQX\web\.next\dev\build\chunks\[root-of-the-server]__0e674580._.js
+- C:\Users\saswa\OneDrive\Desktop\Eccomerce Store\RIIQX\web\.next\dev\build\chunks\[turbopack]_runtime.js
+- C:\Users\saswa\OneDrive\Desktop\Eccomerce Store\RIIQX\web\.next\dev\build\postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1369:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1179:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:322:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1449:12)]
+    [at require (node:internal/modules/helpers:135:16)]
+    [at <anonymous> (turbopack:///[turbopack-node]/transforms/postcss.ts:49:25)]
+    [at <anonymous>]
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Desktop/Eccomerce Store/RIIQX/web/src/app/globals.css [Client Component Browser]
+    ./OneDrive/Desktop/Eccomerce Store/RIIQX/web/src/app/layout.tsx [Server Component]
+
+
+ GET / 500 in 914ms (compile: 665ms, render: 250ms)
+Γ¿» ./OneDrive/Desktop/Eccomerce Store/RIIQX/web/src/app/globals.css
+Error evaluating Node.js code
+Error: Cannot find module '@tailwindcss/postcss'
+Require stack:
+- C:\Users\saswa\OneDrive\Desktop\Eccomerce Store\RIIQX\web\.next\dev\build\chunks\[root-of-the-server]__0e674580._.js
+- C:\Users\saswa\OneDrive\Desktop\Eccomerce Store\RIIQX\web\.next\dev\build\chunks\[turbopack]_runtime.js
+- C:\Users\saswa\OneDrive\Desktop\Eccomerce Store\RIIQX\web\.next\dev\build\postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1369:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1179:37)]
+    [at TracingChannel.traceSync (node:diagnostics_channel:322:14)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)]
+    [at Module.require (node:internal/modules/cjs/loader:1449:12)]
+    [at require (node:internal/modules/helpers:135:16)]
+    [at <anonymous> (turbopack:///[turbopack-node]/transforms/postcss.ts:49:25)]
+    [at <anonymous>]
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Desktop/Eccomerce Store/RIIQX/web/src/app/globals.css [Client Component Browser]
+    ./OneDrive/Desktop/Eccomerce Store/RIIQX/web/src/app/layout.tsx [Server Component]
+
+
+ HEAD / 500 in 22ms (compile: 8ms, render: 14ms)
+Γ£ô Compiled in 1232ms
+Image with src "/assets/carousel/slide-1-streetwear.png" is using quality "95" which is not configured in images.qualities [75]. Please update your config to [75, 95].
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET / 200 in 1028ms (compile: 368ms, render: 660ms)
+Γ£ô Compiled in 118ms
+ GET / 200 in 188ms (compile: 72ms, render: 116ms)

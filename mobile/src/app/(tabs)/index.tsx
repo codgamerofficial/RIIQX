@@ -1,143 +1,98 @@
-import { View, Text, ScrollView, Image, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
-import { Link, Stack } from "expo-router";
-import { useEffect, useState } from "react";
-import { getProducts, getCollectionProducts } from "@/lib/shopify";
-import { Product } from "@/lib/shopify/types";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ArrowRight } from "lucide-react-native";
-import { DesignFeaturedStory } from "@/components/marketing/DesignFeaturedStory";
-import { HeroCarousel } from "@/components/home/HeroCarousel";
+import React from 'react';
+import { View, Text, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { HeroCarousel } from '../../components/home/HeroCarousel';
+import { BrandCard } from '../../components/home/BrandCard';
+import { Ionicons } from '@expo/vector-icons';
+import { useIslandStore } from '../../store/islandStore';
 
-import { DesignFearlessPromo } from "@/components/marketing/DesignFearlessPromo";
-import { DesignNewArrivalsBanner } from "@/components/marketing/DesignNewArrivalsBanner";
+const CATEGORIES = ["All", "Beauty", "Fashion", "Lifestyle", "Wellness", "Tech"];
+const BRANDS = [
+    { id: '1', name: "Zara", image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=2069&auto=format&fit=crop', cashback: '10%', category: 'Fashion' },
+    { id: '2', name: "Sephora", image: 'https://images.unsplash.com/photo-1571781535014-53bd96540988?q=80&w=2070&auto=format&fit=crop', cashback: '5%', category: 'Beauty' },
+    { id: '3', name: "Nike", image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2070&auto=format&fit=crop', cashback: '8%', category: 'Sport' },
+    { id: '4', name: "Aesop", image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1887&auto=format&fit=crop', cashback: '12%', category: 'Beauty' },
+];
 
 export default function HomeScreen() {
-    const [newDrops, setNewDrops] = useState<Product[]>([]);
-    const [trending, setTrending] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        async function loadData() {
-            try {
-                // Fetch New Arrivals for "Latest Drops"
-                const { products: newArrivalsData } = await getCollectionProducts({ handle: 'new-arrivals', limit: 8 });
-                setNewDrops(newArrivalsData);
-
-                // Fetch Streetwear for "Trending"
-                const { products: trendingData } = await getCollectionProducts({ handle: 'streetwear', limit: 4 });
-                setTrending(trendingData);
-            } catch (e) {
-                console.error(e);
-            } finally {
-                setLoading(false);
-            }
-        }
-        loadData();
-    }, []);
-
-    const renderCard = ({ item }: { item: Product }) => (
-        <Link href="/shop" asChild>
-            <TouchableOpacity className="mr-4 w-60 group">
-                <View className="aspect-[4/5] bg-muted rounded-2xl overflow-hidden border border-white/5 relative">
-                    <Image
-                        source={{ uri: item.featuredImage?.url }}
-                        className="w-full h-full"
-                        resizeMode="cover"
-                    />
-                    <View className="absolute top-2 right-2 bg-black/60 px-2 py-1 rounded backdrop-blur-md">
-                        <Text className="text-[#D9F99D] text-[10px] font-bold uppercase">New Drop</Text>
-                    </View>
-                </View>
-                <View className="mt-3">
-                    <Text className="text-white font-bold text-sm uppercase truncate" numberOfLines={1}>{item.title}</Text>
-                    <Text className="text-white/50 text-xs font-medium mt-1">
-                        {Number(item.priceRange.minVariantPrice.amount).toLocaleString('en-US', { style: 'currency', currency: item.priceRange.minVariantPrice.currencyCode })}
-                    </Text>
-                </View>
-            </TouchableOpacity>
-        </Link>
-    );
-
     return (
-        <SafeAreaView className="flex-1 bg-background">
-            <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-                {/* Hero Carousel v2 - Premium Redesign */}
+        <View className="flex-1 bg-background">
+            <StatusBar style="light" />
+            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+
+                {/* Header */}
+                <SafeAreaView className="px-6 pb-2 flex-row justify-between items-center bg-black/80">
+                    <Text className="text-white text-2xl font-bold">Cherry<Text className="text-cherry">.</Text></Text>
+                    <View className="flex-row gap-4">
+                        <TouchableOpacity>
+                            <Ionicons name="notifications-outline" size={24} color="white" />
+                        </TouchableOpacity>
+                        <TouchableOpacity>
+                            <Ionicons name="bag-outline" size={24} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                </SafeAreaView>
+
                 <HeroCarousel />
 
-                {/* [NEW] Design 4: Fearless Promo */}
-                <View className="px-6 mb-8">
-                    <DesignFearlessPromo />
-                </View>
+                <ScrollView horizontal showsVerticalScrollIndicator={false} className="px-6 mb-8">
+                    {/* Demo Trigger */}
+                    <TouchableOpacity
+                        onPress={() => useIslandStore.getState().startActivity({
+                            id: 'music-1',
+                            type: 'music',
+                            title: 'Starboy',
+                            subtitle: 'The Weeknd',
+                        })}
+                        className="mr-4 px-6 py-2 rounded-full border bg-cherry border-cherry"
+                    >
+                        <Text className="font-bold text-white">🎵 Play Music</Text>
+                    </TouchableOpacity>
 
-                {/* [NEW] Design 3: New Arrivals Banner */}
-                <DesignNewArrivalsBanner />
+                    <TouchableOpacity
+                        onPress={() => useIslandStore.getState().startActivity({
+                            id: 'timer-1',
+                            type: 'timer',
+                            title: 'Timer',
+                            subtitle: '14:59',
+                        })}
+                        className="mr-4 px-6 py-2 rounded-full border bg-orange-500 border-orange-500"
+                    >
+                        <Text className="font-bold text-white">⏱ Start Timer</Text>
+                    </TouchableOpacity>
 
-                {/* New Drops Horizontal Scroll */}
-                <View className="pl-6 mb-8">
-                    <View className="flex-row items-center justify-between pr-6 mb-4">
-                        <Text className="text-white text-xl font-bold uppercase tracking-tight">Latest Drops</Text>
-                        <Link href="/collections/new-arrivals" asChild>
-                            <TouchableOpacity>
-                                <Text className="text-[#D9F99D] text-xs font-bold uppercase tracking-widest">View All</Text>
-                            </TouchableOpacity>
-                        </Link>
+                    {CATEGORIES.map((cat, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            className={`mr-4 px-6 py-2 rounded-full border ${index === 0 ? 'bg-white border-white' : 'bg-transparent border-gray-700'}`}
+                        >
+                            <Text className={`font-bold ${index === 0 ? 'text-black' : 'text-gray-400'}`}>{cat}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+
+                {/* Featured Brands */}
+                <View className="px-6 mb-24">
+                    <View className="flex-row justify-between items-end mb-6">
+                        <Text className="text-white text-xl font-bold">Trending Brands</Text>
+                        <TouchableOpacity>
+                            <Text className="text-cherry font-medium">See All</Text>
+                        </TouchableOpacity>
                     </View>
 
-                    {loading ? (
-                        <ActivityIndicator color="#D9F99D" />
-                    ) : (
-                        <FlatList
-                            data={newDrops}
-                            renderItem={renderCard}
-                            keyExtractor={(item) => item.id}
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={{ paddingRight: 24 }}
-                        />
-                    )}
-                </View>
-
-                {/* [NEW] Design 1: Featured Story */}
-                <View className="px-6 mb-8">
-                    <DesignFeaturedStory />
-                </View>
-
-                {/* Categories / Trending Grid */}
-                <View className="px-6">
-                    <View className="flex-row items-center justify-between mb-4">
-                        <Text className="text-white text-xl font-bold uppercase tracking-tight">Trending Heat</Text>
-                        <Link href="/collections/streetwear" asChild>
-                            <TouchableOpacity>
-                                <Text className="text-[#D9F99D] text-xs font-bold uppercase tracking-widest">View All</Text>
-                            </TouchableOpacity>
-                        </Link>
+                    <View className="flex-row flex-wrap justify-between">
+                        {BRANDS.map((brand, index) => (
+                            <BrandCard
+                                key={brand.id}
+                                index={index}
+                                {...brand}
+                            />
+                        ))}
                     </View>
-
-                    {loading ? (
-                        <ActivityIndicator color="#D9F99D" />
-                    ) : (
-                        <View className="flex-row flex-wrap justify-between">
-                            {trending.map((item) => (
-                                <Link key={item.id} href="/shop" asChild>
-                                    <TouchableOpacity className="w-[48%] mb-4">
-                                        <View className="aspect-square bg-muted rounded-xl overflow-hidden border border-white/5 mb-2">
-                                            <Image
-                                                source={{ uri: item.featuredImage?.url }}
-                                                className="w-full h-full"
-                                                resizeMode="cover"
-                                            />
-                                        </View>
-                                        <Text className="text-white font-bold text-xs uppercase truncate">{item.title}</Text>
-                                        <Text className="text-white/50 text-[10px] font-bold">
-                                            {Number(item.priceRange.minVariantPrice.amount).toLocaleString('en-US', { style: 'currency', currency: item.priceRange.minVariantPrice.currencyCode })}
-                                        </Text>
-                                    </TouchableOpacity>
-                                </Link>
-                            ))}
-                        </View>
-                    )}
                 </View>
+
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 }

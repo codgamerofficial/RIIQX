@@ -38,26 +38,26 @@ export function CartSheet() {
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className="fixed top-0 right-0 z-[70] h-full w-full max-w-md bg-[#121212] border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col"
+                        className="fixed top-0 right-0 z-[70] h-full w-full max-w-md bg-rich-black border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col"
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between p-6 border-b border-white/10 bg-[#121212]">
+                        <div className="flex items-center justify-between p-6 border-b border-white/10 bg-rich-black">
                             <h2 className="text-2xl font-black text-white uppercase tracking-tighter flex items-center gap-2">
-                                <span className="text-primary">///</span> Your Cart
+                                <span className="text-cherry-red">///</span> Your Cart
                                 <span className="bg-white/10 text-white text-xs font-bold px-2 py-1 rounded-full ml-2">
                                     {items.length}
                                 </span>
                             </h2>
                             <button
                                 onClick={() => setCartOpen(false)}
-                                className="p-2 text-white/50 hover:text-primary transition-colors hover:rotate-90 duration-300"
+                                className="p-2 text-white/50 hover:text-cherry-red transition-colors hover:rotate-90 duration-300"
                             >
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
 
                         {/* Free Shipping Progress */}
-                        <div className="px-6 pb-2 pt-6 bg-[#121212]">
+                        <div className="px-6 pb-2 pt-6 bg-rich-black">
                             <div className="bg-neutral-900 rounded-none border border-white/10 p-5 relative overflow-hidden group">
                                 {(() => {
                                     const total = getCartTotal();
@@ -71,14 +71,14 @@ export function CartSheet() {
                                                 <span className="text-white/70">
                                                     {remaining > 0 ? `Add ${formatPrice(remaining.toString(), 'INR')} for Free Shipping` : "Free Shipping Unlocked!"}
                                                 </span>
-                                                <span className="text-primary">{Math.round(progress)}%</span>
+                                                <span className="text-cherry-red">{Math.round(progress)}%</span>
                                             </div>
                                             <div className="h-1.5 w-full bg-white/10 overflow-hidden">
                                                 <motion.div
                                                     initial={{ width: 0 }}
                                                     animate={{ width: `${progress}%` }}
                                                     transition={{ duration: 1, ease: "easeOut" }}
-                                                    className={`h-full ${remaining <= 0 ? 'bg-primary shadow-[0_0_10px_#D9F99D]' : 'bg-white'}`}
+                                                    className={`h-full ${remaining <= 0 ? 'bg-gold shadow-[0_0_10px_#F5C518]' : 'bg-cherry-red'}`}
                                                 />
                                             </div>
                                         </div>
@@ -88,7 +88,7 @@ export function CartSheet() {
                         </div>
 
                         {/* Items */}
-                        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 bg-[#121212] custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 bg-rich-black custom-scrollbar">
                             {items.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center space-y-6 pt-12 text-muted-foreground">
                                     <div className="w-24 h-24 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center animate-pulse">
@@ -102,7 +102,7 @@ export function CartSheet() {
                                     </div>
                                     <button
                                         onClick={() => setCartOpen(false)}
-                                        className="mt-4 px-8 py-3 bg-white text-black font-black uppercase tracking-widest hover:bg-primary transition-colors text-xs"
+                                        className="mt-4 px-8 py-3 bg-white text-black font-black uppercase tracking-widest hover:bg-gold transition-colors text-xs"
                                     >
                                         Start Shopping
                                     </button>
@@ -116,7 +116,7 @@ export function CartSheet() {
 
                         {/* Footer */}
                         {items.length > 0 && (
-                            <div className="p-6 border-t border-white/10 bg-[#121212]">
+                            <div className="p-6 border-t border-white/10 bg-rich-black">
                                 <div className="space-y-2 mb-6">
                                     <div className="flex items-center justify-between text-sm text-white/60">
                                         <span>Subtotal</span>
@@ -124,14 +124,17 @@ export function CartSheet() {
                                     </div>
                                     <div className="flex items-center justify-between text-2xl font-black text-white uppercase">
                                         <span>Total</span>
-                                        <span>{formatPrice(getCartTotal().toString(), 'INR')}</span>
+                                        <span className="text-cherry-red">{formatPrice(getCartTotal().toString(), 'INR')}</span>
                                     </div>
                                     <p className="text-[10px] text-white/40 uppercase tracking-widest text-right">
                                         Shipping & Taxes Calculated at Checkout
                                     </p>
                                 </div>
                                 <Link href="/checkout" className="block">
-                                    <button className="w-full py-4 bg-primary text-black font-black uppercase tracking-widest hover:bg-white transition-colors flex items-center justify-center space-x-2 group">
+                                    <button
+                                        onClick={() => setCartOpen(false)}
+                                        className="w-full py-4 bg-gradient-to-r from-cherry-red to-red-700 text-white font-black uppercase tracking-widest hover:shadow-[0_0_20px_rgba(227,28,121,0.5)] transition-all flex items-center justify-center space-x-2 group rounded-lg"
+                                    >
                                         <span>Secure Checkout</span>
                                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                     </button>

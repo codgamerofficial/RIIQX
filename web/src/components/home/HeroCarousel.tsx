@@ -151,6 +151,17 @@ export function HeroCarousel() {
                 </motion.div>
             </AnimatePresence>
 
+            {/* Preload Next Slide Image (Hidden) */}
+            <div className="hidden">
+                <Image
+                    src={HERO_SLIDES[(currentSlide + 1) % HERO_SLIDES.length].image}
+                    alt="preload"
+                    width={10}
+                    height={10}
+                    priority
+                />
+            </div>
+
             {/* Floating Badge */}
             <motion.div
                 key={`badge-${slide.id}`}
@@ -160,8 +171,8 @@ export function HeroCarousel() {
                 transition={{ delay: 0.3 }}
                 className="absolute top-8 right-8 z-20"
             >
-                <div className="px-4 py-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full">
-                    <span className="text-white text-xs font-bold tracking-[0.2em] uppercase">
+                <div className="px-4 py-2 bg-black/40 backdrop-blur-xl border border-gold/50 rounded-full">
+                    <span className="text-gold text-xs font-bold tracking-[0.2em] uppercase">
                         {slide.badge}
                     </span>
                 </div>
@@ -184,7 +195,7 @@ export function HeroCarousel() {
                         >
                             {/* Button Background Animation */}
                             <motion.div
-                                className="absolute inset-0 bg-gradient-to-r from-lime-400 via-orange-500 to-pink-500"
+                                className="absolute inset-0 bg-gradient-to-r from-cherry-red via-red-500 to-gold"
                                 initial={{ x: "-100%" }}
                                 whileHover={{ x: 0 }}
                                 transition={{ duration: 0.3 }}
@@ -212,7 +223,7 @@ export function HeroCarousel() {
             {/* Progress Bar */}
             <div className="absolute bottom-0 left-0 right-0 z-30 h-1 bg-white/10">
                 <motion.div
-                    className="h-full bg-gradient-to-r from-lime-400 via-orange-500 to-pink-500"
+                    className="h-full bg-gradient-to-r from-cherry-red via-red-500 to-gold"
                     style={{ width: `${progress}%` }}
                     transition={{ duration: 0.05 }}
                 />

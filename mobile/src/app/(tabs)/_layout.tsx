@@ -1,6 +1,6 @@
-import { Tabs } from "expo-router";
-import { Home, ShoppingBag, Search, User } from "lucide-react-native";
-import { View } from "react-native";
+import { Tabs } from 'expo-router';
+import { View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
     return (
@@ -8,39 +8,47 @@ export default function TabLayout() {
             screenOptions={{
                 headerShown: false,
                 tabBarStyle: {
-                    backgroundColor: "#121212",
-                    borderTopColor: "#333",
+                    backgroundColor: '#0A0A0A',
+                    borderTopColor: '#1A1A1A',
                     height: 80,
                     paddingBottom: 20,
-                    paddingTop: 10,
                 },
-                tabBarActiveTintColor: "#D9F99D", // Neon
-                tabBarInactiveTintColor: "#666",
+                tabBarActiveTintColor: '#E31C79', // Cherry
+                tabBarInactiveTintColor: '#666666',
                 tabBarShowLabel: false,
             }}
         >
             <Tabs.Screen
                 name="index"
                 options={{
-                    tabBarIcon: ({ color }) => <Home size={28} color={color} />,
+                    tabBarIcon: ({ color, size, focused }) => (
+                        <View className={focused ? 'bg-cherry/10 p-2 rounded-xl' : ''}>
+                            <Ionicons name={focused ? "home" : "home-outline"} size={26} color={color} />
+                        </View>
+                    ),
                 }}
             />
+
             <Tabs.Screen
-                name="shop"
+                name="explore"
                 options={{
-                    tabBarIcon: ({ color }) => <Search size={28} color={color} />,
+                    tabBarIcon: ({ color, size, focused }) => (
+                        <View className={focused ? 'bg-cherry/10 p-2 rounded-xl' : ''}>
+                            <Ionicons name={focused ? "search" : "search-outline"} size={26} color={color} />
+                        </View>
+                    ),
                 }}
             />
+
             <Tabs.Screen
-                name="bag"
+                name="dashboard"
                 options={{
-                    tabBarIcon: ({ color }) => <ShoppingBag size={28} color={color} />,
-                }}
-            />
-            <Tabs.Screen
-                name="profile"
-                options={{
-                    tabBarIcon: ({ color }) => <User size={28} color={color} />,
+                    tabBarIcon: ({ color, size, focused }) => (
+                        <View className={focused ? 'bg-cherry/10 p-2 rounded-xl' : ''}>
+                            {/* Dashboard / Analytics */}
+                            <Ionicons name={focused ? "stats-chart" : "stats-chart-outline"} size={26} color={color} />
+                        </View>
+                    ),
                 }}
             />
         </Tabs>

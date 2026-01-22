@@ -32,20 +32,20 @@ export default function CartPage() {
 
     if (items.length === 0) {
         return (
-            <div className="min-h-screen bg-background pt-24 pb-12">
+            <div className="min-h-screen bg-white pt-24 pb-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center py-24">
-                        <div className="w-32 h-32 mx-auto rounded-full border-2 border-dashed border-white/20 flex items-center justify-center mb-8">
-                            <ShoppingBag className="w-16 h-16 text-white/30" />
+                        <div className="w-32 h-32 mx-auto rounded-full border-2 border-dashed border-neutral-gray flex items-center justify-center mb-8">
+                            <ShoppingBag className="w-16 h-16 text-neutral-gray" />
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tight mb-4 font-montserrat">
+                        <h1 className="text-4xl md:text-6xl font-black font-serif text-rich-black uppercase tracking-tight mb-4">
                             Your Cart is Empty
                         </h1>
-                        <p className="text-muted-foreground text-lg mb-8">
+                        <p className="text-neutral-gray text-lg mb-8">
                             Looks like you haven't added anything to your cart yet.
                         </p>
                         <Link href="/shop">
-                            <button className="bewakoof-btn bewakoof-btn-primary px-8 py-4 text-base">
+                            <button className="bg-cherry-red text-white px-8 py-4 rounded-lg font-semibold hover:bg-cherry-red/90 transition-colors">
                                 Continue Shopping
                             </button>
                         </Link>
@@ -56,14 +56,14 @@ export default function CartPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background pt-24 pb-12">
+        <div className="min-h-screen bg-white pt-24 pb-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-12">
-                    <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tight mb-2 font-montserrat">
+                    <h1 className="text-4xl md:text-6xl font-black font-serif text-rich-black uppercase tracking-tight mb-2">
                         Shopping Cart
                     </h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-neutral-gray">
                         {getItemCount()} {getItemCount() === 1 ? "item" : "items"} in your cart
                     </p>
                 </div>
@@ -77,10 +77,10 @@ export default function CartPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="bg-neutral-900 border border-white/10 rounded-xl p-6 flex gap-6"
+                                className="bg-neutral-light border border-neutral-gray rounded-xl p-6 flex gap-6"
                             >
                                 {/* Product Image */}
-                                <div className="relative w-32 h-32 flex-shrink-0 bg-neutral-800 rounded-lg overflow-hidden">
+                                <div className="relative w-32 h-32 flex-shrink-0 bg-neutral-light rounded-lg overflow-hidden">
                                     <Image
                                         src={item.image}
                                         alt={item.title}
@@ -92,11 +92,11 @@ export default function CartPage() {
                                 {/* Product Info */}
                                 <div className="flex-1 flex flex-col justify-between">
                                     <div>
-                                        <h3 className="text-lg font-bold text-white mb-1">{item.title}</h3>
+                                        <h3 className="text-lg font-bold text-rich-black mb-1">{item.title}</h3>
                                         {item.size && (
-                                            <p className="text-sm text-muted-foreground">Size: {item.size}</p>
+                                            <p className="text-sm text-neutral-gray">Size: {item.size}</p>
                                         )}
-                                        <p className="text-xl font-black text-white mt-2">
+                                        <p className="text-xl font-black text-cherry-red mt-2">
                                             {formatPrice((item.price * item.quantity).toString(), "INR")}
                                         </p>
                                     </div>
@@ -106,22 +106,22 @@ export default function CartPage() {
                                         <div className="flex items-center gap-3">
                                             <button
                                                 onClick={() => updateQuantity(item.id, item.variantId, Math.max(1, item.quantity - 1))}
-                                                className="w-8 h-8 border border-white/20 rounded-lg flex items-center justify-center hover:border-white transition-colors"
+                                                className="w-8 h-8 border border-neutral-gray rounded-lg flex items-center justify-center hover:border-cherry-red transition-colors"
                                             >
-                                                <Minus className="w-4 h-4 text-white" />
+                                                <Minus className="w-4 h-4 text-rich-black" />
                                             </button>
-                                            <span className="text-white font-bold w-8 text-center">{item.quantity}</span>
+                                            <span className="text-rich-black font-bold w-8 text-center">{item.quantity}</span>
                                             <button
                                                 onClick={() => updateQuantity(item.id, item.variantId, item.quantity + 1)}
-                                                className="w-8 h-8 border border-white/20 rounded-lg flex items-center justify-center hover:border-white transition-colors"
+                                                className="w-8 h-8 border border-neutral-gray rounded-lg flex items-center justify-center hover:border-cherry-red transition-colors"
                                             >
-                                                <Plus className="w-4 h-4 text-white" />
+                                                <Plus className="w-4 h-4 text-rich-black" />
                                             </button>
                                         </div>
 
                                         <button
                                             onClick={() => removeItem(item.id, item.variantId)}
-                                            className="text-neon-red hover:text-red-400 transition-colors flex items-center gap-2 text-sm font-bold"
+                                            className="text-cherry-red hover:text-cherry-red/80 transition-colors flex items-center gap-2 text-sm font-bold"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                             Remove
@@ -134,14 +134,14 @@ export default function CartPage() {
 
                     {/* Order Summary */}
                     <div className="lg:col-span-1">
-                        <div className="bg-neutral-900 border border-white/10 rounded-xl p-6 sticky top-24">
-                            <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-6">
+                        <div className="bg-neutral-light border border-neutral-gray rounded-xl p-6 sticky top-24">
+                            <h2 className="text-2xl font-black font-serif text-rich-black uppercase tracking-tight mb-6">
                                 Order Summary
                             </h2>
 
                             {/* Coupon Code */}
                             <div className="mb-6">
-                                <label className="text-sm font-bold text-white uppercase tracking-wider mb-2 block">
+                                <label className="text-sm font-bold text-rich-black uppercase tracking-wider mb-2 block">
                                     Coupon Code
                                 </label>
                                 <div className="flex gap-2">
@@ -150,17 +150,17 @@ export default function CartPage() {
                                         value={couponCode}
                                         onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                                         placeholder="Enter code"
-                                        className="flex-1 bg-neutral-800 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:border-bewakoof-yellow focus:outline-none transition-colors"
+                                        className="flex-1 bg-white border border-neutral-gray rounded-lg px-4 py-3 text-rich-black text-sm focus:border-cherry-red focus:outline-none transition-colors"
                                     />
                                     <button
                                         onClick={handleApplyCoupon}
-                                        className="px-6 py-3 bg-white text-black font-bold uppercase text-xs rounded-lg hover:bg-bewakoof-yellow transition-colors"
+                                        className="px-6 py-3 bg-cherry-red text-white font-bold uppercase text-xs rounded-lg hover:bg-cherry-red/90 transition-colors"
                                     >
                                         Apply
                                     </button>
                                 </div>
                                 {appliedCoupon && (
-                                    <div className="mt-2 flex items-center gap-2 text-bewakoof-green text-sm font-bold">
+                                    <div className="mt-2 flex items-center gap-2 text-gold text-sm font-bold">
                                         <Tag className="w-4 h-4" />
                                         {appliedCoupon.code} applied ({appliedCoupon.discount}% off)
                                     </div>
@@ -168,63 +168,63 @@ export default function CartPage() {
                             </div>
 
                             {/* Price Breakdown */}
-                            <div className="space-y-3 mb-6 pb-6 border-b border-white/10">
-                                <div className="flex justify-between text-white">
+                            <div className="space-y-3 mb-6 pb-6 border-b border-neutral-gray">
+                                <div className="flex justify-between text-rich-black">
                                     <span>Subtotal</span>
                                     <span className="font-bold">{formatPrice(subtotal.toString(), "INR")}</span>
                                 </div>
                                 {appliedCoupon && (
-                                    <div className="flex justify-between text-bewakoof-green">
+                                    <div className="flex justify-between text-gold">
                                         <span>Discount ({appliedCoupon.discount}%)</span>
                                         <span className="font-bold">-{formatPrice(discount.toString(), "INR")}</span>
                                     </div>
                                 )}
-                                <div className="flex justify-between text-white">
-                                    <span>Shipping</span>
+                                <div className="flex justify-between text-rich-black">
+                                    <span>Delivery</span>
                                     <span className="font-bold">
                                         {shipping === 0 ? "FREE" : formatPrice(shipping.toString(), "INR")}
                                     </span>
                                 </div>
                                 {shipping > 0 && (
-                                    <p className="text-xs text-muted-foreground">
-                                        Add {formatPrice((5000 - subtotal).toString(), "INR")} more for free shipping
+                                    <p className="text-xs text-neutral-gray">
+                                        Add {formatPrice((5000 - subtotal).toString(), "INR")} more for free delivery
                                     </p>
                                 )}
                             </div>
 
                             {/* Total */}
-                            <div className="flex justify-between text-2xl font-black text-white uppercase mb-6">
+                            <div className="flex justify-between text-2xl font-black text-cherry-red uppercase mb-6">
                                 <span>Total</span>
                                 <span>{formatPrice(total.toString(), "INR")}</span>
                             </div>
 
                             {/* Checkout Button */}
                             <Link href="/checkout">
-                                <button className="w-full bewakoof-btn bewakoof-btn-primary py-4 text-base flex items-center justify-center gap-2">
-                                    <span>Proceed to Checkout</span>
+                                <button className="w-full bg-cherry-red text-white py-4 rounded-lg font-semibold hover:bg-cherry-red/90 transition-colors flex items-center justify-center gap-2">
+                                    <span>Checkout</span>
                                     <ArrowRight className="w-5 h-5" />
                                 </button>
                             </Link>
 
                             {/* Continue Shopping */}
                             <Link href="/shop">
-                                <button className="w-full mt-3 bewakoof-btn bewakoof-btn-secondary py-3 text-sm">
+                                <button className="w-full mt-3 bg-neutral-light text-rich-black py-3 rounded-lg font-semibold hover:bg-neutral-gray transition-colors text-sm">
                                     Continue Shopping
                                 </button>
                             </Link>
 
                             {/* Trust Badges */}
-                            <div className="mt-6 pt-6 border-t border-white/10 space-y-2">
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <div className="w-1 h-1 bg-bewakoof-green rounded-full"></div>
+                            <div className="mt-6 pt-6 border-t border-neutral-gray space-y-2">
+                                <div className="flex items-center gap-2 text-xs text-neutral-gray">
+                                    <div className="w-1 h-1 bg-gold rounded-full"></div>
                                     <span>Secure Payment</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <div className="w-1 h-1 bg-bewakoof-green rounded-full"></div>
+                                <div className="flex items-center gap-2 text-xs text-neutral-gray">
+                                    <div className="w-1 h-1 bg-gold rounded-full"></div>
                                     <span>Easy Returns & Exchange</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <div className="w-1 h-1 bg-bewakoof-green rounded-full"></div>
+                                <div className="flex items-center gap-2 text-xs text-neutral-gray">
+                                    <div className="w-1 h-1 bg-gold rounded-full"></div>
                                     <span>100% Authentic Products</span>
                                 </div>
                             </div>

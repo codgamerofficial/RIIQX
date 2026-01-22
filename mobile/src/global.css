@@ -1,3 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    /* RIIQX Brand Palette */
+    --background: #ffffff;
+    --foreground: #1f1f1f;
+
+    --card: #f7f7f7;
+    --card-foreground: #1f1f1f;
+
+    --popover: #ffffff;
+    --popover-foreground: #1f1f1f;
+
+    --primary: #e31c79;
+    /* Cherry Red */
+    --primary-foreground: #ffffff;
+
+    --secondary: #cccccc;
+    /* Neutral */
+    --secondary-foreground: #1f1f1f;
+
+    --muted: #f7f7f7;
+    --muted-foreground: #666666;
+
+    --accent: #f5c518;
+    /* Gold */
+    --accent-foreground: #1f1f1f;
+
+    --destructive: #e31c79;
+    --destructive-foreground: #ffffff;
+
+    --border: #cccccc;
+    --input: #f7f7f7;
+    --ring: #e31c79;
+
+    --radius: 0.5rem;
+
+    /* Brand Colors */
+    --rich-black: #1f1f1f;
+    --cherry-red: #e31c79;
+    --gold: #f5c518;
+    --neutral-light: #f7f7f7;
+    --neutral-gray: #cccccc;
+
+    /* Typography */
+    --font-sans: 'Inter', sans-serif;
+    --font-serif: 'Playfair Display', serif;
+}

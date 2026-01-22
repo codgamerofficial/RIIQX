@@ -7,6 +7,7 @@ import { Product, ProductVariant } from "@/lib/shopify/types";
 import { ArrowLeft, ShoppingBag, Heart } from "lucide-react-native";
 import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
+import { useIslandStore } from "@/store/islandStore";
 
 export default function ProductScreen() {
     const { handle } = useLocalSearchParams<{ handle: string }>();
@@ -94,65 +95,71 @@ export default function ProductScreen() {
             size: selectedOptions['Size']
         });
 
-        Alert.alert("Added to Bag", `${product.title} has been added to your loadout.`);
+        // Trigger Dynamic Island (Commerce update)
+        const newCount = useCartStore.getState().getItemCount();
+        useIslandStore.getState().startActivity({
+            id: 'cart-status',
+            type: 'cart',
+            title: 'Added to Bag',
+            subtitle: `${newCount} items`,
+            priority: 10,
+        });
     };
 
     if (loading) {
         return (
-            <SafeAreaView className="flex-1 bg-black items-center justify-center">
-                <ActivityIndicator size="large" color="#D9F99D" />
+            <SafeAreaView className="flex-1 bg-white items-center justify-center">
+                <ActivityIndicator size="large" color="#e31c79" />
             </SafeAreaView>
         );
     }
 
     if (!product) {
         return (
-            <SafeAreaView className="flex-1 bg-black items-center justify-center">
-                <Text className="text-white">Product not found.</Text>
+            <SafeAreaView className="flex-1 bg-white items-center justify-center">
+                <Text className="text-rich-black">Product not found.</Text>
             </SafeAreaView>
         );
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-black" edges={['top']}>
+        <SafeAreaView className="flex-1 bg-white" edges={['top']}>
             <Stack.Screen options={{ headerShown: false }} />
+
+            {/* Sticky Header */}
+            <View className="bg-white border-b border-neutral-gray px-4 py-3">
+                <View className="flex-row items-center justify-between">
+                    <TouchableOpacity onPress={() => router.back()}>
+                        <ArrowLeft color="#1f1f1f" size={24} />
+                    </TouchableOpacity>
+                    <Text className="text-lg font-semibold text-rich-black flex-1 text-center" numberOfLines={1}>{product.title}</Text>
+                    <TouchableOpacity onPress={toggleWishlist}>
+                        <Heart
+                            color={isWishlisted ? "#e31c79" : "#1f1f1f"}
+                            fill={isWishlisted ? "#e31c79" : "transparent"}
+                            size={24}
+                        />
+                    </TouchableOpacity>
+                </View>
+            </View>
 
             <View className="flex-1 relative">
                 <ScrollView>
                     {/* Header Image */}
-                    <View className="w-full aspect-[3/4] bg-zinc-900 relative">
+                    <View className="w-full aspect-[3/4] bg-neutral-light relative">
                         <Image
                             source={{ uri: selectedVariant?.image?.url || product.featuredImage?.url }}
                             className="w-full h-full"
                             resizeMode="cover"
                         />
-
-                        {/* Back Button Overlay */}
-                        <TouchableOpacity
-                            onPress={() => router.back()}
-                            className="absolute top-4 left-4 w-10 h-10 bg-black/50 rounded-full items-center justify-center backdrop-blur-md"
-                        >
-                            <ArrowLeft color="white" size={20} />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={toggleWishlist}
-                            className="absolute top-4 right-4 w-10 h-10 bg-black/50 rounded-full items-center justify-center backdrop-blur-md"
-                        >
-                            <Heart
-                                color={isWishlisted ? "#D9F99D" : "white"}
-                                fill={isWishlisted ? "#D9F99D" : "transparent"}
-                                size={20}
-                            />
-                        </TouchableOpacity>
                     </View>
 
                     <View className="p-6 pb-32">
-                        <Text className="text-3xl font-black text-white uppercase tracking-tighter mb-2">
+                        <Text className="text-2xl font-bold font-serif text-rich-black mb-2">
                             {product.title}
                         </Text>
 
-                        <Text className="text-2xl font-bold text-[#D9F99D] mb-6">
+                        <Text className="text-xl font-bold text-cherry-red mb-6">
                             {selectedVariant ?
                                 formatPrice(selectedVariant.price.amount, selectedVariant.price.currencyCode) :
                                 formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode)
@@ -162,7 +169,7 @@ export default function ProductScreen() {
                         {/* Options */}
                         {product.options.map((option) => (
                             <View key={option.id} className="mb-6">
-                                <Text className="text-white/70 text-sm font-bold uppercase tracking-widest mb-3">
+                                <Text className="text-neutral-gray text-sm font-semibold uppercase mb-3">
                                     {option.name}
                                 </Text>
                                 <View className="flex-row flex-wrap gap-2">
@@ -172,9 +179,9 @@ export default function ProductScreen() {
                                             <TouchableOpacity
                                                 key={value}
                                                 onPress={() => handleOptionSelect(option.name, value)}
-                                                className={`px-4 py-2 border rounded-lg ${isSelected ? 'bg-white border-white' : 'bg-transparent border-white/30'}`}
+                                                className={`px-4 py-2 border rounded-lg ${isSelected ? 'bg-cherry-red border-cherry-red' : 'bg-transparent border-neutral-gray'}`}
                                             >
-                                                <Text className={`text-sm font-bold ${isSelected ? 'text-black' : 'text-white'}`}>
+                                                <Text className={`text-sm font-semibold ${isSelected ? 'text-white' : 'text-rich-black'}`}>
                                                     {value}
                                                 </Text>
                                             </TouchableOpacity>
@@ -185,8 +192,8 @@ export default function ProductScreen() {
                         ))}
 
                         <View className="mb-6">
-                            <Text className="text-white/70 text-sm font-bold uppercase tracking-widest mb-2">Description</Text>
-                            <Text className="text-white/80 leading-6">
+                            <Text className="text-neutral-gray text-sm font-semibold uppercase mb-2">Description</Text>
+                            <Text className="text-rich-black leading-6">
                                 {product.description}
                             </Text>
                         </View>
@@ -194,14 +201,14 @@ export default function ProductScreen() {
                 </ScrollView>
 
                 {/* Bottom Bar */}
-                <View className="absolute bottom-0 left-0 right-0 p-4 bg-black/90 border-t border-white/10 backdrop-blur-xl">
+                <View className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-neutral-gray">
                     <TouchableOpacity
                         onPress={handleAddToCart}
-                        className={`w-full py-4 rounded-full flex-row items-center justify-center space-x-2 ${selectedVariant?.availableForSale ? 'bg-[#D9F99D]' : 'bg-zinc-700 opacity-50'}`}
+                        className={`w-full py-4 rounded-lg flex-row items-center justify-center ${selectedVariant?.availableForSale ? 'bg-cherry-red' : 'bg-neutral-gray'}`}
                         disabled={!selectedVariant?.availableForSale}
                     >
-                        <ShoppingBag color="black" size={20} />
-                        <Text className="text-black font-black uppercase tracking-wider">
+                        <ShoppingBag color="white" size={20} />
+                        <Text className="text-white font-bold uppercase ml-2">
                             {selectedVariant?.availableForSale ? 'Add to Bag' : 'Sold Out'}
                         </Text>
                     </TouchableOpacity>

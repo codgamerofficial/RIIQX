@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Product } from "@/lib/shopify/types";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import NextImage from "next/image";
 import { formatPrice } from "@/lib/shopify";
 
 interface NewDropsProps {
@@ -126,11 +127,19 @@ function ProductCard({ product, isMobile = false }: { product: Product, isMobile
             <div className="absolute inset-0 overflow-hidden">
                 {product.featuredImage && (
                     <>
-                        <img
-                            src={product.featuredImage.url}
-                            alt={product.title}
-                            className={`w-full h-full object-cover transition-transform duration-700 ${!isMobile && 'group-hover:scale-110 grayscale group-hover:grayscale-0'}`}
-                        />
+                        <div className={`w-full h-full relative ${!isMobile && 'transition-transform duration-700 group-hover:scale-110'}`}>
+                            {/* Main Image - Color/Grayscale handled via filters */}
+                            <div className={`absolute inset-0 w-full h-full transition-all duration-500 ${!isMobile && 'grayscale group-hover:grayscale-0'}`}>
+                                <NextImage
+                                    src={product.featuredImage.url}
+                                    alt={product.title}
+                                    fill
+                                    className="object-cover"
+                                    sizes={isMobile ? "90vw" : "(max-width: 1200px) 50vw, 33vw"}
+                                />
+                            </div>
+                        </div>
+
                         {/* Rating Pill on Image */}
                         <div className="absolute bottom-4 left-4 z-10 bewakoof-rating-pill">
                             <svg className="w-3 h-3 fill-current bewakoof-rating-star" viewBox="0 0 24 24">

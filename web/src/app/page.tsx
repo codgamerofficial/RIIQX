@@ -1,151 +1,84 @@
 import { HeroCarousel } from "@/components/home/HeroCarousel";
-import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { NewDrops } from "@/components/home/NewDrops";
-import { TrendingGrid } from "@/components/home/TrendingGrid";
 import { CategoryCircles } from "@/components/home/CategoryCircles";
-import { FeaturedSection } from "@/components/home/FeaturedSection";
-import { PromotionalBanner } from "@/components/home/PromotionalBanner";
-import { TrendingCategories } from "@/components/home/TrendingCategories";
 import { CollectionSection } from "@/components/home/CollectionSection";
 import { getCollectionProducts, getCollections, getProducts } from "@/lib/shopify";
-import { ShoppingBag } from "lucide-react";
-import { DesignFearlessPromo } from "@/components/marketing/DesignFearlessPromo";
-import { DesignNewArrivalsBanner } from "@/components/marketing/DesignNewArrivalsBanner";
-import { DesignFeaturedStory } from "@/components/marketing/DesignFeaturedStory";
+import { Search, ShoppingBag } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default async function Home() {
-  const collections = await getCollections();
+  let collections: any = [], newArrivals: any = { products: [] }, bestSellers: any = { products: [] }, streetwear: any = { products: [] };
+  let errorMsg = null;
 
-  // 1. New Arrivals (Handle: new-arrivals) - Increased to 12
-  const newArrivals = await getCollectionProducts({ handle: 'new-arrivals', limit: 12 });
-
-  // 2. Best Sellers (Sorted by BEST_SELLING) - Increased to 16
-  const bestSellers = await getProducts({ sortKey: 'BEST_SELLING', limit: 16 });
-
-  // 3. Streetwear (Handle: streetwear) - Increased to 12
-  const streetwear = await getCollectionProducts({ handle: 'streetwear', limit: 12 });
-
-  // 4. Accessories (Handle: accessories) - Increased to 12
-  const accessories = await getCollectionProducts({ handle: 'accessories', limit: 12 });
-
-  // 5. Summer Collection (Handle: summer-collection) - Increased to 12
-  const summer = await getCollectionProducts({ handle: 'summer-collection', limit: 12 });
-
-  // 6. Limited Edition (Handle: limited-edition) - Increased to 12
-  const limited = await getCollectionProducts({ handle: 'limited-edition', limit: 12 });
-
-  // 7. Collaborations (Handle: collaboration) - Increased to 12
-  const collaboration = await getCollectionProducts({ handle: 'collaboration', limit: 12 });
-
-
-  // Featured Section Logic: Use specific products from 'frontpage' or 'featured' or just the first few best sellers
-  // Increased to 6 for better showcase
-  const featured = await getCollectionProducts({ handle: 'frontpage', limit: 6 });
-  const featuredProducts = featured.products.length > 0 ? featured.products : bestSellers.products.slice(0, 6);
-
-  // Trending Grid Logic: Use remaining best sellers or 'trending' collection
-  // Increased to 16 for more variety
-  const trending = await getCollectionProducts({ handle: 'trending', limit: 16 });
-  const trendingProducts = trending.products.length > 0 ? trending.products : (await getProducts({ sortKey: 'BEST_SELLING', limit: 16 })).products;
-
+  try {
+    collections = await getCollections();
+    newArrivals = await getCollectionProducts({ handle: 'new-arrivals', limit: 12 });
+    bestSellers = await getProducts({ sortKey: 'BEST_SELLING', limit: 12 });
+    streetwear = await getCollectionProducts({ handle: 'streetwear', limit: 12 });
+  } catch (e: any) {
+    console.error("Shopify Fetch Error:", e);
+    errorMsg = e.message;
+    // Fallback data to prevent crash
+    collections = [];
+    newArrivals = { products: [] };
+    bestSellers = { products: [] };
+    streetwear = { products: [] };
+  }
 
   return (
-    <main className="flex flex-col min-h-screen">
-      {/* Promotional Banner */}
-      <PromotionalBanner
-        message="2 Crore+ Customers Trust RIIQX"
-        icon={<ShoppingBag className="w-5 h-5" />}
-      />
+    <main className="flex flex-col min-h-screen bg-rich-black text-white">
 
-      {/* 1. Hero Carousel v2 - Premium Redesign */}
+
+      {/* Hero Section - Full-screen Carousel */}
       <HeroCarousel />
 
-      {/* [NEW] Design 4: Fearless Promo */}
-      <DesignFearlessPromo />
-
-      {/* 2. Trending Categories (Bewakoof-style) */}
-      <TrendingCategories products={trendingProducts} />
-
-      {/* 3. Category Circles (Real Collections) */}
-      <CategoryCircles collections={collections} />
-
-      {/* [NEW] Design 3: New Arrivals Banner */}
-      <DesignNewArrivalsBanner />
-
-      {/* 4. New Drops (Horizontal Parallax) - "New Arrivals" */}
-      <NewDrops products={newArrivals.products} />
-
-      {/* 5. Best Sellers (Collection Section) */}
-      <CollectionSection
-        title="Best Sellers"
-        subtitle="Global Favorites"
-        products={bestSellers.products}
-        link="/best-sellers"
-      />
-
-      {/* [NEW] Design 1: Featured Story (Replaces old FeaturedSection) */}
-      <DesignFeaturedStory />
-
-      {/* 7. Accessories (Collection Section) */}
-      <CollectionSection
-        title="Accessories"
-        subtitle="Loadout"
-        products={accessories.products}
-        link="/accessories"
-        dark
-      />
-
-      {/* 8. Streetwear (Collection Section) */}
-      <CollectionSection
-        title="Streetwear"
-        subtitle="Urban Ops"
-        products={streetwear.products}
-        link="/streetwear"
-      />
-
-      {/* 9. Summer Collection (Collection Section) */}
-      {summer.products.length > 0 && (
-        <CollectionSection
-          title="Summer Collection"
-          subtitle="Heat Wave"
-          products={summer.products}
-          link="/collections/summer-collection"
-          dark
-        />
+      {errorMsg && (
+        <div className="bg-red-500/10 border border-red-500 p-4 m-4 rounded text-red-500 font-mono text-sm">
+          <strong>System Error:</strong> {errorMsg}
+        </div>
       )}
 
-      {/* 10. Trending Grid (Bento Layout) */}
-      <TrendingGrid products={trendingProducts} />
-
-      {/* 11. Limited Edition */}
-      {limited.products.length > 0 && (
-        <CollectionSection
-          title="Limited Edition"
-          subtitle="Secure The Bag"
-          products={limited.products}
-          link="/collections/limited-edition"
-        />
-      )}
-
-      {/* 12. Collaborations */}
-      {collaboration.products.length > 0 && (
-        <CollectionSection
-          title="Collaborations"
-          subtitle="RIIQX x UNIVERSE"
-          products={collaboration.products}
-          link="/collections/collaboration"
-          dark
-        />
-      )}
-
-      <NewsletterSection />
-
-      {/* Brand Statement / Spacer */}
-      <section className="py-24 px-4 text-center bg-black">
-        <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase">
-          Rule the <span className="text-outline text-transparent stroke-white" style={{ WebkitTextStroke: "1px white" }}>Digital</span> Streets
-        </h2>
+      {/* Trending & Curated Collections */}
+      <section className="py-12 px-4">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold font-display text-white uppercase tracking-wider">Trending <span className="text-outline-gold">Streetwear</span></h2>
+          <Link href="/streetwear" className="text-gold text-sm font-bold uppercase tracking-widest hover:text-white transition-colors">View All &rarr;</Link>
+        </div>
+        <NewDrops products={streetwear.products} />
       </section>
+
+      {/* New Arrivals (Darker Section) */}
+      <section className="py-12 px-4 bg-white/5 border-y border-white/5">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold font-display text-white uppercase tracking-wider">New <span className="text-cherry-red">Drops</span></h2>
+        </div>
+        <NewDrops products={newArrivals.products} />
+      </section>
+
+      <section className="py-12 px-4">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold font-display text-gold uppercase tracking-wider">Best <span className="text-white">Sellers</span></h2>
+        </div>
+        <NewDrops products={bestSellers.products} />
+      </section>
+
+      {/* Category Cards */}
+      <section className="py-12">
+        <CategoryCircles collections={collections} />
+      </section>
+
+      {/* Sticky Bottom CTA */}
+      <div className="fixed bottom-0 left-0 right-0 bg-rich-black/90 backdrop-blur-lg border-t border-gold/20 p-4 z-50">
+        <Button className="w-full bg-gradient-to-r from-cherry-red to-gold hover:from-red-600 hover:to-yellow-500 text-black font-black uppercase tracking-widest py-6 text-lg shadow-[0_0_20px_rgba(227,28,121,0.4)]">
+          <ShoppingBag className="w-5 h-5 mr-3" />
+          Shop the Drop
+        </Button>
+      </div>
+
+      {/* Spacer for fixed CTA */}
+      <div className="h-24"></div>
     </main>
   );
 }

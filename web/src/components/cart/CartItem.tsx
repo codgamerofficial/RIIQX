@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { CartItem as CartItemType, useCartStore } from "@/store/useCartStore";
+import { formatPrice } from "@/lib/shopify";
 
 interface CartItemProps {
     item: CartItemType;
@@ -33,7 +34,7 @@ export function CartItem({ item }: CartItemProps) {
                 </div>
                 <div className="flex items-center justify-between mt-2">
                     <span className="text-sm font-bold text-white">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        {formatPrice((item.price * item.quantity).toString(), 'INR')}
                     </span>
 
                     {/* Quantity Controls */}
