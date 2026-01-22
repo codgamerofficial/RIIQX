@@ -12,6 +12,7 @@ import { Toaster } from "sonner";
 import { MusicProvider } from "@/context/MusicContext";
 import { DynamicIsland } from "@/components/ui/DynamicIsland/DynamicIsland";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { SocialProofNotifications } from "@/components/shared/SocialProofNotifications";
 
 
 
