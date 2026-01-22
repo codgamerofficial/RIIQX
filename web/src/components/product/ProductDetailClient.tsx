@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, Share2, ChevronLeft, ChevronRight, Star, Truck, RotateCcw, Shield, Plus, Minus, Check } from "lucide-react";
 import { Product } from "@/lib/shopify/types";
@@ -21,6 +22,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState<"details" | "size" | "reviews">("details");
     const [showSizeGuide, setShowSizeGuide] = useState(false);
+
+    const router = useRouter();
 
     const { addItem } = useCartStore();
     const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
@@ -69,6 +72,25 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             quantity,
             size: selectedSize || undefined,
         });
+    };
+
+    const handleBuyNow = () => {
+        if (!selectedSize && sizes.length > 0) {
+            alert("Please select a size");
+            return;
+        }
+
+        const variant = product.variants?.edges?.[0]?.node;
+        addItem({
+            id: product.id,
+            variantId: variant?.id,
+            title: product.title,
+            price: parseFloat(price.amount),
+            image: mainImage?.url || "",
+            quantity,
+            size: selectedSize || undefined,
+        });
+        router.push("/checkout");
     };
 
     const handleWishlist = () => {
@@ -248,32 +270,48 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                             </div>
                         </div>
 
-                        {/* Product Accordions / Details */}
-                        <div className="space-y-8 pt-8 border-t border-white/10">
-                            {/* Description */}
-                            <div className="space-y-4">
-                                <h2 className="text-lg font-bold font-display text-white uppercase tracking-widest flex items-center gap-3">
-                                    <div className="w-8 h-[1px] bg-gold"></div>
-                                    Description
-                                </h2>
-                                <div className="text-white/60 leading-relaxed prose-invert">
-                                    <div dangerouslySetInnerHTML={{ __html: product.descriptionHtml || product.description }} />
-                                </div>
-                            </div>
+                        {/* Main Action Buttons */}
+                        <div className="flex gap-4 pt-4">
+                            <button
+                                onClick={handleAddToCart}
+                                className="flex-1 bg-cherry-red text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all shadow-lg active:scale-95 border-2 border-cherry-red hover:border-white"
+                            >
+                                Add to Bag
+                            </button>
+                            <button
+                                onClick={handleBuyNow}
+                                className="flex-1 bg-white text-black py-4 rounded-xl font-black uppercase tracking-widest hover:bg-gold hover:text-black transition-all shadow-lg active:scale-95 border-2 border-white hover:border-gold"
+                            >
+                                Buy Now
+                            </button>
+                        </div>
+                    </div>
 
-                            {/* Material */}
-                            <div className="space-y-4">
-                                <h2 className="text-lg font-bold font-display text-white uppercase tracking-widest flex items-center gap-3">
-                                    <div className="w-8 h-[1px] bg-gold"></div>
-                                    Composition
-                                </h2>
-                                <p className="text-white/60">
-                                    100% Premium Cotton. Designed in Paris.
-                                </p>
+                    {/* Product Accordions / Details */}
+                    <div className="space-y-8 pt-8 border-t border-white/10">
+                        {/* Description */}
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-bold font-display text-white uppercase tracking-widest flex items-center gap-3">
+                                <div className="w-8 h-[1px] bg-gold"></div>
+                                Description
+                            </h2>
+                            <div className="text-white/60 leading-relaxed prose-invert">
+                                <div dangerouslySetInnerHTML={{ __html: product.descriptionHtml || product.description }} />
                             </div>
                         </div>
 
+                        {/* Material */}
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-bold font-display text-white uppercase tracking-widest flex items-center gap-3">
+                                <div className="w-8 h-[1px] bg-gold"></div>
+                                Composition
+                            </h2>
+                            <p className="text-white/60">
+                                100% Premium Cotton. Designed in Paris.
+                            </p>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
@@ -289,6 +327,12 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                         className="flex-[2] bg-gradient-to-r from-cherry-red to-red-600 text-white py-4 rounded-full font-black uppercase tracking-widest hover:shadow-[0_0_25px_rgba(227,28,121,0.5)] transition-all active:scale-95"
                     >
                         Add to Bag
+                    </button>
+                    <button
+                        onClick={handleBuyNow}
+                        className="hidden md:block flex-1 bg-white text-black py-4 rounded-full font-black uppercase tracking-widest hover:bg-gold transition-all active:scale-95"
+                    >
+                        Buy Now
                     </button>
                     <button
                         onClick={handleWishlist}
@@ -308,7 +352,6 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                     </button>
                 </div>
             </div>
-
         </div>
     );
 }
