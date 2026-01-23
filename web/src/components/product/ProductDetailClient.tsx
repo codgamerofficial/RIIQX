@@ -330,28 +330,28 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             </div>
 
             {/* Fixed Add to Cart */}
-            <div className="fixed bottom-0 left-0 right-0 bg-rich-black/95 backdrop-blur-xl border-t border-white/10 p-4 z-50">
-                <div className="max-w-7xl mx-auto flex items-center gap-4">
+            <div className="fixed bottom-0 left-0 right-0 bg-rich-black/95 backdrop-blur-xl border-t border-white/10 p-4 z-[100] pb-[env(safe-area-inset-bottom)]">
+                <div className="max-w-7xl mx-auto flex items-center gap-3">
                     <div className="hidden sm:block flex-1">
                         <div className="text-xl font-black text-white">{formatPrice(price.amount, price.currencyCode)}</div>
                         <div className="text-xs text-gold uppercase tracking-widest font-bold">Free global shipping</div>
                     </div>
                     <button
                         onClick={handleAddToCart}
-                        className="flex-[2] bg-gradient-to-r from-cherry-red to-red-600 text-white py-4 rounded-full font-black uppercase tracking-widest hover:shadow-[0_0_25px_rgba(227,28,121,0.5)] transition-all active:scale-95"
+                        className="flex-1 bg-white/10 text-white py-4 rounded-full font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all active:scale-95 text-xs sm:text-base border border-white/10"
                     >
                         Add to Bag
                     </button>
                     <button
                         onClick={handleBuyNow}
-                        className="hidden md:block flex-1 bg-white text-black py-4 rounded-full font-black uppercase tracking-widest hover:bg-gold transition-all active:scale-95"
+                        className="flex-1 bg-gradient-to-r from-cherry-red to-red-600 text-white py-4 rounded-full font-black uppercase tracking-widest hover:shadow-[0_0_25px_rgba(227,28,121,0.5)] transition-all active:scale-95 text-xs sm:text-base"
                     >
                         Buy Now
                     </button>
                     <button
                         onClick={handleWishlist}
                         className={cn(
-                            "p-4 border-2 rounded-full transition-all aspect-square flex items-center justify-center",
+                            "p-4 border-2 rounded-full transition-all aspect-square flex items-center justify-center hidden sm:flex",
                             isInWishlist(product.id)
                                 ? "border-cherry-red bg-cherry-red/20"
                                 : "border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30"
