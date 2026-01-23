@@ -171,7 +171,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
                     {/* Product Info */}
                     <div className="space-y-10 py-4">
-                        <ProductActivity productId={product.id} initialViews={Math.floor(Math.random() * 50) + 120} />
+                        <ProductActivity productId={product.id} initialViews={120 + (hashCode(product.id) % 50)} />
                         {/* Title & Rating */}
                         <div>
                             <h1 className="text-4xl md:text-5xl font-black font-display text-white mb-4 uppercase tracking-tighter leading-tight">
