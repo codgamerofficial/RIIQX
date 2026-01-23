@@ -246,19 +246,12 @@ export function CartSheet() {
                                         Shipping & Taxes Calculated at Checkout
                                     </p>
                                 </div>
-                                </Link>
                                 <CheckoutButton items={items} />
                             </div>
                         )}
-                </motion.div>
-        </>
-    )
-}
-                            </div >
-                        )}
-                    </motion.div >
+                    </motion.div>
                 </>
             )}
-        </AnimatePresence >
+        </AnimatePresence>
     );
 }
