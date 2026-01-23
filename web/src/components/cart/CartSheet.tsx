@@ -1,23 +1,121 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShoppingBag, ArrowRight, Trash2 } from "lucide-react";
+import { Tag, Check, X, ShoppingBag, ArrowRight, Trash2 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { CartItem } from "./CartItem";
 import { NeonButton } from "@/components/ui/neon-button";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { formatPrice } from "@/lib/shopify";
+import { validatePromoCode } from "@/lib/promo";
+import { createClient } from "@/lib/supabase/client";
+
+function PromoCodeSection() {
+    const { getCartTotal, applyDiscount, removeDiscount, discount } = useCartStore();
+    const [code, setCode] = useState("");
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+
+    const handleApply = () => {
+        setError("");
+        setSuccess("");
+
+        if (!code) return;
+
+        const result = validatePromoCode(code, getCartTotal());
+
+        if (result.valid && result.discount) {
+            applyDiscount(result.discount);
+            setSuccess(`Code applied! ${result.discount.type === 'percentage' ? result.discount.value + '%' : '₹' + result.discount.value} OFF`);
+        } else {
+            setError(result.error || "Invalid code");
+        }
+    };
+
+    const handleRemove = () => {
+        removeDiscount();
+        setSuccess("");
+        setCode("");
+    };
+
+    if (discount) {
+        return (
+            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-400" />
+                    <div>
+                        <p className="text-green-400 text-sm font-bold uppercase tracking-wider">{discount.code}</p>
+                        <p className="text-green-400/60 text-[10px]">Discount Applied</p>
+                    </div>
+                </div>
+                <button onClick={handleRemove} className="text-white/40 hover:text-white transition-colors">
+                    <X className="w-4 h-4" />
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-2">
+            <div className="flex gap-2">
+                <div className="relative flex-1">
+                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                    <input
+                        type="text"
+                        placeholder="Promo Code"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value.toUpperCase())}
+                        className="w-full bg-black/40 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-cherry-red transition-colors placeholder:text-white/20 uppercase"
+                    />
+                </div>
+                <button
+                    onClick={handleApply}
+                    className="bg-white/10 hover:bg-white/20 text-white px-4 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors"
+                >
+                    Apply
+                </button>
+            </div>
+            {error && <p className="text-neon-red text-[10px] pl-1 animate-pulse">{error}</p>}
+            {success && <p className="text-green-400 text-[10px] pl-1">{success}</p>}
+        </div>
+    );
+}
 
 export function CartSheet() {
-    const { isOpen, toggleCart, items, getCartTotal, setCartOpen } = useCartStore();
+    const { isOpen, toggleCart, items, getCartTotal, setCartOpen, getDiscountAmount, getFinalTotal } = useCartStore();
     const pathname = usePathname();
+    const supabase = createClient();
 
     // Close cart when navigating
     useEffect(() => {
         setCartOpen(false);
     }, [pathname, setCartOpen]);
+
+    // Sync Cart to Supabase (Persistence)
+    useEffect(() => {
+        const syncCart = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+                // Upsert cart
+                await supabase.from('carts').upsert({
+                    user_id: session.user.id,
+                    items: items,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id' });
+            }
+        };
+
+        // Debounce sync
+        const timeoutId = setTimeout(() => {
+            if (items.length > 0) {
+                syncCart();
+            }
+        }, 2000);
+
+        return () => clearTimeout(timeoutId);
+    }, [items]);
 
     return (
         <AnimatePresence>
@@ -87,7 +185,7 @@ export function CartSheet() {
                             </div>
                         </div>
 
-                        {/* Items */}
+                        {/* Promo Code & Items */}
                         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 bg-rich-black custom-scrollbar">
                             {items.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center space-y-6 pt-12 text-muted-foreground">
@@ -108,9 +206,18 @@ export function CartSheet() {
                                     </button>
                                 </div>
                             ) : (
-                                items.map((item, idx) => (
-                                    <CartItem key={`${item.id}-${item.variantId || idx}`} item={item} />
-                                ))
+                                <>
+                                    <div className="space-y-6">
+                                        {items.map((item, idx) => (
+                                            <CartItem key={`${item.id}-${item.variantId || idx}`} item={item} />
+                                        ))}
+                                    </div>
+
+                                    {/* Promo Code Input */}
+                                    <div className="pt-4 border-t border-white/10">
+                                        <PromoCodeSection />
+                                    </div>
+                                </>
                             )}
                         </div>
 
@@ -122,9 +229,17 @@ export function CartSheet() {
                                         <span>Subtotal</span>
                                         <span>{formatPrice(getCartTotal().toString(), 'INR')}</span>
                                     </div>
+
+                                    {getDiscountAmount() > 0 && (
+                                        <div className="flex items-center justify-between text-sm text-green-400 font-bold">
+                                            <span>Discount</span>
+                                            <span>-{formatPrice(getDiscountAmount().toString(), 'INR')}</span>
+                                        </div>
+                                    )}
+
                                     <div className="flex items-center justify-between text-2xl font-black text-white uppercase">
                                         <span>Total</span>
-                                        <span className="text-cherry-red">{formatPrice(getCartTotal().toString(), 'INR')}</span>
+                                        <span className="text-cherry-red">{formatPrice(getFinalTotal().toString(), 'INR')}</span>
                                     </div>
                                     <p className="text-[10px] text-white/40 uppercase tracking-widest text-right">
                                         Shipping & Taxes Calculated at Checkout

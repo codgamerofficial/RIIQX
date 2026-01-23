@@ -9,6 +9,7 @@ import { ShoppingBag, Menu, X, User, Search, Zap, ChevronDown, Heart } from "luc
 import { useCartStore } from "@/store/useCartStore";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { PredictiveSearch } from "@/components/search/PredictiveSearch";
+import { UserMenu } from "@/components/auth/UserMenu";
 
 export function Navbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -217,9 +218,7 @@ export function Navbar() {
                             )}
                         </button>
 
-                        <Link href="/account" className="text-muted-foreground hover:text-primary transition-colors relative group">
-                            <User className="w-6 h-6 group-hover:fill-primary/20" />
-                        </Link>
+                        <UserMenu />
                     </div>
 
                     {/* Mobile Menu Button */}

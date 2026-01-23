@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { ReviewSection } from "./ReviewSection";
 import { ProductActivity } from "./ProductActivity";
 import { LowStockWarning } from "./LowStockWarning";
+import { RelatedProducts } from "./RelatedProducts";
 
 interface ProductDetailClientProps {
     product: Product;
@@ -321,6 +322,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
                 <div className="mt-24 border-t border-white/10 pt-16">
                     <ReviewSection productId={product.id} />
+                </div>
+
+                <div className="mt-8">
+                    <RelatedProducts />
                 </div>
             </div>
 

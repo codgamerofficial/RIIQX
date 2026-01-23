@@ -8,7 +8,7 @@ import { Product } from "@/lib/shopify/types";
 import { formatPrice } from "@/lib/shopify";
 import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ShopifyProductCardProps {
     product: Product;
@@ -19,6 +19,11 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
     const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
     const [isHovered, setIsHovered] = useState(false);
     const [added, setAdded] = useState(false);
+    const [hasMounted, setHasMounted] = useState(false);
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
 
     const mainImage = product.featuredImage?.url || product.images?.edges?.[0]?.node.url || "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000&auto=format&fit=crop";
     const secondImage = product.images?.edges?.[1]?.node.url || mainImage;
@@ -41,6 +46,9 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
         setAdded(true);
         setTimeout(() => setAdded(false), 2000);
     };
+
+    // Hydration fix: Default to false (not in wishlist) during SSR
+    const isWishlisted = hasMounted ? isInWishlist(product.id) : false;
 
     return (
         <motion.div
@@ -103,17 +111,17 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        if (isInWishlist(product.id)) {
+                        if (isWishlisted) {
                             removeFromWishlist(product.id);
                         } else {
                             addToWishlist(product);
                         }
                     }}
                     className="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors duration-300"
-                    title={isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
+                    title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
                 >
                     <Heart
-                        className={`w-6 h-6 transition-all duration-300 ${isInWishlist(product.id) ? "fill-cherry-red text-cherry-red drop-shadow-[0_0_8px_rgba(227,28,121,0.5)]" : "text-white"}`}
+                        className={`w-6 h-6 transition-all duration-300 ${isWishlisted ? "fill-cherry-red text-cherry-red drop-shadow-[0_0_8px_rgba(227,28,121,0.5)]" : "text-white"}`}
                     />
                 </button>
 

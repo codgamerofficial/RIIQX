@@ -52,7 +52,7 @@ export default function RegisterPage() {
                 password: formData.password,
                 options: {
                     data: {
-                        name: formData.name,
+                        full_name: formData.name,
                         phone: formData.phone,
                     },
                 },

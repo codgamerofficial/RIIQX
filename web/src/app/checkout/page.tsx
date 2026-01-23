@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -42,11 +42,70 @@ export default function CheckoutPage() {
     const shipping = subtotal > 5000 ? 0 : 200;
     const total = subtotal + shipping;
 
+    const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+    const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+
     const steps = [
         { id: "address", label: "Delivery Address", icon: Truck },
         { id: "payment", label: "Payment Method", icon: CreditCard },
         { id: "review", label: "Review Order", icon: Package },
     ];
+
+    useEffect(() => {
+        const fetchAddresses = async () => {
+            const { createClient } = await import("@/lib/supabase/client");
+            const supabase = createClient();
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (user) {
+                const { data } = await supabase
+                    .from('addresses')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('is_default', { ascending: false });
+
+                if (data && data.length > 0) {
+                    setSavedAddresses(data);
+                    // Optional: Auto-fill default address
+                    const defaultAddr = data.find((a: any) => a.is_default) || data[0];
+                    fillAddress(defaultAddr);
+                    setSelectedAddressId(defaultAddr.id);
+                }
+            }
+        };
+        fetchAddresses();
+    }, []);
+
+    const fillAddress = (addr: any) => {
+        setAddress({
+            name: addr.full_name || "",
+            phone: addr.phone || "",
+            addressLine1: addr.street_address || "",
+            addressLine2: addr.apt_suite || "",
+            city: addr.city || "",
+            state: addr.state || "",
+            pincode: addr.zip_code || "",
+        });
+    };
+
+    const handleSavedAddressChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const addrId = e.target.value;
+        setSelectedAddressId(addrId);
+        if (addrId) {
+            const addr = savedAddresses.find(a => a.id === addrId);
+            if (addr) fillAddress(addr);
+        } else {
+            setAddress({
+                name: "",
+                phone: "",
+                addressLine1: "",
+                addressLine2: "",
+                city: "",
+                state: "",
+                pincode: "",
+            });
+        }
+    };
 
     const handleAddressSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -102,6 +161,7 @@ export default function CheckoutPage() {
                         }
 
                         // 4. Success
+                        await saveOrderToSupabase(response.razorpay_order_id, data.amount / 100);
                         clearCart();
                         // alert("Payment Successful!");
                         router.push('/shop'); // Or a success page
@@ -126,6 +186,37 @@ export default function CheckoutPage() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             alert(error.message || 'Failed to initiate payment');
+        }
+    };
+
+    const saveOrderToSupabase = async (razorpayOrderId: string, amount: number) => {
+        try {
+            const { createClient } = await import("@/lib/supabase/client");
+            const supabase = createClient();
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) return; // Don't save for guest checkout if we don't support it in DB yet
+
+            const orderId = `ORN-${Math.floor(Math.random() * 1000000)}`;
+
+            const { error } = await supabase.from('orders').insert({
+                user_id: user.id,
+                shopify_order_id: razorpayOrderId, // Using Razorpay Order ID as unique identifier for now
+                order_number: orderId,
+                total_price: amount,
+                currency_code: "INR",
+                status: "paid",
+                fulfillment_status: "unfulfilled",
+                items: items,
+                shipping_address: address,
+                created_at: new Date().toISOString()
+            });
+
+            if (error) {
+                console.error("Failed to save order:", error);
+            }
+        } catch (err) {
+            console.error("Error saving order:", err);
         }
     };
 
@@ -227,6 +318,26 @@ export default function CheckoutPage() {
                                     <h2 className="text-2xl font-black font-display text-white uppercase mb-8 flex items-center gap-3">
                                         <span className="text-cherry-red">01.</span> Delivery Address
                                     </h2>
+
+                                    {savedAddresses.length > 0 && (
+                                        <div className="mb-6 bg-white/5 p-4 rounded-lg border border-white/10">
+                                            <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-2">
+                                                Use Saved Address
+                                            </label>
+                                            <select
+                                                value={selectedAddressId}
+                                                onChange={handleSavedAddressChange}
+                                                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cherry-red focus:outline-none transition-colors appearance-none cursor-pointer"
+                                            >
+                                                <option value="">-- Add New Address --</option>
+                                                {savedAddresses.map((addr) => (
+                                                    <option key={addr.id} value={addr.id}>
+                                                        {addr.full_name} - {addr.street_address}, {addr.city} {addr.is_default ? '(Default)' : ''}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
                                     <form onSubmit={handleAddressSubmit} className="space-y-6">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">

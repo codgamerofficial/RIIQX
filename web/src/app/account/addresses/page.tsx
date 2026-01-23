@@ -1,261 +1,226 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { NeonButton } from "@/components/ui/neon-button";
-import { ArrowLeft, MapPin, Plus, Trash2, Home, Briefcase } from "lucide-react";
-import Link from "next/link";
-import { toast } from "sonner";
+import { MapPin, Plus, Trash2, Edit2, Loader2, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface Address {
-    id: string;
-    type: string;
-    street: string;
-    city: string;
-    state: string;
-    zip: string;
-    country: string;
-    is_default: boolean;
-}
-
-export default function ManageAddressesPage() {
-    const router = useRouter();
-    const supabase = createClient();
-    const [addresses, setAddresses] = useState<Address[]>([]);
+export default function AddressesPage() {
+    const [addresses, setAddresses] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showAddForm, setShowAddForm] = useState(false);
+    const [isAdding, setIsAdding] = useState(false);
+    const [formData, setFormData] = useState({
+        full_name: "",
+        street_address: "",
+        city: "",
+        state: "",
+        zip_code: "",
+        country: "India",
+        phone: "",
+        is_default: false
+    });
 
-    // New Address State
-    const [newAddress, setNewAddress] = useState({ type: "Home", street: "", city: "", state: "", zip: "", country: "", is_default: false });
+    const supabase = createClient();
+
+    const fetchAddresses = async () => {
+        setLoading(true);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            const { data } = await supabase
+                .from('addresses')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('is_default', { ascending: false });
+            setAddresses(data || []);
+        }
+        setLoading(false);
+    };
 
     useEffect(() => {
         fetchAddresses();
     }, []);
 
-    const fetchAddresses = async () => {
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            router.push("/auth");
-            return;
+
+        if (!user) return;
+
+        // If setting as default, unset others first (optional, triggers can handle this but simpler here for now)
+        if (formData.is_default) {
+            await supabase
+                .from('addresses')
+                .update({ is_default: false })
+                .eq('user_id', user.id);
         }
 
-        const { data, error } = await supabase
-            .from("addresses")
-            .select("*")
-            .eq("user_id", user.id)
-            .order("created_at", { ascending: false });
+        const { error } = await supabase.from('addresses').insert({
+            ...formData,
+            user_id: user.id
+        });
 
-        if (error) {
-            console.error(error);
-            toast.error("Failed to load addresses");
-        } else {
-            const fetched = data as any;
-            setAddresses(fetched || []);
+        if (!error) {
+            setIsAdding(false);
+            setFormData({
+                full_name: "",
+                street_address: "",
+                city: "",
+                state: "",
+                zip_code: "",
+                country: "India",
+                phone: "",
+                is_default: false
+            });
+            fetchAddresses();
         }
         setLoading(false);
     };
 
-    const handleAddAddress = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        // If this is the first address, make it default
-        const isDefault = addresses.length === 0 || newAddress.is_default;
-
-        const { data, error } = await supabase
-            .from("addresses")
-            .insert({
-                user_id: user.id,
-                type: newAddress.type,
-                street: newAddress.street,
-                city: newAddress.city,
-                state: newAddress.state,
-                zip: newAddress.zip,
-                country: newAddress.country,
-                is_default: isDefault
-            } as any)
-            .select()
-            .single();
-
-        if (error) {
-            toast.error(error.message || "Failed to add address");
-            console.error(error);
-        } else {
-            setAddresses([data, ...addresses]);
-            setShowAddForm(false);
-            setNewAddress({ type: "Home", street: "", city: "", state: "", zip: "", country: "", is_default: false });
-            toast.success("Address added successfully");
-        }
-    };
-
     const handleDelete = async (id: string) => {
-        const { error } = await supabase
-            .from("addresses")
-            .delete()
-            .eq("id", id);
-
-        if (error) {
-            toast.error("Failed to delete address");
-        } else {
-            setAddresses(addresses.filter(a => a.id !== id));
-            toast.success("Address removed");
+        if (confirm("Are you sure you want to delete this address?")) {
+            await supabase.from('addresses').delete().eq('id', id);
+            fetchAddresses();
         }
     };
 
     return (
-        <div className="min-h-screen bg-background pt-24 pb-12 px-4 sm:px-6">
-            <div className="max-w-4xl mx-auto space-y-8">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Link href="/account" className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                            <ArrowLeft className="w-6 h-6 text-white" />
-                        </Link>
-                        <h1 className="text-3xl font-bold text-white">My Addresses</h1>
-                    </div>
-                    <NeonButton variant="primary" onClick={() => setShowAddForm(!showAddForm)}>
-                        <Plus className="w-4 h-4 mr-2" /> Add New
-                    </NeonButton>
-                </div>
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold text-white">Saved Addresses</h1>
+                <button
+                    onClick={() => setIsAdding(!isAdding)}
+                    className="flex items-center gap-2 text-sm font-bold text-bewakoof-yellow hover:text-yellow-400 transition-colors"
+                >
+                    <Plus className="w-4 h-4" />
+                    Add New Address
+                </button>
+            </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Address List */}
-                    <AnimatePresence>
-                        {addresses.map((addr) => (
-                            <motion.div
-                                key={addr.id}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                className="bg-card border border-white/5 rounded-2xl p-6 relative group overflow-hidden"
+            <AnimatePresence>
+                {isAdding && (
+                    <motion.form
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="bg-neutral-800 border border-white/10 p-6 rounded-xl space-y-4 overflow-hidden"
+                        onSubmit={handleSubmit}
+                    >
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input
+                                placeholder="Full Name"
+                                required
+                                value={formData.full_name}
+                                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                            />
+                            <input
+                                placeholder="Phone Number"
+                                required
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                            />
+                            <input
+                                placeholder="Street Address"
+                                required
+                                className="md:col-span-2 w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                                value={formData.street_address}
+                                onChange={(e) => setFormData({ ...formData, street_address: e.target.value })}
+                            />
+                            <input
+                                placeholder="City"
+                                required
+                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                                value={formData.city}
+                                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                            />
+                            <input
+                                placeholder="State"
+                                required
+                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                                value={formData.state}
+                                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                            />
+                            <input
+                                placeholder="ZIP Code"
+                                required
+                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                                value={formData.zip_code}
+                                onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
+                            />
+                            <input
+                                placeholder="Country"
+                                required
+                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                                value={formData.country}
+                                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                            />
+                        </div>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={formData.is_default}
+                                onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
+                                className="rounded border-white/20 bg-neutral-900 text-bewakoof-yellow focus:ring-bewakoof-yellow"
+                            />
+                            <span className="text-sm text-muted-foreground">Set as default address</span>
+                        </label>
+                        <div className="flex justify-end gap-3 pt-4">
+                            <button
+                                type="button"
+                                onClick={() => setIsAdding(false)}
+                                className="px-4 py-2 text-sm text-muted-foreground hover:text-white transition-colors"
                             >
-                                {addr.is_default && (
-                                    <div className="absolute top-0 right-0 bg-primary/20 text-primary text-xs px-3 py-1 rounded-bl-xl font-medium">
-                                        Default
-                                    </div>
-                                )}
-                                <div className="flex items-start gap-4">
-                                    <div className="p-3 bg-white/5 rounded-xl">
-                                        {addr.type === "Work" ? <Briefcase className="w-6 h-6 text-secondary" /> : <Home className="w-6 h-6 text-primary" />}
-                                    </div>
-                                    <div className="space-y-1">
-                                        <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                            {addr.type}
-                                        </h3>
-                                        <p className="text-gray-400">{addr.street}</p>
-                                        <p className="text-gray-400">{addr.city}, {addr.state} {addr.zip}</p>
-                                        <p className="text-gray-500 text-sm">{addr.country}</p>
-                                    </div>
-                                </div>
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="bewakoof-btn bewakoof-btn-primary px-6 py-2 text-sm"
+                            >
+                                {loading ? "Saving..." : "Save Address"}
+                            </button>
+                        </div>
+                    </motion.form>
+                )}
+            </AnimatePresence>
 
+            {loading && !isAdding ? (
+                <div className="text-white">Loading addresses...</div>
+            ) : addresses.length === 0 && !isAdding ? (
+                <div className="text-center py-12 bg-neutral-800/30 border border-white/5 rounded-xl">
+                    <MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                    <p className="text-muted-foreground">No addresses saved yet.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {addresses.map((addr) => (
+                        <div key={addr.id} className="bg-neutral-800/50 border border-white/5 p-6 rounded-xl relative group">
+                            {addr.is_default && (
+                                <span className="absolute top-4 right-4 bg-bewakoof-yellow text-black text-[10px] font-bold px-2 py-1 rounded">
+                                    DEFAULT
+                                </span>
+                            )}
+                            <h3 className="font-bold text-white mb-1">{addr.full_name}</h3>
+                            <div className="text-sm text-muted-foreground space-y-1">
+                                <p>{addr.street_address}</p>
+                                <p>{addr.city}, {addr.state} {addr.zip_code}</p>
+                                <p>{addr.country}</p>
+                                <p className="pt-2 text-white/60">{addr.phone}</p>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-white/5 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button
                                     onClick={() => handleDelete(addr.id)}
-                                    className="absolute bottom-4 right-4 p-2 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all opacity-0 group-hover:opacity-100"
+                                    className="text-xs font-bold text-neon-red hover:underline flex items-center gap-1"
                                 >
-                                    <Trash2 className="w-5 h-5" />
+                                    <Trash2 className="w-3 h-3" /> Delete
                                 </button>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-
-                    {!loading && addresses.length === 0 && !showAddForm && (
-                        <div className="col-span-full text-center py-12 text-gray-500">
-                            No addresses found. Add one to get started.
+                            </div>
                         </div>
-                    )}
+                    ))}
                 </div>
-
-                {/* Add Form Modal/Section */}
-                <AnimatePresence>
-                    {showAddForm && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="bg-card border border-primary/20 rounded-2xl p-6 md:p-8 overflow-hidden"
-                        >
-                            <h2 className="text-xl font-bold text-white mb-6">Add New Address</h2>
-                            <form onSubmit={handleAddAddress} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="md:col-span-2">
-                                    <label className="label">Street Address</label>
-                                    <input
-                                        required
-                                        className="input-field"
-                                        placeholder="1234 Space Station Way"
-                                        value={newAddress.street}
-                                        onChange={e => setNewAddress({ ...newAddress, street: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label">City</label>
-                                    <input
-                                        required
-                                        className="input-field"
-                                        placeholder="Neo City"
-                                        value={newAddress.city}
-                                        onChange={e => setNewAddress({ ...newAddress, city: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label">State / Province</label>
-                                    <input
-                                        required
-                                        className="input-field"
-                                        placeholder="Sector 7"
-                                        value={newAddress.state}
-                                        onChange={e => setNewAddress({ ...newAddress, state: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label">Zip / Postal Code</label>
-                                    <input
-                                        required
-                                        className="input-field"
-                                        placeholder="X99-001"
-                                        value={newAddress.zip}
-                                        onChange={e => setNewAddress({ ...newAddress, zip: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label">Country</label>
-                                    <input
-                                        required
-                                        className="input-field"
-                                        placeholder="India"
-                                        value={newAddress.country}
-                                        onChange={e => setNewAddress({ ...newAddress, country: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label">Type</label>
-                                    <select
-                                        className="input-field"
-                                        value={newAddress.type}
-                                        onChange={e => setNewAddress({ ...newAddress, type: e.target.value })}
-                                    >
-                                        <option>Home</option>
-                                        <option>Work</option>
-                                        <option>Other</option>
-                                    </select>
-                                </div>
-                                <div className="md:col-span-2 flex justify-end gap-3 mt-4">
-                                    <NeonButton type="button" variant="secondary" onClick={() => setShowAddForm(false)}>Cancel</NeonButton>
-                                    <NeonButton type="submit" variant="primary">Save Address</NeonButton>
-                                </div>
-                            </form>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                <style jsx>{`
-                    .label { display: block; color: #9ca3af; font-size: 0.875rem; margin-bottom: 0.5rem; }
-                    .input-field { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; padding: 0.5rem 1rem; color: white; outline: none; transition: all 0.2s; }
-                    .input-field:focus { border-color: #8b5cf6; }
-                `}</style>
-            </div>
+            )}
         </div>
     );
 }
