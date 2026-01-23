@@ -1,24 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, ShoppingBag, ArrowRight } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import Confetti from "react-confetti";
 import { useEffect, useState } from "react";
-import { useWindowSize } from "react-use";
 
 export default function SuccessPage() {
-    const { width, height } = useWindowSize();
-    const [showConfetti, setShowConfetti] = useState(true);
-
-    useEffect(() => {
-        const timer = setTimeout(() => setShowConfetti(false), 8000);
-        return () => clearTimeout(timer);
-    }, []);
-
     return (
         <div className="min-h-screen bg-rich-black flex items-center justify-center relative overflow-hidden">
-            {showConfetti && <Confetti width={width} height={height} numberOfPieces={200} gravity={0.1} />}
+            {/* Background Gradient Pulse */}
+            <div className="absolute inset-0 bg-cherry-red/5 animate-pulse" />
 
             <div className="relative z-10 max-w-md w-full px-6 text-center">
                 <motion.div
