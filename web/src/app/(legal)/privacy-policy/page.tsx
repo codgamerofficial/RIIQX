@@ -23,7 +23,7 @@ export default function PrivacyPage() {
                     <h2 className="text-2xl font-bold text-white mb-4">Information We Collect</h2>
                     <ul className="list-disc pl-6 space-y-2 text-gray-400">
                         <li>Personal Identification Information (Name, email address, phone number, etc.)</li>
-                        <li>Payment Information: We do not store your credit card details. All payment transactions are processed through secure third-party payment gateways (Razorpay) adhering to PCI-DSS standards.</li>
+                        <li>Payment Information: We do not store your credit card details. All payment transactions are processed through secure third-party payment gateways (Shopify) adhering to PCI-DSS standards.</li>
                         <li>Usage Data (Browser type, pages visited, time spent on site)</li>
                     </ul>
                 </section>
