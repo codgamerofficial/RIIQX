@@ -332,10 +332,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             {/* Fixed Add to Cart */}
             <div className="fixed bottom-0 left-0 right-0 bg-rich-black/95 backdrop-blur-xl border-t border-white/10 p-4 z-[100] pb-[env(safe-area-inset-bottom)]">
                 <div className="max-w-7xl mx-auto flex items-center gap-3">
-                    <div className="hidden sm:block flex-1">
-                        <div className="text-xl font-black text-white">{formatPrice(price.amount, price.currencyCode)}</div>
-                        <div className="text-xs text-gold uppercase tracking-widest font-bold">Free global shipping</div>
-                    </div>
+
                     <button
                         onClick={handleAddToCart}
                         className="flex-1 bg-white/10 text-white py-4 rounded-full font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all active:scale-95 text-xs sm:text-base border border-white/10"
