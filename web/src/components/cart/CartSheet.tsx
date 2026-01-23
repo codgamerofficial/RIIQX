@@ -5,6 +5,7 @@ import { Tag, Check, X, ShoppingBag, ArrowRight, Trash2 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { CartItem } from "./CartItem";
 import { NeonButton } from "@/components/ui/neon-button";
+import { CheckoutButton } from "./CheckoutButton";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -245,20 +246,19 @@ export function CartSheet() {
                                         Shipping & Taxes Calculated at Checkout
                                     </p>
                                 </div>
-                                <Link href="/checkout" className="block">
-                                    <button
-                                        onClick={() => setCartOpen(false)}
-                                        className="w-full py-4 bg-gradient-to-r from-cherry-red to-red-700 text-white font-black uppercase tracking-widest hover:shadow-[0_0_20px_rgba(227,28,121,0.5)] transition-all flex items-center justify-center space-x-2 group rounded-lg"
-                                    >
-                                        <span>Secure Checkout</span>
-                                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                    </button>
                                 </Link>
+                                <CheckoutButton items={items} />
                             </div>
                         )}
-                    </motion.div>
+                </motion.div>
+        </>
+    )
+}
+                            </div >
+                        )}
+                    </motion.div >
                 </>
             )}
-        </AnimatePresence>
+        </AnimatePresence >
     );
 }
