@@ -47,6 +47,7 @@ export type Product = {
     description: string;
     descriptionHtml: string;
     availableForSale: boolean;
+    updatedAt: string;
     priceRange: {
         minVariantPrice: Money;
         maxVariantPrice: Money;
@@ -92,6 +93,7 @@ export type Collection = {
     handle: string;
     title: string;
     description: string;
+    updatedAt: string;
     products: Connection<Product>;
     image?: Image;
 };
