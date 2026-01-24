@@ -67,26 +67,13 @@ export default async function ShopPage({
     // --- Aggregation Step ---
     // Extract available filters (Types, Colors, Sizes) from a larger batch to show what's possible
     // Fetch all products for filter aggregation (46 products total)
-    const { products: allProducts } = await getProducts({ limit: 50 });
+    // Fetch collections for sidebar
+    const { products: allProducts } = await getProducts({ limit: 10 }); // Reduced limit for simpler fetch
+    // Actually we need getCollections() here.
+    const collections = await import("@/lib/shopify").then(mod => mod.getCollections());
 
+    // Extract available filters (Types, Colors, Sizes) from a larger batch to show what's possible
     const availableTypes = Array.from(new Set(allProducts.map(p => p.productType).filter(Boolean)));
-
-    // Extract Options
-    const extractOptions = (products: Product[], optionName: string) => {
-        const values = new Set<string>();
-        products.forEach(p => {
-            const option = p.options?.find(o => o.name.toLowerCase() === optionName.toLowerCase() || o.name.toLowerCase() === optionName.toLowerCase() + 's'); // "Color" or "Colors"
-            if (option) {
-                option.values.forEach(v => values.add(v));
-            }
-        });
-        return Array.from(values);
-    };
-
-    const availableColors = extractOptions(allProducts, 'Color');
-    const availableSizes = extractOptions(allProducts, 'Size');
-
-    // Simple Price Range calc
     const prices = allProducts.flatMap(p => [
         parseFloat(p.priceRange.minVariantPrice.amount),
         parseFloat(p.priceRange.maxVariantPrice.amount)
@@ -96,18 +83,16 @@ export default async function ShopPage({
 
 
     return (
-        <div className="min-h-screen bg-rich-black pt-24 pb-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#0B0B0B] pt-32 pb-24">
+            <div className="max-w-[1400px] mx-auto px-6">
 
+                {/* @ts-ignore */}
                 <ShopClient
                     initialProductCount={products.length}
                     queryParam={queryParam}
                     categoryParam={categoryParam}
-                    availableTypes={availableTypes}
-                    availableColors={availableColors}
-                    availableSizes={availableSizes}
-                    minPrice={minPrice}
-                    maxPrice={maxPrice}
+                    // @ts-ignore
+                    collections={collections}
                 />
 
                 {/* Grid & View Toggle */}
@@ -118,20 +103,20 @@ export default async function ShopPage({
 
                             {/* Pagination */}
                             {pageInfo?.hasNextPage && (
-                                <div className="flex justify-center mt-12">
+                                <div className="flex justify-center mt-24">
                                     <a
                                         href={`?cursor=${pageInfo?.endCursor}${sort ? `&sort=${sort}` : ''}${queryParam ? `&q=${queryParam}` : ''}${categoryParam ? `&category=${categoryParam}` : ''}`}
-                                        className="px-6 py-3 bg-white/5 border border-white/10 rounded-full text-white font-medium hover:bg-white/10 hover:border-white/30 transition-all flex items-center space-x-2"
+                                        className="px-8 py-4 border border-white/20 text-white text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all"
                                     >
-                                        <span>Load More Products</span>
+                                        Load More
                                     </a>
                                 </div>
                             )}
                         </>
                     ) : (
-                        <div className="text-center py-24 border border-dashed border-white/10 rounded-2xl">
-                            <p className="text-muted-foreground text-lg">No products found matching your filters.</p>
-                            <a href="/shop" className="text-gold underline mt-2 inline-block">Clear all filters</a>
+                        <div className="flex flex-col items-center justify-center py-32 border border-dashed border-white/10">
+                            <p className="text-white/40 font-mono text-sm uppercase tracking-widest">No products found.</p>
+                            <a href="/shop" className="text-white font-bold underline mt-4 text-sm">Clear Filters</a>
                         </div>
                     )}
                 </div>

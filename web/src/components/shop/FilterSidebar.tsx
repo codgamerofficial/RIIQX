@@ -1,20 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Collection } from "@/lib/shopify/types";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Filter, X } from "lucide-react";
+import { Filter, X, ChevronRight } from "lucide-react";
 
 interface FilterSidebarProps {
     collections: Collection[];
     className?: string;
+    isOpen?: boolean;
+    onClose?: () => void;
 }
 
-export function FilterSidebar({ collections, className = "" }: FilterSidebarProps) {
+export function FilterSidebar({ collections, className = "", isOpen, onClose }: FilterSidebarProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [isOpen, setIsOpen] = useState(false);
 
     // State from URL
     const selectedCollection = searchParams.get("collection");
@@ -28,82 +28,54 @@ export function FilterSidebar({ collections, className = "" }: FilterSidebarProp
         const params = new URLSearchParams(searchParams.toString());
         params.set("minPrice", priceRange[0].toString());
         params.set("maxPrice", priceRange[1].toString());
-
-        // Reset page on filter change
         params.delete("after");
-
         router.push(`?${params.toString()}`);
-        setIsOpen(false); // Close on mobile
+        if (onClose) onClose();
     };
 
     const handleCollectionClick = (handle: string) => {
-        // If we are on /products, we filter by collection param? 
-        // OR better, we navigate to /collections/[handle] for SEO and cleaner URLs.
-        // But if we want combined filters, we might stick to query params.
-        // For this implementation, let's navigate to the collection page.
         router.push(`/collections/${handle}`);
+        if (onClose) onClose();
     };
 
     return (
         <>
-            {/* Mobile Toggle */}
-            <button
-                onClick={() => setIsOpen(true)}
-                className="md:hidden fixed bottom-4 left-4 z-40 bg-primary text-black px-4 py-2 rounded-full font-bold flex items-center gap-2 shadow-lg"
-            >
-                <Filter className="w-4 h-4" /> Filters
-            </button>
-
-            {/* Sidebar Container */}
             <div className={`
-        fixed inset-y-0 left-0 z-50 w-80 bg-black/95 backdrop-blur-xl border-r border-white/10 p-6 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:w-64 md:bg-transparent md:border-none md:p-0
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        ${className}
-      `}>
-                <div className="flex items-center justify-between mb-8 md:hidden">
-                    <h2 className="text-xl font-bold text-white">Filters</h2>
-                    <button onClick={() => setIsOpen(false)}><X className="w-6 h-6 text-white" /></button>
+                fixed inset-y-0 left-0 z-50 w-full md:w-80 bg-[#0B0B0B] border-r border-white/5 p-8 transform transition-transform duration-500 ease-[0.16,1,0.3,1]
+                ${isOpen ? "translate-x-0" : "-translate-x-full"}
+                ${className}
+            `}>
+                <div className="flex items-center justify-between mb-12">
+                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter font-display">Filter</h2>
+                    <button onClick={onClose}>
+                        <X className="w-6 h-6 text-white hover:text-white/50 transition-colors" />
+                    </button>
                 </div>
 
-                <div className="space-y-8">
+                <div className="space-y-12">
                     {/* Categories */}
                     <div>
-                        <h3 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">Categories</h3>
-                        <div className="space-y-2">
+                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-6">Collections</h3>
+                        <div className="space-y-4">
                             <button
                                 onClick={() => router.push('/products')}
-                                className={`block w-full text-left text-sm py-1 hover:text-white transition-colors ${!selectedCollection ? 'text-primary font-bold' : 'text-gray-400'}`}
+                                className={`block w-full text-left text-sm uppercase tracking-wider hover:text-white transition-all ${!selectedCollection ? 'text-white font-bold pl-2 border-l-2 border-white' : 'text-white/40'}`}
                             >
                                 All Products
                             </button>
 
-                            {/* Specific Categories requested by user */}
-                            {['T-shirt', 'Hoodies', 'Shirt', 'Jeans', 'Sweatshirt', 'Accessories', 'Mobile Back Case'].map((cat) => {
-                                // Create a URL-friendly handle
-                                const handle = cat.toLowerCase().replace(/\s+/g, '-');
-                                return (
-                                    <button
-                                        key={cat}
-                                        onClick={() => handleCollectionClick(handle)}
-                                        className={`block w-full text-left text-sm py-1 hover:text-white transition-colors ${selectedCollection === handle ? 'text-primary font-bold' : 'text-gray-400'}`}
-                                    >
-                                        {cat}
-                                    </button>
-                                );
-                            })}
-
-                            <div className="w-full h-px bg-white/10 my-4" />
-
-                            {/* Dynamic Collections from Shopify (avoiding duplicates if possible, or just append) */}
-                            {collections
-                                .filter(c => !['new-arrivals', 'best-sellers'].includes(c.handle)) // Filter out functional ones if needed
+                            {collections.length > 0 && collections
+                                .filter(c => !['new-arrivals', 'best-sellers'].includes(c.handle))
                                 .map(c => (
                                     <button
                                         key={c.id}
                                         onClick={() => handleCollectionClick(c.handle)}
-                                        className={`block w-full text-left text-sm py-1 hover:text-white transition-colors ${selectedCollection === c.handle ? 'text-primary font-bold' : 'text-gray-400'}`}
+                                        className={`group block w-full text-left text-sm uppercase tracking-wider hover:text-white transition-all ${selectedCollection === c.handle ? 'text-white font-bold pl-2 border-l-2 border-white' : 'text-white/40'}`}
                                     >
-                                        {c.title}
+                                        <div className="flex items-center justify-between">
+                                            <span>{c.title}</span>
+                                            <ChevronRight className={`w-3 h-3 opacity-0 -translate-x-2 transition-all duration-300 ${selectedCollection === c.handle ? 'opacity-100 translate-x-0' : 'group-hover:opacity-100 group-hover:translate-x-0'}`} />
+                                        </div>
                                     </button>
                                 ))}
                         </div>
@@ -111,24 +83,24 @@ export function FilterSidebar({ collections, className = "" }: FilterSidebarProp
 
                     {/* Price Range */}
                     <div>
-                        <h3 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">Price Range</h3>
-                        <div className="px-2">
-                            <div className="flex justify-between text-white text-xs mb-2">
-                                <span>₹{priceRange[0]}</span>
-                                <span>₹{priceRange[1]}</span>
+                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-6">Price Range</h3>
+                        <div className="px-1">
+                            <div className="flex justify-between text-white font-mono text-xs mb-4">
+                                <span>₹ {priceRange[0]}</span>
+                                <span>₹ {priceRange[1]}+</span>
                             </div>
                             <input
                                 type="range"
-                                min="0" max="10000" step="50"
+                                min="0" max="10000" step="100"
                                 value={priceRange[1]}
                                 onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                                className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-primary"
+                                className="w-full h-px bg-white/20 appearance-none cursor-pointer accent-white"
                             />
                             <button
                                 onClick={handleApply}
-                                className="w-full mt-4 bg-white/10 border border-white/20 text-white py-2 rounded-lg text-xs font-bold hover:bg-white hover:text-black transition-colors"
+                                className="w-full mt-8 bg-white text-black py-4 text-xs font-black uppercase tracking-widest hover:bg-white/90 transition-colors"
                             >
-                                Apply Price
+                                Update Results
                             </button>
                         </div>
                     </div>
@@ -138,8 +110,8 @@ export function FilterSidebar({ collections, className = "" }: FilterSidebarProp
             {/* Backdrop */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/80 z-40 md:hidden"
-                    onClick={() => setIsOpen(false)}
+                    className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm transition-opacity duration-500"
+                    onClick={onClose}
                 />
             )}
         </>
