@@ -15,6 +15,7 @@ export const PRODUCTS_QUERY = `
           title
           description
           availableForSale
+          updatedAt
           productType
           tags
           featuredImage {
@@ -150,6 +151,7 @@ export const COLLECTIONS_QUERY = `
           title
           handle
           description
+          updatedAt
           image {
             url
             altText
