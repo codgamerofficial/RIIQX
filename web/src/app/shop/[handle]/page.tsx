@@ -30,5 +30,7 @@ export default async function ProductPage({
         notFound();
     }
 
-    return <ProductDetailClient product={product} />;
+    const { products: relatedProducts } = await getProducts({ limit: 4 });
+
+    return <ProductDetailClient product={product} relatedProducts={relatedProducts} />;
 }
