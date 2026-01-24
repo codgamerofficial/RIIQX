@@ -40,6 +40,16 @@ export const useCartStore = create<CartState>()(
             discount: null,
 
             addItem: (newItem) => {
+                // Trigger Dynamic Island (Web)
+                import("@/components/ui/DynamicIsland").then(({ useWebIslandStore }) => {
+                    useWebIslandStore.getState().startActivity({
+                        id: `cart-${Date.now()}`,
+                        type: 'cart',
+                        title: newItem.title,
+                        subtitle: 'Added to Cart'
+                    });
+                });
+
                 const { items } = get();
                 const existingItem = items.find(
                     (item) => item.id === newItem.id && item.variantId === newItem.variantId

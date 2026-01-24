@@ -35,6 +35,15 @@ export const useCartStore = create<CartState>()(
             items: [],
             isOpen: false,
             addItem: (newItem) => {
+                // Trigger Island
+                const { useIslandStore } = require('./islandStore'); // Lazy load to avoid cycle
+                useIslandStore.getState().startActivity({
+                    id: `cart-${Date.now()}`,
+                    type: 'cart',
+                    title: `${newItem.title} Added`,
+                    subtitle: newItem.price
+                });
+
                 set((state) => {
                     const existingItemIndex = state.items.findIndex(
                         (item) =>

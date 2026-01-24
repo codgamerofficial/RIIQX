@@ -58,30 +58,36 @@ export default function HomeScreen() {
                 {/* ... rest of content ... */}
                 <View className="px-6 mb-8 mt-6">
                     {/* Horizontal Scroll logic kept simple for now */}
-                    <ScrollView horizontal showsVerticalScrollIndicator={false}>
-                        {/* Demo Trigger */}
+                    <ScrollView horizontal showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingVertical: 10 }}>
+                        {/* Demo Trigger: Music */}
                         <TouchableOpacity
-                            onPress={() => useIslandStore.getState().startActivity({
-                                id: 'music-1',
-                                type: 'music',
-                                title: 'Starboy',
-                                subtitle: 'The Weeknd',
-                            })}
-                            className="mr-4 px-6 py-2 rounded-full border bg-cherry border-cherry"
+                            onPress={() => {
+                                console.log("Starting Island Music Activity");
+                                useIslandStore.getState().startActivity({
+                                    id: 'music-demo',
+                                    type: 'music',
+                                    title: 'Starboy',
+                                    subtitle: 'The Weeknd',
+                                });
+                            }}
+                            className="mr-3 px-5 py-3 rounded-full bg-[#E31C79] border-2 border-[#E31C79]/50 shadow-lg shadow-pink-500/30"
                         >
-                            <Text className="font-bold text-white">🎵 Play Music</Text>
+                            <Text className="font-bold text-white text-sm">🎵 Demo Music</Text>
                         </TouchableOpacity>
 
+                        {/* Demo Trigger: Cart */}
                         <TouchableOpacity
-                            onPress={() => useIslandStore.getState().startActivity({
-                                id: 'timer-1',
-                                type: 'timer',
-                                title: 'Timer',
-                                subtitle: '14:59',
-                            })}
-                            className="mr-4 px-6 py-2 rounded-full border bg-orange-500 border-orange-500"
+                            onPress={() => {
+                                console.log("Starting Island Cart Activity");
+                                useIslandStore.getState().startActivity({
+                                    id: 'cart-demo',
+                                    type: 'cart',
+                                    title: 'Air Max Added',
+                                });
+                            }}
+                            className="mr-3 px-5 py-3 rounded-full bg-[#CCFF00] border-2 border-[#CCFF00]/50 shadow-lg shadow-lime-500/30"
                         >
-                            <Text className="font-bold text-white">⏱ Start Timer</Text>
+                            <Text className="font-bold text-black text-sm">🛍️ Demo Cart</Text>
                         </TouchableOpacity>
 
                         {CATEGORIES.map((cat, index) => (

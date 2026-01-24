@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
 import { DynamicIsland } from "@/components/ui/DynamicIsland";
 import { Session, AuthChangeEvent } from '@supabase/supabase-js';
+import { useSystemMusicSync } from '@/hooks/useSystemMusicSync';
 
 export default function Layout() {
     useEffect(() => {
@@ -26,6 +27,9 @@ export default function Layout() {
 
         return () => subscription.unsubscribe();
     }, []);
+
+    // Activate System Music Sync (Simulated)
+    useSystemMusicSync();
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
