@@ -1,14 +1,11 @@
 "use client";
 
-/**
- * LivingScrollProvider
- * Originally wrapped the app in smooth scroll (Lenis).
- * Now restricted to default native scrolling as per user request.
- */
-export function LivingScrollProvider({ children }: { children: React.ReactNode }) {
+import { ReactLenis } from "@studio-freight/react-lenis";
+
+export function LivingScrollProvider({ children }: { children: any }) {
     return (
-        <>
+        <ReactLenis root options={{ lerp: 0.1, duration: 1.5, smoothWheel: true }}>
             {children}
-        </>
+        </ReactLenis>
     );
 }

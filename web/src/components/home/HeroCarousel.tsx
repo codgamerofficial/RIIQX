@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useMotionValue } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import { ScrollReveal } from "../ui/ScrollReveal";
 
 const HERO_SLIDES = [
     {
@@ -89,32 +90,34 @@ export function HeroCarousel() {
             </AnimatePresence>
 
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10 px-4">
-                <motion.div
-                    key={slide.id + "content"}
-                    initial={{ opacity: 0, y: 40 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -40 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                >
-                    <h2 className="text-sm md:text-base font-bold text-accent uppercase tracking-[0.3em] mb-6">
-                        {slide.subtitle}
-                    </h2>
-                    <h1 className="text-[12vw] leading-[0.85] font-black uppercase tracking-tighter text-white mix-blend-screen font-display mb-12">
-                        {slide.title}
-                    </h1>
+                <ScrollReveal direction="down" distance={20} className="w-full flex flex-col items-center">
+                    <motion.div
+                        key={slide.id + "content"}
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -40 }}
+                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                        <h2 className="text-sm md:text-base font-bold text-accent uppercase tracking-[0.3em] mb-6">
+                            {slide.subtitle}
+                        </h2>
+                        <h1 className="text-[12vw] leading-[0.85] font-black uppercase tracking-tighter text-white mix-blend-screen font-display mb-12">
+                            {slide.title}
+                        </h1>
 
-                    <Link href={slide.link}>
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="group relative px-12 py-5 bg-white text-black font-black uppercase tracking-widest text-sm overflow-hidden"
-                        >
-                            <span className="relative z-10 flex items-center gap-3 group-hover:gap-6 transition-all duration-300">
-                                {slide.cta} <ArrowRight className="w-4 h-4" />
-                            </span>
-                        </motion.button>
-                    </Link>
-                </motion.div>
+                        <Link href={slide.link}>
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="group relative px-12 py-5 bg-white text-black font-black uppercase tracking-widest text-sm overflow-hidden"
+                            >
+                                <span className="relative z-10 flex items-center gap-3 group-hover:gap-6 transition-all duration-300">
+                                    {slide.cta} <ArrowRight className="w-4 h-4" />
+                                </span>
+                            </motion.button>
+                        </Link>
+                    </motion.div>
+                </ScrollReveal>
             </div>
 
             <div className="absolute bottom-12 left-12 right-12 z-20 flex items-end justify-between">

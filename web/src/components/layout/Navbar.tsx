@@ -10,10 +10,13 @@ import { useCartStore } from "@/store/useCartStore";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { PredictiveSearch } from "@/components/search/PredictiveSearch";
 import { UserMenu } from "@/components/auth/UserMenu";
+import { MobileMenu } from "./MobileMenu";
+import { ScaleButton } from "../ui/ScaleButton";
 
 export function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { toggleCart, getItemCount } = useCartStore();
     const itemCount = getItemCount();
 
@@ -30,6 +33,7 @@ export function Navbar() {
 
     // Minimal Navigation
     const navLinks = [
+        { name: "Home", href: "/" },
         { name: "Shop", href: "/shop" },
         { name: "New Drops", href: "/new-arrivals" },
         { name: "Collections", href: "/collections" },
@@ -46,8 +50,9 @@ export function Navbar() {
             <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
                 {/* 1. Left: Mobile Menu Trigger (Visible on Mobile) */}
                 <div className="md:hidden">
-                    {/* Placeholder for simple mobile menu trigger if needed, or keeping it clean */}
-                    <Menu className="w-6 h-6 text-white" />
+                    <button onClick={() => setMobileMenuOpen(true)}>
+                        <Menu className="w-6 h-6 text-white" />
+                    </button>
                 </div>
 
                 {/* 2. Left: Navigation (Desktop) */}
@@ -72,26 +77,27 @@ export function Navbar() {
 
                 {/* 4. Right: Actions */}
                 <div className="flex items-center space-x-6">
-                    <button onClick={() => setIsSearchOpen(true)} className="group">
+                    <ScaleButton onClick={() => setIsSearchOpen(true)} className="group">
                         <Search className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
-                    </button>
+                    </ScaleButton>
 
                     <Link href="/account" className="hidden md:block group">
-                        <User className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
+                        <User className="w-5 h-5 text-white/70 group-hover:text-white transition-colors hover:scale-110 transition-transform duration-200" />
                     </Link>
 
-                    <button onClick={toggleCart} className="relative group">
+                    <ScaleButton onClick={toggleCart} className="relative group">
                         <ShoppingBag className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
                         {mounted && itemCount > 0 && (
                             <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
                                 {itemCount}
                             </span>
                         )}
-                    </button>
+                    </ScaleButton>
                 </div>
             </div>
 
             <PredictiveSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+            <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
         </motion.nav>
     );
 }

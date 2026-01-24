@@ -50,6 +50,15 @@ module.exports = {
                     '100%': { transform: 'scale(1)', opacity: '1' },
                 },
             },
+            transitionDuration: {
+                'fast': '120ms',
+                'normal': '200ms',
+                'slow': '280ms',
+            },
+            transitionTimingFunction: {
+                'standard': 'cubic-bezier(0.2, 0, 0, 1)',
+                'exit': 'cubic-bezier(0.4, 0, 1, 1)',
+            },
         },
     },
     plugins: [],

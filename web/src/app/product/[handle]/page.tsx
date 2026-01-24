@@ -57,5 +57,27 @@ export default async function ProductPage({
         return notFound();
     }
 
-    return <ProductDetailClient product={product} />;
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.title,
+        description: product.description,
+        image: product.featuredImage?.url,
+        offers: {
+            '@type': 'Offer',
+            price: product.priceRange.minVariantPrice.amount,
+            priceCurrency: product.priceRange.minVariantPrice.currencyCode,
+            availability: product.availableForSale ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        },
+    };
+
+    return (
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <ProductDetailClient product={product} />
+        </>
+    );
 }

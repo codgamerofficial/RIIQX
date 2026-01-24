@@ -71,12 +71,12 @@ export default function LookbookPage() {
     nextDropDate.setDate(nextDropDate.getDate() + 3);
 
     return (
-        <div className="min-h-screen bg-rich-black pt-24 pb-12">
+        <div className="min-h-screen bg-[#0B0B0B] pt-24 pb-12">
             {/* Header Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 space-y-12">
                 <div className="text-center space-y-6">
                     <h1 className="text-5xl md:text-8xl font-black font-display text-white uppercase tracking-tighter leading-none">
-                        The <span className="text-transparent bg-clip-text bg-gradient-to-r from-cherry-red to-red-600">Archive</span>
+                        The <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-purple-500">Archive</span>
                     </h1>
                     <p className="text-white/60 max-w-2xl mx-auto text-lg leading-relaxed font-light">
                         Curated styles from our latest collections. Explore the looks and shop the pieces that define the RIIQX aesthetic.
@@ -111,7 +111,7 @@ export default function LookbookPage() {
                                     <h3 className="text-3xl font-black font-display text-white uppercase tracking-tighter translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                                         {look.title}
                                     </h3>
-                                    <p className="text-cherry-red font-bold uppercase tracking-widest text-xs mt-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                                    <p className="text-accent font-bold uppercase tracking-widest text-xs mt-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
                                         View Look
                                     </p>
                                 </div>
