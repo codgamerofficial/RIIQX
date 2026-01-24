@@ -48,7 +48,7 @@ export function DynamicIsland() {
 
 
     return (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100]">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100]">
             <motion.div
                 layout
                 initial={{ width: 120, height: 36, borderRadius: 20, opacity: 0, y: -50 }}
