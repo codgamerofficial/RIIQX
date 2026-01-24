@@ -58,7 +58,7 @@ export function SocialProofNotifications() {
                     initial={{ opacity: 0, y: 50, scale: 0.3 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-                    className="fixed bottom-24 left-4 right-4 md:left-auto md:right-8 md:w-96 z-50"
+                    className="fixed top-24 right-4 md:right-8 w-[calc(100%-2rem)] md:w-96 z-50"
                 >
                     <div className="bg-gradient-to-r from-cherry/10 to-gold/10 backdrop-blur-xl border border-cherry/20 rounded-2xl p-4 shadow-2xl">
                         <div className="flex items-start gap-3">

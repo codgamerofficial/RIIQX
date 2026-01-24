@@ -1,8 +1,39 @@
 import { getCollectionProducts, getProducts } from "@/lib/shopify";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 import { ProductFilters } from "@/components/shop/ProductFilters";
+import { LoadMoreProducts } from "@/components/shop/LoadMoreProducts";
+import { Metadata } from "next";
 
 export const revalidate = 60;
+
+
+export async function generateMetadata({
+    params
+}: {
+    params: Promise<{ handle: string }>;
+}): Promise<Metadata> {
+    const { handle } = await params;
+
+    // We fetch a small amount just to get the collection info
+    const { collectionInfo } = await getCollectionProducts({ handle, limit: 1 });
+
+    if (!collectionInfo) {
+        return {
+            title: 'Collection Not Found',
+            description: 'The requested collection could not be found.'
+        };
+    }
+
+    return {
+        title: collectionInfo.seo.title || collectionInfo.title,
+        description: collectionInfo.seo.description || collectionInfo.description || `Browse our latest ${collectionInfo.title} collection.`,
+        openGraph: {
+            title: collectionInfo.seo.title || collectionInfo.title,
+            description: collectionInfo.seo.description || collectionInfo.description,
+            type: 'website'
+        }
+    };
+}
 
 export default async function CollectionPage({
     params,
@@ -32,12 +63,22 @@ export default async function CollectionPage({
         reverse = true;
     }
 
-    // 1. Fetch products (max 100 for client filtering)
-    const { products } = await getCollectionProducts({
+    // 1. Fetch products (Server Side Pagination)
+    // Note: detailed client side filtering with pagination is complex with Shopify Storefront API
+    // because you can't filter purely by generic tags AND paginate efficiently without retrieving all.
+    // For now, we will fetch a larger batch if filters are present, or standard batch if not.
+    // Ideally, we rely on Shopify's `filters` if possible, but our `getCollectionProducts` 
+    // implementation currently mostly does client sorting/limiting or passes filters if designed.
+
+    // Check if we have specific filters to decide strategy
+    const hasFilters = resolvedSearchParams.category || resolvedSearchParams.color || resolvedSearchParams.size || resolvedSearchParams.min_price || resolvedSearchParams.max_price;
+    const limit = hasFilters ? 100 : 24; // Fetch more if we are filtering client side to ensure we have matches
+
+    const { products, pageInfo, collectionInfo } = await getCollectionProducts({
         handle,
         sortKey,
         reverse,
-        limit: 100
+        limit
     });
 
     const categoryParam = resolvedSearchParams.category as string | undefined;
@@ -108,18 +149,24 @@ export default async function CollectionPage({
     const maxPrice = prices.length ? Math.max(...prices) : 1000;
 
 
-    // Formatting handle for title (e.g., "new-arrivals" -> "New Arrivals")
-    const title = handle.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    // Title from Shopify Collection Data
+    const title = collectionInfo?.title || handle.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    const description = collectionInfo?.description;
 
     return (
         <div className="min-h-screen bg-background pt-24 pb-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-12 border-b border-white/10 pb-6">
-                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white uppercase mb-2">
+                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white uppercase mb-4">
                         {categoryParam ? `${title} / ${categoryParam}` : title}
                     </h1>
-                    <p className="text-white/50 text-lg font-medium">
+                    {description && (
+                        <div className="prose prose-invert max-w-2xl mb-4 text-white/60">
+                            {description}
+                        </div>
+                    )}
+                    <p className="text-white/40 text-sm font-mono tracking-widest uppercase">
                         {displayProducts.length} Items
                     </p>
                 </div>
@@ -137,7 +184,16 @@ export default async function CollectionPage({
                     {/* Grid */}
                     <div className="flex-1">
                         {displayProducts.length > 0 ? (
-                            <ProductGrid products={displayProducts} />
+                            <>
+                                <ProductGrid products={displayProducts} />
+                                {!hasFilters && (
+                                    <LoadMoreProducts
+                                        handle={handle}
+                                        startCursor={pageInfo.endCursor}
+                                        initialHasNextPage={pageInfo.hasNextPage}
+                                    />
+                                )}
+                            </>
                         ) : (
                             <div className="space-y-12">
                                 <div className="text-center py-12 border border-dashed border-white/10 rounded-2xl">

@@ -45,6 +45,39 @@ export const PRODUCTS_QUERY = `
   }
 `;
 
+export const PREDICTIVE_SEARCH_QUERY = `
+  query predictiveSearch($query: String!, $limit: Int = 6) {
+    predictiveSearch(query: $query, limit: $limit, limitScope: EACH, types: [PRODUCT, QUERY, COLLECTION]) {
+      products {
+        id
+        handle
+        title
+        featuredImage {
+          url
+          altText
+          width
+          height
+        }
+        priceRange {
+          minVariantPrice {
+            amount
+            currencyCode
+          }
+        }
+      }
+      queries {
+        text
+        styledText
+      }
+      collections {
+        id
+        handle
+        title
+      }
+    }
+  }
+`;
+
 export const PRODUCT_BY_HANDLE_QUERY = `
   query getProductByHandle($handle: String!) {
     product(handle: $handle) {
@@ -165,9 +198,15 @@ export const COLLECTIONS_QUERY = `
 `;
 
 export const COLLECTION_PRODUCTS_QUERY = `
-  query getCollectionProducts($handle: String!, $first: Int = 24, $sortKey: ProductCollectionSortKeys, $reverse: Boolean, $filters: [ProductFilter!]) {
+  query getCollectionProducts($handle: String!, $first: Int = 24, $sortKey: ProductCollectionSortKeys, $reverse: Boolean, $filters: [ProductFilter!], $after: String) {
     collection(handle: $handle) {
-      products(first: $first, sortKey: $sortKey, reverse: $reverse, filters: $filters) {
+      title
+      description
+      seo {
+        description
+        title
+      }
+      products(first: $first, sortKey: $sortKey, reverse: $reverse, filters: $filters, after: $after) {
         pageInfo {
           hasNextPage
           endCursor

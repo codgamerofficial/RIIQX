@@ -1,15 +1,18 @@
 'use server';
 
-import { getProducts } from "@/lib/shopify";
+import { getPredictiveSearchResults, getProducts } from "@/lib/shopify";
 
 export async function searchProducts(query: string) {
-    if (!query || query.length < 2) return { products: [] };
+    const { products } = await getProducts({ query, limit: 10 });
+    return { products };
+}
 
+export async function predictiveSearchAction(query: string) {
     try {
-        const { products } = await getProducts({ query, limit: 6 });
-        return { products };
+        const results = await getPredictiveSearchResults(query);
+        return results;
     } catch (error) {
-        console.error("Search error:", error);
-        return { products: [] };
+        console.error("Predictive search failed:", error);
+        return { products: [], collections: [], queries: [] };
     }
 }

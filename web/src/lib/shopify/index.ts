@@ -197,34 +197,66 @@ export async function getCollections(): Promise<Collection[]> {
     return removeEdgesAndNodes(res.collections);
 }
 
+
 /**
  * Fetch products for a specific collection.
+ * Includes SEO metadata for the collection page.
  */
 export async function getCollectionProducts({
     handle,
     sortKey,
     reverse,
     limit = 24,
-    filters
+    filters,
+    after
 }: {
     handle: string;
     sortKey?: 'TITLE' | 'PRICE' | 'CREATED' | 'BEST_SELLING';
     reverse?: boolean;
     limit?: number;
     filters?: any[];
-}): Promise<{ products: Product[]; pageInfo: Connection<Product>['pageInfo'] }> {
-    const res = await shopifyFetch<{ collection: { products: Connection<Product> } }>({
+    after?: string;
+}): Promise<{
+    products: Product[];
+    pageInfo: Connection<Product>['pageInfo'];
+    collectionInfo: { title: string; description: string; seo: { title: string; description: string } } | null;
+}> {
+    const res = await shopifyFetch<{ collection: { title: string; description: string; seo: { title: string; description: string }; products: Connection<Product> } }>({
         query: require('./queries').COLLECTION_PRODUCTS_QUERY,
-        variables: { handle, first: limit, sortKey, reverse, filters },
-        revalidate: 0,
+        variables: { handle, first: limit, sortKey, reverse, filters, after },
+        revalidate: 60,
     });
 
     if (!res.collection) {
-        return { products: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } };
+        return {
+            products: [],
+            pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: undefined, endCursor: undefined },
+            collectionInfo: null
+        };
     }
 
     return {
         products: removeEdgesAndNodes(res.collection.products),
         pageInfo: res.collection.products.pageInfo,
+        collectionInfo: {
+            title: res.collection.title,
+            description: res.collection.description,
+            seo: res.collection.seo
+        }
     };
 }
+
+/**
+ * Fetch predictive search results (Products, Collections, Queries).
+ * Used for "As you type" search suggestions.
+ */
+export async function getPredictiveSearchResults(query: string) {
+    const res = await shopifyFetch<{ predictiveSearch: { products: Product[], collections: Collection[], queries: { text: string }[] } }>({
+        query: require('./queries').PREDICTIVE_SEARCH_QUERY,
+        variables: { query },
+        revalidate: 0 // Always live
+    });
+
+    return res.predictiveSearch;
+}
+
