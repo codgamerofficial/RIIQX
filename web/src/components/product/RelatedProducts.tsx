@@ -4,38 +4,14 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/shopify";
+import { Product } from "@/lib/shopify/types";
 
-// Mock data for now, utilizing robust Shopify types in future
-const MOCK_RELATED = [
-    {
-        handle: "cyber-punk-hoodie",
-        title: "Cyberpunk Hoodie 2077",
-        price: "4999",
-        image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=2070&auto=format&fit=crop",
-    },
-    {
-        handle: "neon-city-tee",
-        title: "Neon City Tee",
-        price: "1999",
-        image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=1887&auto=format&fit=crop",
-    },
-    {
-        handle: "future-cargo-pants",
-        title: "Future Cargo Pants",
-        price: "3499",
-        image: "https://images.unsplash.com/photo-1552160753-117159821e01?q=80&w=1883&auto=format&fit=crop",
-    },
-    {
-        handle: "techwear-jacket",
-        title: "Techwear Shell Jacket",
-        price: "7999",
-        image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1936&auto=format&fit=crop",
-    }
-];
+interface RelatedProductsProps {
+    products: Product[];
+}
 
-export function RelatedProducts() {
-    // In a real implementation, we would fetch based on category/collection of current product
-    // For now, we return a static "You Might Also Like" to demonstrate the UI
+export function RelatedProducts({ products }: RelatedProductsProps) {
+    if (!products.length) return null;
 
     return (
         <div className="py-24 border-t border-white/5">
@@ -50,15 +26,21 @@ export function RelatedProducts() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-                {MOCK_RELATED.map((product, idx) => (
-                    <Link key={idx} href={`/product/${product.handle}`} className="group block">
+                {products.map((product) => (
+                    <Link key={product.id} href={`/product/${product.handle}`} className="group block">
                         <div className="relative aspect-[3/4] bg-neutral-900 overflow-hidden mb-4">
-                            <Image
-                                src={product.image}
-                                alt={product.title}
-                                fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-700"
-                            />
+                            {product.featuredImage ? (
+                                <Image
+                                    src={product.featuredImage.url}
+                                    alt={product.featuredImage.altText || product.title}
+                                    fill
+                                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-white/5 text-white/20">
+                                    No Image
+                                </div>
+                            )}
 
                             {/* Overlay */}
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
@@ -74,9 +56,11 @@ export function RelatedProducts() {
                         <h3 className="text-white font-bold uppercase tracking-tight mb-1 truncate group-hover:text-cherry-red transition-colors">
                             {product.title}
                         </h3>
-                        <p className="text-white/60 text-sm font-medium">
-                            {formatPrice(product.price, "INR")}
-                        </p>
+                        {product.priceRange && (
+                            <p className="text-white/60 text-sm font-medium">
+                                {formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode)}
+                            </p>
+                        )}
                     </Link>
                 ))}
             </div>

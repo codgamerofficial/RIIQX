@@ -189,8 +189,8 @@ export default async function CollectionPage({
                                 {!hasFilters && (
                                     <LoadMoreProducts
                                         handle={handle}
-                                        startCursor={pageInfo.endCursor}
-                                        initialHasNextPage={pageInfo.hasNextPage}
+                                        startCursor={pageInfo?.endCursor}
+                                        initialHasNextPage={pageInfo?.hasNextPage ?? false}
                                     />
                                 )}
                             </>

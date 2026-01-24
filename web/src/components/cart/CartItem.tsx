@@ -16,12 +16,18 @@ export function CartItem({ item }: CartItemProps) {
         <div className="flex items-center space-x-4 py-4 border-b border-white/10 last:border-0">
             {/* Image */}
             <div className="relative w-16 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted border border-white/5">
-                <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                />
+                {item.image ? (
+                    <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        className="object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-white/5 text-white/20 text-[10px] uppercase">
+                        No Image
+                    </div>
+                )}
             </div>
 
             {/* Details */}

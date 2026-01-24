@@ -47,7 +47,7 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
             // Submit review first
             const review = await submitReview({
                 product_id: productId,
-                user_id: 'anonymous', // Replace with actual user ID from auth
+                user_id: null, // Anonymous review
                 user_name: name,
                 user_email: email,
                 rating,
@@ -78,9 +78,9 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
             setImages([]);
 
             onSuccess?.();
-        } catch (error) {
-            console.error('Error submitting review:', error);
-            toast.error('Failed to submit review. Please try again.');
+        } catch (error: any) {
+            console.error('Error submitting review:', error.message || error);
+            toast.error(`Failed to submit review: ${error.message || 'Unknown error'}`);
         } finally {
             setIsSubmitting(false);
         }

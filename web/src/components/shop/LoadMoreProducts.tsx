@@ -5,7 +5,7 @@ import { Product } from "@/lib/shopify/types";
 import { ProductGrid } from "./ProductGrid";
 import { Loader2 } from "lucide-react";
 // We need a server action to fetch more products securely
-import { fetchMoreCollectionProducts } from "@/app/actions/shop";
+import { fetchMoreCollectionProducts } from "@/app/actions/product-actions";
 
 interface LoadMoreProductsProps {
     handle: string; // Collection handle
@@ -30,8 +30,10 @@ export function LoadMoreProducts({ handle, startCursor, initialHasNextPage }: Lo
             });
 
             setProducts((prev) => [...prev, ...newProducts]);
-            setHasNextPage(pageInfo.hasNextPage);
-            setCursor(pageInfo.endCursor);
+            if (pageInfo) {
+                setHasNextPage(pageInfo.hasNextPage);
+                setCursor(pageInfo.endCursor);
+            }
         } catch (error) {
             console.error("Failed to load more products collection", error);
         } finally {

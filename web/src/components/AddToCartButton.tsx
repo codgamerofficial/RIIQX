@@ -35,8 +35,8 @@ export function AddToCartButton({ product, variant, className = "" }: AddToCartB
             price: price,
             image: image,
             quantity: 1,
-            size: selectedVariant?.selectedOptions.find(o => o.name === 'Size')?.value,
-            color: selectedVariant?.selectedOptions.find(o => o.name === 'Color')?.value,
+            size: selectedVariant?.selectedOptions.find(o => o.name.toLowerCase() === 'size')?.value,
+            color: selectedVariant?.selectedOptions.find(o => ['color', 'colour'].includes(o.name.toLowerCase()))?.value,
         });
 
         setStatus("success");

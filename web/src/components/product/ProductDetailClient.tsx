@@ -13,25 +13,33 @@ import { RelatedProducts } from "./RelatedProducts";
 
 interface ProductDetailClientProps {
     product: Product;
+    relatedProducts: Product[];
 }
 
-export function ProductDetailClient({ product }: ProductDetailClientProps) {
+export function ProductDetailClient({ product, relatedProducts }: ProductDetailClientProps) {
     const [selectedImage, setSelectedImage] = useState(0);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const [selectedColor, setSelectedColor] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
 
     const images = product.images?.edges?.map(edge => edge.node) || [];
     const mainImage = images[selectedImage] || product.featuredImage;
     const price = product.priceRange.minVariantPrice;
 
-    // Extract sizes
+    // Extract options
     const sizeOption = product.options?.find(opt => opt.name.toLowerCase() === 'size');
     const sizes = sizeOption?.values || [];
 
-    // Get selected variant based on size (simplified)
-    const selectedVariant = product.variants.edges.find(edge =>
-        edge.node.selectedOptions.some(opt => opt.name.toLowerCase() === 'size' && opt.value === selectedSize)
-    )?.node;
+    const colorOption = product.options?.find(opt => opt.name.toLowerCase() === 'color' || opt.name.toLowerCase() === 'colour');
+    const colors = colorOption?.values || [];
+
+    // Get selected variant based on ALL selected options
+    const selectedVariant = product.variants.edges.find(edge => {
+        const options = edge.node.selectedOptions;
+        const sizeMatch = !sizes.length || (selectedSize && options.some(o => o.name.toLowerCase() === 'size' && o.value === selectedSize));
+        const colorMatch = !colors.length || (selectedColor && options.some(o => (o.name.toLowerCase() === 'color' || o.name.toLowerCase() === 'colour') && o.value === selectedColor));
+        return sizeMatch && colorMatch;
+    })?.node;
 
     return (
         <div className="min-h-screen bg-[#0B0B0B] text-white pt-24 pb-24">
@@ -45,14 +53,20 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                             transition={{ duration: 0.5 }}
                             className="relative aspect-[3/4] w-full overflow-hidden bg-white/5"
                         >
-                            <Image
-                                src={mainImage?.url || ""}
-                                alt={mainImage?.altText || product.title}
-                                fill
-                                className="object-cover"
-                                priority
-                                sizes="(min-width: 1024px) 50vw, 100vw"
-                            />
+                            {mainImage?.url ? (
+                                <Image
+                                    src={mainImage.url}
+                                    alt={mainImage.altText || product.title}
+                                    fill
+                                    className="object-cover"
+                                    priority
+                                    sizes="(min-width: 1024px) 50vw, 100vw"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-white/5">
+                                    <span className="text-white/20 font-mono text-xs uppercase tracking-widest">No Image</span>
+                                </div>
+                            )}
                         </motion.div>
 
                         {/* Thumbnails */}
@@ -93,6 +107,31 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Color Selector */}
+                        {colors.length > 0 && (
+                            <div className="space-y-4">
+                                <div className="text-xs uppercase tracking-widest text-white/40 font-bold">
+                                    Select Color: <span className="text-white ml-2">{selectedColor}</span>
+                                </div>
+                                <div className="flex flex-wrap gap-3">
+                                    {colors.map((color) => (
+                                        <button
+                                            key={color}
+                                            onClick={() => setSelectedColor(color)}
+                                            className={cn(
+                                                "h-10 px-4 flex items-center justify-center border transition-all text-sm font-bold uppercase",
+                                                selectedColor === color
+                                                    ? "bg-white text-black border-white"
+                                                    : "bg-transparent text-white border-white/20 hover:border-white"
+                                            )}
+                                        >
+                                            {color}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Size Selector */}
                         {sizes.length > 0 && (
@@ -143,7 +182,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 </div>
 
                 <div className="mt-32">
-                    <RelatedProducts />
+                    <RelatedProducts products={relatedProducts} />
                     <div className="mt-16">
                         <ReviewSection productId={product.id} />
                     </div>

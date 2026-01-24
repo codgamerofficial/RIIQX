@@ -10,6 +10,7 @@ interface DropTimerProps {
 
 export default function DropTimer({ targetDate, label = "Next Drop In" }: DropTimerProps) {
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+    const [mounted, setMounted] = useState(false);
 
     function calculateTimeLeft() {
         const difference = +targetDate - +new Date();
@@ -33,12 +34,15 @@ export default function DropTimer({ targetDate, label = "Next Drop In" }: DropTi
     }
 
     useEffect(() => {
+        setMounted(true);
         const timer = setTimeout(() => {
             setTimeLeft(calculateTimeLeft());
         }, 1000);
 
         return () => clearTimeout(timer);
     });
+
+    if (!mounted) return null;
 
     const timerComponents = Object.keys(timeLeft).map((interval) => {
         if (!timeLeft[interval as keyof typeof timeLeft] && interval === 'days') {

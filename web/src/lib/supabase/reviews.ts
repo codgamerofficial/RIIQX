@@ -8,7 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export interface Review {
     id: string;
     product_id: string;
-    user_id: string;
+    user_id: string | null;
     user_name: string;
     user_email: string;
     rating: number;

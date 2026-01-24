@@ -1,4 +1,5 @@
 import { getProduct } from "@/lib/shopify";
+import { getProducts } from "@/lib/shopify";
 import { ProductDetailClient } from "@/components/product/ProductDetailClient";
 import { notFound } from "next/navigation";
 
@@ -71,13 +72,15 @@ export default async function ProductPage({
         },
     };
 
+    const { products: relatedProducts } = await getProducts({ limit: 4 });
+
     return (
         <>
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            <ProductDetailClient product={product} />
+            <ProductDetailClient product={product} relatedProducts={relatedProducts} />
         </>
     );
 }
