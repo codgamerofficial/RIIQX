@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Play, Pause, ShoppingBag } from "lucide-react";
-import { useIslandStore } from "@/store/islandStore"; // Need to ensure we share or recreate this store for web
+
 
 // Leveraging the same logic store if possible, or creating a web version if it relies on RN specific imports.
 // For now, I'll assume we need to replicate the store logic for web or ensure the existing one is platform agnostic.
