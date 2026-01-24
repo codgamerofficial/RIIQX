@@ -35,35 +35,31 @@ function CustomDrawerContent(props: any) {
 
 export default function DrawerLayout() {
     return (
-    return (
-        <>
-            <DynamicIsland />
-            <Drawer
-                drawerContent={(props) => <CustomDrawerContent {...props} />}
-                screenOptions={{
-                    headerShown: false,
-                    drawerStyle: {
-                        backgroundColor: '#000000',
-                        width: '80%',
-                    },
-                    drawerActiveTintColor: '#E31C79',
-                    drawerInactiveTintColor: '#FFFFFF',
-                    drawerLabelStyle: {
-                        marginLeft: -20,
-                        fontWeight: 'bold',
-                        fontSize: 14,
-                    },
-                    drawerActiveBackgroundColor: 'rgba(227, 28, 121, 0.1)',
+        <Drawer
+            drawerContent={(props) => <CustomDrawerContent {...props} />}
+            screenOptions={{
+                headerShown: false,
+                drawerStyle: {
+                    backgroundColor: '#000000',
+                    width: '80%',
+                },
+                drawerActiveTintColor: '#E31C79',
+                drawerInactiveTintColor: '#FFFFFF',
+                drawerLabelStyle: {
+                    marginLeft: -20,
+                    fontWeight: 'bold',
+                    fontSize: 14,
+                },
+                drawerActiveBackgroundColor: 'rgba(227, 28, 121, 0.1)',
+            }}
+        >
+            <Drawer.Screen
+                name="(tabs)"
+                options={{
+                    drawerLabel: 'Home',
+                    drawerIcon: ({ color }) => <Ionicons name="home-outline" size={22} color={color} />,
                 }}
-            >
-                <Drawer.Screen
-                    name="(tabs)"
-                    options={{
-                        drawerLabel: 'Home',
-                        drawerIcon: ({ color }) => <Ionicons name="home-outline" size={22} color={color} />,
-                    }}
-                />
-            </Drawer>
-        </>
+            />
+        </Drawer>
     );
 }

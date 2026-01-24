@@ -31,8 +31,8 @@ export default function Layout() {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <View className="flex-1 bg-background">
                 <StatusBar style="light" />
-                <DynamicIsland />
                 <Stack screenOptions={{ headerShown: false }} />
+                <DynamicIsland />
             </View>
         </GestureHandlerRootView>
     );

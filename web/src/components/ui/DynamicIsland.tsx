@@ -45,7 +45,7 @@ export const useWebIslandStore = create<IslandStore>((set, get) => ({
 export function DynamicIsland() {
     const { islandState, activeActivity, expand, collapse, endActivity } = useWebIslandStore();
 
-    if (!activeActivity) return null;
+
 
     return (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100]">
