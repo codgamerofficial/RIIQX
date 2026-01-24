@@ -10,7 +10,6 @@ import { HyperCursor } from "@/components/ui/HyperCursor";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { Toaster } from "sonner";
 import { MusicProvider } from "@/context/MusicContext";
-import { DynamicIsland } from "@/components/ui/DynamicIsland";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SocialProofNotifications } from "@/components/shared/SocialProofNotifications";
 
@@ -125,7 +124,7 @@ export default function RootLayout({
               {/* RiiqxAssistant removed */}
               <Footer />
             </LivingScrollProvider>
-            <DynamicIsland /> {/* Placeholder for next step */}
+
             <CartSheet />
             <BottomNav />
             <Toaster />

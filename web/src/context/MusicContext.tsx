@@ -79,15 +79,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         audio.src = currentTrack.url;
         if (isPlaying) {
             audio.play().catch(() => setIsPlaying(false));
-            // Trigger Dynamic Island
-            import("@/components/ui/DynamicIsland").then(({ useWebIslandStore }) => {
-                useWebIslandStore.getState().startActivity({
-                    id: currentTrack.id,
-                    type: 'music',
-                    title: currentTrack.title,
-                    subtitle: currentTrack.artist
-                });
-            });
+
         }
     }, [currentTrackIndex, tracks]); // Re-run when track changes
 

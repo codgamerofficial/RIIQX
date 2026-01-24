@@ -120,7 +120,7 @@ export function Footer() {
                 {/* Back to Top */}
                 <button
                     onClick={scrollToTop}
-                    className="fixed bottom-8 right-8 w-12 h-12 bg-white text-black rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:scale-110 active:scale-95 transition-all z-50 group"
+                    className="fixed bottom-24 md:bottom-8 right-8 w-12 h-12 bg-white text-black rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:scale-110 active:scale-95 transition-all z-50 group"
                 >
                     <ArrowUp className="w-5 h-5" />
                 </button>
