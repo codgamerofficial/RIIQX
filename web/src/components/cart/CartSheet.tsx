@@ -57,12 +57,12 @@ function PromoCodeSection() {
                         placeholder="Promo Code"
                         value={code}
                         onChange={(e) => setCode(e.target.value.toUpperCase())}
-                        className="w-full bg-white/5 border border-white/10 rounded-none pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-accent transition-colors placeholder:text-white/20 uppercase"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-accent transition-colors placeholder:text-white/20 uppercase"
                     />
                 </div>
                 <button
                     onClick={handleApply}
-                    className="bg-white/10 hover:bg-white/20 text-white px-4 rounded-none text-xs font-bold uppercase tracking-wider transition-colors"
+                    className="bg-white/10 hover:bg-white/20 text-white px-4 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors"
                 >
                     Apply
                 </button>
@@ -119,7 +119,7 @@ export function CartSheet() {
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                        className="fixed top-0 right-0 z-[70] h-full w-full max-w-md bg-black/90 backdrop-blur-3xl border-l border-white/5 flex flex-col shadow-2xl"
+                        className="fixed top-0 right-0 z-[70] h-full w-full max-w-md bg-black/90 backdrop-blur-3xl border-l border-white/5 flex flex-col shadow-2xl rounded-l-2xl overflow-hidden"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between p-6 border-b border-white/5">

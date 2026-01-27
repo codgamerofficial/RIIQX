@@ -3,6 +3,8 @@
 import { createCart } from "@/lib/shopify";
 import { CartItem } from "@/store/useCartStore";
 
+import { createClient } from "@/lib/supabase/server";
+
 export async function redirectToCheckout(items: CartItem[]) {
     try {
         if (!items || items.length === 0) {
@@ -14,7 +16,13 @@ export async function redirectToCheckout(items: CartItem[]) {
             quantity: item.quantity,
         }));
 
-        const cart = await createCart(lines);
+        // Get user session to pre-fill checkout if logged in
+        const supabase = await createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        const email = session?.user?.email;
+
+        // Note: We are passing email for pre-fill, but not customerAccessToken yet (requires Multipass or unified auth)
+        const cart = await createCart(lines, undefined, email);
 
         if (!cart?.checkoutUrl) {
             throw new Error("Failed to create checkout URL");

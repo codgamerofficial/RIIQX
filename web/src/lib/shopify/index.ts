@@ -116,10 +116,13 @@ export async function getProduct(handle: string): Promise<Product | undefined> {
 /**
  * Create a cart and return the checkout URL.
  */
-export async function createCart(lines: CartLineInput[], customerAccessToken?: string): Promise<Cart> {
+export async function createCart(lines: CartLineInput[], customerAccessToken?: string, email?: string): Promise<Cart> {
     const variables: any = { lines };
-    if (customerAccessToken) {
-        variables.buyerIdentity = { customerAccessToken };
+
+    if (customerAccessToken || email) {
+        variables.buyerIdentity = {};
+        if (customerAccessToken) variables.buyerIdentity.customerAccessToken = customerAccessToken;
+        if (email) variables.buyerIdentity.email = email;
     }
 
     const res = await shopifyFetch<{ cartCreate: { cart: Cart } }>({

@@ -1,6 +1,7 @@
 import { getProduct } from "@/lib/shopify";
 import { getProducts } from "@/lib/shopify";
 import { ProductDetailClient } from "@/components/product/ProductDetailClient";
+import { ReviewsSection } from "@/components/product/ReviewsSection";
 import { notFound } from "next/navigation";
 
 import { Metadata } from "next";
@@ -81,6 +82,7 @@ export default async function ProductPage({
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
             <ProductDetailClient product={product} relatedProducts={relatedProducts} />
+            <ReviewsSection />
         </>
     );
 }

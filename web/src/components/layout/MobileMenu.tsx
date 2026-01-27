@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { X, ChevronRight, Twitter, Instagram, Facebook } from "lucide-react";
+import { X, ChevronRight, Twitter, Instagram, Facebook, LogIn, UserPlus } from "lucide-react";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -17,6 +17,7 @@ const navLinks = [
     { name: "Lookbook", href: "/lookbook" },
     { name: "About", href: "/about" },
     { name: "Support", href: "/contact" },
+    { name: "Wishlist", href: "/wishlist" },
 ];
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
@@ -30,7 +31,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] md:hidden"
+                        className="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] md:hidden"
                     />
 
                     {/* Menu Drawer */}
@@ -39,18 +40,18 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         animate={{ x: 0 }}
                         exit={{ x: "-100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed top-0 left-0 bottom-0 w-[80%] max-w-sm bg-[#0B0B0B] border-r border-white/10 z-[70] md:hidden flex flex-col"
+                        className="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-[#050505] border-r border-white/10 z-[70] md:hidden flex flex-col"
                     >
                         {/* Header */}
                         <div className="p-6 flex items-center justify-between border-b border-white/5">
-                            <span className="font-display text-2xl font-black tracking-tighter text-white">
+                            <span className="font-display text-3xl font-black tracking-tighter text-white">
                                 RIIQX
                             </span>
                             <button
                                 onClick={onClose}
-                                className="p-2 hover:bg-white/5 rounded-full transition-colors"
+                                className="p-2 hover:bg-white/5 rounded-full transition-colors text-white"
                             >
-                                <X className="w-6 h-6 text-white" />
+                                <X className="w-6 h-6" />
                             </button>
                         </div>
 
@@ -61,9 +62,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                     key={link.name}
                                     href={link.href}
                                     onClick={onClose}
-                                    className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-colors group"
+                                    className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-colors group border border-transparent hover:border-white/5"
                                 >
-                                    <span className="text-lg font-bold text-white/80 group-hover:text-white transition-colors">
+                                    <span className="text-lg font-bold uppercase tracking-wide text-white/70 group-hover:text-white transition-colors">
                                         {link.name}
                                     </span>
                                     <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-accent transition-colors" />
@@ -71,16 +72,27 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                             ))}
                         </div>
 
-                        {/* Footer */}
-                        <div className="p-8 border-t border-white/5 bg-[#050505]">
-                            <div className="flex justify-center space-x-6 mb-6">
-                                <a href="#" className="text-white/40 hover:text-white transition-colors"><Instagram className="w-5 h-5" /></a>
-                                <a href="#" className="text-white/40 hover:text-white transition-colors"><Twitter className="w-5 h-5" /></a>
-                                <a href="#" className="text-white/40 hover:text-white transition-colors"><Facebook className="w-5 h-5" /></a>
+                        {/* Footer / Account */}
+                        <div className="p-6 border-t border-white/5 bg-[#050505] space-y-6">
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <Link href="/login" onClick={onClose}>
+                                    <button className="w-full py-3 border border-white/20 text-white text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-colors flex justify-center items-center gap-2">
+                                        <LogIn className="w-4 h-4" /> Sign In
+                                    </button>
+                                </Link>
+                                <Link href="/register" onClick={onClose}>
+                                    <button className="w-full py-3 bg-accent text-black text-xs font-bold uppercase tracking-widest hover:bg-white transition-colors flex justify-center items-center gap-2">
+                                        <UserPlus className="w-4 h-4" /> Join
+                                    </button>
+                                </Link>
                             </div>
-                            <button className="w-full py-4 bg-white text-black font-bold uppercase tracking-widest rounded-lg hover:bg-gray-200 transition-colors">
-                                Sign In
-                            </button>
+
+                            <div className="flex justify-center space-x-6">
+                                <a href="#" className="text-white/30 hover:text-accent transition-colors"><Instagram className="w-5 h-5" /></a>
+                                <a href="#" className="text-white/30 hover:text-accent transition-colors"><Twitter className="w-5 h-5" /></a>
+                                <a href="#" className="text-white/30 hover:text-accent transition-colors"><Facebook className="w-5 h-5" /></a>
+                            </div>
                         </div>
                     </motion.div>
                 </>

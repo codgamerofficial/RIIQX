@@ -43,7 +43,7 @@ export function CheckoutButton({ items }: CheckoutButtonProps) {
                 onClick={handleCheckout}
                 disabled={status === "loading" || status === "success"}
                 layout // Enables automatic layout animations
-                className={`relative w-full h-14 flex items-center justify-center rounded-lg font-black uppercase tracking-widest overflow-hidden transition-all duration-300
+                className={`relative w-full h-14 flex items-center justify-center rounded-xl font-black uppercase tracking-widest overflow-hidden transition-all duration-300
                     ${status === "error" ? "bg-neon-red" : "bg-gradient-to-r from-cherry-red to-red-700"}
                     text-white shadow-[0_0_20px_rgba(227,28,121,0.3)] hover:shadow-[0_0_30px_rgba(227,28,121,0.6)]
                 `}

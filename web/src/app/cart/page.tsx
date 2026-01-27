@@ -8,6 +8,7 @@ import { Trash2, Plus, Minus, ArrowRight, Tag, ShoppingBag } from "lucide-react"
 import { useCartStore } from "@/store/useCartStore";
 import { formatPrice } from "@/lib/shopify";
 import { cn } from "@/lib/utils";
+import { CheckoutButton } from "@/components/cart/CheckoutButton";
 
 export default function CartPage() {
     const { items, updateQuantity, removeItem, getCartTotal, getItemCount } = useCartStore();
@@ -167,6 +168,20 @@ export default function CartPage() {
                                 )}
                             </div>
 
+                            {/* Free Shipping Progress */}
+                            <div className="mb-6 pb-6 border-b border-neutral-gray space-y-3">
+                                <div className="flex justify-between text-xs font-bold text-rich-black uppercase">
+                                    <span>{shipping === 0 ? "Free Shipping Unlocked" : `Add ${formatPrice((5000 - subtotal).toString(), 'INR')} for free shipping`}</span>
+                                    <span>{Math.min(100, Math.round((subtotal / 5000) * 100))}%</span>
+                                </div>
+                                <div className="h-2 w-full bg-neutral-light border border-neutral-gray rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-cherry-red transition-all duration-500"
+                                        style={{ width: `${Math.min(100, (subtotal / 5000) * 100)}%` }}
+                                    />
+                                </div>
+                            </div>
+
                             {/* Price Breakdown */}
                             <div className="space-y-3 mb-6 pb-6 border-b border-neutral-gray">
                                 <div className="flex justify-between text-rich-black">
@@ -185,11 +200,6 @@ export default function CartPage() {
                                         {shipping === 0 ? "FREE" : formatPrice(shipping.toString(), "INR")}
                                     </span>
                                 </div>
-                                {shipping > 0 && (
-                                    <p className="text-xs text-neutral-gray">
-                                        Add {formatPrice((5000 - subtotal).toString(), "INR")} more for free delivery
-                                    </p>
-                                )}
                             </div>
 
                             {/* Total */}
@@ -199,12 +209,7 @@ export default function CartPage() {
                             </div>
 
                             {/* Checkout Button */}
-                            <Link href="/checkout">
-                                <button className="w-full bg-cherry-red text-white py-4 rounded-lg font-semibold hover:bg-cherry-red/90 transition-colors flex items-center justify-center gap-2">
-                                    <span>Checkout</span>
-                                    <ArrowRight className="w-5 h-5" />
-                                </button>
-                            </Link>
+                            <CheckoutButton items={items} />
 
                             {/* Continue Shopping */}
                             <Link href="/shop">

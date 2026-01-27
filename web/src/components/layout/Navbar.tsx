@@ -12,6 +12,7 @@ import { PredictiveSearch } from "@/components/search/PredictiveSearch";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { MobileMenu } from "./MobileMenu";
 import { ScaleButton } from "../ui/ScaleButton";
+import { NavDropdown } from "./NavDropdown";
 
 export function Navbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -57,38 +58,62 @@ export function Navbar() {
 
                 {/* 2. Left: Navigation (Desktop) */}
                 <div className="hidden md:flex items-center space-x-8">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.name}
-                            href={link.href}
-                            className="text-sm font-bold uppercase tracking-widest text-white/70 hover:text-white transition-colors hover-scale"
-                        >
-                            {link.name}
-                        </Link>
-                    ))}
+                    <Link
+                        href="/"
+                        className="text-sm font-bold uppercase tracking-widest text-white/70 hover:text-white transition-colors hover-scale"
+                    >
+                        Home
+                    </Link>
+
+                    <NavDropdown
+                        label="Shop"
+                        items={[
+                            { name: "All Products", href: "/shop" },
+                            { name: "New Arrivals", href: "/new-arrivals" },
+                            { name: "Best Sellers", href: "/best-sellers" },
+                            { name: "Accessories", href: "/shop?category=accessories" },
+                        ]}
+                    />
+
+                    <NavDropdown
+                        label="Collections"
+                        items={[
+                            { name: "Future Wear", href: "/collections/future-wear" },
+                            { name: "Tech Pack", href: "/collections/tech-pack" },
+                            { name: "Essentials", href: "/collections/essentials" },
+                        ]}
+                    />
                 </div>
 
                 {/* 3. Center: Brand Logo */}
                 <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 group">
-                    <span className="font-display text-3xl font-black tracking-tighter text-white group-hover:text-gradient transition-all cursor-pointer">
-                        RIIQX
-                    </span>
+                    <div className="relative w-32 h-10 hover-scale">
+                        <img
+                            src="/riiqx-logo-new.png"
+                            alt="RIIQX"
+                            className="w-full h-full object-contain"
+                        />
+                    </div>
                 </Link>
 
                 {/* 4. Right: Actions */}
                 <div className="flex items-center space-x-6">
                     <ScaleButton onClick={() => setIsSearchOpen(true)} className="group">
-                        <Search className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
+                        <Search className="w-5 h-5 text-white/70 group-hover:text-accent transition-colors" />
                     </ScaleButton>
 
+                    <Link href="/wishlist" className="hidden md:block group relative">
+                        <Heart className="w-5 h-5 text-white/70 group-hover:text-accent transition-colors hover:scale-110 transition-transform duration-200" />
+                    </Link>
+
                     <Link href="/account" className="hidden md:block group">
-                        <User className="w-5 h-5 text-white/70 group-hover:text-white transition-colors hover:scale-110 transition-transform duration-200" />
+                        <User className="w-5 h-5 text-white/70 group-hover:text-accent transition-colors hover:scale-110 transition-transform duration-200" />
                     </Link>
 
                     <ScaleButton onClick={toggleCart} className="relative group">
-                        <ShoppingBag className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
+                        <ShoppingBag className="w-5 h-5 text-white/70 group-hover:text-accent transition-colors" />
                         {mounted && itemCount > 0 && (
-                            <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
+                            <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-black border border-black">
                                 {itemCount}
                             </span>
                         )}

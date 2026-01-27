@@ -1,4 +1,4 @@
-import { Inter, Oswald, Montserrat } from "next/font/google";
+import { Montserrat, Roboto, Playfair_Display } from "next/font/google";
 
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
@@ -6,7 +6,6 @@ import { Footer } from "@/components/layout/Footer";
 import { CartSheet } from "@/components/cart/CartSheet";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { LivingScrollProvider } from "@/components/ui/LivingScrollProvider";
-import { HyperCursor } from "@/components/ui/HyperCursor";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { Toaster } from "sonner";
 import { MusicProvider } from "@/context/MusicContext";
@@ -15,26 +14,27 @@ import { SocialProofNotifications } from "@/components/shared/SocialProofNotific
 
 
 
-const inter = Inter({
-  variable: "--font-inter",
+const roboto = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin"],
-});
-
-const oswald = Oswald({
-  variable: "--font-oswald",
-  subsets: ["latin"],
-  weight: ["200", "300", "400", "500", "600", "700"],
+  weight: ["100", "300", "400", "500", "700", "900"],
 });
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-import { Playfair_Display } from "next/font/google";
 const playfair = Playfair_Display({
   variable: "--font-serif",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+import { Oswald } from "next/font/google"; // Manual import if not available in top import
+const oswald = Oswald({
+  variable: "--font-oswald",
   subsets: ["latin"],
   display: "swap",
 });
@@ -108,13 +108,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${oswald.variable} ${montserrat.variable} ${playfair.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}
+        className={`${roboto.variable} ${montserrat.variable} ${playfair.variable} ${oswald.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
         <MusicProvider>
           <ThemeProvider attribute="data-mode" defaultTheme="electronics" enableSystem={false} themes={["fashion", "electronics"]}>
             <LivingScrollProvider>
-              <HyperCursor />
               <ScrollProgress />
               <Navbar />
               <main className="flex-grow pb-24 md:pb-0">
