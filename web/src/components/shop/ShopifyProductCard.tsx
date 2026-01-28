@@ -60,7 +60,7 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
             onMouseLeave={() => setIsHovered(false)}
         >
             {/* Card Container - Light Theme as per reference */}
-            <div className="relative aspect-[3/4] bg-[#F4F4F4] overflow-hidden w-full border border-white/5 group-hover:border-accent/50 transition-colors duration-300">
+            <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden w-full border border-white/5 group-hover:border-accent/50 transition-colors duration-300">
                 {/* Link to PDP */}
                 <Link href={`/product/${product.handle}`} className="absolute inset-0 z-10" />
 
@@ -72,7 +72,7 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
                 </div>
 
                 {/* Images with Morph/Scale Effect */}
-                <div className="relative w-full h-full overflow-hidden p-8 mix-blend-multiply">
+                <div className="relative w-full h-full overflow-hidden p-4">
                     <AnimatePresence>
                         <motion.div
                             className="absolute inset-0 w-full h-full"
