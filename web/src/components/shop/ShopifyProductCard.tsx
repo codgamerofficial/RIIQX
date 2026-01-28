@@ -51,7 +51,6 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
     const isWishlisted = hasMounted ? isInWishlist(product.id) : false;
 
     return (
-    return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
