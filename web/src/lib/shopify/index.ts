@@ -47,6 +47,7 @@ export async function shopifyFetch<T>({
 
     if (!response.ok) {
         const text = await response.text();
+        console.error(`[Shopify Error] Status: ${response.status}, Body: ${text}`);
         throw new Error(`Shopify API Error (${response.status}): ${text}`);
     }
 
@@ -59,6 +60,7 @@ export async function shopifyFetch<T>({
     const body = (await response.json()) as ShopifyResponse<T>;
 
     if (body.errors) {
+        console.error(`[Shopify GraphQL Error]: ${JSON.stringify(body.errors)}`);
         throw new Error(`Shopify API Error: ${JSON.stringify(body.errors)}`);
     }
 

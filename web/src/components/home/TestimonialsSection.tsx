@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useAnimationControls } from "framer-motion";
 import { Star, Quote } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 const TESTIMONIALS = [
     {
@@ -36,87 +37,72 @@ const TESTIMONIALS = [
 
 export function TestimonialsSection() {
     return (
-        <section className="py-24 bg-[#050505] overflow-hidden relative">
-            {/* Background Elements */}
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        <section className="py-32 bg-[#050505] overflow-hidden relative border-t border-white/5">
+            {/* Background Texture */}
+            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none" />
 
-            <div className="max-w-[1400px] mx-auto px-6 mb-16 text-center">
-                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-white font-display mb-4">
-                    Community Voices
+            <div className="max-w-[1400px] mx-auto px-6 mb-20 text-center relative z-10">
+                <h2 className="text-4xl md:text-7xl font-black uppercase tracking-tighter text-white font-display mb-6 italic">
+                    Community <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-white">Voices.</span>
                 </h2>
-                <p className="text-white/50 text-sm tracking-widest uppercase">
-                    Join 10,000+ Visionaries
-                </p>
+                <div className="w-24 h-1 bg-accent mx-auto clip-path-slant" />
             </div>
 
-            {/* Marquee Container */}
-            <div className="relative flex overflow-x-hidden">
-                <div className="flex animate-marquee space-x-8">
-                    {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
+            {/* Framer Motion Infinite Slider */}
+            <div className="relative flex overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-24 md:w-48 z-10 bg-gradient-to-r from-[#050505] to-transparent pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-24 md:w-48 z-10 bg-gradient-to-l from-[#050505] to-transparent pointer-events-none" />
+
+                <motion.div
+                    className="flex gap-8 px-8"
+                    animate={{
+                        x: ["0%", "-50%"]
+                    }}
+                    transition={{
+                        x: {
+                            repeat: Infinity,
+                            repeatType: "loop",
+                            duration: 30, // Slow, premium speed
+                            ease: "linear",
+                        },
+                    }}
+                >
+                    {/* Double the array for seamless loop */}
+                    {[...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
                         <div
                             key={`${t.id}-${i}`}
-                            className="flex-shrink-0 w-[300px] md:w-[400px] p-8 glass rounded-2xl relative group hover:border-accent/50 transition-colors duration-300"
+                            className="flex-shrink-0 w-[400px] bg-[#080808] border border-white/5 p-10 relative group hover:border-accent transition-all duration-500 clip-path-slant-right-bottom hover:-translate-y-2"
                         >
-                            <Quote className="absolute top-6 right-6 w-8 h-8 text-white/5 group-hover:text-accent/20 transition-colors" />
+                            {/* Quote Icon */}
+                            <Quote className="absolute top-8 right-8 w-16 h-16 text-white/5 group-hover:text-accent/10 transition-colors" />
 
-                            <div className="flex gap-1 mb-6">
+                            <div className="flex gap-1.5 mb-8 relative z-10">
                                 {[...Array(5)].map((_, idx) => (
                                     <Star
                                         key={idx}
-                                        className={`w-4 h-4 ${idx < Math.floor(t.rating) ? "text-accent fill-accent" : "text-white/20"}`}
+                                        className={`w-4 h-4 ${idx < Math.floor(t.rating) ? "text-white fill-white" : "text-white/10"}`}
                                     />
                                 ))}
                             </div>
 
-                            <p className="text-white/80 text-lg font-medium leading-relaxed mb-6">
+                            <p className="text-white text-xl font-medium leading-relaxed mb-10 min-h-[90px] relative z-10">
                                 "{t.text}"
                             </p>
 
-                            <div>
-                                <h4 className="text-white font-bold uppercase tracking-wider text-sm">
+                            <div className="border-t border-white/10 pt-6 relative z-10">
+                                <h4 className="text-white font-black uppercase tracking-widest text-lg font-display italic">
                                     {t.author}
                                 </h4>
-                                <span className="text-white/40 text-xs uppercase tracking-widest">
+                                <span className="text-accent text-xs uppercase tracking-[0.25em] font-bold block mt-2 opacity-80 group-hover:opacity-100 transition-opacity">
                                     {t.role}
                                 </span>
                             </div>
+
+                            {/* Neon Glow on Hover */}
+                            <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                         </div>
                     ))}
-                </div>
-
-                {/* Duplicate for seamless loop - CSS animation handles the movement */}
-                <div className="absolute top-0 flex animate-marquee2 space-x-8" aria-hidden="true">
-                    {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
-                        <div
-                            key={`${t.id}-${i}-dup`}
-                            className="flex-shrink-0 w-[300px] md:w-[400px] p-8 glass rounded-2xl relative group hover:border-accent/50 transition-colors duration-300"
-                        >
-                            <Quote className="absolute top-6 right-6 w-8 h-8 text-white/5 group-hover:text-accent/20 transition-colors" />
-
-                            <div className="flex gap-1 mb-6">
-                                {[...Array(5)].map((_, idx) => (
-                                    <Star
-                                        key={idx}
-                                        className={`w-4 h-4 ${idx < Math.floor(t.rating) ? "text-accent fill-accent" : "text-white/20"}`}
-                                    />
-                                ))}
-                            </div>
-
-                            <p className="text-white/80 text-lg font-medium leading-relaxed mb-6">
-                                "{t.text}"
-                            </p>
-
-                            <div>
-                                <h4 className="text-white font-bold uppercase tracking-wider text-sm">
-                                    {t.author}
-                                </h4>
-                                <span className="text-white/40 text-xs uppercase tracking-widest">
-                                    {t.role}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                </motion.div>
             </div>
         </section>
     );

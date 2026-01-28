@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Collection } from "@/lib/shopify/types";
-import { Filter, X, ChevronRight } from "lucide-react";
+import { Filter, X, ChevronDown, Check } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface FilterSidebarProps {
     collections: Collection[];
@@ -12,97 +13,230 @@ interface FilterSidebarProps {
     onClose?: () => void;
 }
 
+const SORT_OPTIONS = [
+    { label: "Newest Arrivals", value: "newest" },
+    { label: "Best Selling", value: "best_selling" },
+    { label: "Price: Low to High", value: "price_low" },
+    { label: "Price: High to Low", value: "price_high" },
+];
+
+const GENDER_OPTIONS = ["Men", "Women", "Unisex"];
+const TYPE_OPTIONS = ["T-Shirts", "Hoodies", "Sweatshirts", "Jackets", "Pants", "Accessories"];
+const COLOR_OPTIONS = ["Black", "White", "Navy", "Red", "Green", "Beige"];
+const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "XXL"];
+
 export function FilterSidebar({ collections, className = "", isOpen, onClose }: FilterSidebarProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // State from URL
-    const selectedCollection = searchParams.get("collection");
-    const minPrice = searchParams.get("minPrice") || "0";
-    const maxPrice = searchParams.get("maxPrice") || "10000";
+    // Accordion State
+    const [openSections, setOpenSections] = useState<string[]>(["sort", "gender", "type"]);
 
-    // Local state for slider
-    const [priceRange, setPriceRange] = useState([parseInt(minPrice), parseInt(maxPrice)]);
+    const toggleSection = (section: string) => {
+        setOpenSections(prev =>
+            prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
+        );
+    };
 
-    const handleApply = () => {
+    // Filter Logic
+    const updateFilter = (key: string, value: string) => {
         const params = new URLSearchParams(searchParams.toString());
-        params.set("minPrice", priceRange[0].toString());
-        params.set("maxPrice", priceRange[1].toString());
-        params.delete("after");
+        const current = params.get(key);
+
+        if (current === value) {
+            params.delete(key);
+        } else {
+            params.set(key, value);
+        }
+
+        // Reset cursor on filter change
+        params.delete("cursor");
+
         router.push(`?${params.toString()}`);
-        if (onClose) onClose();
     };
 
-    const handleCollectionClick = (handle: string) => {
-        router.push(`/collections/${handle}`);
-        if (onClose) onClose();
-    };
+    const isActive = (key: string, value: string) => searchParams.get(key) === value;
 
     return (
         <>
             <div className={`
-                fixed inset-y-0 left-0 z-50 w-full md:w-80 bg-[#0B0B0B] border-r border-white/5 p-8 transform transition-transform duration-500 ease-[0.16,1,0.3,1]
-                ${isOpen ? "translate-x-0" : "-translate-x-full"}
+                fixed inset-y-0 right-0 z-[60] w-full md:w-[400px] bg-[#0B0B0B] border-l border-white/10 p-0 transform transition-transform duration-500 ease-[0.16,1,0.3,1] flex flex-col
+                ${isOpen ? "translate-x-0" : "translate-x-full"}
                 ${className}
             `}>
-                <div className="flex items-center justify-between mb-12">
-                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter font-display">Filter</h2>
-                    <button onClick={onClose}>
-                        <X className="w-6 h-6 text-white hover:text-white/50 transition-colors" />
+                {/* Header */}
+                <div className="flex items-center justify-between p-8 border-b border-white/5">
+                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter font-display">Filter & Sort</h2>
+                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                        <X className="w-6 h-6 text-white" />
                     </button>
                 </div>
 
-                <div className="space-y-12">
-                    {/* Categories */}
-                    <div>
-                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-6">Collections</h3>
-                        <div className="space-y-4">
-                            <button
-                                onClick={() => router.push('/products')}
-                                className={`block w-full text-left text-sm uppercase tracking-wider hover:text-white transition-all ${!selectedCollection ? 'text-white font-bold pl-2 border-l-2 border-white' : 'text-white/40'}`}
-                            >
-                                All Products
-                            </button>
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
 
-                            {collections.length > 0 && collections
-                                .filter(c => !['new-arrivals', 'best-sellers'].includes(c.handle))
-                                .map(c => (
-                                    <button
-                                        key={c.id}
-                                        onClick={() => handleCollectionClick(c.handle)}
-                                        className={`group block w-full text-left text-sm uppercase tracking-wider hover:text-white transition-all ${selectedCollection === c.handle ? 'text-white font-bold pl-2 border-l-2 border-white' : 'text-white/40'}`}
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <span>{c.title}</span>
-                                            <ChevronRight className={`w-3 h-3 opacity-0 -translate-x-2 transition-all duration-300 ${selectedCollection === c.handle ? 'opacity-100 translate-x-0' : 'group-hover:opacity-100 group-hover:translate-x-0'}`} />
-                                        </div>
-                                    </button>
-                                ))}
-                        </div>
+                    {/* Sort Section */}
+                    <div className="border-b border-white/5 pb-8">
+                        <button onClick={() => toggleSection('sort')} className="flex items-center justify-between w-full mb-6 group">
+                            <h3 className="text-sm font-bold text-white uppercase tracking-widest">Sort By</h3>
+                            <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${openSections.includes('sort') ? 'rotate-180' : ''}`} />
+                        </button>
+                        <AnimatePresence>
+                            {openSections.includes('sort') && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="space-y-3 overflow-hidden"
+                                >
+                                    {SORT_OPTIONS.map((option) => (
+                                        <button
+                                            key={option.value}
+                                            onClick={() => updateFilter("sort", option.value)}
+                                            className={`flex items-center justify-between w-full text-left text-sm uppercase tracking-wider transition-all py-2 ${isActive("sort", option.value) ? 'text-accent font-bold pl-2 border-l-2 border-accent' : 'text-white/60 hover:text-white'}`}
+                                        >
+                                            {option.label}
+                                            {isActive("sort", option.value) && <Check className="w-3 h-3 text-accent" />}
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
-                    {/* Price Range */}
-                    <div>
-                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-6">Price Range</h3>
-                        <div className="px-1">
-                            <div className="flex justify-between text-white font-mono text-xs mb-4">
-                                <span>₹ {priceRange[0]}</span>
-                                <span>₹ {priceRange[1]}+</span>
-                            </div>
-                            <input
-                                type="range"
-                                min="0" max="10000" step="100"
-                                value={priceRange[1]}
-                                onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                                className="w-full h-px bg-white/20 appearance-none cursor-pointer accent-white"
-                            />
-                            <button
-                                onClick={handleApply}
-                                className="w-full mt-8 bg-white text-black py-4 text-xs font-black uppercase tracking-widest hover:bg-white/90 transition-colors"
-                            >
-                                Update Results
-                            </button>
-                        </div>
+                    {/* Gender Section */}
+                    <div className="border-b border-white/5 pb-8">
+                        <button onClick={() => toggleSection('gender')} className="flex items-center justify-between w-full mb-6 group">
+                            <h3 className="text-sm font-bold text-white uppercase tracking-widest">Gender</h3>
+                            <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${openSections.includes('gender') ? 'rotate-180' : ''}`} />
+                        </button>
+                        <AnimatePresence>
+                            {openSections.includes('gender') && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="grid grid-cols-2 gap-3 overflow-hidden"
+                                >
+                                    {GENDER_OPTIONS.map((option) => (
+                                        <button
+                                            key={option}
+                                            onClick={() => updateFilter("gender", option.toLowerCase())}
+                                            className={`px-4 py-3 text-xs font-bold uppercase tracking-widest border transition-all ${isActive("gender", option.toLowerCase()) ? 'bg-white text-black border-white' : 'bg-transparent text-white/60 border-white/10 hover:border-white/30'}`}
+                                        >
+                                            {option}
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Category/Type Section */}
+                    <div className="border-b border-white/5 pb-8">
+                        <button onClick={() => toggleSection('type')} className="flex items-center justify-between w-full mb-6 group">
+                            <h3 className="text-sm font-bold text-white uppercase tracking-widest">Category</h3>
+                            <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${openSections.includes('type') ? 'rotate-180' : ''}`} />
+                        </button>
+                        <AnimatePresence>
+                            {openSections.includes('type') && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="space-y-3 overflow-hidden"
+                                >
+                                    {TYPE_OPTIONS.map((option) => (
+                                        <button
+                                            key={option}
+                                            onClick={() => updateFilter("category", option.toLowerCase())}
+                                            className={`block w-full text-left text-sm uppercase tracking-wider transition-all py-1 ${isActive("category", option.toLowerCase()) ? 'text-white font-bold' : 'text-white/60 hover:text-white'}`}
+                                        >
+                                            <span className="flex items-center gap-3">
+                                                <span className={`w-1.5 h-1.5 rounded-full ${isActive("category", option.toLowerCase()) ? 'bg-accent' : 'bg-white/20'}`} />
+                                                {option}
+                                            </span>
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Color Section */}
+                    <div className="border-b border-white/5 pb-8">
+                        <button onClick={() => toggleSection('color')} className="flex items-center justify-between w-full mb-6 group">
+                            <h3 className="text-sm font-bold text-white uppercase tracking-widest">Color</h3>
+                            <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${openSections.includes('color') ? 'rotate-180' : ''}`} />
+                        </button>
+                        <AnimatePresence>
+                            {openSections.includes('color') && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="flex flex-wrap gap-3 overflow-hidden"
+                                >
+                                    {COLOR_OPTIONS.map((option) => (
+                                        <button
+                                            key={option}
+                                            onClick={() => updateFilter("color", option.toLowerCase())}
+                                            className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${isActive("color", option.toLowerCase()) ? 'border-accent scale-110' : 'border-transparent hover:scale-105'}`}
+                                            title={option}
+                                            style={{ backgroundColor: option.toLowerCase() }}
+                                        >
+                                            {isActive("color", option.toLowerCase()) && <Check className={`w-4 h-4 ${option.toLowerCase() === 'white' || option.toLowerCase() === 'beige' ? 'text-black' : 'text-white'}`} />}
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Size Section */}
+                    <div className="border-b border-white/5 pb-8">
+                        <button onClick={() => toggleSection('size')} className="flex items-center justify-between w-full mb-6 group">
+                            <h3 className="text-sm font-bold text-white uppercase tracking-widest">Size</h3>
+                            <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${openSections.includes('size') ? 'rotate-180' : ''}`} />
+                        </button>
+                        <AnimatePresence>
+                            {openSections.includes('size') && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="grid grid-cols-4 gap-2 overflow-hidden"
+                                >
+                                    {SIZE_OPTIONS.map((option) => (
+                                        <button
+                                            key={option}
+                                            onClick={() => updateFilter("size", option)}
+                                            className={`py-3 text-xs font-bold uppercase tracking-wider border transition-all ${isActive("size", option) ? 'bg-white text-black border-white' : 'bg-transparent text-white/60 border-white/10 hover:border-white/30'}`}
+                                        >
+                                            {option}
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </div>
+
+                {/* Footer Buttons */}
+                <div className="p-8 border-t border-white/10 bg-[#0B0B0B]">
+                    <div className="grid grid-cols-2 gap-4">
+                        <button
+                            onClick={() => router.push('/shop')}
+                            className="px-6 py-4 border border-white/20 text-white text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all"
+                        >
+                            Reset
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="px-6 py-4 bg-white text-black text-xs font-black uppercase tracking-widest hover:bg-accent transition-colors"
+                        >
+                            View Results
+                        </button>
                     </div>
                 </div>
             </div>
@@ -110,7 +244,7 @@ export function FilterSidebar({ collections, className = "", isOpen, onClose }: 
             {/* Backdrop */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm transition-opacity duration-500"
+                    className="fixed inset-0 bg-black/80 z-50 backdrop-blur-sm transition-opacity duration-500"
                     onClick={onClose}
                 />
             )}

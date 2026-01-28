@@ -35,27 +35,31 @@ export function ShopClient({
 
     return (
         <div className="mb-12">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-                <div>
-                    <h1 className="text-[10vw] md:text-8xl font-black tracking-tighter text-white uppercase leading-none font-display">
-                        {categoryParam ? categoryParam.replace(/-/g, ' ') : "All Products"}
-                    </h1>
-                    <div className="flex items-center gap-4 mt-4">
-                        <span className="h-px w-12 bg-white/20"></span>
-                        <p className="text-white/40 text-sm font-mono uppercase tracking-widest">
-                            {initialProductCount} Items Arrived
-                        </p>
-                    </div>
-                </div>
+            <div className="flex flex-col gap-12 mb-20">
+                <div className="flex flex-col md:flex-row md:items-end justify-between items-start gap-8">
+                    <div className="relative w-full">
+                        <h1 className="text-[8vw] font-black tracking-tighter text-white uppercase leading-[0.8] font-display select-none">
+                            {categoryParam ? categoryParam.replace(/-/g, ' ') : "All Products"}
+                        </h1>
 
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => setIsFilterOpen(true)}
-                        className="group flex items-center gap-2 px-8 py-4 bg-white text-black text-xs font-black uppercase tracking-widest hover:bg-[#CCFF00] transition-colors"
-                    >
-                        <SlidersHorizontal className="w-4 h-4" />
-                        <span>Filter & Sort</span>
-                    </button>
+                        <div className="flex items-center gap-6 mt-6 md:mt-2 pl-2">
+                            <div className="h-px w-24 bg-white/30" />
+                            <span className="text-white/60 font-mono text-sm uppercase tracking-[0.2em] font-bold">
+                                {initialProductCount} Items Arrived
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="flex-shrink-0 mb-4 md:mb-8">
+                        <button
+                            onClick={() => setIsFilterOpen(true)}
+                            className="group relative flex items-center gap-3 px-10 py-5 bg-white text-black transition-all hover:bg-accent"
+                        >
+                            <SlidersHorizontal className="w-4 h-4" />
+                            <span className="text-sm font-black uppercase tracking-widest">Filter & Sort</span>
+                            <div className="absolute inset-0 border-2 border-transparent group-hover:border-black/10 transition-colors pointer-events-none" />
+                        </button>
+                    </div>
                 </div>
             </div>
 

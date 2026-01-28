@@ -14,6 +14,7 @@ export default async function ShopPage({
     const sort = resolvedSearchParams.sort as string | undefined;
     const queryParam = resolvedSearchParams.q as string | undefined;
     const categoryParam = resolvedSearchParams.category as string | undefined;
+    const genderParam = resolvedSearchParams.gender as string | undefined;
 
     const colorParam = resolvedSearchParams.color as string | undefined;
     const sizeParam = resolvedSearchParams.size as string | undefined;
@@ -42,15 +43,27 @@ export default async function ShopPage({
 
     // Construct the Shopify query
     // We append conditions using AND
+    // Using wildcards (*) for flexible matching (case-insensitive in some fields)
     let queryParts: string[] = [];
 
-    if (queryParam) queryParts.push(queryParam);
-    if (categoryParam) queryParts.push(`product_type:${categoryParam}`);
+    if (queryParam) queryParts.push(`title:*${queryParam}*`); // Wildcard search on title
+
+    if (genderParam) {
+        // Assuming products are tagged with 'Men', 'Women', 'Unisex'
+        // We capitalize it to match standard conventions if needed, or just exact match
+        queryParts.push(`tag:${genderParam}`);
+    }
+
+    if (categoryParam) {
+        // Handle multi-word types (e.g. "t-shirts" -> "t-shirts")
+        // Adding wildcards helps with partials
+        queryParts.push(`product_type:*${categoryParam.replace(/-/g, ' ')}*`);
+    }
 
     // Note: Filtering by variant_title works for now but relies on titles containing the option value (e.g. "Red / L")
     // A more robust way is using tags if they are synced (e.g. "color:Red"), but standard setup uses variant titles.
-    if (colorParam) queryParts.push(`variant_title:${colorParam}`);
-    if (sizeParam) queryParts.push(`variant_title:${sizeParam}`);
+    if (colorParam) queryParts.push(`variant_title:*${colorParam}*`);
+    if (sizeParam) queryParts.push(`variant_title:*${sizeParam}*`);
 
     if (minPriceParam) queryParts.push(`price:>=${minPriceParam}`);
     if (maxPriceParam) queryParts.push(`price:<=${maxPriceParam}`);

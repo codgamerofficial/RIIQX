@@ -32,23 +32,18 @@ export function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // Minimal Navigation
-    const navLinks = [
-        { name: "Home", href: "/" },
-        { name: "Shop", href: "/shop" },
-        { name: "New Drops", href: "/new-arrivals" },
-        { name: "Collections", href: "/collections" },
-    ];
-
     return (
         <motion.nav
             initial={{ y: -100 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "glass py-4" : "bg-transparent py-6"
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${scrolled
+                ? "bg-[#050505]/80 backdrop-blur-md border-white/5 py-3"
+                : "bg-transparent border-transparent py-6"
                 }`}
         >
-            <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
+            <div className="max-w-[1500px] mx-auto px-6 flex items-center justify-between">
+
                 {/* 1. Left: Mobile Menu Trigger (Visible on Mobile) */}
                 <div className="md:hidden">
                     <button onClick={() => setMobileMenuOpen(true)}>
@@ -57,10 +52,10 @@ export function Navbar() {
                 </div>
 
                 {/* 2. Left: Navigation (Desktop) */}
-                <div className="hidden md:flex items-center space-x-8">
+                <div className="hidden md:flex items-center space-x-10">
                     <Link
                         href="/"
-                        className="text-sm font-bold uppercase tracking-widest text-white/70 hover:text-white transition-colors hover-scale"
+                        className="text-sm font-black uppercase tracking-widest text-white/70 hover:text-accent transition-colors font-display italic"
                     >
                         Home
                     </Link>
@@ -87,11 +82,11 @@ export function Navbar() {
 
                 {/* 3. Center: Brand Logo */}
                 <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 group">
-                    <div className="relative w-32 h-10 hover-scale">
+                    <div className={`relative transition-all duration-500 ${scrolled ? "w-16" : "w-20 md:w-24"} hover:scale-105`}>
                         <img
                             src="/riiqx-logo-new.png"
                             alt="RIIQX"
-                            className="w-full h-full object-contain"
+                            className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
                         />
                     </div>
                 </Link>
@@ -102,21 +97,20 @@ export function Navbar() {
                         <Search className="w-5 h-5 text-white/70 group-hover:text-accent transition-colors" />
                     </ScaleButton>
 
-                    <Link href="/wishlist" className="hidden md:block group relative">
-                        <Heart className="w-5 h-5 text-white/70 group-hover:text-accent transition-colors hover:scale-110 transition-transform duration-200" />
-                    </Link>
-
-                    <Link href="/account" className="hidden md:block group">
-                        <User className="w-5 h-5 text-white/70 group-hover:text-accent transition-colors hover:scale-110 transition-transform duration-200" />
-                    </Link>
+                    {/* Auth Menu (Middle of Search and Cart) */}
+                    <div className="block">
+                        <UserMenu />
+                    </div>
 
                     <ScaleButton onClick={toggleCart} className="relative group">
-                        <ShoppingBag className="w-5 h-5 text-white/70 group-hover:text-accent transition-colors" />
-                        {mounted && itemCount > 0 && (
-                            <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-black border border-black">
-                                {itemCount}
-                            </span>
-                        )}
+                        <div className="relative">
+                            <ShoppingBag className="w-5 h-5 text-white/70 group-hover:text-accent transition-colors" />
+                            {mounted && itemCount > 0 && (
+                                <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center bg-accent text-[9px] font-black text-black clip-path-slant">
+                                    {itemCount}
+                                </span>
+                            )}
+                        </div>
                     </ScaleButton>
                 </div>
             </div>

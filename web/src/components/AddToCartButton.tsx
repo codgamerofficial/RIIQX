@@ -10,9 +10,10 @@ interface AddToCartButtonProps {
     product: Product;
     variant?: ProductVariant;
     className?: string;
+    quantity?: number;
 }
 
-export function AddToCartButton({ product, variant, className = "" }: AddToCartButtonProps) {
+export function AddToCartButton({ product, variant, className = "", quantity = 1 }: AddToCartButtonProps) {
     const { addItem } = useCartStore();
     const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
 
@@ -34,7 +35,7 @@ export function AddToCartButton({ product, variant, className = "" }: AddToCartB
             title: product.title,
             price: price,
             image: image,
-            quantity: 1,
+            quantity: quantity,
             size: selectedVariant?.selectedOptions.find(o => o.name.toLowerCase() === 'size')?.value,
             color: selectedVariant?.selectedOptions.find(o => ['color', 'colour'].includes(o.name.toLowerCase()))?.value,
         });

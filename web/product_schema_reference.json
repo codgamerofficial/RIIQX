@@ -1,0 +1,114 @@
+{
+    "section": "product",
+    "settings": {
+        "title": "{{product.title}}",
+        "price": "{{product.price | money}}",
+        "compare_at_price": "{{product.compare_at_price | money}}",
+        "currency": "{{shop.currency}}",
+        "tags": [
+            "{{product.type}}",
+            "{{product.vendor}}"
+        ],
+        "images": [
+            {% for image in product.images %
+            }
+      {
+                "src": "{{image.src}}",
+                "alt": "{{image.alt}}"
+            }{% unless forloop.last %
+            },
+            {% endunless %
+            }
+      {% endfor %
+            }
+        ],
+        "galleryLayout": "carousel",
+        "thumbnailAspectRatio": "1:1",
+        "imageZoom": true,
+        "showImageCount": true,
+        "showLightbox": true
+    },
+    "blocks": [
+        {
+            "type": "variant-picker",
+            "settings": {
+                "label": "color",
+                "options": [
+                    {% for variant in product.options %
+                    }
+          "{{variant.name}}"{% unless forloop.last %
+                    },
+                    {% endunless %
+                    }
+          {% endfor %
+                    }
+                ],
+                "displayStyle": "swatches"
+            }
+        },
+        {
+            "type": "size-selector",
+            "settings": {
+                "label": "size",
+                "options": [
+                    {% for size in product.options_with_name.size %
+                    }
+          "{{size}}"{% unless forloop.last %
+                    },
+                    {% endunless %
+                    }
+          {% endfor %
+                    }
+                ],
+                "inlineGuide": "Size Guide"
+            }
+        },
+        {
+            "type": "quantity-input",
+            "settings": {
+                "min": 1,
+                "max": "{{product.available}}"
+            }
+        },
+        {
+            "type": "add-to-cart",
+            "settings": {
+                "button_text": "Add to Cart",
+                "button_style": "primary"
+            }
+        },
+        {
+            "type": "benefits-info",
+            "settings": {
+                "items": [
+                    "Free Shipping",
+                    "Authenticity Guaranteed",
+                    "Easy Returns"
+                ]
+            }
+        },
+        {
+            "type": "description",
+            "settings": {
+                "text": "{{product.description}}"
+            }
+        }
+    ],
+    "styles": {
+        "layout": {
+            "maxWidth": "1000px",
+            "centered": true
+        },
+        "typography": {
+            "titleSize": "28px",
+            "bodySize": "16px",
+            "color": "#111"
+        },
+        "buttons": {
+            "primary": {
+                "background": "#000",
+                "color": "#fff"
+            }
+        }
+    }
+}

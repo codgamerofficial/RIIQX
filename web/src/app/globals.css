@@ -30,11 +30,33 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth;  <-- REMOVED to prevent conflict with Lenis */
   overscroll-behavior-y: none;
   /* Prevent bounce */
   -webkit-tap-highlight-color: transparent;
   background: var(--background);
+}
+
+/* LENIS RECOMMENDED CSS */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }
 
 body {
@@ -63,6 +85,23 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-image: linear-gradient(to right, #F5F5F5, #999);
+}
+
+/* Aggressive Shapes */
+.clip-path-slant {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.clip-path-slant-right {
+  clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.clip-path-slant-left {
+  clip-path: polygon(0 0, 85% 0, 100% 100%, 0 100%);
+}
+
+.clip-path-slant-right-mobile {
+  clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
 }
 
 /* Custom Scrollbar */

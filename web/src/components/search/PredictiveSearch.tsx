@@ -116,33 +116,33 @@ export function PredictiveSearch({ isOpen, onClose }: PredictiveSearchProps) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[100] bg-[#0B0B0B]/98 backdrop-blur-3xl flex flex-col pt-4 sm:pt-12 px-6"
+                    className="fixed inset-0 z-[100] bg-[#050505]/98 backdrop-blur-3xl flex flex-col pt-8 sm:pt-16 px-6 sm:px-12"
                 >
                     {/* Close Button */}
                     <button
                         onClick={onClose}
-                        className="absolute top-6 right-6 p-2 text-white/50 hover:text-white transition-colors z-[110]"
+                        className="absolute top-6 right-6 p-2 text-white/50 hover:text-white transition-colors z-[110] hover:rotate-90 duration-300"
                     >
                         <X className="w-8 h-8" />
                     </button>
 
-                    <div className="w-full max-w-5xl mx-auto flex-1 flex flex-col">
+                    <div className="w-full max-w-7xl mx-auto flex-1 flex flex-col">
                         {/* Search Input */}
-                        <form onSubmit={handleSearch} className="relative group w-full mb-12">
+                        <form onSubmit={handleSearch} className="relative group w-full mb-16">
                             <input
                                 ref={inputRef}
                                 type="text"
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 placeholder="SEARCH ARCHIVE..."
-                                className="w-full bg-transparent border-b border-white/10 text-4xl md:text-6xl font-black text-white placeholder-white/10 py-8 pr-16 focus:outline-none focus:border-white transition-all uppercase tracking-tighter"
+                                className="w-full bg-transparent border-b-2 border-white/10 text-5xl md:text-8xl font-black text-white placeholder-white/10 py-8 pr-20 focus:outline-none focus:border-accent transition-all uppercase tracking-tighter font-display italic"
                             />
                             <button
                                 type="submit"
-                                className="absolute right-0 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+                                className="absolute right-0 top-1/2 -translate-y-1/2 text-white/30 hover:text-accent transition-colors"
                                 disabled={loading}
                             >
-                                {loading ? <Loader2 className="w-8 h-8 animate-spin" /> : <Search className="w-8 h-8" />}
+                                {loading ? <Loader2 className="w-10 h-10 animate-spin" /> : <Search className="w-10 h-10" />}
                             </button>
                         </form>
 
@@ -150,108 +150,68 @@ export function PredictiveSearch({ isOpen, onClose }: PredictiveSearchProps) {
 
                             {/* RESULTS VIEW */}
                             {query.length >= 2 ? (
-                                <div className="space-y-12">
-                                    {/* Typo Suggestion */}
-                                    {typoSuggestion && results.products.length === 0 && (
-                                        <div className="flex items-center gap-3 text-white/60 text-lg">
-                                            <AlertCircle className="w-5 h-5 text-accent" />
-                                            <span>Did you mean </span>
-                                            <button onClick={handleTypoClick} className="text-white font-bold underline decoration-accent decoration-2 underline-offset-4">
-                                                {typoSuggestion}
-                                            </button>
-                                            <span>?</span>
-                                        </div>
-                                    )}
-
+                                <div className="space-y-16">
                                     {/* Product Results */}
                                     {results.products.length > 0 && (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                            {results.products.map((product) => (
-                                                <Link
+                                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
+                                            {results.products.map((product, idx) => (
+                                                <motion.div
                                                     key={product.id}
-                                                    href={`/product/${product.handle}`}
-                                                    onClick={onClose}
-                                                    className="group block"
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: idx * 0.05 }}
                                                 >
-                                                    <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-neutral-900 mb-4">
-                                                        {product.featuredImage && (
-                                                            <Image
-                                                                src={product.featuredImage.url}
-                                                                alt={product.title}
-                                                                fill
-                                                                className="object-cover group-hover:scale-105 transition-transform duration-700"
-                                                            />
-                                                        )}
-                                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                                                    </div>
-                                                    <h4 className="text-white font-bold uppercase tracking-tight text-sm truncate group-hover:text-gray-300 transition-colors">
-                                                        {product.title}
-                                                    </h4>
-                                                    <span className="text-white/50 text-xs font-mono mt-1 block">
-                                                        {product.priceRange?.minVariantPrice?.amount} {product.priceRange?.minVariantPrice?.currencyCode}
-                                                    </span>
-                                                </Link>
+                                                    <Link
+                                                        href={`/product/${product.handle}`}
+                                                        onClick={onClose}
+                                                        className="group block"
+                                                    >
+                                                        <div className="relative aspect-[3/4] overflow-hidden bg-neutral-900 mb-6 clip-path-slant-right-bottom">
+                                                            {product.featuredImage && (
+                                                                <Image
+                                                                    src={product.featuredImage.url}
+                                                                    alt={product.title}
+                                                                    fill
+                                                                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                                                />
+                                                            )}
+                                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                                                            <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-end">
+                                                                <span className="text-accent font-mono text-xs font-bold">VIEW ITEM</span>
+                                                            </div>
+                                                        </div>
+                                                        <h4 className="text-white text-2xl font-black uppercase tracking-tighter font-display italic leading-none group-hover:text-accent transition-colors mb-2">
+                                                            {product.title}
+                                                        </h4>
+                                                        <span className="text-white/50 text-sm font-mono block">
+                                                            {product.priceRange?.minVariantPrice?.amount} {product.priceRange?.minVariantPrice?.currencyCode}
+                                                        </span>
+                                                    </Link>
+                                                </motion.div>
                                             ))}
                                         </div>
                                     )}
 
-                                    {/* Suggestions / Topics */}
-                                    {results.queries.length > 0 && (
-                                        <div>
-                                            <h3 className="text-xs font-bold text-white/30 uppercase tracking-[0.2em] mb-4">Suggested</h3>
-                                            <div className="flex flex-wrap gap-2">
-                                                {results.queries.map((q) => (
-                                                    <button
-                                                        key={q.text}
-                                                        onClick={() => setQuery(q.text)}
-                                                        className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-full text-sm transition-colors"
-                                                    >
-                                                        {q.styledText || q.text}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Collections */}
-                                    {results.collections.length > 0 && (
-                                        <div>
-                                            <h3 className="text-xs font-bold text-white/30 uppercase tracking-[0.2em] mb-4">Collections</h3>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                {results.collections.map((col) => (
-                                                    <Link
-                                                        key={col.id}
-                                                        href={`/collections/${col.handle}`}
-                                                        onClick={onClose}
-                                                        className="p-4 border border-white/10 hover:border-white/30 rounded flex items-center justify-between group transition-colors"
-                                                    >
-                                                        <span className="text-white font-bold">{col.title}</span>
-                                                        <ArrowRight className="w-4 h-4 text-white/50 group-hover:text-white -translate-x-2 group-hover:translate-x-0 transition-all" />
-                                                    </Link>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
+                                    {/* Fallback / Empty */}
                                     {!loading && results.products.length === 0 && results.collections.length === 0 && !typoSuggestion && (
                                         <div className="text-center py-20">
-                                            <p className="text-white/30 text-xl font-light">No results found for "{query}"</p>
+                                            <p className="text-white/30 text-2xl font-black uppercase tracking-widest font-display">No matches found for "{query}"</p>
                                         </div>
                                     )}
                                 </div>
                             ) : (
                                 /* DEFAULT STATE (Empty Query) */
-                                <div className="grid md:grid-cols-2 gap-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                                    <div>
-                                        <h3 className="flex items-center gap-2 text-xs font-bold text-accent uppercase tracking-[0.2em] mb-8">
-                                            <TrendingUp className="w-4 h-4" /> Trending Now
+                                <div className="grid md:grid-cols-12 gap-16 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+                                    <div className="md:col-span-5">
+                                        <h3 className="flex items-center gap-2 text-xs font-black text-white/40 uppercase tracking-[0.3em] mb-8 font-mono">
+                                            <TrendingUp className="w-4 h-4 text-accent" /> Trending Now
                                         </h3>
-                                        <div className="flex flex-wrap gap-3">
+                                        <div className="flex flex-wrap gap-4">
                                             {TRENDING_TERMS.map((term) => (
                                                 <button
                                                     key={term}
                                                     onClick={() => setQuery(term)}
-                                                    className="px-5 py-2.5 rounded-none border border-white/20 text-white hover:bg-white hover:text-black hover:border-white transition-all text-sm font-bold uppercase tracking-wider"
+                                                    className="px-6 py-3 border border-white/10 text-white hover:bg-white hover:text-black hover:border-white transition-all text-sm font-black uppercase tracking-widest font-display"
                                                 >
                                                     {term}
                                                 </button>
@@ -259,27 +219,34 @@ export function PredictiveSearch({ isOpen, onClose }: PredictiveSearchProps) {
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-[0.2em] mb-8">
+                                    <div className="md:col-span-7">
+                                        <h3 className="text-xs font-black text-white/40 uppercase tracking-[0.3em] mb-8 font-mono">
                                             Explore Collections
                                         </h3>
-                                        <ul className="space-y-1">
+                                        <ul className="space-y-4">
                                             {[
                                                 { name: "New Arrivals", href: "/new-arrivals" },
                                                 { name: "Best Sellers", href: "/best-sellers" },
                                                 { name: "Accessories", href: "/collections/accessories" },
                                                 { name: "Streetwear", href: "/collections/streetwear" }
-                                            ].map((link) => (
-                                                <li key={link.name}>
+                                            ].map((link, i) => (
+                                                <motion.li
+                                                    key={link.name}
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: 0.1 + (i * 0.1) }}
+                                                >
                                                     <Link
                                                         href={link.href}
                                                         onClick={onClose}
-                                                        className="flex items-center justify-between group py-3 border-b border-white/5 hover:border-white/20 transition-colors"
+                                                        className="flex items-center justify-between group py-2 border-b border-white/5 hover:border-accent transition-colors"
                                                     >
-                                                        <span className="text-2xl text-white font-black uppercase tracking-tighter group-hover:pl-4 transition-all duration-300">{link.name}</span>
-                                                        <ArrowRight className="w-6 h-6 text-white/30 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                                                        <span className="text-4xl md:text-5xl text-white font-black uppercase tracking-tighter group-hover:text-accent group-hover:pl-6 transition-all duration-300 font-display italic">
+                                                            {link.name}
+                                                        </span>
+                                                        <ArrowRight className="w-8 h-8 text-white/30 group-hover:text-accent opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-0 -translate-x-4" />
                                                     </Link>
-                                                </li>
+                                                </motion.li>
                                             ))}
                                         </ul>
                                     </div>
