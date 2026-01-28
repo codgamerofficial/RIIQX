@@ -78,7 +78,7 @@ export function ProductDetailClient({ product, relatedProducts }: ProductDetailC
                                         <Star className="w-3 h-3 text-accent fill-accent" /> 4.9 Rated
                                     </div>
                                 </div>
-                                <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter font-display leading-[0.85] mb-6 text-white mix-blend-difference">
+                                <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter font-display leading-[0.9] mb-6 text-white mix-blend-difference">
                                     {product.title}
                                 </h1>
                                 <p className="text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">
