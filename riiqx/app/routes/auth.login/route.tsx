@@ -29,6 +29,7 @@ export default function Auth() {
   return (
     <AppProvider embedded={false}>
       <s-page>
+        {/* @ts-expect-error type mismatch with Shopify elements */}
         <Form method="post">
           <s-section heading="Log in">
             <s-text-field
