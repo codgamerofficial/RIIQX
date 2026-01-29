@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -91,10 +92,6 @@ export default function ExploreScreen() {
                 </View>
             </View>
 
-            import Animated from 'react-native-reanimated';
-
-            // ... 
-
             <Animated.ScrollView
                 className="flex-1"
                 showsVerticalScrollIndicator={false}
@@ -157,7 +154,7 @@ export default function ExploreScreen() {
                     )}
                 </View>
 
-            </ScrollView>
+            </Animated.ScrollView>
         </SafeAreaView>
     );
 }
