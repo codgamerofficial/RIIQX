@@ -4,10 +4,14 @@ import { useLocalSearchParams, Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { getProduct, formatPrice } from "@/lib/shopify";
 import { Product, ProductVariant } from "@/lib/shopify/types";
-import { ArrowLeft, ShoppingBag, Heart } from "lucide-react-native";
+import { ArrowLeft, ShoppingBag, Heart, Share2 } from "lucide-react-native";
 import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useIslandStore } from "@/store/islandStore";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
+
+import { PremiumButton } from "@/components/ui/PremiumButton";
 
 export default function ProductScreen() {
     const { handle } = useLocalSearchParams<{ handle: string }>();
@@ -108,112 +112,143 @@ export default function ProductScreen() {
 
     if (loading) {
         return (
-            <SafeAreaView className="flex-1 bg-white items-center justify-center">
-                <ActivityIndicator size="large" color="#e31c79" />
-            </SafeAreaView>
+            <View className="flex-1 bg-background items-center justify-center">
+                <ActivityIndicator size="large" color="#CCFF00" />
+            </View>
         );
     }
 
     if (!product) {
         return (
-            <SafeAreaView className="flex-1 bg-white items-center justify-center">
-                <Text className="text-rich-black">Product not found.</Text>
-            </SafeAreaView>
+            <View className="flex-1 bg-background items-center justify-center">
+                <Text className="text-white font-display">Product not found.</Text>
+            </View>
         );
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-white" edges={['top']}>
+        <View className="flex-1 bg-background">
             <Stack.Screen options={{ headerShown: false }} />
 
-            {/* Sticky Header */}
-            <View className="bg-white border-b border-neutral-gray px-4 py-3">
-                <View className="flex-row items-center justify-between">
-                    <TouchableOpacity onPress={() => router.back()}>
-                        <ArrowLeft color="#1f1f1f" size={24} />
-                    </TouchableOpacity>
-                    <Text className="text-lg font-semibold text-rich-black flex-1 text-center" numberOfLines={1}>{product.title}</Text>
-                    <TouchableOpacity onPress={toggleWishlist}>
-                        <Heart
-                            color={isWishlisted ? "#e31c79" : "#1f1f1f"}
-                            fill={isWishlisted ? "#e31c79" : "transparent"}
-                            size={24}
-                        />
-                    </TouchableOpacity>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
+                {/* Header Image */}
+                <View className="w-full aspect-[3/4] relative bg-neutral-900">
+                    <Image
+                        source={{ uri: selectedVariant?.image?.url || product.featuredImage?.url }}
+                        className="w-full h-full"
+                        resizeMode="cover"
+                    />
+                    <LinearGradient
+                        colors={['transparent', '#050505']}
+                        className="absolute bottom-0 left-0 right-0 h-32"
+                    />
+
+                    {/* Floating Nav */}
+                    <SafeAreaView className="absolute top-0 left-0 right-0 p-4 flex-row justify-between items-start">
+                        <TouchableOpacity
+                            onPress={() => router.back()}
+                            className="w-10 h-10 rounded-full bg-black/40 items-center justify-center"
+                        >
+                            <ArrowLeft color="white" size={20} />
+                        </TouchableOpacity>
+
+                        <View className="flex-row gap-3">
+                            <TouchableOpacity
+                                onPress={toggleWishlist}
+                                className="w-10 h-10 rounded-full bg-black/40 items-center justify-center"
+                            >
+                                <Heart
+                                    color={isWishlisted ? "#E31C79" : "white"}
+                                    fill={isWishlisted ? "#E31C79" : "transparent"}
+                                    size={20}
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity className="w-10 h-10 rounded-full bg-black/40 items-center justify-center">
+                                <Share2 color="white" size={20} />
+                            </TouchableOpacity>
+                        </View>
+                    </SafeAreaView>
                 </View>
-            </View>
 
-            <View className="flex-1 relative">
-                <ScrollView>
-                    {/* Header Image */}
-                    <View className="w-full aspect-[3/4] bg-neutral-light relative">
-                        <Image
-                            source={{ uri: selectedVariant?.image?.url || product.featuredImage?.url }}
-                            className="w-full h-full"
-                            resizeMode="cover"
-                        />
-                    </View>
+                {/* Content */}
+                <View className="px-6 -mt-8 relative z-10">
+                    <Animated.Text
+                        entering={FadeInDown.delay(100).springify()}
+                        className="text-white text-3xl font-display uppercase leading-tight mb-2"
+                    >
+                        {product.title}
+                    </Animated.Text>
 
-                    <View className="p-6 pb-32">
-                        <Text className="text-2xl font-bold font-serif text-rich-black mb-2">
-                            {product.title}
+                    <Animated.Text
+                        entering={FadeInDown.delay(200).springify()}
+                        className="text-brand text-2xl font-mono font-bold mb-6"
+                    >
+                        {selectedVariant ?
+                            formatPrice(selectedVariant.price.amount, selectedVariant.price.currencyCode) :
+                            formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode)
+                        }
+                    </Animated.Text>
+
+                    {/* Options */}
+                    {product.options.map((option, idx) => (
+                        <Animated.View
+                            key={option.id}
+                            entering={FadeInDown.delay(300 + idx * 100).springify()}
+                            className="mb-6"
+                        >
+                            <Text className="text-white/60 text-xs font-bold uppercase tracking-widest mb-3">
+                                Select {option.name}
+                            </Text>
+                            <View className="flex-row flex-wrap gap-3">
+                                {option.values.map((value) => {
+                                    const isSelected = selectedOptions[option.name] === value;
+                                    return (
+                                        <TouchableOpacity
+                                            key={value}
+                                            onPress={() => handleOptionSelect(option.name, value)}
+                                            className={`px-5 py-3 rounded-xl border ${isSelected ? 'bg-white border-white' : 'bg-surface border-white/10'}`}
+                                        >
+                                            <Text className={`font-bold uppercase text-sm ${isSelected ? 'text-black' : 'text-white'}`}>
+                                                {value}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    )
+                                })}
+                            </View>
+                        </Animated.View>
+                    ))}
+
+                    <View className="mb-6 mt-4">
+                        <Text className="text-white/60 text-xs font-bold uppercase tracking-widest mb-4">Description</Text>
+                        <Text className="text-white/80 leading-6 font-sans">
+                            {product.description}
                         </Text>
+                    </View>
+                </View>
+            </ScrollView>
 
-                        <Text className="text-xl font-bold text-cherry-red mb-6">
+            {/* Sticky Bottom Bar */}
+            <View className="absolute bottom-0 left-0 right-0 bg-[#050505]/90 border-t border-white/10 p-4 pb-8 backdrop-blur-lg">
+                <View className="flex-row gap-4 items-center">
+                    <View>
+                        <Text className="text-white/60 text-[10px] uppercase font-bold tracking-widest">Total Price</Text>
+                        <Text className="text-white text-xl font-display uppercase">
                             {selectedVariant ?
                                 formatPrice(selectedVariant.price.amount, selectedVariant.price.currencyCode) :
-                                formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode)
+                                '---'
                             }
                         </Text>
-
-                        {/* Options */}
-                        {product.options.map((option) => (
-                            <View key={option.id} className="mb-6">
-                                <Text className="text-neutral-gray text-sm font-semibold uppercase mb-3">
-                                    {option.name}
-                                </Text>
-                                <View className="flex-row flex-wrap gap-2">
-                                    {option.values.map((value) => {
-                                        const isSelected = selectedOptions[option.name] === value;
-                                        return (
-                                            <TouchableOpacity
-                                                key={value}
-                                                onPress={() => handleOptionSelect(option.name, value)}
-                                                className={`px-4 py-2 border rounded-lg ${isSelected ? 'bg-cherry-red border-cherry-red' : 'bg-transparent border-neutral-gray'}`}
-                                            >
-                                                <Text className={`text-sm font-semibold ${isSelected ? 'text-white' : 'text-rich-black'}`}>
-                                                    {value}
-                                                </Text>
-                                            </TouchableOpacity>
-                                        )
-                                    })}
-                                </View>
-                            </View>
-                        ))}
-
-                        <View className="mb-6">
-                            <Text className="text-neutral-gray text-sm font-semibold uppercase mb-2">Description</Text>
-                            <Text className="text-rich-black leading-6">
-                                {product.description}
-                            </Text>
-                        </View>
                     </View>
-                </ScrollView>
-
-                {/* Bottom Bar */}
-                <View className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-neutral-gray">
-                    <TouchableOpacity
+                    <PremiumButton
+                        label={selectedVariant?.availableForSale ? 'Add to Bag' : 'Sold Out'}
+                        variant="primary"
                         onPress={handleAddToCart}
-                        className={`w-full py-4 rounded-lg flex-row items-center justify-center ${selectedVariant?.availableForSale ? 'bg-cherry-red' : 'bg-neutral-gray'}`}
                         disabled={!selectedVariant?.availableForSale}
-                    >
-                        <ShoppingBag color="white" size={20} />
-                        <Text className="text-white font-bold uppercase ml-2">
-                            {selectedVariant?.availableForSale ? 'Add to Bag' : 'Sold Out'}
-                        </Text>
-                    </TouchableOpacity>
+                        className={`flex-1 ${!selectedVariant?.availableForSale && 'opacity-50'}`}
+                        textClassName="text-base"
+                    />
                 </View>
             </View>
-        </SafeAreaView>
+        </View>
     );
 }

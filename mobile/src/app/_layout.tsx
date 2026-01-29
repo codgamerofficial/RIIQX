@@ -10,7 +10,21 @@ import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Session, AuthChangeEvent } from '@supabase/supabase-js';
 
+// Fonts
+import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
+import { Oswald_400Regular, Oswald_500Medium, Oswald_700Bold } from '@expo-google-fonts/oswald';
+
 export default function Layout() {
+    // Load Fonts
+    const [fontsLoaded] = useFonts({
+        Inter_400Regular,
+        Inter_500Medium,
+        Inter_700Bold,
+        Oswald_400Regular,
+        Oswald_500Medium,
+        Oswald_700Bold,
+    });
+
     useEffect(() => {
         registerForPushNotificationsAsync();
 
@@ -26,6 +40,13 @@ export default function Layout() {
         return () => subscription.unsubscribe();
     }, []);
 
+    if (!fontsLoaded) {
+        return null;
+    }
+
+    return (
+        <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#050505' }}>
+            <View style={{ flex: 1 }}>
                 <StatusBar style="light" />
                 <Stack screenOptions={{ headerShown: false }} />
             </View >

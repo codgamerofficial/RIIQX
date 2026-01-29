@@ -8,6 +8,9 @@ import { Search, SlidersHorizontal, ArrowUpDown } from "lucide-react-native";
 import SortModal, { SortOption } from "@/components/SortModal";
 import FilterModal, { FilterOptions } from "@/components/FilterModal";
 
+import { PremiumCard } from "@/components/ui/PremiumCard";
+import { PremiumButton } from "@/components/ui/PremiumButton";
+
 export default function ShopScreen() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
@@ -55,85 +58,93 @@ export default function ShopScreen() {
     const renderProduct = ({ item }: { item: Product }) => (
         <Link href={`/product/${item.handle}`} asChild>
             <TouchableOpacity className="flex-1 m-2 mb-6 group">
-                <View className="aspect-[4/5] bg-muted rounded-xl overflow-hidden border border-white/5 mb-2 relative">
-                    <Image
-                        source={{ uri: item.featuredImage?.url }}
-                        className="w-full h-full"
-                        resizeMode="cover"
-                    />
-                </View>
-                <Text className="text-white font-bold text-xs uppercase truncate">{item.title}</Text>
-                <Text className="text-[#D9F99D] text-xs font-bold mt-1">
-                    {formatPrice(item.priceRange.minVariantPrice.amount, item.priceRange.minVariantPrice.currencyCode)}
-                </Text>
+                <PremiumCard className="p-0 bg-surface border-white/5" variant="glass">
+                    <View className="aspect-[4/5] rounded-t-[24px] overflow-hidden relative">
+                        <Image
+                            source={{ uri: item.featuredImage?.url }}
+                            className="w-full h-full"
+                            resizeMode="cover"
+                        />
+                        {/* Sold Out / New Badge could go here */}
+                    </View>
+                    <View className="p-3">
+                        <Text className="text-white font-display text-sm uppercase truncate mb-1">{item.title}</Text>
+                        <Text className="text-brand font-mono text-xs font-bold">
+                            {formatPrice(item.priceRange.minVariantPrice.amount, item.priceRange.minVariantPrice.currencyCode)}
+                        </Text>
+                    </View>
+                </PremiumCard>
             </TouchableOpacity>
         </Link>
     );
 
     return (
-        <SafeAreaView className="flex-1 bg-background">
-            <View className="px-4 py-4 border-b border-white/10">
-                <Text className="text-2xl font-black text-white uppercase tracking-tighter mb-4">All Drops</Text>
+        <View className="flex-1 bg-background">
+            <SafeAreaView className="flex-1" edges={['top']}>
+                <View className="px-4 py-4 border-b border-white/5 bg-background/90 z-10">
+                    <Text className="text-3xl font-display text-white uppercase tracking-tighter mb-4">All Drops</Text>
 
-                {/* Search Bar */}
-                <View className="bg-white/5 border border-white/10 rounded-full flex-row items-center px-4 py-3 mb-4">
-                    <Search size={20} color="#666" />
-                    <TextInput
-                        placeholder="Search products..."
-                        placeholderTextColor="#666"
-                        className="flex-1 ml-3 text-white font-medium"
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
+                    {/* Search Bar */}
+                    <View className="bg-surface border border-white/10 rounded-full flex-row items-center px-4 py-3 mb-4">
+                        <Search size={20} color="#666" />
+                        <TextInput
+                            placeholder="Find your vibe..."
+                            placeholderTextColor="#666"
+                            className="flex-1 ml-3 text-white font-sans font-medium"
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                        />
+                    </View>
+
+                    {/* Filter/Sort Buttons */}
+                    <View className="flex-row gap-3">
+                        <TouchableOpacity
+                            onPress={() => setSortModalVisible(true)}
+                            className="flex-1 bg-surface border border-white/10 rounded-full py-3 flex-row items-center justify-center gap-2 active:bg-white/5"
+                        >
+                            <ArrowUpDown size={16} color="white" />
+                            <Text className="text-white font-display uppercase text-xs tracking-widest">Sort</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => setFilterModalVisible(true)}
+                            className="flex-1 bg-surface border border-white/10 rounded-full py-3 flex-row items-center justify-center gap-2 active:bg-white/5"
+                        >
+                            <SlidersHorizontal size={16} color="white" />
+                            <Text className="text-white font-display uppercase text-xs tracking-widest">Filter</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+                {loading ? (
+                    <View className="flex-1 items-center justify-center">
+                        <ActivityIndicator size="large" color="#CCFF00" />
+                    </View>
+                ) : (
+                    <FlatList
+                        data={products}
+                        renderItem={renderProduct}
+                        keyExtractor={(item) => item.id}
+                        numColumns={2}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ padding: 8, paddingBottom: 100 }}
+                        columnWrapperStyle={{ justifyContent: 'space-between' }}
                     />
-                </View>
+                )}
 
-                {/* Filter/Sort Buttons */}
-                <View className="flex-row gap-3">
-                    <TouchableOpacity
-                        onPress={() => setSortModalVisible(true)}
-                        className="flex-1 bg-white/5 border border-white/10 rounded-xl py-3 flex-row items-center justify-center gap-2"
-                    >
-                        <ArrowUpDown size={16} color="white" />
-                        <Text className="text-white font-bold uppercase text-[10px] tracking-widest">Sort</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => setFilterModalVisible(true)}
-                        className="flex-1 bg-white/5 border border-white/10 rounded-xl py-3 flex-row items-center justify-center gap-2"
-                    >
-                        <SlidersHorizontal size={16} color="white" />
-                        <Text className="text-white font-bold uppercase text-[10px] tracking-widest">Filter</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-
-            {loading ? (
-                <View className="flex-1 items-center justify-center">
-                    <ActivityIndicator size="large" color="#D9F99D" />
-                </View>
-            ) : (
-                <FlatList
-                    data={products}
-                    renderItem={renderProduct}
-                    keyExtractor={(item) => item.id}
-                    numColumns={2}
-                    contentContainerStyle={{ padding: 8, paddingBottom: 100 }}
-                    columnWrapperStyle={{ justifyContent: 'space-between' }}
+                <SortModal
+                    visible={sortModalVisible}
+                    onClose={() => setSortModalVisible(false)}
+                    onSelect={handleSortSelect}
+                    currentSort={currentSort}
                 />
-            )}
 
-            <SortModal
-                visible={sortModalVisible}
-                onClose={() => setSortModalVisible(false)}
-                onSelect={handleSortSelect}
-                currentSort={currentSort}
-            />
-
-            <FilterModal
-                visible={filterModalVisible}
-                onClose={() => setFilterModalVisible(false)}
-                onApply={setFilters}
-                currentFilters={filters}
-            />
-        </SafeAreaView>
+                <FilterModal
+                    visible={filterModalVisible}
+                    onClose={() => setFilterModalVisible(false)}
+                    onApply={setFilters}
+                    currentFilters={filters}
+                />
+            </SafeAreaView>
+        </View>
     );
 }
