@@ -46,14 +46,20 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 
                     {/* Image */}
                     <div className="relative h-full w-full bg-[#1c1c1e]">
-                        <Image
-                            src={featuredImage?.url}
-                            alt={featuredImage?.altText || title}
-                            fill
-                            className="object-cover transition-transform duration-700 ease-[0.25,0.1,0.25,1] group-hover:scale-105"
-                            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
-                            priority={priority}
-                        />
+                        {featuredImage?.url ? (
+                            <Image
+                                src={featuredImage.url}
+                                alt={featuredImage.altText || title}
+                                fill
+                                className="object-cover transition-transform duration-700 ease-[0.25,0.1,0.25,1] group-hover:scale-105"
+                                sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+                                priority={priority}
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                                <span className="text-white/20 text-xs uppercase tracking-widest">No Visual</span>
+                            </div>
+                        )}
 
                         {/* Subtle inner shadow for depth */}
                         <div className="absolute inset-0 ring-1 ring-inset ring-white/5 rounded-[32px] pointer-events-none" />

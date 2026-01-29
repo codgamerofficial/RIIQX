@@ -165,7 +165,7 @@ export function useScrollAnimationBatch<T extends HTMLElement = HTMLDivElement>(
 
     // Return array of ref setters
     return Array.from({ length: count }, (_, i) => ({
-        current: null,
+
         get current() {
             return refs.current[i];
         },

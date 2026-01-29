@@ -152,12 +152,6 @@ export function ReviewList({ productId }: ReviewListProps) {
                     No reviews yet. Be the first to review this product!
                 </div>
             ) : (
-                {/* Reviews */ }
-            {reviews.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                    No reviews yet. Be the first to review this product!
-                </div>
-            ) : (
                 <>
                     {/* MOBILE: Swipeable Carousel */}
                     <div className="md:hidden -mx-6 px-6">
@@ -263,7 +257,6 @@ export function ReviewList({ productId }: ReviewListProps) {
                         ))}
                     </div>
                 </>
-            )}
             )}
         </div>
     );

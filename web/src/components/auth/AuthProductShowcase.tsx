@@ -25,8 +25,8 @@ function FloatingProduct({ url, index }: { url: string; index: number }) {
 
     return (
         <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-            <group ref={ref}>
-                <ImageImpl url={url} transparent scale={[4, 5, 1]} position={[0, 0, 0]} />
+            <group ref={ref} scale={[4, 5, 1]} position={[0, 0, 0]}>
+                <ImageImpl url={url} transparent />
             </group>
         </Float>
     );
