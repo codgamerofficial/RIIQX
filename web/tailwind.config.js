@@ -41,6 +41,10 @@ module.exports = {
                 'scale-in': 'scaleIn 0.3s ease-out forwards',
                 'marquee': 'marquee 25s linear infinite',
                 'marquee2': 'marquee2 25s linear infinite',
+                'float': 'float 3s ease-in-out infinite',
+                'pulse-slow': 'pulse-slow 3s ease-in-out infinite',
+                'spin-slow': 'spin 3s linear infinite',
+                'glow': 'glow 2s ease-in-out infinite',
             },
             keyframes: {
                 marquee: {
@@ -59,6 +63,18 @@ module.exports = {
                     '0%': { transform: 'scale(0.95)', opacity: '0' },
                     '100%': { transform: 'scale(1)', opacity: '1' },
                 },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0px)' },
+                    '50%': { transform: 'translateY(-10px)' },
+                },
+                'pulse-slow': {
+                    '0%, 100%': { opacity: '1' },
+                    '50%': { opacity: '0.5' },
+                },
+                glow: {
+                    '0%, 100%': { boxShadow: '0 0 5px rgba(124, 58, 237, 0.5)' },
+                    '50%': { boxShadow: '0 0 20px rgba(124, 58, 237, 0.8), 0 0 30px rgba(124, 58, 237, 0.6)' },
+                },
             },
             transitionDuration: {
                 'fast': '120ms',
@@ -68,6 +84,13 @@ module.exports = {
             transitionTimingFunction: {
                 'standard': 'cubic-bezier(0.2, 0, 0, 1)',
                 'exit': 'cubic-bezier(0.4, 0, 1, 1)',
+                'spring': 'cubic-bezier(0.16, 1, 0.3, 1)',
+                'bounce': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+            },
+            spacing: {
+                '18': '4.5rem',
+                '88': '22rem',
+                '128': '32rem',
             },
         },
     },

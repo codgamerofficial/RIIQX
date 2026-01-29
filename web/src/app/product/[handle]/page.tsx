@@ -73,7 +73,11 @@ export default async function ProductPage({
         },
     };
 
-    const { products: relatedProducts } = await getProducts({ limit: 4 });
+    const { products: allRelated } = await getProducts({ limit: 20, sortKey: 'BEST_SELLING' });
+    const relatedProducts = allRelated
+        .filter(p => p.id !== product.id)
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 8);
 
     return (
         <>
@@ -82,7 +86,7 @@ export default async function ProductPage({
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
             <ProductDetailClient product={product} relatedProducts={relatedProducts} />
-            <ReviewsSection />
+            <ReviewsSection productId={product.id} />
         </>
     );
 }

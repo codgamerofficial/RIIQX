@@ -5,6 +5,8 @@ import { ProductCard } from "@/components/ProductCard";
 import { ArrowRight, Zap } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { TextReveal } from "@/components/ui/AnimatedText";
+import { MagneticButton } from "@/components/ui/MagneticButton";
 
 interface NewDropsProps {
     products: Product[];
@@ -26,13 +28,13 @@ export function NewDrops({ products = [] }: NewDropsProps) {
                             <span className="text-accent text-xs font-black uppercase tracking-widest">Fresh Arrivals</span>
                         </div>
                         <h2 className="text-6xl md:text-8xl font-black uppercase tracking-tighter text-white font-display italic">
-                            New Drops
+                            <TextReveal direction="up" delay={0.2}>New Drops</TextReveal>
                         </h2>
                     </div>
-                    <Link href="/new-arrivals">
-                        <button className="hidden md:flex px-8 py-4 bg-white text-black text-xs font-black uppercase tracking-widest hover:bg-accent hover:text-white transition-all group clip-path-slant-right items-center gap-2">
+                    <Link href="/new-arrivals" className="hidden md:block">
+                        <MagneticButton className="px-8 py-4 bg-white text-black text-xs font-black uppercase tracking-widest hover:bg-accent hover:text-white transition-all group clip-path-slant-right flex items-center gap-2">
                             View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </button>
+                        </MagneticButton>
                     </Link>
                 </div>
 
@@ -70,9 +72,9 @@ export function NewDrops({ products = [] }: NewDropsProps) {
 
                 <div className="mt-16 text-center md:hidden">
                     <Link href="/new-arrivals">
-                        <button className="w-full px-8 py-4 bg-white text-black text-xs font-black uppercase tracking-widest hover:bg-accent hover:text-white transition-all group clip-path-slant-right flex items-center justify-center gap-2">
+                        <MagneticButton className="w-full px-8 py-4 bg-white text-black text-xs font-black uppercase tracking-widest hover:bg-accent hover:text-white transition-all group clip-path-slant-right flex items-center justify-center gap-2">
                             View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </button>
+                        </MagneticButton>
                     </Link>
                 </div>
             </div>

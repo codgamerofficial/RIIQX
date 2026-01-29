@@ -13,7 +13,7 @@ export function EditorialSection() {
                     {/* Left: Text Block (Sticky-ish feel) */}
                     <div className="md:col-span-4 space-y-12 relative z-10">
                         <motion.div
-                            initial={{ opacity: 0, y: 50 }}
+                            initial={{ opacity: 1, y: 0 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
@@ -31,7 +31,7 @@ export function EditorialSection() {
                         </motion.div>
 
                         <motion.p
-                            initial={{ opacity: 0 }}
+                            initial={{ opacity: 1 }}
                             whileInView={{ opacity: 1 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8, delay: 0.2 }}
@@ -43,7 +43,7 @@ export function EditorialSection() {
                         </motion.p>
 
                         <motion.div
-                            initial={{ opacity: 0 }}
+                            initial={{ opacity: 1 }}
                             whileInView={{ opacity: 1 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8, delay: 0.4 }}

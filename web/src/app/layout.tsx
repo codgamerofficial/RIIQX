@@ -11,6 +11,9 @@ import { Toaster } from "sonner";
 import { MusicProvider } from "@/context/MusicContext";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SocialProofNotifications } from "@/components/shared/SocialProofNotifications";
+import { CustomCursor } from "@/components/ui/CustomCursor";
+import { PageTransition } from "@/components/layout/PageTransition";
+import { MotionConfig } from "framer-motion";
 
 
 
@@ -111,25 +114,30 @@ export default function RootLayout({
         className={`${roboto.variable} ${montserrat.variable} ${playfair.variable} ${oswald.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
-        <MusicProvider>
-          <ThemeProvider attribute="data-mode" defaultTheme="electronics" enableSystem={false} themes={["fashion", "electronics"]}>
-            <LivingScrollProvider>
-              <ScrollProgress />
-              <Navbar />
-              <main className="flex-grow pb-24 md:pb-0">
-                {children}
-              </main>
-              {/* MusicPlayer removed - Integrated into DynamicIsland */}
-              {/* RiiqxAssistant removed */}
-              <Footer />
-            </LivingScrollProvider>
+        <MotionConfig reducedMotion="user">
+          <MusicProvider>
+            <ThemeProvider attribute="data-mode" defaultTheme="electronics" enableSystem={false} themes={["fashion", "electronics"]}>
+              <LivingScrollProvider>
+                <ScrollProgress />
+                <Navbar />
+                <main className="flex-grow pb-24 md:pb-0">
+                  <PageTransition>
+                    {children}
+                  </PageTransition>
+                </main>
+                {/* MusicPlayer removed - Integrated into DynamicIsland */}
+                {/* RiiqxAssistant removed */}
+                <Footer />
+              </LivingScrollProvider>
 
-            <CartSheet />
-            <BottomNav />
-            <Toaster />
-            <SocialProofNotifications />
-          </ThemeProvider>
-        </MusicProvider>
+              <CartSheet />
+              <BottomNav />
+              <Toaster />
+              <SocialProofNotifications />
+              <CustomCursor />
+            </ThemeProvider>
+          </MusicProvider>
+        </MotionConfig>
       </body>
     </html>
   );

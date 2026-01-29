@@ -1,0 +1,107 @@
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm.
+
+> typecheck
+> react-router typegen && tsc --noEmit
+
+app/routes/app._index.tsx(104,6): error TS2746: This JSX tag's 'children' prop expects a single child of type 'SPageChildren | undefined', but multiple children were provided.
+app/routes/app._index.tsx(105,7): error TS2339: Property 's-button' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(107,7): error TS2339: Property 's-button' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(109,7): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(110,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(112,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(117,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(119,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(119,72): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(121,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(126,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(128,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(129,7): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(130,7): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(131,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(134,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(139,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(141,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(142,9): error TS2339: Property 's-stack' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(143,11): error TS2339: Property 's-button' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(148,11): error TS2339: Property 's-button' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(150,13): error TS2339: Property 's-button' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(160,13): error TS2339: Property 's-button' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(162,9): error TS2339: Property 's-stack' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(164,11): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(165,13): error TS2339: Property 's-stack' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(166,15): error TS2339: Property 's-box' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(175,15): error TS2339: Property 's-box' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(177,15): error TS2339: Property 's-heading' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(177,60): error TS2339: Property 's-heading' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(178,15): error TS2339: Property 's-box' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(187,15): error TS2339: Property 's-box' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(188,13): error TS2339: Property 's-stack' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(189,11): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(191,7): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(193,7): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(194,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(195,11): error TS2339: Property 's-text' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(195,30): error TS2339: Property 's-text' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(196,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(198,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(199,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(200,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(201,11): error TS2339: Property 's-text' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(201,30): error TS2339: Property 's-text' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(202,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(207,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(208,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(209,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(210,11): error TS2339: Property 's-text' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(210,24): error TS2339: Property 's-text' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(211,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(216,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(217,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(218,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(219,11): error TS2339: Property 's-text' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(219,29): error TS2339: Property 's-text' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(220,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(222,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(223,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(224,7): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(226,7): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(227,9): error TS2339: Property 's-unordered-list' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(228,11): error TS2339: Property 's-list-item' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(230,13): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(235,13): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(236,11): error TS2339: Property 's-list-item' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(237,11): error TS2339: Property 's-list-item' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(239,13): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(244,13): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(245,11): error TS2339: Property 's-list-item' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(246,9): error TS2339: Property 's-unordered-list' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app._index.tsx(247,7): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(3,6): error TS2746: This JSX tag's 'children' prop expects a single child of type 'SPageChildren | undefined', but multiple children were provided.
+app/routes/app.additional.tsx(4,7): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(5,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(8,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(13,11): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(15,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(16,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(21,9): error TS2339: Property 's-paragraph' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(22,7): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(23,7): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(24,9): error TS2339: Property 's-unordered-list' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(25,11): error TS2339: Property 's-list-item' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(26,13): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(31,13): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(32,11): error TS2339: Property 's-list-item' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(33,9): error TS2339: Property 's-unordered-list' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.additional.tsx(34,7): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.tsx(21,9): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.tsx(21,33): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.tsx(22,9): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/app.tsx(22,55): error TS2339: Property 's-link' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/auth.login/route.tsx(32,9): error TS2559: Type 'ReactElement<any, any>' has no properties in common with type 'SPageChildren'.
+app/routes/auth.login/route.tsx(33,9): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/auth.login/route.tsx(34,11): error TS2339: Property 's-text-field' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/auth.login/route.tsx(39,24): error TS7006: Parameter 'e' implicitly has an 'any' type.
+app/routes/auth.login/route.tsx(42,12): error TS2339: Property 's-text-field' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/auth.login/route.tsx(43,11): error TS2339: Property 's-button' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/auth.login/route.tsx(43,41): error TS2339: Property 's-button' does not exist on type 'JSX.IntrinsicElements'.
+app/routes/auth.login/route.tsx(44,9): error TS2339: Property 's-section' does not exist on type 'JSX.IntrinsicElements'.

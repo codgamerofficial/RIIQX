@@ -1,55 +1,70 @@
 "use client";
 
-import { CinematicHero } from "@/components/ui/CinematicHero";
 import { motion } from "framer-motion";
 import { Package, Search, ArrowRight } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function TrackOrderPage() {
     const [orderId, setOrderId] = useState("");
 
     return (
-        <main className="bg-black min-h-screen pb-20">
-            <CinematicHero
-                title="TRACK ORDER"
-                subtitle="Status Uplink"
-                description="Enter your Order ID to retrieve real-time telemetry on your package shipment."
-            />
+        <main className="bg-black min-h-screen flex items-center justify-center p-4 pt-32 pb-20">
+            {/* iOS Style Card */}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: [0.2, 0, 0, 1] }}
+                className="w-full max-w-[400px] bg-[#121212] border border-white/10 rounded-[32px] p-8 shadow-2xl overflow-hidden relative"
+            >
+                {/* Ambient Glow */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-white/5 blur-[50px] rounded-full pointer-events-none" />
 
-            <section className="max-w-2xl mx-auto px-4 -mt-20 relative z-20">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-zinc-900/50 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl space-y-8"
-                >
-                    <div className="text-center space-y-2">
-                        <Package className="w-12 h-12 text-primary mx-auto opacity-80" />
-                        <h2 className="text-2xl font-bold text-white">Locate Shipment</h2>
-                        <p className="text-gray-400 text-sm">Input your Order ID found in your confirmation signal.</p>
+                <div className="relative z-10 flex flex-col items-center text-center space-y-6">
+                    {/* Icon */}
+                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-2">
+                        <Package className="w-8 h-8 text-white opacity-80" strokeWidth={1.5} />
                     </div>
 
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-xs uppercase tracking-widest text-white/50 font-bold ml-1">Order ID / Tracking Number</label>
-                            <div className="relative">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    {/* Header */}
+                    <div className="space-y-2">
+                        <h1 className="text-2xl font-semibold text-white tracking-tight">Locate Shipment</h1>
+                        <p className="text-white/40 text-sm font-medium leading-relaxed px-4">
+                            Input your Order ID found in your confirmation signal.
+                        </p>
+                    </div>
+
+                    {/* Input Group */}
+                    <div className="w-full space-y-6 pt-4">
+                        <div className="space-y-2 text-left">
+                            <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold ml-1">Order ID / Tracking Number</label>
+                            <div className="relative group">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 group-focus-within:text-white transition-colors" />
                                 <input
                                     type="text"
                                     value={orderId}
-                                    onChange={(e) => setOrderId(e.target.value)}
-                                    className="w-full bg-black/50 border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-hidden transition-all placeholder:text-white/20 font-mono"
+                                    onChange={(e) => setOrderId(e.target.value.toUpperCase())}
+                                    className="w-full bg-[#1c1c1e] border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-white text-sm font-medium focus:outline-none focus:border-white/20 transition-all placeholder:text-white/20 uppercase tracking-widest font-mono"
                                     placeholder="ORD-2026-XXXX"
                                 />
                             </div>
                         </div>
 
-                        <button className="w-full bg-white text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-bewakoof-yellow hover:text-black transition-all group">
+                        {/* Action Button */}
+                        <button className="w-full bg-white text-black font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all">
                             <span>Track Status</span>
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            <ArrowRight className="w-4 h-4" />
                         </button>
                     </div>
-                </motion.div>
-            </section>
+                </div>
+
+                {/* Footer Link */}
+                <div className="mt-8 text-center pt-6 border-t border-white/5">
+                    <Link href="/help" className="text-xs text-white/30 hover:text-white transition-colors">
+                        Need help finding your Order ID?
+                    </Link>
+                </div>
+            </motion.div>
         </main>
     );
 }

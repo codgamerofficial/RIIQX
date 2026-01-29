@@ -280,7 +280,7 @@ export function ProductDetailClient({ product, relatedProducts }: ProductDetailC
             </div>
 
             {/* --- MOBILE STICKY BAR --- */}
-            <div className="fixed bottom-0 left-0 w-full bg-[#050505]/90 backdrop-blur-xl border-t border-white/10 p-4 z-50 md:hidden flex items-center gap-4">
+            <div className="fixed bottom-0 left-0 w-full bg-[#050505]/80 backdrop-blur-xl border-t border-white/10 p-4 z-[100] md:hidden flex items-center gap-4 safe-area-bottom">
                 <div className="flex-1">
                     <p className="text-white text-xs font-black uppercase tracking-widest truncate">{product.title}</p>
                     <p className="text-accent text-xs font-mono">{formatPrice(price.amount, price.currencyCode)}</p>

@@ -12,6 +12,7 @@ export interface HeroSlideData {
     price?: string;
     badge?: string;
     layout?: HeroLayout;
+    objectPosition?: string; // e.g. "top", "center", "bottom", "left", "right"
     // Chapter data injected during flattening
     chapterId?: string;
     chapterTitle?: string;
@@ -49,7 +50,8 @@ export const HERO_CHAPTERS: HeroChapter[] = [
                 subtitle: 'Official Team Gear',
                 ctaText: 'View Teams',
                 ctaLink: '/collections/ipl',
-                layout: 'full'
+                layout: 'full',
+                objectPosition: 'top'
             }
         ]
     },
@@ -118,7 +120,8 @@ export const HERO_CHAPTERS: HeroChapter[] = [
                 subtitle: 'Everyday Essentials',
                 ctaText: 'Shop Core',
                 ctaLink: '/collections/core',
-                layout: 'center'
+                layout: 'center',
+                objectPosition: 'center top' // Focus on faces
             }
         ]
     },

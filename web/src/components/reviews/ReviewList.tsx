@@ -5,6 +5,11 @@ import { Star, ThumbsUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination, FreeMode } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/free-mode";
 
 interface Review {
     id: string;
@@ -147,49 +152,118 @@ export function ReviewList({ productId }: ReviewListProps) {
                     No reviews yet. Be the first to review this product!
                 </div>
             ) : (
-                <div className="space-y-6">
-                    {reviews.map((review) => (
-                        <div
-                            key={review.id}
-                            className="bg-neutral-900 border border-white/10 rounded-xl p-6"
-                        >
-                            {/* Header */}
-                            <div className="flex items-start justify-between mb-4">
-                                <div>
-                                    <div className="flex gap-1 mb-2">
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            <Star
-                                                key={star}
-                                                className={cn(
-                                                    "w-4 h-4",
-                                                    star <= review.rating
-                                                        ? "fill-bewakoof-yellow text-bewakoof-yellow"
-                                                        : "text-gray-600"
-                                                )}
-                                            />
-                                        ))}
-                                    </div>
-                                    <p className="text-white font-bold">
-                                        {review.profiles?.name || "Anonymous"}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Content */}
-                            <h4 className="text-lg font-bold text-white mb-2">{review.title}</h4>
-                            <p className="text-muted-foreground mb-4">{review.comment}</p>
-
-                            {/* Helpful Button */}
-                            <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-white transition-colors">
-                                <ThumbsUp className="w-4 h-4" />
-                                <span>Helpful ({review.helpful_count})</span>
-                            </button>
-                        </div>
-                    ))}
+                {/* Reviews */ }
+            {reviews.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                    No reviews yet. Be the first to review this product!
                 </div>
+            ) : (
+                <>
+                    {/* MOBILE: Swipeable Carousel */}
+                    <div className="md:hidden -mx-6 px-6">
+                        <Swiper
+                            slidesPerView={1.2}
+                            spaceBetween={16}
+                            freeMode={true}
+                            modules={[FreeMode]}
+                            className="w-full !overflow-visible"
+                        >
+                            {reviews.map((review) => (
+                                <SwiperSlide key={review.id} className="h-auto">
+                                    <div className="bg-[#0A0A0A]/90 backdrop-blur-md border border-white/10 p-6 h-full flex flex-col justify-between clip-path-slant relative overflow-hidden group">
+                                        {/* Neon Accent */}
+                                        <div className="absolute top-0 left-0 w-1 h-full bg-accent/50 group-hover:bg-accent transition-colors" />
+
+                                        <div>
+                                            {/* Header */}
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div>
+                                                    <div className="flex gap-1 mb-2">
+                                                        {[1, 2, 3, 4, 5].map((star) => (
+                                                            <Star
+                                                                key={star}
+                                                                className={cn(
+                                                                    "w-3 h-3",
+                                                                    star <= review.rating
+                                                                        ? "fill-accent text-accent"
+                                                                        : "text-white/10"
+                                                                )}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                    <p className="text-white text-xs font-black uppercase tracking-widest">
+                                                        {review.profiles?.name || "Verified Buyer"}
+                                                    </p>
+                                                    <p className="text-[10px] text-white/40 uppercase tracking-wider mt-1 font-mono">
+                                                        {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Content */}
+                                            <h4 className="text-sm font-black text-white uppercase italic tracking-wider mb-2 line-clamp-1">{review.title}</h4>
+                                            <p className="text-white/60 text-xs leading-relaxed line-clamp-4">{review.comment}</p>
+                                        </div>
+
+                                        {/* Footer */}
+                                        <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between">
+                                            <div className="flex items-center gap-2 text-[10px] text-accent uppercase tracking-widest font-bold">
+                                                <ThumbsUp className="w-3 h-3" /> Helpful ({review.helpful_count})
+                                            </div>
+                                            <div className="w-2 h-2 bg-accent rounded-full animate-pulse" />
+                                        </div>
+                                    </div>
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+                    </div>
+
+                    {/* DESKTOP: Vertical Stack */}
+                    <div className="hidden md:block space-y-6">
+                        {reviews.map((review) => (
+                            <div
+                                key={review.id}
+                                className="bg-neutral-900/50 border border-white/5 hover:border-white/20 transition-all p-6 transform hover:-translate-y-1 hover:bg-[#0A0A0A]"
+                            >
+                                {/* Header */}
+                                <div className="flex items-start justify-between mb-4">
+                                    <div>
+                                        <div className="flex gap-1 mb-2">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <Star
+                                                    key={star}
+                                                    className={cn(
+                                                        "w-4 h-4",
+                                                        star <= review.rating
+                                                            ? "fill-accent text-accent"
+                                                            : "text-white/10"
+                                                    )}
+                                                />
+                                            ))}
+                                        </div>
+                                        <p className="text-white font-black uppercase tracking-widest">
+                                            {review.profiles?.name || "Verified Buyer"}
+                                        </p>
+                                        <p className="text-xs text-white/40 font-mono uppercase mt-1">
+                                            {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Content */}
+                                <h4 className="text-lg font-black text-white mb-2 uppercase italic tracking-tighter">{review.title}</h4>
+                                <p className="text-white/70 mb-4 font-light leading-relaxed">{review.comment}</p>
+
+                                {/* Helpful Button */}
+                                <button className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/30 hover:text-accent transition-colors">
+                                    <ThumbsUp className="w-4 h-4" />
+                                    <span>Helpful ({review.helpful_count})</span>
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </>
+            )}
             )}
         </div>
     );

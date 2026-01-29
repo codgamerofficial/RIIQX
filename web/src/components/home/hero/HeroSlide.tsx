@@ -5,7 +5,9 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { HeroSlideData } from "@/lib/hero-config";
 import { cn } from "@/lib/utils";
-import { ArrowRight, ShoppingBag } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { useMouseParallax } from "@/hooks/useParallax";
+import { MagneticButton } from "@/components/ui/MagneticButton";
 
 interface HeroSlideProps {
     slide: HeroSlideData;
@@ -52,8 +54,12 @@ const imageVariants = {
 export function HeroSlide({ slide, isActive }: HeroSlideProps) {
     const isSplit = slide.layout === 'split';
 
+    // Parallax Hooks - Different strengths for depth perception
+    const { ref: containerRef, x: textX, y: textY } = useMouseParallax({ strength: 20 });
+    const { x: imageX, y: imageY } = useMouseParallax({ strength: -15 }); // Opposite direction for depth
+
     return (
-        <div className="relative w-full h-full overflow-hidden bg-[#0A0A0A]">
+        <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-[#0A0A0A]">
 
             {/* --- DESKTOP LAYOUT --- */}
             <div className="hidden md:flex w-full h-full">
@@ -62,6 +68,7 @@ export function HeroSlide({ slide, isActive }: HeroSlideProps) {
                 {isSplit && (
                     <div className="w-[40%] h-full flex flex-col justify-center px-16 z-20 relative clip-path-slant-right bg-[#0A0A0A]">
                         <motion.div
+                            style={{ x: textX, y: textY }}
                             variants={textContainerVariants}
                             initial="hidden"
                             animate={isActive ? "visible" : "hidden"}
@@ -85,13 +92,13 @@ export function HeroSlide({ slide, isActive }: HeroSlideProps) {
 
                             <motion.div variants={textItemVariants} className="pt-8 flex gap-4">
                                 <Link href={slide.ctaLink}>
-                                    <button className="px-8 py-5 bg-white text-black font-black uppercase tracking-widest hover:scale-105 transition-all text-sm flex items-center gap-2 group clip-path-slant-right hover:bg-accent hover:text-white">
+                                    <MagneticButton className="px-8 py-5 bg-white text-black font-black uppercase tracking-widest hover:scale-105 transition-all text-sm flex items-center gap-2 group clip-path-slant-right hover:bg-accent hover:text-white">
                                         {slide.ctaText} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                    </button>
+                                    </MagneticButton>
                                 </Link>
-                                <button className="px-8 py-5 border border-white/20 text-white font-black uppercase tracking-widest hover:bg-white/10 transition-colors text-sm clip-path-slant-left">
+                                <MagneticButton strength={0.2} className="px-8 py-5 border border-white/20 text-white font-black uppercase tracking-widest hover:bg-white/10 transition-colors text-sm clip-path-slant-left">
                                     View Lookbook
-                                </button>
+                                </MagneticButton>
                             </motion.div>
                         </motion.div>
                     </div>
@@ -107,43 +114,54 @@ export function HeroSlide({ slide, isActive }: HeroSlideProps) {
                         initial="hidden"
                         animate={isActive ? "visible" : "hidden"}
                         className="w-full h-full relative"
+                        style={!isSplit ? { x: imageX, y: imageY } : undefined}
                     >
                         <div className="absolute inset-0 bg-black/20 z-10" />
 
                         {/* Text Overlay for Full Layout */}
                         {!isSplit && (
-                            <div className="absolute inset-0 bg-black/40 z-20 flex flex-col items-center justify-center text-center">
+                            <div className="absolute inset-0 bg-black/20 z-20 flex flex-col items-center justify-center text-center pointer-events-none">
                                 <motion.div
+                                    style={{ x: textX, y: textY }}
                                     variants={textContainerVariants}
                                     initial="hidden"
                                     animate={isActive ? "visible" : "hidden"}
                                     className="px-4"
                                 >
-                                    <motion.h2 variants={textItemVariants} className="text-[120px] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/0 font-display italic mb-4 leading-none mix-blend-overlay">
-                                        {slide.title}
-                                    </motion.h2>
-                                    <motion.h2 variants={textItemVariants} className="text-9xl font-black uppercase tracking-tighter text-white font-display italic mb-8 -mt-24 transform -skew-x-6">
+                                    {/* Ghost Text */}
+                                    <motion.h2 variants={textItemVariants} className="text-6xl md:text-8xl lg:text-9xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white/30 to-white/0 font-display italic mb-4 leading-none select-none">
                                         {slide.title}
                                     </motion.h2>
 
-                                    <motion.div variants={textItemVariants}>
+                                    {/* Main Text */}
+                                    <motion.h2 variants={textItemVariants} className="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter text-white font-display italic mb-8 -mt-16 md:-mt-24 transform -skew-x-6 drop-shadow-2xl">
+                                        {slide.title}
+                                    </motion.h2>
+
+                                    <motion.div variants={textItemVariants} className="pointer-events-auto">
                                         <Link href={slide.ctaLink}>
-                                            <button className="px-12 py-6 bg-accent text-white font-black uppercase tracking-widest hover:scale-110 transition-transform clip-path-slant text-sm hover:bg-white hover:text-black">
+                                            <MagneticButton className="px-10 py-5 bg-accent text-white font-black uppercase tracking-widest hover:scale-110 transition-transform clip-path-slant text-xs md:text-sm hover:bg-white hover:text-black shadow-[0_0_30px_rgba(124,58,237,0.4)]">
                                                 {slide.ctaText}
-                                            </button>
+                                            </MagneticButton>
                                         </Link>
                                     </motion.div>
                                 </motion.div>
                             </div>
                         )}
 
-                        <Image
-                            src={slide.image}
-                            alt={slide.title}
-                            fill
-                            className="object-cover"
-                            priority={isActive}
-                        />
+                        <motion.div
+                            style={isSplit ? { x: imageX, y: imageY, scale: 1.1 } : { scale: 1.1 }}
+                            className="w-full h-full"
+                        >
+                            <Image
+                                src={slide.image}
+                                alt={slide.title}
+                                fill
+                                className="object-cover"
+                                style={{ objectPosition: slide.objectPosition || 'center' }}
+                                priority={isActive}
+                            />
+                        </motion.div>
                     </motion.div>
                 </div>
             </div>
@@ -157,34 +175,35 @@ export function HeroSlide({ slide, isActive }: HeroSlideProps) {
                     animate={isActive ? "visible" : "hidden"}
                     className="w-full h-full"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
                     <Image
                         src={slide.image}
                         alt={slide.title}
                         fill
                         className="object-cover"
+                        style={{ objectPosition: slide.objectPosition || 'top' }} // Default to top for mobile
                         priority={isActive}
                     />
                 </motion.div>
 
-                <div className="absolute bottom-0 left-0 w-full p-6 z-20 pb-32">
+                <div className="absolute bottom-0 left-0 w-full p-6 z-20 pb-24 sm:pb-32">
                     <motion.div
                         variants={textContainerVariants}
                         initial="hidden"
                         animate={isActive ? "visible" : "hidden"}
-                        className="space-y-4"
+                        className="space-y-3"
                     >
                         {slide.badge && (
                             <motion.span variants={textItemVariants} className="text-accent text-[10px] font-black tracking-widest uppercase border border-accent/30 px-2 py-1 bg-black/50 backdrop-blur-md">
                                 {slide.badge}
                             </motion.span>
                         )}
-                        <motion.h2 variants={textItemVariants} className="text-6xl font-black uppercase leading-[0.85] tracking-tighter text-white font-display italic transform -skew-x-6">
+                        <motion.h2 variants={textItemVariants} className="text-4xl sm:text-5xl font-black uppercase leading-[0.9] tracking-tighter text-white font-display italic transform -skew-x-6 drop-shadow-lg">
                             {slide.title}
                         </motion.h2>
                         <motion.div variants={textItemVariants} className="pt-4">
                             <Link href={slide.ctaLink}>
-                                <button className="w-full py-4 bg-white text-black font-black uppercase tracking-widest flex items-center justify-center gap-2 clip-path-slant-right active:scale-95 transition-transform text-sm">
+                                <button className="w-full py-3.5 bg-white text-black font-black uppercase tracking-widest flex items-center justify-center gap-2 clip-path-slant-right active:scale-95 transition-transform text-xs sm:text-sm hover:bg-accent hover:text-white">
                                     {slide.ctaText} <ArrowRight className="w-4 h-4" />
                                 </button>
                             </Link>

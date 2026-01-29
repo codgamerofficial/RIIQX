@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShoppingBag, Truck, Info } from "lucide-react";
+import { X, ShoppingBag, Truck, Info, ArrowRight, Tag } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { CartItem } from "./CartItem";
 import { CheckoutButton } from "./CheckoutButton";
@@ -32,12 +32,14 @@ function PromoCodeSection() {
 
     if (discount) {
         return (
-            <div className="bg-accent/10 border-l-2 border-accent p-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 bg-accent rotate-45" />
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="h-6 w-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                        <Tag className="w-3 h-3 text-emerald-500" />
+                    </div>
                     <div>
-                        <p className="text-accent text-sm font-bold uppercase tracking-wider font-display">{discount.code}</p>
-                        <p className="text-accent/60 text-[10px] uppercase tracking-wider">Discount Applied</p>
+                        <p className="text-white text-sm font-bold tracking-wide">{discount.code}</p>
+                        <p className="text-emerald-400 text-[10px] font-medium">Coupon Active</p>
                     </div>
                 </div>
                 <button onClick={() => { removeDiscount(); setSuccess(""); setCode(""); }} className="text-white/40 hover:text-white transition-colors">
@@ -49,23 +51,26 @@ function PromoCodeSection() {
 
     return (
         <div className="space-y-2">
-            <div className="flex gap-0">
-                <input
-                    type="text"
-                    placeholder="ENTER PROMO CODE"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value.toUpperCase())}
-                    className="flex-1 bg-black/50 border border-white/10 border-r-0 px-4 py-3 text-xs font-bold text-white focus:outline-none focus:border-accent transition-colors placeholder:text-white/20 uppercase tracking-wider font-mono"
-                />
+            <div className="flex gap-2">
+                <div className="relative flex-1">
+                    <input
+                        type="text"
+                        placeholder="Promo Code"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value.toUpperCase())}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-medium text-white focus:outline-none focus:border-white/30 transition-colors placeholder:text-white/20 uppercase tracking-wide"
+                    />
+                </div>
                 <button
                     onClick={handleApply}
-                    className="bg-white/10 hover:bg-accent hover:text-black border border-white/10 text-white px-4 text-[10px] font-black uppercase tracking-widest transition-all"
+                    disabled={!code}
+                    className="bg-white text-black hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-5 text-sm font-bold transition-all"
                 >
                     Apply
                 </button>
             </div>
-            {error && <p className="text-red-500 text-[10px] font-bold uppercase tracking-wide flex items-center gap-1"><Info className="w-3 h-3" /> {error}</p>}
-            {success && <p className="text-accent text-[10px] font-bold uppercase tracking-wide">{success}</p>}
+            {error && <p className="text-red-400 text-xs font-medium pl-1 flex items-center gap-1.5"><Info className="w-3 h-3" /> {error}</p>}
+            {success && <p className="text-emerald-400 text-xs font-medium pl-1">{success}</p>}
         </div>
     );
 }
@@ -103,7 +108,6 @@ export function CartSheet() {
     const discountAmount = getDiscountAmount();
     const FREE_SHIPPING_THRESHOLD = 5000;
     const isFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
-    const shippingCost = isFreeShipping ? 0 : 500; // Flat rate fallback, typical integration updates this at checkout
 
     return (
         <AnimatePresence>
@@ -114,72 +118,70 @@ export function CartSheet() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setCartOpen(false)}
-                        className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm"
+                        className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-md"
                     />
 
                     <motion.div
                         initial={{ x: "100%" }}
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
-                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed top-0 right-0 z-[70] h-full w-full max-w-md bg-[#050505] border-l border-white/10 flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.9)]"
+                        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                        className="fixed top-0 right-0 z-[70] h-full w-full max-w-[420px] bg-[#09090b]/95 backdrop-blur-3xl border-l border-white/5 flex flex-col shadow-2xl"
                     >
-                        {/* Header - Aggressive */}
-                        <div className="flex items-center justify-between p-6 border-b border-white/10 bg-[#0A0A0A]">
-                            <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter flex items-center gap-3 font-display">
-                                Your Bag
-                                <span className="bg-accent text-black text-xs not-italic font-bold px-1.5 py-0.5 clip-path-slant">
+                        {/* Clean Header */}
+                        <div className="flex items-center justify-between px-6 pt-6 pb-4">
+                            <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+                                Review Bag
+                                <span className="text-xs font-medium text-white/40 bg-white/5 px-2 py-1 rounded-full">
                                     {items.length}
                                 </span>
                             </h2>
                             <button
                                 onClick={() => setCartOpen(false)}
-                                className="group p-2 hover:bg-white/10 transition-colors"
+                                className="h-9 w-9 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center transition-all active:scale-95"
                             >
-                                <X className="w-6 h-6 text-white/50 group-hover:text-white transition-colors" />
+                                <X className="w-5 h-5 text-white/70" />
                             </button>
                         </div>
 
-                        {/* Free Shipping Progress - Neon */}
-                        <div className="px-6 py-5 border-b border-white/10 bg-black relative overflow-hidden">
+                        {/* Minimalist Progress Bar */}
+                        <div className="px-6 pb-6">
                             {(() => {
                                 const progress = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
                                 const remaining = FREE_SHIPPING_THRESHOLD - subtotal;
 
                                 return (
-                                    <div className="space-y-3 relative z-10">
-                                        <div className="flex justify-between items-end text-[10px] font-bold uppercase tracking-widest text-white/60 font-mono">
-                                            <span className={remaining <= 0 ? "text-accent" : ""}>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between text-xs font-medium">
+                                            <span className="text-white/60">
                                                 {remaining > 0 ? (
-                                                    <>Add <span className="text-white">{formatPrice(remaining.toString(), 'INR')}</span> for <span className="text-accent">Free Shipping</span></>
+                                                    <span className="text-white">Add {formatPrice(remaining.toString(), 'INR')} for free shipping</span>
                                                 ) : (
-                                                    "Free Shipping Unlocked"
+                                                    <span className="text-white flex items-center gap-1.5"><Truck className="w-3 h-3" /> You have free shipping</span>
                                                 )}
                                             </span>
-                                            <span className="text-white">{Math.round(progress)}%</span>
+                                            <span className="text-white/40">{Math.round(progress)}%</span>
                                         </div>
-                                        <div className="h-1.5 w-full bg-white/5 overflow-hidden relative">
+                                        <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
                                             <motion.div
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${progress}%` }}
-                                                className={`h-full ${remaining <= 0 ? "bg-accent shadow-[0_0_10px_rgba(var(--accent-rgb),0.5)]" : "bg-white"}`}
+                                                className="h-full bg-white rounded-full"
+                                                transition={{ duration: 1, ease: "easeOut" }}
                                             />
                                         </div>
                                     </div>
                                 );
                             })()}
-                            {/* Background decoration */}
-                            <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-accent/5 to-transparent pointer-events-none" />
                         </div>
 
-                        {/* Items - Scrollable */}
-                        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 scrollbar-thin scrollbar-track-black scrollbar-thumb-white/20 hover:scrollbar-thumb-accent/50">
+                        <div className="flex-1 overflow-y-auto px-6 py-2 space-y-6 scrollbar-hide">
                             {items.length === 0 ? (
-                                <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-40">
-                                    <div className="w-20 h-20 border border-white/20 rotate-45 flex items-center justify-center">
-                                        <ShoppingBag className="w-8 h-8 -rotate-45 text-white" />
+                                <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-50">
+                                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center">
+                                        <ShoppingBag className="w-6 h-6 text-white" />
                                     </div>
-                                    <p className="text-base font-black uppercase tracking-widest font-display">Your bag is empty</p>
+                                    <p className="text-sm font-medium text-white/60">Your bag is empty.</p>
                                 </div>
                             ) : (
                                 <>
@@ -188,61 +190,43 @@ export function CartSheet() {
                                             <CartItem key={`${item.id}-${item.variantId || idx}`} item={item} />
                                         ))}
                                     </div>
-                                    <div className="pt-8 border-t border-white/10 space-y-4">
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Have a promo code?</p>
+                                    <div className="pt-8 border-t border-white/5 space-y-4">
                                         <PromoCodeSection />
                                     </div>
                                 </>
                             )}
                         </div>
 
-                        {/* Footer - Detailed Pricing */}
+                        {/* Footer - Clean Apple Style */}
                         {items.length > 0 && (
-                            <div className="p-6 border-t border-white/10 bg-[#0A0A0A] space-y-4">
-                                {/* Price Breakdown */}
-                                <div className="space-y-2 text-xs font-mono uppercase tracking-wide">
+                            <div className="p-6 bg-[#09090b]/80 backdrop-blur-xl border-t border-white/5 space-y-4 safe-area-pb">
+                                <div className="space-y-3 text-sm font-medium">
                                     <div className="flex justify-between text-white/60">
                                         <span>Subtotal</span>
                                         <span className="text-white">{formatPrice(subtotal.toString(), 'INR')}</span>
                                     </div>
 
-                                    <div className="flex justify-between text-white/60">
-                                        <span>Shipping</span>
-                                        {isFreeShipping ? (
-                                            <span className="text-accent">FREE</span>
-                                        ) : (
-                                            <div className="text-right">
-                                                <span className="text-white line-through opacity-50 block text-[10px]">₹500</span>
-                                                <span className="text-white/60 text-[10px] lowercase normal-case tracking-normal">(Calculated at checkout)</span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex justify-between text-white/60">
-                                        <span>Tax (15.25% Included)</span>
-                                        <span className="text-white">
-                                            {formatPrice((subtotal * (0.1525 / 1.1525)).toString(), 'INR')}
-                                        </span>
-                                    </div>
-
                                     {discountAmount > 0 && (
-                                        <div className="flex justify-between text-accent font-bold">
-                                            <span>Discount</span>
+                                        <div className="flex justify-between text-emerald-400">
+                                            <span>Savings</span>
                                             <span>-{formatPrice(discountAmount.toString(), 'INR')}</span>
                                         </div>
                                     )}
+
+                                    <div className="flex justify-between items-end pt-2">
+                                        <span className="text-base text-white font-bold">Total</span>
+                                        <div className="text-right">
+                                            <span className="text-xl font-bold text-white block leading-none">
+                                                {formatPrice((getFinalTotal()).toString(), 'INR')}
+                                            </span>
+                                            <span className="text-[10px] text-white/40 font-medium">Including Taxes</span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                {/* Total */}
-                                <div className="flex items-center justify-between text-2xl font-black text-white uppercase italic tracking-tighter border-t border-white/10 pt-4 font-display">
-                                    <span>Total</span>
-                                    <span>{formatPrice((getFinalTotal()).toString(), 'INR')}</span>
+                                <div className="pt-2">
+                                    <CheckoutButton items={items} />
                                 </div>
-                                <div className="text-[10px] text-white/30 text-center uppercase tracking-widest pb-2">
-                                    Tax included • Shipping calculated at checkout
-                                </div>
-
-                                <CheckoutButton items={items} />
                             </div>
                         )}
                     </motion.div>

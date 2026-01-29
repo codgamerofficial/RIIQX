@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { X, ChevronRight, Twitter, Instagram, Facebook, LogIn, UserPlus, Fingerprint, LogOut, Terminal } from "lucide-react";
+import Image from "next/image";
+import { X, ChevronRight, Twitter, Instagram, Facebook, LogIn, UserPlus, Fingerprint, LogOut, Terminal, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
@@ -14,31 +15,31 @@ interface MobileMenuProps {
 }
 
 const navLinks = [
-    { name: "Home", href: "/", id: "01" },
-    { name: "Shop All", href: "/shop", id: "02" },
-    { name: "New Arrivals", href: "/new-arrivals", id: "03" },
-    { name: "Collections", href: "/collections", id: "04" },
-    { name: "Lookbook", href: "/lookbook", id: "05" },
-    { name: "About", href: "/about", id: "06" },
+    { name: "Home", href: "/", id: "01", sub: "Main Base" },
+    { name: "Shop All", href: "/shop", id: "02", sub: "Full Catalog" },
+    { name: "New Arrivals", href: "/new-arrivals", id: "03", sub: "Fresh Drops" },
+    { name: "Collections", href: "/collections", id: "04", sub: "Season 2026" },
+    { name: "Lookbook", href: "/lookbook", id: "05", sub: "Visuals" },
+    { name: "About Base", href: "/about", id: "06", sub: "The Mission" },
 ];
 
 const sidebarVariants = {
     closed: {
         x: "-100%",
         transition: {
-            type: "spring",
-            stiffness: 400,
-            damping: 40
+            type: "tween",
+            ease: [0.4, 0, 0.2, 1],
+            duration: 0.3
         }
     },
     open: {
         x: "0%",
         transition: {
-            type: "spring",
-            stiffness: 400,
-            damping: 40,
-            staggerChildren: 0.1,
-            delayChildren: 0.2
+            type: "tween",
+            ease: [0.4, 0, 0.2, 1],
+            duration: 0.3,
+            staggerChildren: 0.05,
+            delayChildren: 0.1
         }
     }
 };
@@ -63,7 +64,6 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
         checkUser();
 
-        // Listen for auth state changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
         });
@@ -82,123 +82,140 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <AnimatePresence>
             {isOpen && (
                 <>
-                    {/* Backdrop */}
+                    {/* Darker Grid Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[60] md:hidden"
+                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] md:hidden"
                     />
 
-                    {/* Menu Drawer */}
+                    {/* Menu Drawer - Sports/Streetwear Industrial Design */}
                     <motion.div
                         initial="closed"
                         animate="open"
                         exit="closed"
                         variants={sidebarVariants}
-                        className="fixed top-0 left-0 bottom-0 w-[90%] max-w-sm bg-[#0a0a0a] border-r-2 border-white/10 z-[70] md:hidden flex flex-col clip-path-slant-right-mobile"
+                        className="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-[#080808] border-r border-white/10 z-[70] md:hidden flex flex-col"
                     >
-                        {/* Header */}
-                        <div className="p-8 flex items-center justify-between border-b border-white/5 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-accent/5 blur-3xl rounded-full" />
+                        {/* Noise Texture Overlay */}
+                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("/assets/noise.png")' }} />
 
-                            <span className="font-display text-4xl font-black tracking-tighter text-white uppercase italic transform -skew-x-6 z-10">
-                                RIIQX<span className="text-accent">.</span>
-                            </span>
+                        {/* Header */}
+                        <div className="p-6 flex items-center justify-between border-b border-white/10 relative z-10 bg-[#080808]">
+                            <div className="flex items-center gap-3">
+                                <div className="relative w-6 h-6">
+                                    <Image
+                                        src="/riiqx-logo-new.png"
+                                        alt="RIIQX Logo"
+                                        fill
+                                        className="object-contain"
+                                    />
+                                </div>
+                                <span className="font-display text-2xl font-black tracking-tighter text-white uppercase italic">
+                                    RIIQX<span className="text-accent">.</span>LABS
+                                </span>
+                            </div>
                             <button
                                 onClick={onClose}
-                                className="p-3 bg-white/5 hover:bg-accent hover:text-black rounded-sm transition-all text-white transform hover:rotate-90 z-10"
+                                className="w-8 h-8 flex items-center justify-center text-white/50 hover:text-white transition-colors"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="w-6 h-6" />
                             </button>
                         </div>
 
-                        {/* Links */}
-                        <div className="flex-1 overflow-y-auto py-8 px-6 space-y-2">
-                            {/* User Status Badge */}
-                            <motion.div variants={itemVariants} className="mb-8">
+                        {/* Scrollable Content */}
+                        <div className="flex-1 overflow-y-auto relative z-10 hide-scrollbar">
+
+                            {/* User Bar - Compact */}
+                            <motion.div variants={itemVariants} className="px-6 py-6 border-b border-white/5">
                                 {loading ? (
-                                    <div className="h-10 w-full bg-white/5 animate-pulse rounded-sm" />
+                                    <div className="h-10 w-full bg-white/5 animate-pulse" />
                                 ) : user ? (
-                                    <div className="border border-accent/20 bg-accent/5 p-4 relative group overflow-hidden">
-                                        <div className="absolute top-0 left-0 w-1 h-full bg-accent" />
-                                        <p className="text-[10px] text-accent uppercase tracking-widest font-bold mb-1 flex items-center gap-2">
-                                            <Fingerprint className="w-3 h-3" /> Identity Verified
-                                        </p>
-                                        <p className="text-white font-mono text-xs truncate uppercase">
-                                            {user.email}
-                                        </p>
+                                    <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/10">
+                                        <div className="w-8 h-8 bg-accent flex items-center justify-center font-bold text-black text-sm uppercase">
+                                            {user.email?.charAt(0)}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-[9px] text-accent uppercase tracking-widest font-bold">Logged In</p>
+                                            <p className="text-white text-xs truncate font-mono">{user.email}</p>
+                                        </div>
                                     </div>
                                 ) : (
-                                    <div className="border border-white/10 bg-white/5 p-4">
-                                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1 flex items-center gap-2">
-                                            <Terminal className="w-3 h-3" /> No Active Session
-                                        </p>
-                                        <p className="text-white/60 font-mono text-xs uppercase">
-                                            Guest User
-                                        </p>
+                                    <div className="flex items-center gap-2 text-white/40 font-mono text-[10px] uppercase tracking-widest">
+                                        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                                        Guest Access // Read Only
                                     </div>
                                 )}
                             </motion.div>
 
-                            <div className="space-y-1">
+                            {/* Navigation Links */}
+                            <div className="py-2">
                                 {navLinks.map((link) => (
                                     <motion.div key={link.name} variants={itemVariants}>
                                         <Link
                                             href={link.href}
                                             onClick={onClose}
-                                            className="group flex items-center justify-between py-4 border-b border-white/5 hover:border-accent/50 transition-colors"
+                                            className="group flex items-center justify-between px-8 py-5 border-b border-white/5 hover:bg-white/5 transition-colors relative overflow-hidden"
                                         >
-                                            <div className="flex items-baseline gap-4">
-                                                <span className="font-mono text-[10px] text-white/30 group-hover:text-accent transition-colors">
-                                                    {link.id}
-                                                </span>
-                                                <span className="text-2xl font-black uppercase italic tracking-wider text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-white/50 transition-all transform group-hover:translate-x-2">
-                                                    {link.name}
+                                            {/* Hover Accent Bar */}
+                                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
+
+                                            <div className="flex flex-col">
+                                                <div className="flex items-baseline gap-3">
+                                                    <span className="font-mono text-[9px] text-accent/50 group-hover:text-accent font-bold">
+                                                        {link.id}
+                                                    </span>
+                                                    <span className="text-xl font-black uppercase italic tracking-wider text-white group-hover:text-white transition-all font-display transform group-hover:translate-x-1 duration-300">
+                                                        {link.name}
+                                                    </span>
+                                                </div>
+                                                <span className="text-[9px] text-white/20 uppercase tracking-[0.2em] ml-6 font-mono hidden group-hover:block animate-in fade-in slide-in-from-left-2">
+                                                    {link.sub}
                                                 </span>
                                             </div>
-                                            <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-accent group-hover:translate-x-1 transition-all" />
+                                            <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-accent -rotate-45 group-hover:rotate-0 transition-all duration-300" />
                                         </Link>
                                     </motion.div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Footer / Account */}
-                        <motion.div variants={itemVariants} className="p-6 border-t border-white/5 bg-[#0a0a0a] space-y-6 relative z-10">
+                        {/* Footer Actions - Industrial Sports Style */}
+                        <motion.div variants={itemVariants} className="p-6 border-t border-white/10 bg-[#080808] relative z-10 safe-area-pb">
                             {user ? (
                                 <button
                                     onClick={handleSignOut}
-                                    className="w-full py-4 bg-white/5 text-white text-xs font-black uppercase tracking-[0.2em] hover:bg-red-600 hover:text-white transition-all flex justify-center items-center gap-2 skew-x-[-6deg]"
+                                    className="w-full py-3 bg-red-600 hover:bg-red-500 text-white text-xs font-black uppercase tracking-[0.2em] transition-all flex justify-center items-center gap-2 skew-x-[-12deg]"
                                 >
-                                    <div className="skew-x-[6deg] flex items-center gap-2">
-                                        <LogOut className="w-4 h-4" /> Terminate Session
+                                    <div className="skew-x-[12deg] flex items-center gap-2">
+                                        TERMINATE SESSION
                                     </div>
                                 </button>
                             ) : (
                                 <div className="grid grid-cols-2 gap-4">
                                     <Link href="/login" onClick={onClose} className="w-full">
-                                        <button className="w-full py-4 border border-white/20 text-white text-xs font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all flex justify-center items-center gap-2 skew-x-[-6deg]">
-                                            <div className="skew-x-[6deg] flex items-center gap-2">
-                                                <LogIn className="w-4 h-4" /> Sign In
+                                        <button className="w-full py-3 border border-white/20 hover:border-white hover:bg-white hover:text-black text-white text-xs font-black uppercase tracking-[0.15em] transition-all flex justify-center items-center gap-2 skew-x-[-12deg] group">
+                                            <div className="skew-x-[12deg] group-hover:translate-x-1 transition-transform">
+                                                LOG IN
                                             </div>
                                         </button>
                                     </Link>
                                     <Link href="/register" onClick={onClose} className="w-full">
-                                        <button className="w-full py-4 bg-accent text-black text-xs font-black uppercase tracking-[0.2em] hover:bg-white transition-all flex justify-center items-center gap-2 skew-x-[-6deg]">
-                                            <div className="skew-x-[6deg] flex items-center gap-2">
-                                                <UserPlus className="w-4 h-4" /> Join
+                                        <button className="w-full py-3 bg-accent text-black hover:bg-white text-xs font-black uppercase tracking-[0.15em] transition-all flex justify-center items-center gap-2 skew-x-[-12deg] shadow-[0_0_15px_rgba(124,58,237,0.3)] group">
+                                            <div className="skew-x-[12deg] group-hover:translate-x-1 transition-transform">
+                                                JOIN CLUB
                                             </div>
                                         </button>
                                     </Link>
                                 </div>
                             )}
 
-                            <div className="flex justify-center space-x-8 pt-4">
-                                <a href="#" className="text-white/30 hover:text-accent hover:scale-110 transition-all"><Instagram className="w-5 h-5" /></a>
-                                <a href="#" className="text-white/30 hover:text-accent hover:scale-110 transition-all"><Twitter className="w-5 h-5" /></a>
-                                <a href="#" className="text-white/30 hover:text-accent hover:scale-110 transition-all"><Facebook className="w-5 h-5" /></a>
+                            <div className="grid grid-cols-3 gap-0 mt-8 border-t border-white/5 pt-4">
+                                <Link href="#" className="flex justify-center text-white/30 hover:text-accent transition-colors py-2 border-r border-white/5"><Instagram className="w-4 h-4" /></Link>
+                                <Link href="#" className="flex justify-center text-white/30 hover:text-accent transition-colors py-2 border-r border-white/5"><Twitter className="w-4 h-4" /></Link>
+                                <Link href="#" className="flex justify-center text-white/30 hover:text-accent transition-colors py-2"><Facebook className="w-4 h-4" /></Link>
                             </div>
                         </motion.div>
                     </motion.div>

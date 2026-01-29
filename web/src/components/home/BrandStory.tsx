@@ -5,6 +5,9 @@ import { useRef } from "react";
 import Image from "next/image";
 import { ArrowUpRight, Zap } from "lucide-react";
 import Link from "next/link";
+import { SplitText, TextReveal } from "@/components/ui/AnimatedText";
+import { MagneticButton } from "@/components/ui/MagneticButton";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const PRODUCTS_SHOWCASE = [
     { name: "VARSITY JACKETS", image: "/assets/hero/slide-captains.jpg" },
@@ -24,13 +27,28 @@ export function BrandStory() {
         offset: ["start end", "end start"]
     });
 
-    const opacity = useTransform(scrollYProgress, [0, 0.3, 0.8, 1], [0, 1, 1, 0]);
+    const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
     const x = useTransform(scrollYProgress, [0, 1], ["0%", "-10%"]);
+    const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1.2]);
+
+    // Scroll Animations
+    const titleRef = useScrollAnimation({
+        from: { opacity: 0, y: 50 },
+        to: { opacity: 1, y: 0 },
+        scrollTrigger: { start: "top 80%" }
+    });
+
+    const contentRef = useScrollAnimation({
+        from: { opacity: 0, x: -50 },
+        to: { opacity: 1, x: 0 },
+        scrollTrigger: { start: "top 70%" },
+        delay: 0.2
+    });
 
     return (
         <section ref={containerRef} className="min-h-screen py-32 bg-[#050505] relative flex items-center overflow-hidden border-t border-white/5">
             {/* 3D Background Text */}
-            <motion.div style={{ x }} className="absolute h-full w-[200%] top-0 left-0 flex flex-col justify-center opacity-[0.03] pointer-events-none select-none z-0">
+            <motion.div style={{ x, opacity }} className="absolute h-full w-[200%] top-0 left-0 flex flex-col justify-center opacity-[0.05] pointer-events-none select-none z-0">
                 <h1 className="text-[20vw] font-black uppercase font-display leading-[0.8] text-white whitespace-nowrap">
                     Premium Gear RIIQX
                 </h1>
@@ -43,40 +61,51 @@ export function BrandStory() {
 
                 {/* Left: Aggressive Typography */}
                 <div className="relative">
-                    <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                    >
-                        <div className="flex items-center gap-4 mb-6">
-                            <span className="h-px w-12 bg-accent"></span>
-                            <span className="text-accent text-sm font-black uppercase tracking-[0.3em] font-mono">
-                                The Collection 2026
+                    <div className="flex items-center gap-4 mb-6">
+                        <motion.span
+                            initial={{ width: 0 }}
+                            whileInView={{ width: 48 }}
+                            transition={{ duration: 0.8 }}
+                            className="h-px bg-accent"
+                        />
+                        <span className="text-accent text-sm font-black uppercase tracking-[0.3em] font-mono">
+                            <TextReveal direction="up">The Collection 2026</TextReveal>
+                        </span>
+                    </div>
+
+                    <div ref={titleRef} className="mb-12">
+                        <h2 className="text-7xl md:text-[7rem] font-black text-white leading-[0.85] font-display uppercase tracking-tighter mix-blend-difference">
+                            <SplitText splitBy="word" staggerDelay={0.1}>Built For</SplitText>
+                            <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/40">
+                                <SplitText splitBy="char" staggerDelay={0.05} animationDelay={0.5}>The Elite.</SplitText>
                             </span>
-                        </div>
-
-                        <h2 className="text-7xl md:text-[7rem] font-black text-white leading-[0.85] font-display uppercase tracking-tighter mb-12 mix-blend-difference">
-                            Built For <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/40">The Elite.</span>
                         </h2>
+                    </div>
 
+                    <div ref={contentRef}>
                         <p className="text-2xl text-white/50 font-light leading-relaxed max-w-xl mb-12">
                             Dominating the streets with <strong className="text-white">Heavyweight Hoodies</strong>, <strong className="text-white">Premium Varsity Jackets</strong>, and <strong className="text-white">Tech Accessories</strong>.
                             Engineered for those who demand power in every thread.
                         </p>
 
                         <div className="flex flex-wrap gap-4">
-                            <Link href="/shop" className="group relative px-8 py-4 bg-white text-black font-black uppercase tracking-wider overflow-hidden">
-                                <span className="relative z-10 flex items-center gap-2">
-                                    Shop Collection <ArrowUpRight className="w-5 h-5" />
-                                </span>
-                                <div className="absolute inset-0 bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
+                            <Link href="/shop" className="group">
+                                <MagneticButton strength={0.2} className="relative px-8 py-4 bg-white text-black font-black uppercase tracking-wider overflow-hidden">
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        Shop Collection <ArrowUpRight className="w-5 h-5" />
+                                    </span>
+                                    <div className="absolute inset-0 bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
+                                </MagneticButton>
                             </Link>
-                            <Link href="/about" className="px-8 py-4 border border-white/20 text-white font-bold uppercase tracking-wider hover:bg-white/10 transition-colors">
-                                Explore The Lores
+
+                            <Link href="/about">
+                                <MagneticButton strength={0.1} className="px-8 py-4 border border-white/20 text-white font-bold uppercase tracking-wider hover:bg-white/10 transition-colors">
+                                    Explore The Lores
+                                </MagneticButton>
                             </Link>
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
 
                 {/* Right: 3D Product Slider */}
@@ -133,7 +162,10 @@ export function BrandStory() {
                     </div>
 
                     {/* Decorative 3D Elements */}
-                    <div className="absolute -z-10 top-20 -right-20 w-full h-full border-2 border-white/5 rounded-[40px] transform rotate-6 scale-95" />
+                    <motion.div
+                        style={{ scale }}
+                        className="absolute -z-10 top-20 -right-20 w-full h-full border-2 border-white/5 rounded-[40px] transform rotate-6 scale-95"
+                    />
                     <div className="absolute -z-20 top-10 -right-10 w-full h-full bg-accent/5 blur-3xl rounded-full" />
                 </div>
             </div>

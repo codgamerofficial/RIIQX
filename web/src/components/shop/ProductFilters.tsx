@@ -2,7 +2,8 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { X, Check, Minus } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ProductFiltersProps {
     availableTypes: string[];
@@ -17,12 +18,12 @@ export function ProductFilters({
     availableSizes = [],
     availableColors = [],
     minPrice = 0,
-    maxPrice = 1000
+    maxPrice = 10000 // Adjusted default for INR
 }: ProductFiltersProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // State for local inputs (like price) to avoid URL spamming on every keystroke
+    // State for local inputs
     const [localMinPrice, setLocalMinPrice] = useState(searchParams.get("min_price") || "");
     const [localMaxPrice, setLocalMaxPrice] = useState(searchParams.get("max_price") || "");
 
@@ -52,11 +53,11 @@ export function ProductFilters({
     const createQueryString = useCallback(
         (name: string, value: string) => {
             const params = new URLSearchParams(searchParams.toString());
-            params.delete('cursor'); // Reset pagination
+            params.delete('cursor');
 
             if (value === "All" || !value) {
                 params.delete(name);
-            } else {
+            } else { // Toggle logic could go here, but stick to single select for now for simplicity
                 params.set(name, value);
             }
             return params.toString();
@@ -74,170 +75,205 @@ export function ProductFilters({
         setLocalMaxPrice("");
     };
 
-    // Helper for color swatches
-    const getColorStyle = (color: string) => {
-        switch (color.toLowerCase()) {
-            case 'white': return '#ffffff';
-            case 'black': return '#000000';
-            case 'red': return '#ef4444';
-            case 'blue': return '#3b82f6';
-            case 'green': return '#10b981';
-            case 'yellow': return '#f59e0b';
-            case 'purple': return '#a855f7';
-            case 'pink': return '#ec4899';
-            case 'orange': return '#f97316';
-            case 'grey': return '#6b7280';
-            case 'beige': return '#d6d3d1';
-            default: return color; // Fallback to name or try to use it as CSS string
+    // Helper: Categorize Sizes (Simple Heuristic)
+    const categorizedSizes = availableSizes.reduce((acc, size) => {
+        const lowerSize = size.toLowerCase();
+        // Check for phone models
+        if (lowerSize.includes("iphone") || /\d/.test(size) && (lowerSize.includes("pro") || lowerSize.includes("max") || lowerSize.includes("mini") || lowerSize.includes("plus"))) {
+            acc.tech.push(size);
+        } else if (['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', 'small', 'medium', 'large'].some(s => lowerSize.includes(s))) {
+            acc.clothing.push(size);
+        } else {
+            acc.other.push(size);
         }
+        return acc;
+    }, { clothing: [] as string[], tech: [] as string[], other: [] as string[] });
+
+    // Helper: Color Styles
+    const getColorStyle = (color: string) => {
+        const map: Record<string, string> = {
+            'white': '#ffffff', 'black': '#000000', 'red': '#ef4444',
+            'blue': '#3b82f6', 'green': '#10b981', 'yellow': '#f59e0b',
+            'purple': '#a855f7', 'pink': '#ec4899', 'orange': '#f97316',
+            'grey': '#6b7280', 'beige': '#d6d3d1', 'navy': '#1e3a8a',
+            'maroon': '#7f1d1d', 'olive': '#3f6212', 'teal': '#14b8a6'
+        };
+        return map[color.toLowerCase()] || color;
     };
 
     const hasActiveFilters = currentCategory || currentColor || currentSize || localMinPrice || localMaxPrice;
 
     return (
-        <aside className="w-full md:w-64 space-y-8 flex-shrink-0">
-            {/* Filter Header */}
-            <div className="flex items-center justify-between">
-                <h2 className="text-xl font-black text-white uppercase tracking-tighter">Filters</h2>
+        <aside className="w-full md:w-72 flex-shrink-0 space-y-12 pr-4">
+
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <h2 className="text-sm font-black text-white uppercase tracking-[0.2em] font-mono">
+                    Filter By
+                </h2>
                 {hasActiveFilters && (
                     <button
                         onClick={clearAll}
-                        className="text-[10px] font-bold text-white/50 hover:text-[#D9F99D] transition-colors uppercase tracking-widest flex items-center gap-1"
+                        className="text-[10px] font-bold text-accent hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1 group"
                     >
-                        Clear <X className="w-3 h-3" />
+                        Clear All <X className="w-3 h-3 group-hover:rotate-90 transition-transform" />
                     </button>
                 )}
             </div>
 
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-            {/* Categories (Product Types) */}
-            <div className="space-y-4">
-                <h3 className="text-xs font-bold text-white/50 uppercase tracking-widest flex items-center justify-between">
-                    Product Types
-                </h3>
+            {/* Categories */}
+            <FilterSection title="Category" isOpen={true}>
                 <div className="space-y-1">
-                    <button
+                    <FilterOption
+                        label="All Products"
+                        isActive={!currentCategory}
                         onClick={() => handleFilterChange("category", "All")}
-                        className={`block w-full text-left px-4 py-3 rounded-lg text-sm font-bold uppercase tracking-wide transition-all duration-300 border ${!currentCategory
-                            ? "bg-[#D9F99D] text-black border-[#D9F99D] shadow-[0_0_15px_rgba(217,249,157,0.3)]"
-                            : "bg-white/5 text-white/70 border-transparent hover:bg-white/10 hover:text-white"
-                            }`}
-                    >
-                        All Products
-                    </button>
+                    />
                     {availableTypes.map((type) => (
-                        <button
+                        <FilterOption
                             key={type}
+                            label={type}
+                            isActive={currentCategory === type}
                             onClick={() => handleFilterChange("category", type)}
-                            className={`block w-full text-left px-4 py-3 rounded-lg text-sm font-bold uppercase tracking-wide transition-all duration-300 border ${currentCategory === type
-                                ? "bg-[#D9F99D] text-black border-[#D9F99D] shadow-[0_0_15px_rgba(217,249,157,0.3)]"
-                                : "bg-white/5 text-white/70 border-transparent hover:bg-white/10 hover:text-white"
-                                }`}
-                        >
-                            {type}
-                        </button>
+                        />
                     ))}
                 </div>
-            </div>
-
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </FilterSection>
 
             {/* Price Range */}
-            <div className="space-y-4">
-                <h3 className="text-xs font-bold text-white/50 uppercase tracking-widest">Price Range</h3>
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                        <label className="text-[10px] text-white/30 uppercase font-bold">Min</label>
-                        <div className="relative group">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-xs font-bold">$</span>
-                            <input
-                                type="number"
-                                placeholder={String(Math.floor(minPrice))}
-                                value={localMinPrice}
-                                onChange={(e) => setLocalMinPrice(e.target.value)}
-                                className="w-full bg-[#1A1A1A] border border-white/10 rounded-md py-2.5 pl-7 pr-2 text-xs text-white font-bold focus:border-[#D9F99D] focus:outline-none transition-colors"
-                            />
-                        </div>
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-[10px] text-white/30 uppercase font-bold">Max</label>
-                        <div className="relative group">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-xs font-bold">$</span>
-                            <input
-                                type="number"
-                                placeholder={String(Math.ceil(maxPrice))}
-                                value={localMaxPrice}
-                                onChange={(e) => setLocalMaxPrice(e.target.value)}
-                                className="w-full bg-[#1A1A1A] border border-white/10 rounded-md py-2.5 pl-7 pr-2 text-xs text-white font-bold focus:border-[#D9F99D] focus:outline-none transition-colors"
-                            />
-                        </div>
-                    </div>
+            <FilterSection title="Price (INR)" isOpen={true}>
+                <div className="grid grid-cols-2 gap-4">
+                    <PriceInput
+                        label="Min"
+                        value={localMinPrice}
+                        onChange={setLocalMinPrice}
+                        placeholder={Math.floor(minPrice).toString()}
+                    />
+                    <PriceInput
+                        label="Max"
+                        value={localMaxPrice}
+                        onChange={setLocalMaxPrice}
+                        placeholder={Math.ceil(maxPrice).toString()}
+                    />
                 </div>
-            </div>
-
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </FilterSection>
 
             {/* Colors */}
             {availableColors.length > 0 && (
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-xs font-bold text-white/50 uppercase tracking-widest">Color</h3>
-                        {currentColor && (
-                            <button onClick={() => handleFilterChange("color", "")} className="text-[10px] text-white/30 hover:text-white uppercase font-bold">Reset</button>
-                        )}
-                    </div>
-                    <div className="flex flex-wrap gap-3">
-                        {availableColors.map((color) => (
-                            <button
-                                key={color}
-                                onClick={() => handleFilterChange("color", currentColor === color ? "" : color)}
-                                className={`w-8 h-8 rounded-full border transition-all relative group shadow-lg ${currentColor === color ? 'border-[#D9F99D] scale-110' : 'border-white/10 hover:border-white'}`}
-                                style={{ backgroundColor: getColorStyle(color) }}
-                                title={color}
-                            >
-                                <span className="sr-only">Select {color}</span>
-                                {currentColor === color && (
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className="w-1 h-1 bg-black rounded-full shadow-white shadow-[0_0_5px_white]" />
-                                    </div>
-                                )}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
+                <FilterSection title="Color" isOpen={true}>
+                    <div className="grid grid-cols-5 gap-2">
+                        {availableColors.map((color) => {
+                            const isActive = currentColor === color;
+                            const colorHex = getColorStyle(color);
+                            const isWhite = colorHex.toLowerCase() === '#ffffff' || color.toLowerCase() === 'white';
 
-            {availableColors.length > 0 && (
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                            return (
+                                <button
+                                    key={color}
+                                    onClick={() => handleFilterChange("color", isActive ? "" : color)}
+                                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all relative group ${isActive ? 'border-accent scale-110' : 'border-white/10 hover:border-white/40'}`}
+                                    style={{ backgroundColor: colorHex }}
+                                    title={color}
+                                >
+                                    {isActive && <Check className={`w-4 h-4 ${isWhite ? 'text-black' : 'text-white'}`} />}
+                                    <span className="sr-only">{color}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </FilterSection>
             )}
 
             {/* Sizes */}
             {availableSizes.length > 0 && (
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-xs font-bold text-white/50 uppercase tracking-widest">Size</h3>
-                        {currentSize && (
-                            <button onClick={() => handleFilterChange("size", "")} className="text-[10px] text-white/30 hover:text-white uppercase font-bold">Reset</button>
-                        )}
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                        {availableSizes.map((size) => (
-                            <button
-                                key={size}
-                                onClick={() => handleFilterChange("size", currentSize === size ? "" : size)}
-                                className={`border rounded-md py-2.5 text-xs font-bold transition-all uppercase ${currentSize === size
-                                    ? "bg-[#D9F99D] text-black border-[#D9F99D]"
-                                    : "bg-white/5 text-white/70 border-white/10 hover:bg-white hover:text-black"
-                                    }`}
-                            >
-                                {size}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                <FilterSection title="Size" isOpen={true}>
+                    {/* Clothing Sizes */}
+                    {categorizedSizes.clothing.length > 0 && (
+                        <div className="mb-4">
+                            <h4 className="text-[10px] text-white/30 uppercase font-bold tracking-widest mb-2">Apparel</h4>
+                            <div className="grid grid-cols-4 gap-2">
+                                {categorizedSizes.clothing.map(size => (
+                                    <SizeButton
+                                        key={size}
+                                        label={size}
+                                        isActive={currentSize === size}
+                                        onClick={() => handleFilterChange("size", currentSize === size ? "" : size)}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Tech/Other Sizes */}
+                    {(categorizedSizes.tech.length > 0 || categorizedSizes.other.length > 0) && (
+                        <div>
+                            <h4 className="text-[10px] text-white/30 uppercase font-bold tracking-widest mb-2">Accessories / Tech</h4>
+                            <div className="grid grid-cols-2 gap-2">
+                                {[...categorizedSizes.tech, ...categorizedSizes.other].map(size => (
+                                    <SizeButton
+                                        key={size}
+                                        label={size}
+                                        isActive={currentSize === size}
+                                        onClick={() => handleFilterChange("size", currentSize === size ? "" : size)}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </FilterSection>
             )}
+
         </aside>
     );
-
 }
+
+// Sub-components for cleaner code
+const FilterSection = ({ title, children, isOpen = true }: { title: string, children: React.ReactNode, isOpen?: boolean }) => (
+    <div className="space-y-4">
+        <h3 className="text-xs font-bold text-white/50 uppercase tracking-[0.2em] flex items-center justify-between">
+            {title}
+        </h3>
+        {children}
+    </div>
+);
+
+const FilterOption = ({ label, isActive, onClick }: { label: string, isActive: boolean, onClick: () => void }) => (
+    <button
+        onClick={onClick}
+        className={`w-full text-left flex items-center justify-between group py-1`}
+    >
+        <span className={`text-sm uppercase tracking-wider font-bold transition-colors ${isActive ? "text-accent" : "text-white/60 group-hover:text-white"}`}>
+            {label}
+        </span>
+        {isActive && <div className="w-1.5 h-1.5 bg-accent rounded-full" />}
+    </button>
+);
+
+const PriceInput = ({ label, value, onChange, placeholder }: { label: string, value: string, onChange: (v: string) => void, placeholder: string }) => (
+    <div className="space-y-1">
+        <label className="text-[10px] text-white/30 uppercase font-bold">{label}</label>
+        <div className="relative group">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-xs font-bold">₹</span>
+            <input
+                type="number"
+                placeholder={placeholder}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full bg-neutral-900/50 border border-white/10 rounded-none py-3 pl-7 pr-2 text-xs text-white font-mono focus:border-accent focus:outline-none transition-all placeholder:text-white/10"
+            />
+        </div>
+    </div>
+);
+
+const SizeButton = ({ label, isActive, onClick }: { label: string, isActive: boolean, onClick: () => void }) => (
+    <button
+        onClick={onClick}
+        className={`border py-2 px-1 text-[10px] font-bold uppercase transition-all truncate hover:border-white/40 ${isActive
+                ? "bg-white text-black border-white"
+                : "bg-transparent text-white/70 border-white/10"
+            }`}
+        title={label}
+    >
+        {label}
+    </button>
+);

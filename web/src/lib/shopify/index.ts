@@ -226,6 +226,25 @@ export async function getCollectionProducts({
     pageInfo: Connection<Product>['pageInfo'];
     collectionInfo: { title: string; description: string; seo: { title: string; description: string } } | null;
 }> {
+    if (handle === 'all') {
+        const { products, pageInfo } = await getProducts({
+            sortKey: sortKey === 'CREATED' ? 'CREATED_AT' : sortKey as any,
+            reverse,
+            limit,
+            after
+        });
+
+        return {
+            products,
+            pageInfo,
+            collectionInfo: {
+                title: "All Products",
+                description: "Browse our complete catalog of premium streetwear.",
+                seo: { title: "All Products | RIIQX", description: "Browse our complete catalog of premium streetwear." }
+            }
+        };
+    }
+
     const res = await shopifyFetch<{ collection: { title: string; description: string; seo: { title: string; description: string }; products: Connection<Product> } }>({
         query: require('./queries').COLLECTION_PRODUCTS_QUERY,
         variables: { handle, first: limit, sortKey, reverse, filters, after },

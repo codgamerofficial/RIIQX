@@ -1,81 +1,151 @@
 "use client";
 
-import { CinematicHero } from "@/components/ui/CinematicHero";
 import { motion } from "framer-motion";
-import { RotateCcw, AlertCircle, CheckCircle2 } from "lucide-react";
+import { RotateCcw, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function ReturnOrderPage() {
+    const [formData, setFormData] = useState({ orderId: '', email: '' });
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 10 },
+        visible: { opacity: 1, y: 0 }
+    };
+
     return (
-        <main className="bg-black min-h-screen pb-20">
-            <CinematicHero
-                title="RETURN ORDER"
-                subtitle="Reverse Logistics"
-                description="Hassle-free returns within 15 days. Initiate a return protocol for your gear."
-            />
+        <main className="bg-black min-h-screen flex items-center justify-center p-4 pt-32 pb-20">
+            <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
 
-            <section className="max-w-4xl mx-auto px-4 -mt-20 relative z-20">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Action Card */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="bg-zinc-900/50 backdrop-blur-xl border border-white/10 p-8 rounded-3xl"
-                    >
-                        <RotateCcw className="w-10 h-10 text-bewakoof-yellow mb-6" />
-                        <h2 className="text-2xl font-bold text-white mb-4">Start a Return</h2>
-                        <form className="space-y-4">
-                            <div className="space-y-2">
-                                <label className="text-xs uppercase tracking-widest text-white/50 font-bold ml-1">Order ID</label>
-                                <input type="text" placeholder="ORD-XXXX" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-bewakoof-yellow outline-hidden" />
+                {/* Left Column: Form Card */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, ease: [0.2, 0, 0, 1] }}
+                    className="w-full bg-[#121212] border border-white/10 rounded-[32px] p-8 shadow-2xl overflow-hidden relative"
+                >
+                    {/* Ambient Glow */}
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 blur-[60px] rounded-full pointer-events-none opacity-50" />
+
+                    <div className="relative z-10 flex flex-col items-start space-y-8">
+                        {/* Header Group */}
+                        <div className="space-y-6 w-full">
+                            {/* Rotating Icon */}
+                            <div className="w-12 h-12 rounded-full border-2 border-white text-white flex items-center justify-center">
+                                <RotateCcw className="w-6 h-6" strokeWidth={2.5} />
                             </div>
+
+                            <h1 className="text-3xl font-bold text-white tracking-tight">
+                                Start a Return
+                            </h1>
+                        </div>
+
+                        {/* Form Group */}
+                        <div className="w-full space-y-6">
+                            {/* Order ID */}
                             <div className="space-y-2">
-                                <label className="text-xs uppercase tracking-widest text-white/50 font-bold ml-1">Email / Phone</label>
-                                <input type="text" placeholder="Registered Contact" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-bewakoof-yellow outline-hidden" />
+                                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold ml-1">Order ID</label>
+                                <input
+                                    type="text"
+                                    value={formData.orderId}
+                                    onChange={(e) => setFormData({ ...formData, orderId: e.target.value.toUpperCase() })}
+                                    className="w-full bg-[#1c1c1e] border border-white/5 rounded-2xl px-5 py-4 text-white text-base font-medium focus:outline-none focus:border-white/20 transition-all placeholder:text-white/20 font-mono uppercase"
+                                    placeholder="ORD-XXXX"
+                                />
                             </div>
-                            <button className="w-full bg-bewakoof-yellow text-black font-bold py-3 rounded-xl hover:brightness-110 transition-all">
-                                Proceed
+
+                            {/* Email / Phone */}
+                            <div className="space-y-2">
+                                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold ml-1">Email / Phone</label>
+                                <input
+                                    type="text"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    className="w-full bg-[#1c1c1e] border border-white/5 rounded-2xl px-5 py-4 text-white text-base font-medium focus:outline-none focus:border-white/20 transition-all placeholder:text-white/20"
+                                    placeholder="Registered Contact"
+                                />
+                            </div>
+
+                            {/* Spacer */}
+                            <div className="h-4" />
+
+                            {/* Action Button */}
+                            <button className="w-full bg-[#1c1c1e] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-white hover:text-black transition-all duration-300">
+                                <span>Proceed</span>
                             </button>
-                        </form>
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* Right Column: Policy Cards */}
+                <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="space-y-4"
+                >
+                    {/* Header Text */}
+                    <motion.div variants={itemVariants} className="mb-6 px-2">
+                        <p className="text-xl font-medium text-white leading-relaxed">
+                            Initiate a return protocol for your gear.
+                        </p>
                     </motion.div>
 
-                    {/* Policy Info */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="space-y-6"
-                    >
-                        <div className="bg-white/5 border border-white/10 p-6 rounded-2xl">
-                            <div className="flex gap-4">
-                                <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
-                                <div>
-                                    <h3 className="text-white font-bold mb-1">15-Day Policy</h3>
-                                    <p className="text-gray-400 text-sm">Return unwashed, unworn items with tags within 15 days of delivery.</p>
-                                </div>
+                    {/* Card 1: 15-Day Policy */}
+                    <motion.div variants={itemVariants} className="bg-[#121212] border border-white/10 rounded-[24px] p-6 hover:bg-[#1a1a1a] transition-colors group">
+                        <div className="flex gap-5">
+                            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                                <CheckCircle2 className="w-5 h-5 text-green-500" strokeWidth={2.5} />
                             </div>
-                        </div>
-                        <div className="bg-white/5 border border-white/10 p-6 rounded-2xl">
-                            <div className="flex gap-4">
-                                <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
-                                <div>
-                                    <h3 className="text-white font-bold mb-1">Instant Refund</h3>
-                                    <p className="text-gray-400 text-sm">Refunds are initiated instantly to your source account after quality check.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-purple-900/10 border border-purple-500/20 p-6 rounded-2xl">
-                            <div className="flex gap-4">
-                                <AlertCircle className="w-6 h-6 text-purple-400 shrink-0" />
-                                <div>
-                                    <h3 className="text-white font-bold mb-1">Non-Returnable</h3>
-                                    <p className="text-gray-400 text-sm">Boxers, innerwear, and free gifts are not eligible for returns.</p>
-                                </div>
+                            <div>
+                                <h3 className="text-white font-bold text-base mb-2 group-hover:text-green-400 transition-colors">15-Day Policy</h3>
+                                <p className="text-white/40 text-sm leading-relaxed">
+                                    Return unwashed, unworn items with tags within 15 days of delivery.
+                                </p>
                             </div>
                         </div>
                     </motion.div>
-                </div>
-            </section>
+
+                    {/* Card 2: Instant Refund */}
+                    <motion.div variants={itemVariants} className="bg-[#121212] border border-white/10 rounded-[24px] p-6 hover:bg-[#1a1a1a] transition-colors group">
+                        <div className="flex gap-5">
+                            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                                <CheckCircle2 className="w-5 h-5 text-green-500" strokeWidth={2.5} />
+                            </div>
+                            <div>
+                                <h3 className="text-white font-bold text-base mb-2 group-hover:text-green-400 transition-colors">Instant Refund</h3>
+                                <p className="text-white/40 text-sm leading-relaxed">
+                                    Refunds are initiated instantly to your source account after quality check.
+                                </p>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    {/* Card 3: Non-Returnable */}
+                    <motion.div variants={itemVariants} className="bg-[#0f0a15] border border-purple-500/20 rounded-[24px] p-6 hover:bg-[#150d1e] transition-colors group">
+                        <div className="flex gap-5">
+                            <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center shrink-0">
+                                <AlertCircle className="w-5 h-5 text-purple-400" strokeWidth={2.5} />
+                            </div>
+                            <div>
+                                <h3 className="text-white font-bold text-base mb-2 group-hover:text-purple-400 transition-colors">Non-Returnable</h3>
+                                <p className="text-white/40 text-sm leading-relaxed">
+                                    Boxers, innerwear, and free gifts are not eligible for returns.
+                                </p>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                </motion.div>
+            </div>
         </main>
     );
 }
