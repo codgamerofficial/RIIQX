@@ -18,6 +18,9 @@ type ShopifyResponse<T> = {
     errors?: unknown[];
 };
 
+const queryCache = new Map<string, { data: any, timestamp: number }>();
+const CACHE_DURATION = 60 * 1000; // 1 minute cache
+
 /**
  * Core function to fetch data from Shopify's Storefront API.
  * Designed to be reusable across Web and Mobile.
@@ -32,37 +35,60 @@ export async function shopifyFetch<T>({
         throw new Error('Missing Shopify environment variables: SHOPIFY_STORE_DOMAIN or SHOPIFY_STOREFRONT_ACCESS_TOKEN');
     }
 
+    // Simple In-Memory Cache for Mobile
+    const cacheKey = JSON.stringify({ query, variables });
+    const now = Date.now();
+    const cached = queryCache.get(cacheKey);
+
+    if (cache !== 'no-store' && cached && (now - cached.timestamp < CACHE_DURATION)) {
+        return cached.data as T;
+    }
+
     const endpoint = `https://${domain}/api/2024-01/graphql.json`;
 
-    const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Shopify-Storefront-Access-Token': storefrontAccessToken,
-        },
-        body: JSON.stringify({ query, variables }),
-        cache: cache as any,
-        ...(revalidate && { next: { revalidate } }),
-    });
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Shopify-Storefront-Access-Token': storefrontAccessToken,
+            },
+            body: JSON.stringify({ query, variables }),
+            cache: cache as any,
+            ...(revalidate && { next: { revalidate } }),
+        });
 
-    if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Shopify API Error (${response.status}): ${text}`);
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`Shopify API Error (${response.status}): ${text}`);
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Invalid content-type from Shopify: ${contentType}. Body: ${text}`);
+        }
+
+        const body = (await response.json()) as ShopifyResponse<T>;
+
+        if (body.errors) {
+            throw new Error(`Shopify API Error: ${JSON.stringify(body.errors)}`);
+        }
+
+        // Cache the successful response
+        if (cache !== 'no-store') {
+            queryCache.set(cacheKey, { data: body.data, timestamp: now });
+        }
+
+        return body.data;
+    } catch (error) {
+        // If network fails but we have stale cache, return it as fallback
+        if (cached) {
+            console.warn("Network request failed, returning stale cache:", error);
+            return cached.data as T;
+        }
+        throw error;
     }
-
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-        const text = await response.text();
-        throw new Error(`Invalid content-type from Shopify: ${contentType}. Body: ${text}`);
-    }
-
-    const body = (await response.json()) as ShopifyResponse<T>;
-
-    if (body.errors) {
-        throw new Error(`Shopify API Error: ${JSON.stringify(body.errors)}`);
-    }
-
-    return body.data;
 }
 
 /**

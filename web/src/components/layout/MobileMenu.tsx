@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { X, ChevronRight, Twitter, Instagram, Facebook, LogIn, UserPlus, Fingerprint, LogOut, Terminal, ArrowRight } from "lucide-react";
+import { X, ChevronRight, Instagram, Twitter, Facebook } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
@@ -20,34 +20,14 @@ const navLinks = [
     { name: "New Arrivals", href: "/new-arrivals", id: "03", sub: "Fresh Drops" },
     { name: "Collections", href: "/collections", id: "04", sub: "Season 2026" },
     { name: "Lookbook", href: "/lookbook", id: "05", sub: "Visuals" },
-    { name: "About Base", href: "/about", id: "06", sub: "The Mission" },
+    { name: "About", href: "/about", id: "06", sub: "The Mission" },
 ];
 
-const sidebarVariants = {
-    closed: {
-        x: "-100%",
-        transition: {
-            type: "tween",
-            ease: [0.4, 0, 0.2, 1],
-            duration: 0.3
-        }
-    },
-    open: {
-        x: "0%",
-        transition: {
-            type: "tween",
-            ease: [0.4, 0, 0.2, 1],
-            duration: 0.3,
-            staggerChildren: 0.05,
-            delayChildren: 0.1
-        }
-    }
-};
-
-const itemVariants = {
-    closed: { x: -20, opacity: 0 },
-    open: { x: 0, opacity: 1 }
-};
+const socialLinks = [
+    { icon: Instagram, href: "#", label: "Instagram" },
+    { icon: Twitter, href: "#", label: "Twitter" },
+    { icon: Facebook, href: "#", label: "Facebook" },
+];
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     const [user, setUser] = useState<User | null>(null);
@@ -71,6 +51,18 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         return () => subscription.unsubscribe();
     }, [supabase]);
 
+    // Lock body scroll when menu is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isOpen]);
+
     const handleSignOut = async () => {
         await supabase.auth.signOut();
         router.push("/");
@@ -78,34 +70,107 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         setUser(null);
     };
 
+    const handleLinkClick = () => {
+        onClose();
+    };
+
+    const backdropVariants = {
+        closed: { opacity: 0 },
+        open: {
+            opacity: 1,
+            transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] }
+        },
+        exit: {
+            opacity: 0,
+            transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] }
+        }
+    };
+
+    const menuVariants = {
+        closed: {
+            x: "-100%",
+            transition: {
+                type: "tween",
+                ease: [0.4, 0, 0.2, 1],
+                duration: 0.3
+            }
+        },
+        open: {
+            x: "0%",
+            transition: {
+                type: "tween",
+                ease: [0.4, 0, 0.2, 1],
+                duration: 0.4,
+                staggerChildren: 0.08,
+                delayChildren: 0.1
+            }
+        },
+        exit: {
+            x: "-100%",
+            transition: {
+                type: "tween",
+                ease: [0.4, 0, 0.2, 1],
+                duration: 0.3
+            }
+        }
+    };
+
+    const itemVariants = {
+        closed: {
+            x: -30,
+            opacity: 0
+        },
+        open: {
+            x: 0,
+            opacity: 1,
+            transition: {
+                duration: 0.4,
+                ease: [0.16, 1, 0.3, 1]
+            }
+        }
+    };
+
+    const headerVariants = {
+        closed: { opacity: 0, y: -20 },
+        open: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] }
+        }
+    };
+
     return (
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
             {isOpen && (
                 <>
-                    {/* Darker Grid Backdrop */}
+                    {/* Backdrop */}
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={onClose}
-                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] md:hidden"
-                    />
-
-                    {/* Menu Drawer - Sports/Streetwear Industrial Design */}
-                    <motion.div
+                        variants={backdropVariants}
                         initial="closed"
                         animate="open"
-                        exit="closed"
-                        variants={sidebarVariants}
-                        className="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-[#080808] border-r border-white/10 z-[70] md:hidden flex flex-col"
+                        exit="exit"
+                        onClick={onClose}
+                        className="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] md:hidden"
+                    />
+
+                    {/* Menu Drawer */}
+                    <motion.div
+                        variants={menuVariants}
+                        initial="closed"
+                        animate="open"
+                        exit="exit"
+                        className="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-[#050505] border-r border-white/10 z-[70] md:hidden flex flex-col"
                     >
                         {/* Noise Texture Overlay */}
                         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("/assets/noise.png")' }} />
 
                         {/* Header */}
-                        <div className="p-6 flex items-center justify-between border-b border-white/10 relative z-10 bg-[#080808]">
+                        <motion.div
+                            variants={headerVariants}
+                            className="p-6 flex items-center justify-between border-b border-white/10 relative z-10 bg-gradient-to-b from-[#080808] to-[#050505]"
+                        >
                             <div className="flex items-center gap-3">
-                                <div className="relative w-6 h-6">
+                                <div className="relative w-8 h-8">
                                     <Image
                                         src="/riiqx-logo-new.png"
                                         alt="RIIQX Logo"
@@ -113,110 +178,145 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                         className="object-contain"
                                     />
                                 </div>
-                                <span className="font-display text-2xl font-black tracking-tighter text-white uppercase italic">
-                                    RIIQX<span className="text-accent">.</span>LABS
+                                <span className="font-display text-xl font-black tracking-tighter text-white uppercase">
+                                    RIIQX<span className="text-accent">.</span>
                                 </span>
                             </div>
-                            <button
+                            <motion.button
                                 onClick={onClose}
-                                className="w-8 h-8 flex items-center justify-center text-white/50 hover:text-white transition-colors"
+                                className="w-10 h-10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/5 rounded-full transition-all duration-300"
+                                whileTap={{ scale: 0.95 }}
+                                aria-label="Close menu"
                             >
                                 <X className="w-6 h-6" />
-                            </button>
-                        </div>
+                            </motion.button>
+                        </motion.div>
 
-                        {/* Scrollable Content */}
-                        <div className="flex-1 overflow-y-auto relative z-10 hide-scrollbar">
-
-                            {/* User Bar - Compact */}
-                            <motion.div variants={itemVariants} className="px-6 py-6 border-b border-white/5">
-                                {loading ? (
-                                    <div className="h-10 w-full bg-white/5 animate-pulse" />
-                                ) : user ? (
-                                    <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/10">
-                                        <div className="w-8 h-8 bg-accent flex items-center justify-center font-bold text-black text-sm uppercase">
-                                            {user.email?.charAt(0)}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-[9px] text-accent uppercase tracking-widest font-bold">Logged In</p>
-                                            <p className="text-white text-xs truncate font-mono">{user.email}</p>
-                                        </div>
+                        {/* User Bar */}
+                        <motion.div
+                            variants={itemVariants}
+                            className="px-6 py-4 border-b border-white/5 bg-white/[0.02]"
+                        >
+                            {loading ? (
+                                <div className="h-12 w-full bg-white/5 animate-pulse rounded" />
+                            ) : user ? (
+                                <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded">
+                                    <div className="w-10 h-10 bg-accent flex items-center justify-center font-bold text-black text-sm uppercase rounded">
+                                        {user.email?.charAt(0).toUpperCase()}
                                     </div>
-                                ) : (
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[10px] text-accent uppercase tracking-widest font-bold">Logged In</p>
+                                        <p className="text-white text-xs truncate font-mono">{user.email}</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2 text-white/40 font-mono text-[10px] uppercase tracking-widest">
                                         <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                                        Guest Access // Read Only
+                                        Guest Access
                                     </div>
-                                )}
-                            </motion.div>
+                                    <Link
+                                        href="/login"
+                                        onClick={handleLinkClick}
+                                        className="text-xs text-accent hover:text-white transition-colors duration-300 font-bold uppercase tracking-wider"
+                                    >
+                                        Sign In →
+                                    </Link>
+                                </div>
+                            )}
+                        </motion.div>
 
-                            {/* Navigation Links */}
-                            <div className="py-2">
-                                {navLinks.map((link) => (
-                                    <motion.div key={link.name} variants={itemVariants}>
+                        {/* Navigation Links */}
+                        <div className="flex-1 overflow-y-auto relative z-10 py-4">
+                            <nav className="px-4">
+                                {navLinks.map((link, index) => (
+                                    <motion.div
+                                        key={link.href}
+                                        variants={itemVariants}
+                                        custom={index}
+                                    >
                                         <Link
                                             href={link.href}
-                                            onClick={onClose}
-                                            className="group flex items-center justify-between px-8 py-5 border-b border-white/5 hover:bg-white/5 transition-colors relative overflow-hidden"
+                                            onClick={handleLinkClick}
+                                            className="group flex items-center justify-between p-4 border-b border-white/5 hover:bg-white/5 transition-all duration-300 rounded-lg"
                                         >
-                                            {/* Hover Accent Bar */}
-                                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
-
-                                            <div className="flex flex-col">
-                                                <div className="flex items-baseline gap-3">
-                                                    <span className="font-mono text-[9px] text-accent/50 group-hover:text-accent font-bold">
-                                                        {link.id}
-                                                    </span>
-                                                    <span className="text-xl font-black uppercase italic tracking-wider text-white group-hover:text-white transition-all font-display transform group-hover:translate-x-1 duration-300">
+                                            <div className="flex items-center gap-4">
+                                                <span className="text-[10px] font-mono text-accent/60 font-bold">
+                                                    {link.id}
+                                                </span>
+                                                <div>
+                                                    <span className="block text-sm font-bold text-white uppercase tracking-wider group-hover:text-accent transition-colors duration-300">
                                                         {link.name}
                                                     </span>
+                                                    <span className="text-[10px] text-white/30 font-mono">
+                                                        {link.sub}
+                                                    </span>
                                                 </div>
-                                                <span className="text-[9px] text-white/20 uppercase tracking-[0.2em] ml-6 font-mono hidden group-hover:block animate-in fade-in slide-in-from-left-2">
-                                                    {link.sub}
-                                                </span>
                                             </div>
-                                            <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-accent -rotate-45 group-hover:rotate-0 transition-all duration-300" />
+                                            <motion.span
+                                                className="text-white/20 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300"
+                                            >
+                                                <ChevronRight className="w-5 h-5" />
+                                            </motion.span>
                                         </Link>
                                     </motion.div>
                                 ))}
-                            </div>
+                            </nav>
                         </div>
 
-                        {/* Footer Actions - Industrial Sports Style */}
-                        <motion.div variants={itemVariants} className="p-6 border-t border-white/10 bg-[#080808] relative z-10 safe-area-pb">
+                        {/* Footer */}
+                        <motion.div
+                            variants={itemVariants}
+                            className="p-6 border-t border-white/10 relative z-10 bg-gradient-to-t from-[#080808] to-[#050505]"
+                        >
+                            {/* Social Links */}
+                            <div className="flex items-center justify-center gap-4 mb-6">
+                                {socialLinks.map((social) => (
+                                    <motion.a
+                                        key={social.label}
+                                        href={social.href}
+                                        className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 text-white/50 hover:text-accent hover:border-accent/50 hover:bg-accent/10 transition-all duration-300 rounded-full"
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        aria-label={social.label}
+                                    >
+                                        <social.icon className="w-4 h-4" />
+                                    </motion.a>
+                                ))}
+                            </div>
+
+                            {/* Auth Actions */}
                             {user ? (
-                                <button
+                                <motion.button
                                     onClick={handleSignOut}
-                                    className="w-full py-3 bg-red-600 hover:bg-red-500 text-white text-xs font-black uppercase tracking-[0.2em] transition-all flex justify-center items-center gap-2 skew-x-[-12deg]"
+                                    className="w-full py-3 bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300 text-xs font-bold uppercase tracking-widest rounded"
+                                    whileTap={{ scale: 0.98 }}
                                 >
-                                    <div className="skew-x-[12deg] flex items-center gap-2">
-                                        TERMINATE SESSION
-                                    </div>
-                                </button>
+                                    Sign Out
+                                </motion.button>
                             ) : (
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Link href="/login" onClick={onClose} className="w-full">
-                                        <button className="w-full py-3 border border-white/20 hover:border-white hover:bg-white hover:text-black text-white text-xs font-black uppercase tracking-[0.15em] transition-all flex justify-center items-center gap-2 skew-x-[-12deg] group">
-                                            <div className="skew-x-[12deg] group-hover:translate-x-1 transition-transform">
-                                                LOG IN
-                                            </div>
-                                        </button>
+                                <div className="flex gap-3">
+                                    <Link
+                                        href="/login"
+                                        onClick={handleLinkClick}
+                                        className="flex-1 py-3 bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300 text-xs font-bold uppercase tracking-widest text-center rounded"
+                                    >
+                                        Sign In
                                     </Link>
-                                    <Link href="/register" onClick={onClose} className="w-full">
-                                        <button className="w-full py-3 bg-accent text-black hover:bg-white text-xs font-black uppercase tracking-[0.15em] transition-all flex justify-center items-center gap-2 skew-x-[-12deg] shadow-[0_0_15px_rgba(124,58,237,0.3)] group">
-                                            <div className="skew-x-[12deg] group-hover:translate-x-1 transition-transform">
-                                                JOIN CLUB
-                                            </div>
-                                        </button>
+                                    <Link
+                                        href="/register"
+                                        onClick={handleLinkClick}
+                                        className="flex-1 py-3 bg-accent text-black hover:bg-accent/90 transition-all duration-300 text-xs font-bold uppercase tracking-widest text-center rounded"
+                                    >
+                                        Join
                                     </Link>
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-3 gap-0 mt-8 border-t border-white/5 pt-4">
-                                <Link href="#" className="flex justify-center text-white/30 hover:text-accent transition-colors py-2 border-r border-white/5"><Instagram className="w-4 h-4" /></Link>
-                                <Link href="#" className="flex justify-center text-white/30 hover:text-accent transition-colors py-2 border-r border-white/5"><Twitter className="w-4 h-4" /></Link>
-                                <Link href="#" className="flex justify-center text-white/30 hover:text-accent transition-colors py-2"><Facebook className="w-4 h-4" /></Link>
-                            </div>
+                            {/* Copyright */}
+                            <p className="text-[9px] text-white/20 text-center mt-4 font-mono uppercase tracking-widest">
+                                © 2026 RIIQX Labs
+                            </p>
                         </motion.div>
                     </motion.div>
                 </>

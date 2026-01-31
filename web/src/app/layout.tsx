@@ -1,4 +1,4 @@
-import { Montserrat, Roboto, Playfair_Display } from "next/font/google";
+import { Montserrat, Roboto, Playfair_Display, Oswald } from "next/font/google";
 
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
@@ -14,8 +14,6 @@ import { SocialProofNotifications } from "@/components/shared/SocialProofNotific
 import { CustomCursor } from "@/components/ui/CustomCursor";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { MotionConfig } from "framer-motion";
-
-
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -35,7 +33,6 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
-import { Oswald } from "next/font/google"; // Manual import if not available in top import
 const oswald = Oswald({
   variable: "--font-oswald",
   subsets: ["latin"],
@@ -45,7 +42,7 @@ const oswald = Oswald({
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://riiqx.com'), // Replace with actual domain
+  metadataBase: new URL('https://riiqx.com'),
   title: {
     default: "RIIQX | Cinematic Print-on-Demand",
     template: "%s | RIIQX"
@@ -67,7 +64,7 @@ export const metadata: Metadata = {
     siteName: "RIIQX Store",
     images: [
       {
-        url: "/og-image.jpg", // Make sure to add this asset later
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "RIIQX Store Preview",
@@ -78,7 +75,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "RIIQX | Cinematic Print-on-Demand",
     description: "Experience the future of fashion. Original, superhero-inspired apparel.",
-    images: ["/og-image.jpg"], // Same as OG
+    images: ["/og-image.jpg"],
     creator: "@riiqx_official",
   },
   robots: {
@@ -98,8 +95,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  userScalable: false, // Prevents zooming for app-like feel
-  viewportFit: "cover", // Utilizes notch area
+  userScalable: false,
+  viewportFit: "cover",
   themeColor: "#000000",
 };
 
@@ -114,7 +111,14 @@ export default function RootLayout({
         className={`${roboto.variable} ${montserrat.variable} ${playfair.variable} ${oswald.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
-        <MotionConfig reducedMotion="user">
+        <MotionConfig
+          reducedMotion="user"
+          transition={{
+            type: "spring",
+            stiffness: 400,
+            damping: 30,
+          }}
+        >
           <MusicProvider>
             <ThemeProvider attribute="data-mode" defaultTheme="electronics" enableSystem={false} themes={["fashion", "electronics"]}>
               <LivingScrollProvider>
@@ -125,14 +129,21 @@ export default function RootLayout({
                     {children}
                   </PageTransition>
                 </main>
-                {/* MusicPlayer removed - Integrated into DynamicIsland */}
-                {/* RiiqxAssistant removed */}
                 <Footer />
               </LivingScrollProvider>
 
               <CartSheet />
               <BottomNav />
-              <Toaster />
+              <Toaster
+                position="bottom-right"
+                toastOptions={{
+                  style: {
+                    background: '#0B0B0B',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: '#fff',
+                  },
+                }}
+              />
               <SocialProofNotifications />
               <CustomCursor />
             </ThemeProvider>

@@ -14,6 +14,11 @@ import { Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
 import { Oswald_400Regular, Oswald_500Medium, Oswald_700Bold } from '@expo-google-fonts/oswald';
 
+import * as SplashScreen from 'expo-splash-screen';
+
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
+
 export default function Layout() {
     // Load Fonts
     const [fontsLoaded] = useFonts({
@@ -24,6 +29,12 @@ export default function Layout() {
         Oswald_500Medium,
         Oswald_700Bold,
     });
+
+    useEffect(() => {
+        if (fontsLoaded) {
+            SplashScreen.hideAsync();
+        }
+    }, [fontsLoaded]);
 
     useEffect(() => {
         registerForPushNotificationsAsync();
@@ -41,7 +52,7 @@ export default function Layout() {
     }, []);
 
     if (!fontsLoaded) {
-        return null;
+        return null; // Keep null while splash screen is visible
     }
 
     return (

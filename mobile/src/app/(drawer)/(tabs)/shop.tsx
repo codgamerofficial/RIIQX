@@ -128,6 +128,9 @@ export default function ShopScreen() {
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{ padding: 8, paddingBottom: 100 }}
                         columnWrapperStyle={{ justifyContent: 'space-between' }}
+                        initialNumToRender={6}
+                        maxToRenderPerBatch={6}
+                        windowSize={5}
                     />
                 )}
 
