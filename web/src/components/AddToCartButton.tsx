@@ -33,6 +33,7 @@ export function AddToCartButton({ product, variant, className = "", quantity = 1
             id: product.id,
             variantId: selectedVariant?.id,
             title: product.title,
+            handle: product.handle,
             price: price,
             image: image,
             quantity: quantity,

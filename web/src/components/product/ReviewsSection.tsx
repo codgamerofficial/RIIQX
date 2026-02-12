@@ -120,7 +120,7 @@ export function ReviewsSection({ productId }: { productId: string }) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     return (
-        <section className="py-24 bg-[#050505] border-t border-white/5 overflow-hidden">
+        <section className="py-24 bg-[#050505] overflow-hidden">
             <div className="max-w-[1400px] mx-auto px-6">
                 <div className="flex flex-col md:flex-row gap-16 items-start">
                     {/* Summary Header (Left Side) */}

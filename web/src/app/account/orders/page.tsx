@@ -22,7 +22,8 @@ export default function OrdersPage() {
             title: item.title,
             price: item.price,
             image: item.image,
-            quantity: 1 // Default to 1 or item.quantity
+            quantity: 1, // Default to 1 or item.quantity
+            handle: item.handle || item.title.toLowerCase().replace(/\s+/g, '-')
         }));
         addItems(cartItems);
         router.push('/shop'); // Or open cart drawer

@@ -5,9 +5,15 @@ import { usePathname } from "next/navigation";
 import { Compass, Heart, User, Search, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export function BottomNav() {
     const pathname = usePathname();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const vibrate = () => {
         if (typeof window !== "undefined" && window.navigator && window.navigator.vibrate) {
@@ -44,7 +50,7 @@ export function BottomNav() {
     ];
 
     // Hide on product pages to prevent overlap with Sticky Add To Cart
-    if (pathname?.startsWith("/product/")) return null;
+    if (!mounted || pathname?.startsWith("/product/")) return null;
 
     return (
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden pointer-events-none">

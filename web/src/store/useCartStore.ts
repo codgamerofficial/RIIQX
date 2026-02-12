@@ -11,6 +11,9 @@ export interface CartItem {
     quantity: number;
     color?: string;
     size?: string;
+    handle: string;
+    currencyCode?: string;
+    selectedOptions?: { name: string; value: string }[];
 }
 
 interface CartState {

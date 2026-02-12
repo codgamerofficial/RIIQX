@@ -1,0 +1,11 @@
+src/app/account/orders/page.tsx(27,18): error TS2345: Argument of type '{ id: any; variantId: any; title: any; price: any; image: any; quantity: number; }[]' is not assignable to parameter of type 'CartItem[]'.
+  Property 'handle' is missing in type '{ id: any; variantId: any; title: any; price: any; image: any; quantity: number; }' but required in type 'CartItem'.
+src/components/home/HomeClient.tsx(37,49): error TS2304: Cannot find name 'newArrivals'.
+src/components/product/QuickViewModal.tsx(55,17): error TS2345: Argument of type '{ id: string; variantId: string; title: string; price: number; image: string; quantity: number; size: string | undefined; color: string | undefined; }' is not assignable to parameter of type 'CartItem'.
+  Property 'handle' is missing in type '{ id: string; variantId: string; title: string; price: number; image: string; quantity: number; size: string | undefined; color: string | undefined; }' but required in type 'CartItem'.
+src/components/shop/AddToCartButton.tsx(17,17): error TS2345: Argument of type '{ id: string; title: string; price: number; image: string; quantity: number; }' is not assignable to parameter of type 'CartItem'.
+  Property 'handle' is missing in type '{ id: string; title: string; price: number; image: string; quantity: number; }' but required in type 'CartItem'.
+src/components/shop/ShopifyAddToCartButton.tsx(25,17): error TS2345: Argument of type '{ id: string; variantId: string; title: string; price: number; image: string; quantity: number; size: string | undefined; color: string | undefined; }' is not assignable to parameter of type 'CartItem'.
+  Property 'handle' is missing in type '{ id: string; variantId: string; title: string; price: number; image: string; quantity: number; size: string | undefined; color: string | undefined; }' but required in type 'CartItem'.
+src/components/shop/ShopifyProductCard.tsx(37,17): error TS2345: Argument of type '{ id: string; variantId: string; title: string; price: number; image: string; quantity: number; }' is not assignable to parameter of type 'CartItem'.
+  Property 'handle' is missing in type '{ id: string; variantId: string; title: string; price: number; image: string; quantity: number; }' but required in type 'CartItem'.

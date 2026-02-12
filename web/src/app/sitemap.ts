@@ -1,10 +1,12 @@
 import { MetadataRoute } from 'next';
 import { getProducts, getCollections } from '@/lib/shopify';
 
-const baseUrl = 'https://riiqx.com'; // Replace with actual domain
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+    : 'https://riiqx.com';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const { products } = await getProducts({});
+    const { products } = await getProducts({ limit: 100 });
     const collections = await getCollections();
 
     const productUrls = products.map((product) => ({

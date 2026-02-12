@@ -11,7 +11,7 @@ interface PremiumCardProps extends ViewProps {
 }
 
 export function PremiumCard({ className, children, variant = 'glass', style, ...props }: PremiumCardProps) {
-    const baseStyles = "rounded-[24px] overflow-hidden border border-white/10";
+    const baseStyles = "rounded-[24px] overflow-hidden border border-[#CCFF00]/30 shadow-[0_0_15px_rgba(204,255,0,0.1)]";
 
     const variants = {
         glass: "bg-surface/60",

@@ -129,7 +129,7 @@ export function Footer() {
     return (
         <footer
             ref={ref}
-            className="w-full bg-[#050505] text-white pt-24 md:pt-32 pb-8 font-sans relative overflow-hidden clip-path-slant-top"
+            className="w-full bg-[#050505] text-white pt-24 md:pt-32 pb-8 font-sans relative overflow-hidden clip-path-slant-top safe-area-inset-bottom"
         >
             {/* Background Layer */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">

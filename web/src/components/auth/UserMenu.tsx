@@ -7,7 +7,11 @@ import { User, LogOut, Package, MapPin, Settings, LayoutDashboard } from "lucide
 import { Menu, Transition } from "@headlessui/react";
 import { createClient } from "@/lib/supabase/client";
 
-export function UserMenu() {
+interface UserMenuProps {
+    isIPLTheme?: boolean;
+}
+
+export function UserMenu({ isIPLTheme = false }: UserMenuProps) {
     const router = useRouter();
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -36,28 +40,34 @@ export function UserMenu() {
     };
 
     if (loading) {
-        return <div className="w-8 h-8 rounded-full bg-neutral-800 animate-pulse" />;
+        return (
+            <div className={`w-8 h-8 rounded-full animate-pulse ${isIPLTheme ? 'bg-white/20' : 'bg-neutral-200'}`} />
+        );
     }
 
     if (!user) {
         return (
             <Link
                 href="/login"
-                className="p-2 text-white hover:text-bewakoof-yellow transition-colors"
+                className={`p-2 transition-colors ${isIPLTheme
+                    ? "text-white/70 hover:text-white"
+                    : "text-black/70 hover:text-black"
+                    }`}
                 aria-label="Login"
             >
-                <User className="w-6 h-6" />
+                <User className="w-5 h-5" strokeWidth={1.5} />
             </Link>
         );
     }
 
     return (
-        <Menu as="div" className="relative ml-3">
+        <Menu as="div" className="relative">
             <div>
                 <Menu.Button className="flex items-center justify-center transition-transform hover:scale-105 focus:outline-none">
                     <span className="sr-only">Open user menu</span>
                     {user.user_metadata?.avatar_url ? (
-                        <div className="relative w-8 h-8 overflow-hidden clip-path-slant border border-white/20 group-hover:border-accent transition-colors">
+                        <div className={`relative w-8 h-8 overflow-hidden rounded-full transition-colors ${isIPLTheme ? 'border border-white/30' : 'border border-black/20'
+                            }`}>
                             <img
                                 className="h-full w-full object-cover"
                                 src={user.user_metadata.avatar_url}
@@ -66,7 +76,10 @@ export function UserMenu() {
                         </div>
                     ) : (
                         <div className="relative group">
-                            <User className="w-5 h-5 text-white/70 group-hover:text-accent transition-colors" />
+                            <User className={`w-5 h-5 transition-colors ${isIPLTheme
+                                    ? "text-white/70 group-hover:text-white"
+                                    : "text-black/70 group-hover:text-black"
+                                }`} strokeWidth={1.5} />
                         </div>
                     )}
                 </Menu.Button>
@@ -80,17 +93,20 @@ export function UserMenu() {
                 leaveFrom="transform opacity-100 scale-100 translate-y-0"
                 leaveTo="transform opacity-0 scale-95 -translate-y-2"
             >
-                <Menu.Items className="absolute right-0 z-50 mt-4 w-64 origin-top-right bg-[#050505] border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur-xl clip-path-slant-right-bottom p-1">
-                    <div className="px-4 py-4 border-b border-white/5 bg-white/5">
-                        <p className="text-sm text-white font-black uppercase tracking-wider font-display italic truncate">
+                <Menu.Items className={`absolute right-0 z-50 mt-4 w-56 origin-top-right shadow-2xl backdrop-blur-xl p-1 rounded-lg ${isIPLTheme
+                        ? "bg-black/95 border border-white/10"
+                        : "bg-white border border-black/5"
+                    }`}>
+                    <div className={`px-4 py-3 border-b ${isIPLTheme ? 'border-white/10 bg-white/5' : 'border-black/5 bg-black/5'}`}>
+                        <p className={`text-sm font-semibold truncate ${isIPLTheme ? 'text-white' : 'text-black'}`}>
                             {user.user_metadata?.full_name || "Guest User"}
                         </p>
-                        <p className="text-[10px] text-white/40 font-mono truncate mt-1">
+                        <p className={`text-xs truncate mt-0.5 ${isIPLTheme ? 'text-white/50' : 'text-black/50'}`}>
                             {user.email}
                         </p>
                     </div>
 
-                    <div className="py-2">
+                    <div className="py-1">
                         {[
                             { href: "/account", label: "Dashboard", Icon: LayoutDashboard },
                             { href: "/account/orders", label: "Orders", Icon: Package },
@@ -101,10 +117,12 @@ export function UserMenu() {
                                 {({ active }) => (
                                     <Link
                                         href={href}
-                                        className={`${active ? "bg-white/5 text-accent pl-6" : "text-white/60 pl-4"
-                                            } group flex items-center py-3 text-xs font-bold uppercase tracking-widest transition-all duration-300`}
+                                        className={`group flex items-center px-4 py-2.5 text-sm transition-colors ${active
+                                                ? isIPLTheme ? "bg-white/10 text-white" : "bg-black/5 text-black"
+                                                : isIPLTheme ? "text-white/70" : "text-black/70"
+                                            }`}
                                     >
-                                        <Icon className={`mr-3 h-4 w-4 transition-colors ${active ? "text-accent" : "text-white/30"}`} />
+                                        <Icon className={`mr-3 h-4 w-4 ${active ? isIPLTheme ? "text-white" : "text-black" : isIPLTheme ? "text-white/40" : "text-black/40"}`} />
                                         {label}
                                     </Link>
                                 )}
@@ -112,15 +130,17 @@ export function UserMenu() {
                         ))}
                     </div>
 
-                    <div className="py-1 border-t border-white/5">
+                    <div className={`py-1 border-t ${isIPLTheme ? 'border-white/10' : 'border-black/5'}`}>
                         <Menu.Item>
                             {({ active }) => (
                                 <button
                                     onClick={handleSignOut}
-                                    className={`${active ? "bg-red-500/10 text-red-500 pl-6" : "text-white/60 pl-4"
-                                        } group flex w-full items-center py-3 text-xs font-bold uppercase tracking-widest transition-all duration-300`}
+                                    className={`group flex w-full items-center px-4 py-2.5 text-sm transition-colors ${active
+                                            ? isIPLTheme ? "bg-red-500/10 text-red-400" : "bg-red-50 text-red-600"
+                                            : isIPLTheme ? "text-white/70" : "text-black/70"
+                                        }`}
                                 >
-                                    <LogOut className="mr-3 h-4 w-4 group-hover:text-red-500 transition-colors" />
+                                    <LogOut className="mr-3 h-4 w-4" />
                                     Sign Out
                                 </button>
                             )}

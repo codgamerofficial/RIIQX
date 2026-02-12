@@ -20,6 +20,7 @@ export function AddToCartButton({ product }: { product: Product }) {
             price: product.selling_price,
             image: product.images?.[0] || "",
             quantity: 1,
+            handle: product.title.toLowerCase().replace(/\s+/g, '-'),
             // color/size would come from selected state if implemented
         });
 

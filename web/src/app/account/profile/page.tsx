@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { User, Mail, Phone, Loader2, Save } from "lucide-react";
+import { User, Mail, Phone, Loader2, Save, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function ProfilePage() {
     const [loading, setLoading] = useState(false);
@@ -20,11 +22,6 @@ export default function ProfilePage() {
         const getProfile = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                // Fetch profile data from 'profiles' table if we want simpler access, 
-                // but user_metadata is often enough for basic info. 
-                // Let's rely on metadata for now as per Auth flow, or fetch from 'profiles' table.
-                // The trigger syncs metadata to profiles, so let's fetch from profiles for SS of Truth.
-
                 const { data: profile } = await supabase
                     .from('profiles')
                     .select('*')
@@ -51,23 +48,17 @@ export default function ProfilePage() {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error("No user found");
 
-            // Update Auth Metadata
             const { error: authError } = await supabase.auth.updateUser({
                 data: { full_name: formData.full_name, phone: formData.phone }
             });
 
             if (authError) throw authError;
 
-            // Update Profiles Table (Trigger handles insert, we handle update manually for redundancy/safety)
             const { error: profileError } = await supabase
                 .from('profiles')
                 .update({
                     full_name: formData.full_name,
                     updated_at: new Date().toISOString()
-                    // phone column might not exist in profiles schema I created?
-                    // Checked schema: profiles (id, updated_at, username, full_name, avatar_url, website)
-                    // I did NOT add phone to profiles in the schema.
-                    // Let's stick to full_name.
                 })
                 .eq('id', user.id);
 
@@ -82,75 +73,86 @@ export default function ProfilePage() {
     };
 
     if (fetching) {
-        return <div className="text-white">Loading profile...</div>;
+        return (
+            <div className="min-h-screen bg-[#050505] flex items-center justify-center p-6">
+                <Loader2 className="w-6 h-6 animate-spin text-white" />
+            </div>
+        );
     }
 
     return (
-        <div className="max-w-xl">
-            <h1 className="text-2xl font-bold text-white mb-6">Profile Details</h1>
+        <div className="min-h-screen bg-[#050505] text-white pt-24 pb-20 px-6">
+            <div className="max-w-xl mx-auto">
+                <Link href="/account" className="flex items-center gap-2 text-white/50 hover:text-white mb-8 transition-colors text-sm font-bold uppercase tracking-widest">
+                    <ArrowLeft className="w-4 h-4" /> Back to Hub
+                </Link>
 
-            {message && (
-                <div className={`p-4 rounded-lg mb-6 ${message.includes("Error") ? "bg-neon-red/10 text-neon-red" : "bg-green-500/10 text-green-400"}`}>
-                    {message}
-                </div>
-            )}
+                <h1 className="text-3xl font-black uppercase tracking-tighter mb-8">Profile Settings</h1>
 
-            <form onSubmit={handleUpdate} className="space-y-6">
-                <div>
-                    <label className="block text-sm font-bold text-white uppercase mb-2">
-                        Full Name
-                    </label>
-                    <div className="relative">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                        <input
-                            type="text"
-                            value={formData.full_name}
-                            onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                            className="w-full bg-neutral-800 border border-white/10 rounded-lg pl-12 pr-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none transition-colors"
-                        />
+                {message && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`p-4 rounded-xl mb-8 border backdrop-blur-md ${message.includes("Error") ? "bg-red-500/10 border-red-500/20 text-red-500" : "bg-green-500/10 border-green-500/20 text-green-500"}`}
+                    >
+                        <p className="text-sm font-bold">{message}</p>
+                    </motion.div>
+                )}
+
+                <form onSubmit={handleUpdate} className="space-y-6">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-white/50">Full Name</label>
+                        <div className="relative group">
+                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-white transition-colors" />
+                            <input
+                                type="text"
+                                value={formData.full_name}
+                                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                                className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl pl-12 pr-4 py-4 text-sm font-medium focus:border-white/40 focus:outline-none transition-colors placeholder:text-white/20"
+                                placeholder="Enter your name"
+                            />
+                        </div>
                     </div>
-                </div>
 
-                <div>
-                    <label className="block text-sm font-bold text-white uppercase mb-2">
-                        Email Address
-                    </label>
-                    <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                        <input
-                            type="email"
-                            value={formData.email}
-                            disabled
-                            className="w-full bg-neutral-800/50 border border-white/5 rounded-lg pl-12 pr-4 py-3 text-muted-foreground cursor-not-allowed"
-                        />
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-white/50">Email Address</label>
+                        <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                            <input
+                                type="email"
+                                value={formData.email}
+                                disabled
+                                className="w-full bg-[#0A0A0A]/50 border border-white/5 rounded-xl pl-12 pr-4 py-4 text-sm font-medium text-white/40 cursor-not-allowed"
+                            />
+                        </div>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">Email cannot be changed.</p>
-                </div>
 
-                <div>
-                    <label className="block text-sm font-bold text-white uppercase mb-2">
-                        Phone Number
-                    </label>
-                    <div className="relative">
-                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                        <input
-                            type="tel"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            className="w-full bg-neutral-800 border border-white/10 rounded-lg pl-12 pr-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none transition-colors"
-                        />
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-white/50">Phone Number</label>
+                        <div className="relative group">
+                            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-white transition-colors" />
+                            <input
+                                type="tel"
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl pl-12 pr-4 py-4 text-sm font-medium focus:border-white/40 focus:outline-none transition-colors placeholder:text-white/20"
+                                placeholder="Add phone number"
+                            />
+                        </div>
                     </div>
-                </div>
 
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="bewakoof-btn bewakoof-btn-primary py-3 px-8 flex items-center gap-2 disabled:opacity-50"
-                >
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                    Save Changes
-                </button>
-            </form>
+                    <div className="pt-4">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full py-4 bg-white text-black font-black uppercase tracking-widest text-sm hover:bg-white/90 rounded-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                        >
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }

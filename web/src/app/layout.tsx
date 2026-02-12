@@ -1,8 +1,10 @@
 import { Montserrat, Roboto, Playfair_Display, Oswald } from "next/font/google";
 
 import "./globals.css";
+/* import "./stranger-verse.css"; */
+import "./cricket-theme.css";
 import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { FooterMinimal } from "@/components/layout/FooterMinimal";
 import { CartSheet } from "@/components/cart/CartSheet";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { LivingScrollProvider } from "@/components/ui/LivingScrollProvider";
@@ -13,7 +15,9 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SocialProofNotifications } from "@/components/shared/SocialProofNotifications";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 import { PageTransition } from "@/components/layout/PageTransition";
+import { KonamiCode } from "@/components/ui/KonamiCode";
 import { MotionConfig } from "framer-motion";
+import { StylistSidebar } from "@/components/ai/StylistSidebar";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -121,6 +125,7 @@ export default function RootLayout({
         >
           <MusicProvider>
             <ThemeProvider attribute="data-mode" defaultTheme="electronics" enableSystem={false} themes={["fashion", "electronics"]}>
+              <KonamiCode />
               <LivingScrollProvider>
                 <ScrollProgress />
                 <Navbar />
@@ -129,7 +134,7 @@ export default function RootLayout({
                     {children}
                   </PageTransition>
                 </main>
-                <Footer />
+                <FooterMinimal />
               </LivingScrollProvider>
 
               <CartSheet />
@@ -145,6 +150,7 @@ export default function RootLayout({
                 }}
               />
               <SocialProofNotifications />
+              <StylistSidebar />
               <CustomCursor />
             </ThemeProvider>
           </MusicProvider>

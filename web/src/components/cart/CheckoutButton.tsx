@@ -43,9 +43,9 @@ export function CheckoutButton({ items }: CheckoutButtonProps) {
                 onClick={handleCheckout}
                 disabled={status === "loading" || status === "success"}
                 layout // Enables automatic layout animations
-                className={`relative w-full h-14 flex items-center justify-center rounded-xl font-black uppercase tracking-widest overflow-hidden transition-all duration-300
-                    ${status === "error" ? "bg-neon-red" : "bg-gradient-to-r from-cherry-red to-red-700"}
-                    text-white shadow-[0_0_20px_rgba(227,28,121,0.3)] hover:shadow-[0_0_30px_rgba(227,28,121,0.6)]
+                className={`relative w-full h-14 flex items-center justify-center rounded-sm font-black uppercase tracking-widest overflow-hidden transition-all duration-300
+                    ${status === "error" ? "bg-red-500" : "bg-white hover:bg-white/90"}
+                    text-black shadow-[0_0_20px_rgba(255,255,255,0.1)]
                 `}
             >
                 <AnimatePresence mode="wait">
@@ -57,7 +57,7 @@ export function CheckoutButton({ items }: CheckoutButtonProps) {
                             exit={{ opacity: 0, y: -10 }}
                             className="flex items-center space-x-2 group w-full justify-center"
                         >
-                            <Lock className="w-4 h-4 text-white/70" />
+                            <Lock className="w-4 h-4 text-black/70" />
                             <span>Secure Checkout</span>
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </motion.div>

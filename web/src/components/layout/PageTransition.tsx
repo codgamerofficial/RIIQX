@@ -12,72 +12,38 @@ interface PageTransitionProps {
 
 export function PageTransition({ children, className }: PageTransitionProps) {
     const pathname = usePathname();
-    const shouldReduceMotion = useReducedMotion();
-    // Removed artificial delay which might cause stuck states
-    const [isLoading, setIsLoading] = useState(false);
 
+    // Prevent hydration mismatch
+    const [isMounted, setIsMounted] = useState(false);
     useEffect(() => {
-        setIsLoading(false);
-    }, [pathname]);
+        setIsMounted(true);
+    }, []);
 
-    const variants = {
-        initial: {
-            opacity: 1, // Changed from 0 to 1 to prevent black screen stuck state
-            y: shouldReduceMotion ? 0 : 20,
-            scale: shouldReduceMotion ? 1 : 0.98,
-            filter: shouldReduceMotion ? "blur(0px)" : "blur(10px)",
-        },
-        enter: {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            filter: "blur(0px)",
-            transition: {
-                duration: shouldReduceMotion ? 0 : 0.5,
-                ease: [0.22, 1, 0.36, 1],
-                staggerChildren: 0.05,
-            },
-        },
-        exit: {
-            opacity: 0,
-            y: shouldReduceMotion ? 0 : -10,
-            scale: shouldReduceMotion ? 1 : 0.99,
-            filter: shouldReduceMotion ? "blur(0px)" : "blur(5px)",
-            transition: {
-                duration: shouldReduceMotion ? 0 : 0.3,
-                ease: [0.22, 1, 0.36, 1],
-            },
-        },
-    };
-
-    const progressVariants = {
-        initial: { scaleX: 0, opacity: 1 },
-        enter: {
-            scaleX: 1,
-            opacity: 0,
-            transition: {
-                scaleX: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-                opacity: { duration: 0.3, delay: 0.5 }
-            }
-        },
-        exit: {
-            scaleX: 0,
-            opacity: 1,
-            transition: { duration: 0.2 }
-        },
-    };
+    if (!isMounted) return null;
 
     return (
         <div className={cn("w-full min-h-screen", className)}>
-            {/* Page Content - simplified to ensure visibility */}
-            <motion.div
-                key={pathname}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-            >
-                {children}
-            </motion.div>
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={pathname}
+                    initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
+                    animate={{
+                        opacity: 1,
+                        scale: 1,
+                        filter: "blur(0px)",
+                        transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+                    }}
+                    exit={{
+                        opacity: 0,
+                        scale: 0.98,
+                        filter: "blur(10px)",
+                        transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+                    }}
+                    className="origin-top"
+                >
+                    {children}
+                </motion.div>
+            </AnimatePresence>
         </div>
     );
 }
@@ -137,6 +103,7 @@ export function ContentFadeIn({ children, className, staggerDelay = 0.1 }: Conte
             transition: {
                 duration: 0.5,
                 ease: [0.16, 1, 0.3, 1],
+                staggerChildren: 0.05,
             },
         },
     };

@@ -3,18 +3,20 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
-    Package, MapPin, Clock, ChevronRight, Settings,
-    LogOut, Truck, RefreshCw, FileText,
-    Info, Instagram, Twitter, Facebook, ShieldCheck, Mail,
-    Bell, Lock, UserCog
+    Package, MapPin, ChevronRight, Settings,
+    LogOut, Truck, RefreshCw, Info, ShieldCheck, Heart, Sparkles, Trophy, Target
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useGamification } from "@/hooks/useGamification";
+import { RankBadge } from "@/components/account/RankBadge";
+import { BentoGrid, BentoGridItem } from "@/components/shop/BentoGrid";
 
 export default function AccountDashboard() {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const supabase = createClient();
+    const { profile, progress, nextLevelXp } = useGamification();
 
     useEffect(() => {
         const getUser = async () => {
@@ -33,221 +35,152 @@ export default function AccountDashboard() {
     if (loading) {
         return (
             <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-                <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-white/20 border-t-[#B4F000] rounded-full animate-spin" />
             </div>
         );
     }
 
-    const cards = [
-        {
-            title: "Total Orders",
-            value: "0",
-            icon: Package,
-            href: "/orders",
-            color: "text-blue-400",
-            bg: "bg-blue-500/10",
-        },
-        {
-            title: "Addresses",
-            value: "0",
-            icon: MapPin,
-            href: "/addresses",
-            color: "text-green-400",
-            bg: "bg-green-500/10",
-        },
-        {
-            title: "Member Since",
-            value: user?.created_at ? new Date(user.created_at).getFullYear().toString() : "-",
-            icon: Clock,
-            href: "#",
-            color: "text-purple-400",
-            bg: "bg-purple-500/10",
-        },
-    ];
-
     const menuGroups = [
         {
-            title: "Support Squad",
+            title: "Mission Logs",
             items: [
-                { label: "Contact HQ", href: "/contact", icon: Mail },
-                { label: "Track Shipment", href: "/track-order", icon: Package },
-                { label: "Logistics Info", href: "/shipping", icon: Truck },
-                { label: "Returns & Exchange", href: "/returns", icon: RefreshCw },
+                { label: "Order History", href: "/account/orders", icon: Package },
+                { label: "Wishlist Protocol", href: "/account/wishlist", icon: Heart },
+                { label: "Drop Zones (Addresses)", href: "/account/addresses", icon: MapPin },
             ]
         },
         {
-            title: "The Franchise",
+            title: "Support Uplink",
             items: [
-                { label: "About RIIQX", href: "/about", icon: Info },
-                { label: "Highlight Reel", href: "/lookbook", icon: Instagram },
-                { label: "Join Roster", href: "/careers", icon: UserCog },
-                { label: "Rulebook (Terms)", href: "/terms", icon: FileText },
+                { label: "Track Shipment", href: "/track-order", icon: Truck },
+                { label: "Returns", href: "/returns", icon: RefreshCw },
+                { label: "Help Center", href: "/contact", icon: Info },
             ]
         },
         {
-            title: "Settings",
+            title: "System Config",
             items: [
-                { label: "Account Security", href: "/settings/security", icon: ShieldCheck },
-                { label: "Notifications", href: "/settings/notifications", icon: Bell },
-                { label: "Privacy Details", href: "/privacy", icon: Lock },
+                { label: "Profile Settings", href: "/account/profile", icon: Settings },
+                { label: "Security", href: "/account/settings", icon: ShieldCheck },
             ]
         }
     ];
 
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.05 }
-        }
-    };
-
-    const itemVariants = {
-        hidden: { y: 10, opacity: 0 },
-        visible: { y: 0, opacity: 1 }
-    };
-
-    const MemberIcon = cards[2].icon;
-
     return (
-        <div className="min-h-screen bg-[#050505] pb-24 font-sans selection:bg-accent/30">
-            {/* Header / Profile Info */}
-            <div className="pt-32 pb-8 px-6 bg-[#0a0a0a] border-b border-white/5 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="min-h-screen bg-[#050505] text-white pt-32 pb-20 px-4 md:px-8">
+            <div className="max-w-5xl mx-auto space-y-12">
 
+                {/* Header / ID Card */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="relative z-10"
+                    className="glass-panel p-8 relative overflow-hidden group"
                 >
-                    <h1 className="text-4xl font-black text-white uppercase tracking-tighter font-display italic mb-2">
-                        My <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-white">Hub</span>
-                    </h1>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center">
-                            <span className="text-sm font-bold text-white">
-                                {user?.email?.charAt(0).toUpperCase()}
-                            </span>
+                    <div className="absolute top-0 right-0 p-32 bg-[#B4F000]/5 blur-3xl rounded-full pointer-events-none" />
+
+                    <div className="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10">
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-white/10 to-black border border-white/20 flex items-center justify-center text-3xl font-black text-white/50 backdrop-blur-sm">
+                            {user?.email?.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                            <p className="text-white font-bold text-sm">
-                                {user?.user_metadata?.full_name || "RIIQX Elite Member"}
-                            </p>
-                            <p className="text-white/40 font-mono text-[10px] uppercase tracking-widest">
-                                {user?.email}
+
+                        <div className="flex-1 text-center md:text-left space-y-4">
+                            <div>
+                                <h1 className="text-3xl font-black uppercase tracking-tighter font-[family-name:var(--font-oswald)]">
+                                    {user?.user_metadata?.full_name || "Operative"}
+                                </h1>
+                                <p className="text-[#B4F000] font-mono text-xs tracking-widest uppercase">
+                                    ID: {user?.id?.substring(0, 8)} // STATUS: ACTIVE
+                                </p>
+                            </div>
+
+                            <RankBadge level={profile.level ?? 1} title={profile.title ?? "Initiate"} />
+                        </div>
+
+                        {/* XP Bar */}
+                        <div className="w-full md:w-64 space-y-2">
+                            <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-white/50">
+                                <span>XP Progress</span>
+                                <span>{Math.floor(profile.xp)} / {profile.level * 1000} XP</span>
+                            </div>
+                            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${progress}%` }}
+                                    transition={{ duration: 1, ease: "easeOut" }}
+                                    className="h-full bg-[#B4F000]"
+                                />
+                            </div>
+                            <p className="text-[10px] text-right text-white/30">
+                                Next Reward: Early Access (Lvl {profile.level + 1})
                             </p>
                         </div>
                     </div>
                 </motion.div>
-            </div>
 
-            <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                className="px-4 -mt-6 space-y-8 relative z-20"
-            >
-                {/* 1. Dashboard Widgets */}
-                <div className="grid grid-cols-2 gap-3">
-                    {cards.slice(0, 2).map((card, idx) => (
-                        <Link href={card.href} key={idx}>
-                            <motion.div
-                                variants={itemVariants}
-                                whileTap={{ scale: 0.98 }}
-                                className="bg-[#121212] border border-white/5 p-5 rounded-[24px] backdrop-blur-md hover:border-white/10 transition-colors h-full flex flex-col justify-between group"
-                            >
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className={`p-2 rounded-xl ${card.bg}`}>
-                                        <card.icon className={`w-5 h-5 ${card.color}`} />
-                                    </div>
-                                    <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white group-hover:translate-x-1 transition-all" />
-                                </div>
-                                <div>
-                                    <h3 className="text-2xl font-black font-display text-white mb-1">{card.value}</h3>
-                                    <p className="text-[10px] font-bold uppercase tracking-wider text-white/40">{card.title}</p>
-                                </div>
-                            </motion.div>
-                        </Link>
+                {/* Command Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {menuGroups.map((group, i) => (
+                        <motion.div
+                            key={group.title}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: i * 0.1 }}
+                            className="bg-zinc-900/50 border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors"
+                        >
+                            <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#B4F000] mb-6">
+                                <Target className="w-3 h-3" /> {group.title}
+                            </h3>
+                            <div className="space-y-1">
+                                {group.items.map((item) => (
+                                    <Link key={item.label} href={item.href} className="flex items-center justify-between p-4 hover:bg-white/5 rounded-lg transition-all group">
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-2 bg-white/5 rounded-md group-hover:bg-[#B4F000]/20 group-hover:text-[#B4F000] transition-colors text-white/50">
+                                                <item.icon className="w-4 h-4" />
+                                            </div>
+                                            <span className="text-sm font-bold uppercase tracking-wide text-white/70 group-hover:text-white">{item.label}</span>
+                                        </div>
+                                        <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-[#B4F000] transition-colors" />
+                                    </Link>
+                                ))}
+                            </div>
+                        </motion.div>
                     ))}
+
+                    {/* Stats / Achievements Placeholder */}
+                    <div className="bg-gradient-to-br from-[#B4F000]/10 to-transparent border border-[#B4F000]/20 rounded-2xl p-6 flex flex-col justify-between">
+                        <div>
+                            <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#B4F000] mb-2">
+                                <Trophy className="w-3 h-3" /> Recent Achievements
+                            </h3>
+                            <div className="space-y-3 mt-4">
+                                <div className="flex items-center gap-3 p-3 bg-black/40 rounded-lg border border-white/5">
+                                    <div className="p-1.5 bg-[#B4F000] rounded-full text-black">
+                                        <Sparkles className="w-3 h-3" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-white">First Drop Copied</p>
+                                        <p className="text-[10px] text-white/50">Earned 500 XP</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button className="mt-6 w-full py-3 border border-[#B4F000]/30 text-[#B4F000] text-xs font-bold uppercase tracking-widest hover:bg-[#B4F000] hover:text-black transition-all rounded-lg">
+                            View All Trophies
+                        </button>
+                    </div>
                 </div>
 
-                {/* Member Status Widget */}
-                <motion.div variants={itemVariants}>
-                    <div className="bg-[#121212] border border-white/5 p-5 rounded-[24px] flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className={`p-2 rounded-xl ${cards[2].bg}`}>
-                                <MemberIcon className={`w-5 h-5 ${cards[2].color}`} />
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-bold uppercase tracking-wider text-white/40">{cards[2].title}</p>
-                                <h3 className="text-lg font-bold text-white">{cards[2].value}</h3>
-                            </div>
-                        </div>
-                        <div className="px-4 py-1.5 bg-accent/10 rounded-full border border-accent/20 text-[10px] uppercase font-black tracking-wider text-accent">
-                            Verified Status
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* 2. Menu Groups */}
-                {menuGroups.map((group, groupIdx) => (
-                    <motion.div variants={itemVariants} key={groupIdx}>
-                        <h3 className="px-4 text-[12px] font-black font-display uppercase tracking-widest text-white/30 mb-3">
-                            {group.title}
-                        </h3>
-                        <div className="bg-[#121212] rounded-[24px] overflow-hidden border border-white/5">
-                            {group.items.map((item, idx) => (
-                                <Link href={item.href} key={idx}>
-                                    <div className={`
-                                        flex items-center justify-between p-5 active:bg-white/5 transition-colors group
-                                        ${idx !== group.items.length - 1 ? 'border-b border-white/5' : ''}
-                                    `}>
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-accent/10 transition-colors">
-                                                <item.icon className="w-4 h-4 text-white/60 group-hover:text-accent transition-colors" />
-                                            </div>
-                                            <span className="text-sm font-bold text-white/90">{item.label}</span>
-                                        </div>
-                                        <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white transition-colors" />
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </motion.div>
-                ))}
-
-                {/* 3. Socials Group */}
-                <motion.div variants={itemVariants}>
-                    <h3 className="px-4 text-[12px] font-black font-display uppercase tracking-widest text-white/30 mb-3">
-                        Connect
-                    </h3>
-                    <div className="bg-[#121212] rounded-[24px] overflow-hidden border border-white/5 flex divide-x divide-white/5">
-                        <a href="#" className="flex-1 py-5 flex justify-center items-center hover:bg-white/5 active:bg-white/10 transition-colors text-white/60 hover:text-white group">
-                            <Instagram className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        </a>
-                        <a href="#" className="flex-1 py-5 flex justify-center items-center hover:bg-white/5 active:bg-white/10 transition-colors text-white/60 hover:text-white group">
-                            <Twitter className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        </a>
-                        <a href="#" className="flex-1 py-5 flex justify-center items-center hover:bg-white/5 active:bg-white/10 transition-colors text-white/60 hover:text-white group">
-                            <Facebook className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        </a>
-                    </div>
-                </motion.div>
-
-                {/* 4. Sign Out */}
-                <motion.div variants={itemVariants} className="pt-4">
+                {/* Sign Out */}
+                <div className="flex justify-center">
                     <button
                         onClick={handleSignOut}
-                        className="w-full bg-[#1e0a0a] border border-red-500/20 rounded-[24px] p-5 flex items-center justify-center gap-3 text-red-500 font-bold uppercase tracking-widest text-sm hover:bg-red-500/10 active:scale-[0.98] transition-all group"
+                        className="flex items-center gap-2 px-8 py-4 text-xs font-bold uppercase tracking-widest text-red-500 hover:bg-red-500/10 rounded-full transition-all"
                     >
-                        <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                        Sign Out
+                        <LogOut className="w-4 h-4" /> Disconnect System
                     </button>
-                    <p className="text-center text-[10px] text-white/20 font-mono uppercase tracking-widest mt-6">
-                        RIIQX Terminal v2.1.0 • Secure
-                    </p>
-                </motion.div>
-            </motion.div>
+                </div>
+
+            </div>
         </div>
     );
 }

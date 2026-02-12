@@ -41,6 +41,7 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
             price: parseFloat(price.amount),
             image: mainImage,
             quantity: 1,
+            handle: product.handle,
         });
 
         setAdded(true);

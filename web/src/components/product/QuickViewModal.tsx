@@ -59,6 +59,7 @@ export function QuickViewModal({ isOpen, onClose, product }: QuickViewModalProps
             price: parseFloat(selectedVariant.price.amount),
             image: selectedVariant.image?.url || product.featuredImage?.url || "",
             quantity: 1,
+            handle: product.handle,
             size: selectedSize || undefined,
             color: selectedColor || undefined
         });

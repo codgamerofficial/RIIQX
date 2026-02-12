@@ -13,6 +13,7 @@ import { Session, AuthChangeEvent } from '@supabase/supabase-js';
 // Fonts
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
 import { Oswald_400Regular, Oswald_500Medium, Oswald_700Bold } from '@expo-google-fonts/oswald';
+import { Rajdhani_400Regular, Rajdhani_500Medium, Rajdhani_600SemiBold, Rajdhani_700Bold } from '@expo-google-fonts/rajdhani';
 
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -28,6 +29,10 @@ export default function Layout() {
         Oswald_400Regular,
         Oswald_500Medium,
         Oswald_700Bold,
+        Rajdhani_400Regular,
+        Rajdhani_500Medium,
+        Rajdhani_600SemiBold,
+        Rajdhani_700Bold,
     });
 
     useEffect(() => {

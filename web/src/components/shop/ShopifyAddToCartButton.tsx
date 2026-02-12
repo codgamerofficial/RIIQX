@@ -29,6 +29,7 @@ export function ShopifyAddToCartButton({ product, selectedVariant }: ShopifyAddT
             price: price,
             image: image,
             quantity: 1,
+            handle: product.handle,
             // Add color/size if we track them from selectedVariant parameters
             size: variant?.selectedOptions.find(o => o.name === 'Size')?.value,
             color: variant?.selectedOptions.find(o => o.name === 'Color')?.value,

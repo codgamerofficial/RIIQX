@@ -44,7 +44,7 @@ export function TrendingGrid({ products = [] }: TrendingGridProps) {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="md:col-span-2 md:row-span-2 relative group overflow-hidden bg-neutral-900 border border-white/10 hover:border-primary/50 transition-all rounded-2xl"
+                        className="md:col-span-2 md:row-span-2 relative group overflow-hidden bg-[#0A0A0A] border border-white/5 hover:border-[#B4F000] transition-colors duration-300 rounded-lg"
                     >
                         {featured.featuredImage && (
                             <img
@@ -56,16 +56,16 @@ export function TrendingGrid({ products = [] }: TrendingGridProps) {
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
 
                         <div className="absolute bottom-0 left-0 p-8 w-full">
-                            <span className="bg-primary text-black text-xs font-bold px-2 py-1 uppercase mb-3 inline-block">
+                            <span className="bg-[#B4F000] text-black text-xs font-bold px-2 py-1 uppercase mb-3 inline-block tracking-widest">
                                 #1 Best Seller
                             </span>
-                            <h3 className="text-4xl font-black text-white mb-2">{featured.title}</h3>
+                            <h3 className="text-5xl font-black text-white mb-2 font-[family-name:var(--font-oswald)] uppercase tracking-tighter">{featured.title}</h3>
                             <div className="flex items-center justify-between">
                                 <p className="text-2xl font-bold text-white">
                                     {formatPrice(featured.priceRange.minVariantPrice.amount, featured.priceRange.minVariantPrice.currencyCode)}
                                 </p>
                                 <Link href={`/shop/${featured.handle}`}>
-                                    <button className="bg-white text-black px-6 py-2 rounded-full font-bold uppercase text-sm hover:bg-primary transition-colors">
+                                    <button className="bg-white text-black px-6 py-2 font-black uppercase tracking-widest text-sm hover:bg-[#B4F000] transition-colors clip-path-slant-right">
                                         Shop Now
                                     </button>
                                 </Link>
@@ -82,7 +82,7 @@ export function TrendingGrid({ products = [] }: TrendingGridProps) {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: idx * 0.1 }}
-                        className={`relative group overflow-hidden bg-neutral-900 border border-white/10 hover:border-white/30 transition-all rounded-2xl ${idx === 0 || idx === 3 ? 'md:col-span-2' : ''
+                        className={`relative group overflow-hidden bg-[#0A0A0A] border border-white/5 hover:border-[#B4F000] transition-colors duration-300 rounded-lg ${idx === 0 || idx === 3 ? 'md:col-span-2' : ''
                             }`}
                     >
                         {product.featuredImage && (
@@ -95,7 +95,7 @@ export function TrendingGrid({ products = [] }: TrendingGridProps) {
                         <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
 
                         <div className="absolute bottom-0 left-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                            <h4 className="text-xl font-bold text-white leading-tight mb-1">{product.title}</h4>
+                            <h4 className="text-2xl font-black text-white leading-none mb-1 font-[family-name:var(--font-oswald)] uppercase tracking-tight">{product.title}</h4>
                             <p className="text-primary font-mono text-sm">
                                 {formatPrice(product.priceRange.minVariantPrice.amount, product.priceRange.minVariantPrice.currencyCode)}
                             </p>

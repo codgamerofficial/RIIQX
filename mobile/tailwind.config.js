@@ -12,9 +12,16 @@ module.exports = {
 
         // RIIQX Brand Colors
         brand: {
-          DEFAULT: '#CCFF00', // Bewakoof Yellow / Neon
-          cyan: '#22d3ee',
+          DEFAULT: '#CCFF00', // Electric Lime
+          cyan: '#00F0FF',    // Electric Cyan
+          purple: '#7C3AED',  // Neon Violet
           pink: '#f472b6',
+          ipl: {
+            mi: '#0057E7',
+            rcb: '#D71920',
+            csk: '#F2CB05',
+            pitch: '#00FF7F'
+          }
         },
 
         // Utility
@@ -24,6 +31,7 @@ module.exports = {
       fontFamily: {
         sans: ['Inter_400Regular'],
         display: ['Oswald_700Bold'],
+        broadcast: ['Rajdhani_600SemiBold'],
         mono: ['Geist_Mono'],
       }
     },

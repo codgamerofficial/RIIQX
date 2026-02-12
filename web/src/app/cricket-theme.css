@@ -1,0 +1,184 @@
+/* =========================================
+   THE STADIUM DROP: IPL STREETWEAR SYSTEM
+   ========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Teko:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* TEAM COLORS */
+    --csk-yellow: #F2CB05;
+    --mi-blue: #0057E7;
+    --rcb-red: #D71920;
+    --gt-purple: #1B2133;
+    --pitch-green: #00FF7F;
+
+    /* NEUTRALS */
+    --night-match: #0A0A0A;
+    --stadium-fog: #121212;
+    --floodlight: #FFFFFF;
+
+    /* FONTS */
+    --font-scoreboard: 'Teko', sans-serif;
+    --font-broadcast: 'Rajdhani', sans-serif;
+}
+
+body {
+    background-color: var(--night-match);
+    color: var(--floodlight);
+    font-family: var(--font-broadcast);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-scoreboard);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* UTILITIES */
+.text-csk {
+    color: var(--csk-yellow);
+}
+
+.text-mi {
+    color: var(--mi-blue);
+}
+
+.text-rcb {
+    color: var(--rcb-red);
+}
+
+.text-pitch {
+    color: var(--pitch-green);
+}
+
+.bg-stadium {
+    background-color: var(--stadium-fog);
+}
+
+/* FLOODLIGHT GLOW */
+.cast-light {
+    box-shadow: 0 0 50px rgba(0, 87, 231, 0.2);
+    /* Base Blue Glow */
+}
+
+.cast-light:hover {
+    box-shadow: 0 0 80px rgba(0, 87, 231, 0.4);
+}
+
+/* SCOREBOARD BORDER */
+.border-score {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 4px solid var(--csk-yellow);
+}
+
+/* ANIMATIONS */
+
+/* 1. STADIUM LIGHTS FLICKER */
+@keyframes stadium-flicker {
+    0% {
+        opacity: 0.8;
+    }
+
+    5% {
+        opacity: 0.9;
+    }
+
+    10% {
+        opacity: 0.8;
+    }
+
+    15% {
+        opacity: 1;
+        text-shadow: 0 0 20px var(--floodlight);
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+
+    100% {
+        opacity: 0.8;
+    }
+}
+
+.animate-flicker {
+    animation: stadium-flicker 4s infinite;
+}
+
+/* 2. REPLAY SCROLL (Marquee) */
+@keyframes ticker-slide {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.ticker-wrap {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.ticker-content {
+    display: inline-block;
+    animation: ticker-slide 20s linear infinite;
+}
+
+/* 3. WICKET GLITCH (Hover Effect) */
+@keyframes wicket-shake {
+    0% {
+        transform: translate(0);
+    }
+
+    20% {
+        transform: translate(-2px, 2px);
+    }
+
+    40% {
+        transform: translate(2px, -2px);
+    }
+
+    60% {
+        transform: translate(-2px, -2px);
+    }
+
+    80% {
+        transform: translate(2px, 2px);
+    }
+
+    100% {
+        transform: translate(0);
+    }
+}
+
+.hover-wicket:hover {
+    animation: wicket-shake 0.3s ease-in-out;
+    border-color: var(--rcb-red);
+    color: var(--rcb-red);
+}
+
+/* 4. SIXER SCALE (Card Hover) */
+.hover-sixer {
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.hover-sixer:hover {
+    transform: scale(1.05) translateY(-5px);
+    z-index: 10;
+}
+
+/* GRADIENTS */
+.gradient-ipl {
+    background: linear-gradient(135deg, var(--mi-blue), var(--rcb-red));
+}
+
+.gradient-pitch {
+    background: linear-gradient(to top, var(--night-match), transparent);
+}

@@ -167,20 +167,17 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         {/* Header */}
                         <motion.div
                             variants={headerVariants}
-                            className="p-6 flex items-center justify-between border-b border-white/10 relative z-10 bg-gradient-to-b from-[#080808] to-[#050505]"
+                            className="p-6 flex items-center justify-between border-b border-white/10 relative z-10 bg-gradient-to-b from-[#080808] to-[#050505] safe-area-inset-top"
                         >
                             <div className="flex items-center gap-3">
-                                <div className="relative w-8 h-8">
+                                <div className="relative h-8 w-24">
                                     <Image
-                                        src="/riiqx-logo-new.png"
+                                        src="/logo.png"
                                         alt="RIIQX Logo"
                                         fill
-                                        className="object-contain"
+                                        className="object-contain object-left"
                                     />
                                 </div>
-                                <span className="font-display text-xl font-black tracking-tighter text-white uppercase">
-                                    RIIQX<span className="text-accent">.</span>
-                                </span>
                             </div>
                             <motion.button
                                 onClick={onClose}
@@ -267,7 +264,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         {/* Footer */}
                         <motion.div
                             variants={itemVariants}
-                            className="p-6 border-t border-white/10 relative z-10 bg-gradient-to-t from-[#080808] to-[#050505]"
+                            className="p-6 border-t border-white/10 relative z-10 bg-gradient-to-t from-[#080808] to-[#050505] safe-area-inset-bottom"
                         >
                             {/* Social Links */}
                             <div className="flex items-center justify-center gap-4 mb-6">

@@ -1,6 +1,6 @@
 import { getProduct } from "@/lib/shopify";
 import { getProducts } from "@/lib/shopify";
-import { ProductDetailClient } from "@/components/product/ProductDetailClient";
+import { ProductControlPanel } from "@/components/product/ProductControlPanel";
 import { ReviewsSection } from "@/components/product/ReviewsSection";
 import { notFound } from "next/navigation";
 
@@ -85,7 +85,7 @@ export default async function ProductPage({
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            <ProductDetailClient product={product} relatedProducts={relatedProducts} />
+            <ProductControlPanel product={product} relatedProducts={relatedProducts} />
             <ReviewsSection productId={product.id} />
         </>
     );

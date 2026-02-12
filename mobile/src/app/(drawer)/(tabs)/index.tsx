@@ -26,12 +26,20 @@ export default function HomeScreen() {
         <View className="flex-1 bg-background">
             <StatusBar style="light" />
 
-            {/* Header */}
-            <SafeAreaView className="px-6 pt-2 pb-4 flex-row justify-between items-center bg-background/90 z-50">
+            {/* SCOREBOARD HEADER */}
+            <SafeAreaView className="px-6 pt-2 pb-4 flex-row justify-between items-center bg-background border-b border-white/10 z-50">
                 <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
                     <Menu color="white" size={24} />
                 </TouchableOpacity>
-                <Text className="text-white text-3xl font-display uppercase tracking-tighter">RIIQX</Text>
+                <View className="items-center">
+                    <Text className="text-white text-3xl font-display uppercase tracking-tighter italic">
+                        RIIQX <Text className="text-brand-DEFAULT">FUTURE</Text>
+                    </Text>
+                    <View className="flex-row items-center gap-1">
+                        <View className="w-1.5 h-1.5 rounded-full bg-brand-cyan" />
+                        <Text className="text-white/50 text-[10px] font-mono tracking-widest">LIVE DROP</Text>
+                    </View>
+                </View>
                 <View className="flex-row gap-4">
                     <Search color="white" size={24} />
                     <ShoppingBag color="white" size={24} />
@@ -43,36 +51,48 @@ export default function HomeScreen() {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 100 }}
             >
-                {/* Hero Section */}
-                <Animated.View entering={FadeInDown.delay(100).springify()} className="px-6 mt-4">
-                    <PremiumCard className="h-[400px] justify-end p-0 border-white/20">
+                {/* FUTURE WEAR HERO */}
+                <Animated.View entering={FadeInDown.delay(100).springify()} className="px-4 mt-4">
+                    <PremiumCard className="h-[450px] justify-end p-0 border-white/20 bg-surface overflow-hidden">
                         <Image
-                            source={{ uri: 'https://images.unsplash.com/photo-1523398002811-999ca8dec234?q=80&w=1000&auto=format&fit=crop' }}
-                            className="absolute inset-0 w-full h-full opacity-80"
+                            source={{ uri: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop' }} // Cyberpunk model
+                            className="absolute inset-0 w-full h-full opacity-60"
                         />
-                        <View className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                        <View className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
+                        <View className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black" />
 
                         <View className="p-6">
-                            <Text className="text-brand font-bold tracking-widest uppercase mb-2">Collection 2026</Text>
-                            <Text className="text-white text-5xl font-display uppercase leading-tight mb-4">
-                                Built For{"\n"}The Bold
+                            <View className="flex-row items-center gap-2 mb-2">
+                                <View className="bg-brand-DEFAULT/20 px-2 py-0.5 border border-brand-DEFAULT">
+                                    <Text className="text-brand-DEFAULT text-[10px] font-bold uppercase">New Season</Text>
+                                </View>
+                                <Text className="text-white/60 text-[10px] font-mono uppercase tracking-widest">Global Release</Text>
+                            </View>
+
+                            <Text className="text-white text-6xl font-display uppercase leading-[0.85] mb-4 italic">
+                                FUTURE{"\n"}<Text className="text-brand-cyan">READY</Text>
                             </Text>
-                            <PremiumButton
-                                label="Shop Now"
-                                variant="primary"
-                                className="self-start"
-                            />
+
+                            <View className="flex-row gap-4 mt-2">
+                                <PremiumButton
+                                    label="Shop Collection"
+                                    variant="primary"
+                                    className="self-start bg-white"
+                                    textClassName="text-black font-display text-lg"
+                                />
+                            </View>
                         </View>
                     </PremiumCard>
                 </Animated.View>
 
-                {/* Categories */}
+                {/* SQUAD SELECTION (Categories) */}
                 <Animated.View entering={FadeInDown.delay(200).springify()} className="mt-8 pl-6">
+                    <Text className="text-white/40 text-xs font-mono uppercase tracking-widest mb-3">SELECT SQUAD</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} className="overflow-visible">
                         {CATEGORIES.map((cat, index) => (
                             <TouchableOpacity
                                 key={index}
-                                className={`mr-3 px-6 py-3 rounded-full border ${index === 0 ? 'bg-white border-white' : 'bg-transparent border-white/20'}`}
+                                className={`mr-3 px-6 py-3 border ${index === 0 ? 'bg-brand-cyan border-brand-cyan' : 'bg-surface border-white/10'}`}
                             >
                                 <Text className={`font-display font-bold uppercase ${index === 0 ? 'text-black' : 'text-white/60'}`}>
                                     {cat}
@@ -82,11 +102,14 @@ export default function HomeScreen() {
                     </ScrollView>
                 </Animated.View>
 
-                {/* New Drops */}
-                <View className="px-6 mt-10">
-                    <View className="flex-row justify-between items-end mb-6">
-                        <Text className="text-white text-2xl font-display uppercase">New Drops</Text>
-                        <Text className="text-brand font-bold text-xs uppercase tracking-widest">View All</Text>
+                {/* PLAYING XI (New Drops) */}
+                <View className="px-4 mt-10">
+                    <View className="flex-row justify-between items-end mb-6 border-l-4 border-brand-DEFAULT pl-4">
+                        <View>
+                            <Text className="text-white/40 text-[10px] font-mono uppercase">STARTING LINEUP</Text>
+                            <Text className="text-white text-3xl font-display uppercase italic">New Drops</Text>
+                        </View>
+                        <Text className="text-brand-DEFAULT font-bold text-xs uppercase tracking-widest bg-brand-DEFAULT/10 px-2 py-1">View All</Text>
                     </View>
 
                     <View className="flex-row flex-wrap justify-between gap-y-6">
@@ -96,19 +119,35 @@ export default function HomeScreen() {
                                 entering={FadeInDown.delay(300 + index * 100).springify()}
                                 className="w-[48%]"
                             >
-                                <PremiumCard className="h-64 p-0 border-white/5 bg-surface" variant="glass">
-                                    <Image
-                                        source={{ uri: product.image }}
-                                        className="w-full h-48 rounded-t-[24px]"
-                                    />
-                                    {product.badge && (
-                                        <View className="absolute top-3 left-3 bg-white px-2 py-1">
-                                            <Text className="text-black text-[10px] font-bold uppercase">{product.badge}</Text>
+                                <PremiumCard className="h-72 p-0 border-white/5 bg-[#0A0A0A]" variant="solid">
+                                    {/* Image Area */}
+                                    <View className="relative h-48 w-full bg-surface overflow-hidden">
+                                        <Image
+                                            source={{ uri: product.image }}
+                                            className="w-full h-full opacity-90"
+                                        />
+                                        <View className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60" />
+
+                                        {product.badge && (
+                                            <View className="absolute top-2 left-2 bg-brand-ipl-rcb px-2 py-0.5">
+                                                <Text className="text-white text-[10px] font-bold uppercase">{product.badge}</Text>
+                                            </View>
+                                        )}
+                                    </View>
+
+                                    {/* Stats Area */}
+                                    <View className="p-3 border-t-2 border-brand-DEFAULT">
+                                        <Text className="text-white font-display uppercase text-lg mb-1 line-clamp-1 italic">{product.name}</Text>
+                                        <View className="flex-row justify-between items-center">
+                                            <View>
+                                                <Text className="text-[8px] text-white/40 font-mono">PRICE</Text>
+                                                <Text className="text-brand-cyan font-mono font-bold text-lg">{product.price}</Text>
+                                            </View>
+                                            <View className="items-end">
+                                                <Text className="text-[8px] text-white/40 font-mono">RATING</Text>
+                                                <Text className="text-brand-purple font-mono font-bold">98.5</Text>
+                                            </View>
                                         </View>
-                                    )}
-                                    <View className="p-3">
-                                        <Text className="text-white font-display uppercase text-sm mb-1 line-clamp-1">{product.name}</Text>
-                                        <Text className="text-white/60 font-mono text-xs">{product.price}</Text>
                                     </View>
                                 </PremiumCard>
                             </Animated.View>
