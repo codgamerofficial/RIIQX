@@ -90,7 +90,7 @@ export default function AddressesPage() {
                 <h1 className="text-2xl font-bold text-white">Saved Addresses</h1>
                 <button
                     onClick={() => setIsAdding(!isAdding)}
-                    className="flex items-center gap-2 text-sm font-bold text-bewakoof-yellow hover:text-yellow-400 transition-colors"
+                    className="flex items-center gap-2 text-sm font-bold text-[#B4F000] hover:text-[#B4F000]/80 transition-colors"
                 >
                     <Plus className="w-4 h-4" />
                     Add New Address
@@ -112,47 +112,47 @@ export default function AddressesPage() {
                                 required
                                 value={formData.full_name}
                                 onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[#B4F000] focus:outline-none"
                             />
                             <input
                                 placeholder="Phone Number"
                                 required
                                 value={formData.phone}
                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[#B4F000] focus:outline-none"
                             />
                             <input
                                 placeholder="Street Address"
                                 required
-                                className="md:col-span-2 w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                                className="md:col-span-2 w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[#B4F000] focus:outline-none"
                                 value={formData.street_address}
                                 onChange={(e) => setFormData({ ...formData, street_address: e.target.value })}
                             />
                             <input
                                 placeholder="City"
                                 required
-                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[#B4F000] focus:outline-none"
                                 value={formData.city}
                                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                             />
                             <input
                                 placeholder="State"
                                 required
-                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[#B4F000] focus:outline-none"
                                 value={formData.state}
                                 onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                             />
                             <input
                                 placeholder="ZIP Code"
                                 required
-                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[#B4F000] focus:outline-none"
                                 value={formData.zip_code}
                                 onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
                             />
                             <input
                                 placeholder="Country"
                                 required
-                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-bewakoof-yellow focus:outline-none"
+                                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[#B4F000] focus:outline-none"
                                 value={formData.country}
                                 onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                             />
@@ -162,7 +162,7 @@ export default function AddressesPage() {
                                 type="checkbox"
                                 checked={formData.is_default}
                                 onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
-                                className="rounded border-white/20 bg-neutral-900 text-bewakoof-yellow focus:ring-bewakoof-yellow"
+                                className="rounded border-white/20 bg-neutral-900 text-[#B4F000] focus:ring-[#B4F000]"
                             />
                             <span className="text-sm text-muted-foreground">Set as default address</span>
                         </label>
@@ -177,7 +177,7 @@ export default function AddressesPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="bewakoof-btn bewakoof-btn-primary px-6 py-2 text-sm"
+                                className="bg-[#B4F000] text-black hover:bg-[#B4F000]/90 px-6 py-2 text-sm font-bold uppercase tracking-wide rounded-sm transition-colors"
                             >
                                 {loading ? "Saving..." : "Save Address"}
                             </button>
@@ -198,7 +198,7 @@ export default function AddressesPage() {
                     {addresses.map((addr) => (
                         <div key={addr.id} className="bg-neutral-800/50 border border-white/5 p-6 rounded-xl relative group">
                             {addr.is_default && (
-                                <span className="absolute top-4 right-4 bg-bewakoof-yellow text-black text-[10px] font-bold px-2 py-1 rounded">
+                                <span className="absolute top-4 right-4 bg-[#B4F000] text-black text-[10px] font-bold px-2 py-1 rounded-sm">
                                     DEFAULT
                                 </span>
                             )}
