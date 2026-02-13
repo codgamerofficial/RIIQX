@@ -36,10 +36,10 @@ export default function AboutPage() {
                 <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center flex-col-reverse">
 
                     <div className="space-y-8">
-                        <h2 className="text-4xl md:text-6xl font-black font-display text-white uppercase leading-none">
-                            Built for the <br /><span className="text-accent">Main Character.</span>
+                        <h2 className="text-4xl md:text-6xl font-black font-[family-name:var(--font-oswald)] text-white uppercase leading-none tracking-tight">
+                            Built for the <br /><span className="text-[#B4F000]">Main Character.</span>
                         </h2>
-                        <div className="space-y-6 text-lg text-white/50 font-light leading-relaxed">
+                        <div className="space-y-6 text-lg text-white/50 font-light leading-relaxed font-mono">
                             <p>
                                 RIIQX isn't just a brand; it's a movement. Born from the electric energy of street cricket and the grit of urban fashion, we craft gear for those who play life on the front foot.
                             </p>
@@ -48,38 +48,38 @@ export default function AboutPage() {
                             </p>
                         </div>
                         <div className="pt-8">
-                            <div className="w-24 h-1 bg-accent mb-8" />
-                            <p className="text-xs font-mono uppercase tracking-widest text-white/30">
+                            <div className="w-24 h-1 bg-[#B4F000] mb-8" />
+                            <p className="text-xs font-mono uppercase tracking-widest text-[#B4F000]">
                                 RIIQX Labs // Innovation Center
                             </p>
                         </div>
                     </div>
 
-                    {/* Values Grid using Rounded Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Values Grid using Sharp Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <ValueCard
                             icon={<Crown className="w-6 h-6 text-black" />}
                             title="Elite Tier"
                             desc="Premium heavy-gauge cotton and technical fabrics."
-                            color="bg-white text-black"
+                            color="bg-[#B4F000] text-black"
                         />
                         <ValueCard
-                            icon={<Zap className="w-6 h-6 text-accent" />}
+                            icon={<Zap className="w-6 h-6 text-[#B4F000]" />}
                             title="High Voltage"
                             desc="Designs that spark conversations and turn heads."
-                            color="bg-[#121212] border-white/10 text-white"
+                            color="bg-[#0A0A0A] border-white/10 text-white"
                         />
                         <ValueCard
-                            icon={<Target className="w-6 h-6 text-accent" />}
+                            icon={<Target className="w-6 h-6 text-[#B4F000]" />}
                             title="Precision"
                             desc="Fits engineered for movement and swagger."
-                            color="bg-[#121212] border-white/10 text-white"
+                            color="bg-[#0A0A0A] border-white/10 text-white"
                         />
                         <ValueCard
-                            icon={<Users className="w-6 h-6 text-accent" />}
-                            title="The Sqaud"
+                            icon={<Users className="w-6 h-6 text-[#B4F000]" />}
+                            title="The Squad"
                             desc="A community of fearless creators and players."
-                            color="bg-[#121212] border-white/10 text-white"
+                            color="bg-[#0A0A0A] border-white/10 text-white"
                         />
                     </div>
                 </div>
@@ -87,19 +87,19 @@ export default function AboutPage() {
 
             {/* Team Sheet / Footer CTA */}
             <section className="py-32 px-4 text-center">
-                <div className="max-w-4xl mx-auto bg-[#121212] rounded-[48px] border border-white/10 p-12 md:p-24 relative overflow-hidden group">
+                <div className="max-w-4xl mx-auto bg-[#0A0A0A] border border-white/10 p-12 md:p-24 relative overflow-hidden group">
                     {/* Hover Effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-accent/0 via-accent/5 to-accent/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                    <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(180,240,0,0.05)_50%,transparent_75%)] bg-[length:250%_250%] animate-[gradient_15s_ease_infinite] pointer-events-none" />
 
-                    <h2 className="text-5xl md:text-8xl font-black font-display uppercase mb-8 relative z-10">
+                    <h2 className="text-5xl md:text-8xl font-black font-[family-name:var(--font-oswald)] uppercase mb-8 relative z-10 text-white">
                         Join The XI
                     </h2>
-                    <p className="text-white/40 mb-12 max-w-xl mx-auto text-lg relative z-10">
+                    <p className="text-white/40 mb-12 max-w-xl mx-auto text-lg relative z-10 font-mono uppercase tracking-wider">
                         The roster is filling up. Secure your spot in the cult of RIIQX.
                     </p>
                     <a
                         href="/shop"
-                        className="relative z-10 inline-flex items-center justify-center bg-white text-black px-12 py-5 rounded-full font-black text-lg uppercase tracking-widest hover:scale-105 transition-transform"
+                        className="relative z-10 inline-flex items-center justify-center bg-[#B4F000] text-black px-12 py-5 font-black text-lg uppercase tracking-widest hover:bg-white transition-colors duration-300 clip-path-slant-right"
                     >
                         Shop The Kit
                     </a>
@@ -111,12 +111,12 @@ export default function AboutPage() {
 
 function ValueCard({ icon, title, desc, color }: { icon: React.ReactNode, title: string, desc: string, color: string }) {
     return (
-        <div className={`${color} p-8 rounded-[32px] border transition-all hover:-translate-y-2 duration-300 relative overflow-hidden`}>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-6 ${color.includes('bg-white') ? 'bg-black/10' : 'bg-white/5'}`}>
+        <div className={`${color} p-8 border transition-all hover:-translate-y-1 hover:border-[#B4F000]/50 duration-300 relative overflow-hidden group`}>
+            <div className={`w-12 h-12 flex items-center justify-center mb-6`}>
                 {icon}
             </div>
-            <h3 className="text-xl font-bold uppercase tracking-wide mb-2">{title}</h3>
-            <p className="opacity-60 text-sm leading-relaxed">{desc}</p>
+            <h3 className="text-xl font-black font-[family-name:var(--font-oswald)] uppercase tracking-wide mb-2">{title}</h3>
+            <p className="opacity-70 text-sm leading-relaxed font-mono">{desc}</p>
         </div>
     );
 }

@@ -79,16 +79,17 @@ export function StylistSidebar() {
     return (
         <>
             {/* Toggle Button */}
+            {/* Toggle Button */}
             <motion.button
                 onClick={() => setIsOpen(true)}
                 className={cn(
-                    "fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 bg-white text-black w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-110 transition-transform",
+                    "fixed bottom-24 right-6 md:bottom-8 md:right-8 z-40 bg-[#B4F000] text-black w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(180,240,0,0.6)] hover:scale-110 transition-transform hover:shadow-[0_0_50px_rgba(180,240,0,0.8)] border border-black/10",
                     isOpen && "hidden"
                 )}
                 whileHover={{ rotate: 90 }}
                 whileTap={{ scale: 0.9 }}
             >
-                <Sparkles className="w-6 h-6" />
+                <Sparkles className="w-7 h-7 stroke-[2.5px]" />
             </motion.button>
 
             {/* Chat Interface */}

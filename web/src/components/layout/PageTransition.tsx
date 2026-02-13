@@ -19,31 +19,36 @@ export function PageTransition({ children, className }: PageTransitionProps) {
         setIsMounted(true);
     }, []);
 
-    if (!isMounted) return null;
-
     return (
         <div className={cn("w-full min-h-screen", className)}>
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={pathname}
-                    initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
-                    animate={{
-                        opacity: 1,
-                        scale: 1,
-                        filter: "blur(0px)",
-                        transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
-                    }}
-                    exit={{
-                        opacity: 0,
-                        scale: 0.98,
-                        filter: "blur(10px)",
-                        transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
-                    }}
-                    className="origin-top"
-                >
+            {!isMounted ? (
+                // Initial server render content (no animation wrapper yet)
+                <div className="opacity-100">
                     {children}
-                </motion.div>
-            </AnimatePresence>
+                </div>
+            ) : (
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={pathname}
+                        initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
+                        animate={{
+                            opacity: 1,
+                            scale: 1,
+                            filter: "blur(0px)",
+                            transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+                        }}
+                        exit={{
+                            opacity: 0,
+                            scale: 0.98,
+                            filter: "blur(10px)",
+                            transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+                        }}
+                        className="origin-top"
+                    >
+                        {children}
+                    </motion.div>
+                </AnimatePresence>
+            )}
         </div>
     );
 }

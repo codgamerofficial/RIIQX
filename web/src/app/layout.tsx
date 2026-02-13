@@ -14,7 +14,7 @@ import { MusicProvider } from "@/context/MusicContext";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SocialProofNotifications } from "@/components/shared/SocialProofNotifications";
 import { CustomCursor } from "@/components/ui/CustomCursor";
-import { PageTransition } from "@/components/layout/PageTransition";
+
 import { KonamiCode } from "@/components/ui/KonamiCode";
 import { MotionConfig } from "framer-motion";
 import { StylistSidebar } from "@/components/ai/StylistSidebar";
@@ -130,9 +130,7 @@ export default function RootLayout({
                 <ScrollProgress />
                 <Navbar />
                 <main className="flex-grow pb-24 md:pb-0">
-                  <PageTransition>
-                    {children}
-                  </PageTransition>
+                  {children}
                 </main>
                 <FooterMinimal />
               </LivingScrollProvider>

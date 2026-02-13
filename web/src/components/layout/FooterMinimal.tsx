@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { SOCIAL_LINKS } from "@/lib/constants";
 
 const shopLinks = [
     { name: "New Arrivals", href: "/new-arrivals" },
@@ -15,6 +16,7 @@ const supportLinks = [
     { name: "Shipping", href: "/shipping" },
     { name: "Returns", href: "/returns" },
     { name: "FAQ", href: "/faq" },
+    { name: "Who We Are", href: "/about" },
 ];
 
 const legalLinks = [
@@ -43,9 +45,9 @@ export function FooterMinimal() {
                         </p>
                         <div className="flex gap-3">
                             {[
-                                { label: "IG", href: "https://instagram.com/riiqx" },
-                                { label: "TW", href: "https://twitter.com/riiqx" },
-                                { label: "YT", href: "https://youtube.com/@riiqx" },
+                                { label: "IG", href: SOCIAL_LINKS.instagram },
+                                { label: "TW", href: SOCIAL_LINKS.twitter },
+                                { label: "PI", href: SOCIAL_LINKS.pinterest },
                             ].map((social) => (
                                 <a
                                     key={social.label}

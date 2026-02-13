@@ -83,11 +83,6 @@ export function CustomCursor() {
         };
     }, [cursorX, cursorY, isVisible]);
 
-    // Don't render on touch devices
-    if (typeof window !== "undefined" && isTouchDevice()) {
-        return null;
-    }
-
     const getCursorSize = () => {
         switch (cursorState) {
             case "hover":

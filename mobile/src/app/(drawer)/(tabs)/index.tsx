@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { DrawerActions } from '@react-navigation/native';
@@ -9,6 +9,8 @@ import { Menu, Search, ShoppingBag } from 'lucide-react-native';
 
 import { PremiumCard, CardTitle, CardContent } from '../../../components/ui/PremiumCard';
 import { PremiumButton } from '../../../components/ui/PremiumButton';
+import { MobileProductCard } from '../../../components/product/MobileProductCard';
+import { useCartStore } from '../../../store/useCartStore';
 
 const CATEGORIES = ["New", "Tees", "Oversized", "Bottoms", "Accessories"];
 
@@ -21,6 +23,24 @@ const PRODUCTS = [
 
 export default function HomeScreen() {
     const navigation = useNavigation();
+    const { addItem } = useCartStore();
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+    const handleQuickAdd = (product: any) => {
+        addItem({
+            id: product.id,
+            variantId: product.id, // Using product ID as variant ID for mock
+            productId: product.id,
+            title: product.name,
+            price: product.price.replace('₹', '').replace(',', ''),
+            image: product.image,
+            quantity: 1,
+            currencyCode: 'INR'
+        });
+
+        setToastMessage(`Added ${product.name} to crate.`);
+        setTimeout(() => setToastMessage(null), 2000);
+    };
 
     return (
         <View className="flex-1 bg-background">
@@ -102,59 +122,60 @@ export default function HomeScreen() {
                     </ScrollView>
                 </Animated.View>
 
-                {/* PLAYING XI (New Drops) */}
+                {/* FUTURE ARRIVALS (New Drops) */}
                 <View className="px-4 mt-10">
-                    <View className="flex-row justify-between items-end mb-6 border-l-4 border-brand-DEFAULT pl-4">
+                    <View className="flex-row justify-between items-end mb-6 border-l-4 border-neon pl-4">
                         <View>
-                            <Text className="text-white/40 text-[10px] font-mono uppercase">STARTING LINEUP</Text>
-                            <Text className="text-white text-3xl font-display uppercase italic">New Drops</Text>
+                            <Text className="text-white/40 text-[10px] font-mono uppercase">LATEST DROP</Text>
+                            <Text className="text-white text-3xl font-display uppercase italic">FUTURE ARRIVALS</Text>
                         </View>
-                        <Text className="text-brand-DEFAULT font-bold text-xs uppercase tracking-widest bg-brand-DEFAULT/10 px-2 py-1">View All</Text>
+                        <TouchableOpacity>
+                            <Text className="text-neon font-bold text-xs uppercase tracking-widest bg-neon/10 px-2 py-1">View All</Text>
+                        </TouchableOpacity>
                     </View>
 
-                    <View className="flex-row flex-wrap justify-between gap-y-6">
+                    <View className="flex-row flex-wrap justify-between">
                         {PRODUCTS.map((product, index) => (
-                            <Animated.View
+                            <MobileProductCard
                                 key={product.id}
-                                entering={FadeInDown.delay(300 + index * 100).springify()}
-                                className="w-[48%]"
-                            >
-                                <PremiumCard className="h-72 p-0 border-white/5 bg-[#0A0A0A]" variant="solid">
-                                    {/* Image Area */}
-                                    <View className="relative h-48 w-full bg-surface overflow-hidden">
-                                        <Image
-                                            source={{ uri: product.image }}
-                                            className="w-full h-full opacity-90"
-                                        />
-                                        <View className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60" />
-
-                                        {product.badge && (
-                                            <View className="absolute top-2 left-2 bg-brand-ipl-rcb px-2 py-0.5">
-                                                <Text className="text-white text-[10px] font-bold uppercase">{product.badge}</Text>
-                                            </View>
-                                        )}
-                                    </View>
-
-                                    {/* Stats Area */}
-                                    <View className="p-3 border-t-2 border-brand-DEFAULT">
-                                        <Text className="text-white font-display uppercase text-lg mb-1 line-clamp-1 italic">{product.name}</Text>
-                                        <View className="flex-row justify-between items-center">
-                                            <View>
-                                                <Text className="text-[8px] text-white/40 font-mono">PRICE</Text>
-                                                <Text className="text-brand-cyan font-mono font-bold text-lg">{product.price}</Text>
-                                            </View>
-                                            <View className="items-end">
-                                                <Text className="text-[8px] text-white/40 font-mono">RATING</Text>
-                                                <Text className="text-brand-purple font-mono font-bold">98.5</Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </PremiumCard>
-                            </Animated.View>
+                                product={{
+                                    id: product.id,
+                                    title: product.name,
+                                    price: product.price,
+                                    image: product.image,
+                                    badge: product.badge,
+                                    type: index === 3 ? "Accessory" : "Apparel"
+                                }}
+                                onAddToCart={() => handleQuickAdd(product)}
+                                onPress={() => console.log('View ' + product.name)}
+                            />
                         ))}
                     </View>
                 </View>
             </ScrollView>
+
+            {/* Custom Toast */}
+            {toastMessage && (
+                <Animated.View
+                    entering={FadeInDown.springify()}
+                    exiting={FadeOutUp}
+                    className="absolute top-12 left-4 right-4 bg-[#B4F000] p-4 border border-white/20 shadow-2xl z-[100]"
+                >
+                    <View className="flex-row items-center gap-3">
+                        <View className="bg-black p-1 rounded-full">
+                            <ShoppingBag size={12} color="#B4F000" />
+                        </View>
+                        <View>
+                            <Text className="text-black font-bold uppercase text-xs tracking-widest">
+                                SUPPLY CRATE UPDATED
+                            </Text>
+                            <Text className="text-black/80 font-mono text-[10px]">
+                                {toastMessage}
+                            </Text>
+                        </View>
+                    </View>
+                </Animated.View>
+            )}
         </View>
     );
 }

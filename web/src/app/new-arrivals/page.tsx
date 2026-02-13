@@ -13,157 +13,106 @@ export const metadata = {
 export default async function NewArrivalsPage({
     searchParams,
 }: {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+    searchParams: { [key: string]: string | string[] | undefined };
 }) {
-    const resolvedSearchParams = await searchParams;
-    const sort = resolvedSearchParams.sort as string | undefined;
+    const { sort, min_price, max_price, category, color, size } = searchParams;
+    const sortKey = sort === 'price_high' || sort === 'price_low' ? 'PRICE' :
+        sort === 'best_selling' ? 'BEST_SELLING' : 'CREATED';
+    const reverse = sort === 'price_low' ? false : true;
 
-    // Filters
-    const colorParam = resolvedSearchParams.color as string | undefined;
-    const sizeParam = resolvedSearchParams.size as string | undefined;
-    const minPriceParam = resolvedSearchParams.min_price as string | undefined;
-    const maxPriceParam = resolvedSearchParams.max_price as string | undefined;
-    const typeParam = resolvedSearchParams.category as string | undefined;
-
-    // Map Sort
-    let sortKey: 'TITLE' | 'PRICE' | 'CREATED' | 'BEST_SELLING' | undefined = 'CREATED';
-    let reverse = true;
-
-    if (sort === "best_selling") {
-        sortKey = 'BEST_SELLING';
-        reverse = false;
-    } else if (sort === "price_low") {
-        sortKey = 'PRICE';
-        reverse = false;
-    } else if (sort === "price_high") {
-        sortKey = 'PRICE';
-        reverse = true;
-    } else if (sort === "newest") {
-        sortKey = 'CREATED';
-        reverse = true;
-    }
-
-    // specific to new arrivals, we default to CREATED desc if not specified? 
-    // Yes, but let's allow override.
-
-    // Build Filters
-    const filters: any[] = []; // ProductFilter[]
-    if (colorParam) filters.push({ variantOption: { name: 'Color', value: colorParam } });
-    if (sizeParam) filters.push({ variantOption: { name: 'Size', value: sizeParam } });
-    if (typeParam) filters.push({ productType: typeParam });
-    if (minPriceParam || maxPriceParam) {
-        filters.push({
-            price: {
-                min: minPriceParam ? parseFloat(minPriceParam) : undefined,
-                max: maxPriceParam ? parseFloat(maxPriceParam) : undefined
-            }
-        });
-    }
-
-    // Fetch Products with Filters
     const { products } = await getCollectionProducts({
         handle: 'new-arrivals',
         sortKey,
-        reverse,
-        filters
+        reverse
     });
 
-    // Fetch All for Sidebar Aggregation
-    const { products: allCollectionProducts } = await getCollectionProducts({
-        handle: 'new-arrivals',
-        limit: 100
-    });
+    // Filter Logic
+    let filteredProducts = products;
 
-    // Helper to extract options
-    const extractOptions = (products: Product[], optionName: string) => {
-        const values = new Set<string>();
-        products.forEach(p => {
-            const option = p.options?.find(o => o.name.toLowerCase() === optionName.toLowerCase() || o.name.toLowerCase() === optionName.toLowerCase() + 's');
-            if (option) {
-                option.values.forEach(v => values.add(v));
-            }
+    if (min_price || max_price) {
+        const min = min_price ? Number(min_price) : 0;
+        const max = max_price ? Number(max_price) : Infinity;
+        filteredProducts = filteredProducts.filter(p => {
+            const price = Number(p.priceRange.minVariantPrice.amount);
+            return price >= min && price <= max;
         });
-        return Array.from(values);
-    };
+    }
 
-    const availableTypes = Array.from(new Set(allCollectionProducts.map(p => p.productType).filter(Boolean)));
-    const availableColors = extractOptions(allCollectionProducts, 'Color');
-    const availableSizes = extractOptions(allCollectionProducts, 'Size');
+    if (category && category !== 'All') {
+        filteredProducts = filteredProducts.filter(p => p.productType === category);
+    }
 
-    // Price Range
-    const prices = allCollectionProducts.flatMap(p => [
-        parseFloat(p.priceRange.minVariantPrice.amount),
-        parseFloat(p.priceRange.maxVariantPrice.amount)
-    ]);
-    const minPrice = prices.length ? Math.min(...prices) : 0;
-    const maxPrice = prices.length ? Math.max(...prices) : 10000;
+    if (color) {
+        filteredProducts = filteredProducts.filter(p =>
+            p.options.find(o => o.name === 'Color')?.values.includes(color as string)
+        );
+    }
+
+    if (size) {
+        filteredProducts = filteredProducts.filter(p =>
+            p.options.find(o => o.name === 'Size')?.values.includes(size as string)
+        );
+    }
+
+    // Extract available filters from ALL products (could be optimized)
+    const availableTypes = Array.from(new Set(products.map(p => p.productType))).filter(Boolean);
+    const availableColors = Array.from(new Set(products.flatMap(p => p.options.find(o => o.name === 'Color')?.values || [])));
+    const availableSizes = Array.from(new Set(products.flatMap(p => p.options.find(o => o.name === 'Size')?.values || [])));
 
 
     return (
-        <div className="min-h-screen bg-background pt-24 pb-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header */}
-                <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div>
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white uppercase mb-2">
-                            New <span className="text-primary">Drops</span>
-                        </h1>
-                        <p className="text-white/50 text-lg font-medium">
-                            {products.length} Items Found
-                        </p>
-                    </div>
-
-                    <div className="flex items-center space-x-4">
-                        <span className="text-xs font-bold text-white/50 uppercase tracking-widest hidden md:block">Sort By:</span>
-                        <SortSelect />
-                    </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row gap-8">
-                    {/* Sidebar */}
+        <main className="min-h-screen bg-[#050505] text-white pt-24 pb-20 px-4 md:px-8">
+            <div className="max-w-[1400px] mx-auto">
+                <div className="flex flex-col md:flex-row gap-12">
+                    {/* Sidebar Filters */}
                     <ProductFilters
                         availableTypes={availableTypes}
-                        availableColors={availableColors}
                         availableSizes={availableSizes}
-                        minPrice={minPrice}
-                        maxPrice={maxPrice}
+                        availableColors={availableColors}
                     />
 
-                    {/* Grid */}
                     <div className="flex-1">
-                        <Suspense fallback={<div className="text-center py-20">Loading Grid...</div>}>
-                            {products.length > 0 ? (
-                                <ProductGrid products={products} />
-                            ) : (
-                                <div className="space-y-12">
-                                    <div className="text-center py-12 border border-dashed border-white/10 rounded-2xl">
-                                        <p className="text-muted-foreground text-lg mb-2">No new drops matching your filters.</p>
-                                        <a href="/new-arrivals" className="text-[#D9F99D] underline mt-2 inline-block mb-8">Clear all filters</a>
-                                        <h3 className="text-2xl font-bold text-white uppercase tracking-tight">
-                                            Trending Now
-                                        </h3>
-                                    </div>
-                                    <RecommendedFallback />
+                        {/* Header & Sort */}
+                        <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b-2 border-[#B4F000] pb-6">
+                            <div className="relative">
+                                {/* Decorator */}
+                                <div className="absolute -top-6 -left-2 text-[10px] font-mono text-[#B4F000] uppercase tracking-widest opacity-60">
+                                    // Season 2026 // Collection 04
                                 </div>
-                            )}
+                                <h1 className="text-6xl md:text-8xl font-black font-[family-name:var(--font-oswald)] uppercase leading-[0.85] tracking-tighter italic">
+                                    New <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B4F000] to-[#B4F000]/50">Drop</span>
+                                </h1>
+                                <p className="text-white/40 font-mono text-sm mt-4 max-w-md uppercase tracking-wide">
+                                    Refresh your loadout with the latest cyber-spec gear. Limited quantities available per sector.
+                                </p>
+                            </div>
+                            <div className="mt-8 md:mt-0">
+                                <SortSelect />
+                            </div>
+                        </div>
+
+                        <Suspense fallback={
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                {[...Array(8)].map((_, i) => (
+                                    <div key={i} className="aspect-[3/4] bg-white/5 animate-pulse" />
+                                ))}
+                            </div>
+                        }>
+                            <ProductGrid products={filteredProducts} />
                         </Suspense>
+
+                        {/* Empty State */}
+                        {filteredProducts.length === 0 && (
+                            <div className="py-20 text-center border border-white/10 bg-white/5">
+                                <h3 className="text-2xl font-bold font-[family-name:var(--font-oswald)] uppercase text-white/50">
+                                    System Error: No Items Found
+                                </h3>
+                                <p className="text-white/30 font-mono mt-2">Adjust your filter parameters.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
-        </div>
-    );
-}
-
-// Fallback Component
-import { getProducts } from "@/lib/shopify";
-
-async function RecommendedFallback() {
-    const { products } = await getProducts({ sortKey: 'BEST_SELLING', limit: 8 });
-    if (!products.length) return null;
-
-    return (
-        <div>
-            <ProductGrid products={products} />
-        </div>
+        </main>
     );
 }

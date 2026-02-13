@@ -13,119 +13,81 @@ export const metadata = {
 export default async function BestSellersPage({
     searchParams,
 }: {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+    searchParams: { [key: string]: string | string[] | undefined };
 }) {
-    const resolvedSearchParams = await searchParams;
-    const sort = resolvedSearchParams.sort as string | undefined;
+    const { sort, min_price, max_price, category, color, size } = searchParams;
+    const sortKey = sort === 'price_high' || sort === 'price_low' ? 'PRICE' :
+        sort === 'newest' ? 'CREATED_AT' : 'BEST_SELLING';
+    const reverse = sort === 'price_low' ? false : true;
 
-    // Filters
-    const queryParam = resolvedSearchParams.q as string | undefined;
-    const categoryParam = resolvedSearchParams.category as string | undefined;
-    const colorParam = resolvedSearchParams.color as string | undefined;
-    const sizeParam = resolvedSearchParams.size as string | undefined;
-    const minPriceParam = resolvedSearchParams.min_price as string | undefined;
-    const maxPriceParam = resolvedSearchParams.max_price as string | undefined;
+    // Fetch products sorted by best selling
+    const { products } = await getProducts({ sortKey, reverse, limit: 100 });
 
-    // Sorting - Default to BEST_SELLING
-    let sortKey: 'TITLE' | 'PRICE' | 'CREATED_AT' | 'BEST_SELLING' | undefined = 'BEST_SELLING';
-    let reverse = false;
+    // Filter Logic
+    let filteredProducts = products;
 
-    if (sort === "newest") {
-        sortKey = 'CREATED_AT';
-        reverse = true;
-    } else if (sort === "price_low") {
-        sortKey = 'PRICE';
-        reverse = false;
-    } else if (sort === "price_high") {
-        sortKey = 'PRICE';
-        reverse = true;
-    } else if (sort === "best_selling") {
-        sortKey = 'BEST_SELLING';
-        reverse = false;
+    if (min_price || max_price) {
+        const min = min_price ? Number(min_price) : 0;
+        const max = max_price ? Number(max_price) : Infinity;
+        filteredProducts = filteredProducts.filter(p => {
+            const price = Number(p.priceRange.minVariantPrice.amount);
+            return price >= min && price <= max;
+        });
     }
 
-    // Build Query
-    let queryParts: string[] = [];
-    if (queryParam) queryParts.push(queryParam);
-    if (categoryParam) queryParts.push(`product_type:${categoryParam}`);
-    if (colorParam) queryParts.push(`variant_title:${colorParam}`);
-    if (sizeParam) queryParts.push(`variant_title:${sizeParam}`);
-    if (minPriceParam) queryParts.push(`price:>=${minPriceParam}`);
-    if (maxPriceParam) queryParts.push(`price:<=${maxPriceParam}`);
+    if (category && category !== 'All') {
+        filteredProducts = filteredProducts.filter(p => p.productType === category);
+    }
 
-    const shopifyQuery = queryParts.join(" AND ");
+    if (color) {
+        filteredProducts = filteredProducts.filter(p =>
+            p.options.find(o => o.name === 'Color')?.values.includes(color as string)
+        );
+    }
 
-    const { products } = await getProducts({
-        sortKey,
-        reverse,
-        query: shopifyQuery,
-    });
+    if (size) {
+        filteredProducts = filteredProducts.filter(p =>
+            p.options.find(o => o.name === 'Size')?.values.includes(size as string)
+        );
+    }
 
-    // Aggregation (Sidebar)
-    const { products: allProducts } = await getProducts({ limit: 100, sortKey: 'BEST_SELLING' });
-
-    const availableTypes = Array.from(new Set(allProducts.map(p => p.productType).filter(Boolean)));
-    const extractOptions = (products: Product[], optionName: string) => {
-        const values = new Set<string>();
-        products.forEach(p => {
-            const option = p.options?.find(o => o.name.toLowerCase() === optionName.toLowerCase() || o.name.toLowerCase() === optionName.toLowerCase() + 's');
-            if (option) {
-                option.values.forEach(v => values.add(v));
-            }
-        });
-        return Array.from(values);
-    };
-    const availableColors = extractOptions(allProducts, 'Color');
-    const availableSizes = extractOptions(allProducts, 'Size');
-
-    const prices = allProducts.flatMap(p => [
-        parseFloat(p.priceRange.minVariantPrice.amount),
-        parseFloat(p.priceRange.maxVariantPrice.amount)
-    ]);
-    const minPrice = prices.length ? Math.min(...prices) : 0;
-    const maxPrice = prices.length ? Math.max(...prices) : 10000;
+    const availableTypes = Array.from(new Set(products.map(p => p.productType))).filter(Boolean);
+    const availableColors = Array.from(new Set(products.flatMap(p => p.options.find(o => o.name === 'Color')?.values || [])));
+    const availableSizes = Array.from(new Set(products.flatMap(p => p.options.find(o => o.name === 'Size')?.values || [])));
 
     return (
-        <div className="min-h-screen bg-background pt-24 pb-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div>
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white uppercase mb-2">
-                            Most <span className="text-primary">Wanted</span>
-                        </h1>
-                        <p className="text-white/50 text-lg font-medium">
-                            {products.length} Top Rated Items
-                        </p>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                        <span className="text-xs font-bold text-white/50 uppercase tracking-widest hidden md:block">Sort By:</span>
-                        <SortSelect />
-                    </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row gap-8">
+        <main className="min-h-screen bg-[#050505] text-white pt-24 pb-20 px-4 md:px-8">
+            <div className="max-w-[1400px] mx-auto">
+                <div className="flex flex-col md:flex-row gap-12">
                     <ProductFilters
                         availableTypes={availableTypes}
-                        availableColors={availableColors}
                         availableSizes={availableSizes}
-                        minPrice={minPrice}
-                        maxPrice={maxPrice}
+                        availableColors={availableColors}
                     />
 
                     <div className="flex-1">
-                        <Suspense fallback={<div className="text-center py-20">Loading Grid...</div>}>
-                            {products.length > 0 ? (
-                                <ProductGrid products={products} />
-                            ) : (
-                                <div className="text-center py-24 border border-dashed border-white/10 rounded-2xl">
-                                    <p className="text-muted-foreground text-lg">No best sellers found.</p>
-                                    <a href="/best-sellers" className="text-[#D9F99D] underline mt-2 inline-block">Clear all filters</a>
-                                </div>
-                            )}
+                        <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b-2 border-white/10 pb-6 relative">
+                            <div>
+                                <h1 className="text-6xl md:text-8xl font-black font-[family-name:var(--font-oswald)] uppercase leading-[0.85] tracking-tighter text-white">
+                                    Best <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B4F000] to-white">Sellers</span>
+                                </h1>
+                                <p className="text-[#B4F000] font-mono text-sm mt-4 uppercase tracking-widest">
+                                    // High Demand / Low Stock / Act Fast
+                                </p>
+                            </div>
+                            <div className="mt-8 md:mt-0">
+                                <SortSelect />
+                            </div>
+                            {/* Decorative glow */}
+                            <div className="absolute bottom-0 left-0 w-1/3 h-[2px] bg-[#B4F000] shadow-[0_0_10px_#B4F000]" />
+                        </div>
+
+                        <Suspense fallback={<div className="text-white/50 font-mono">Loading data...</div>}>
+                            <ProductGrid products={filteredProducts} />
                         </Suspense>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     );
 }

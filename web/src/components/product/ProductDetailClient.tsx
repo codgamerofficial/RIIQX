@@ -7,12 +7,65 @@ import { Product } from "@/lib/shopify/types";
 import { formatPrice } from "@/lib/shopify";
 import { cn } from "@/lib/utils";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { ShareButton } from "@/components/ui/ShareButton";
 import { RelatedProducts } from "./RelatedProducts";
 import { ProductGallery } from "./ProductGallery";
 
 interface ProductDetailClientProps {
     product: Product;
     relatedProducts: Product[];
+}
+
+function FitGuideModal() {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <>
+            <button
+                onClick={() => setIsOpen(true)}
+                className="text-[10px] uppercase tracking-[0.2em] text-[#B4F000] hover:text-white underline decoration-[#B4F000]/30 hover:decoration-white underline-offset-4 flex items-center gap-1"
+            >
+                RIIQX Fit OS <Shield className="w-3 h-3" />
+            </button>
+            <AnimatePresence>
+                {isOpen && (
+                    <div className="fixed inset-0 z[999] flex items-center justify-center px-4 bg-black/80 backdrop-blur-sm z-[200]">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="bg-[#0A0A0A] border border-white/10 w-full max-w-md p-6 relative shadow-2xl"
+                        >
+                            <button onClick={() => setIsOpen(false)} className="absolute top-4 right-4 text-white/50 hover:text-white"><Minus className="w-6 h-6 rotate-45" /></button>
+                            <h3 className="text-xl font-display font-black uppercase text-white mb-6">RIIQX Fit OS <span className="text-[#B4F000]">v2.0</span></h3>
+
+                            <div className="space-y-4 font-mono text-xs text-white/70">
+                                <p>Our cuts are engineered for an <strong className="text-white">Oversized Street Fit</strong>.</p>
+                                <div className="grid grid-cols-3 gap-2 text-center py-4">
+                                    <div className="p-3 bg-white/5 border border-white/5">
+                                        <div className="text-white font-bold mb-1">HEIGHT</div>
+                                        <div>&lt; 5'7"</div>
+                                        <div className="text-[#B4F000] mt-1 font-bold">SIZE S</div>
+                                    </div>
+                                    <div className="p-3 bg-white/5 border border-white/5">
+                                        <div className="text-white font-bold mb-1">5'8" - 6'0"</div>
+                                        <div>Normal</div>
+                                        <div className="text-[#B4F000] mt-1 font-bold">SIZE M</div>
+                                    </div>
+                                    <div className="p-3 bg-white/5 border border-white/5">
+                                        <div className="text-white font-bold mb-1">6'1" +</div>
+                                        <div>Tall</div>
+                                        <div className="text-[#B4F000] mt-1 font-bold">SIZE L/XL</div>
+                                    </div>
+                                </div>
+                                <p className="italic text-white/40">*If you prefer a standard fit, size down once.</p>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+        </>
+    )
 }
 
 export function ProductDetailClient({ product, relatedProducts }: ProductDetailClientProps) {
@@ -69,21 +122,56 @@ export function ProductDetailClient({ product, relatedProducts }: ProductDetailC
 
                             {/* Header */}
                             <div>
-                                <div className="flex items-center gap-4 mb-6">
+                                <div className="flex items-center gap-4 mb-6 flex-wrap">
                                     <span className="bg-accent text-black px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] transform -skew-x-12">
                                         Official Drop
                                     </span>
+
+                                    {/* Accessory Badges */}
+                                    {(product.title.toLowerCase().includes('magsafe') || product.tags?.includes('magsafe')) && (
+                                        <span className="border border-[#B4F000] text-[#B4F000] px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] transform -skew-x-12">
+                                            MagSafe Ready
+                                        </span>
+                                    )}
+                                    {['bottle', 'mug', 'cup'].some(k => product.title.toLowerCase().includes(k) || product.productType?.toLowerCase().includes(k)) && (
+                                        <span className="border border-[#B4F000] text-[#B4F000] px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] transform -skew-x-12">
+                                            Thermal Grade
+                                        </span>
+                                    )}
+
                                     {/* Mock Rating */}
-                                    <div className="flex items-center gap-1 text-white/50 text-[10px] uppercase tracking-widest font-bold">
+                                    <div className="flex items-center gap-1 text-white/50 text-[10px] uppercase tracking-widest font-bold ml-auto">
                                         <Star className="w-3 h-3 text-accent fill-accent" /> 4.9 Rated
                                     </div>
                                 </div>
+
+                                {/* Hype Pulse - Scarcity Engine */}
+                                <div className="flex items-center gap-4 mb-2 text-xs font-mono text-accent/80">
+                                    <div className="flex items-center gap-2">
+                                        <span className="relative flex h-2 w-2">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+                                        </span>
+                                        {Math.floor(Math.random() * (45 - 12) + 12)} people viewing
+                                    </div>
+                                    <span className="text-white/20">|</span>
+                                    <div className="text-red-500 font-bold animate-pulse">
+                                        Low Stock in {selectedSize || "your size"}
+                                    </div>
+                                </div>
+
                                 <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter font-display leading-[0.9] mb-6 text-white mix-blend-difference">
                                     {product.title}
                                 </h1>
-                                <p className="text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">
-                                    {formatPrice(price.amount, price.currencyCode)}
-                                </p>
+                                <div className="flex items-center justify-between">
+                                    <p className="text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">
+                                        {formatPrice(price.amount, price.currencyCode)}
+                                    </p>
+                                    <ShareButton
+                                        title={product.title}
+                                        className="h-10 w-10 border border-white/10 bg-white/5 text-white/60 hover:text-[#B4F000] hover:border-[#B4F000]/50"
+                                    />
+                                </div>
                             </div>
 
                             {/* Separator - Aggressive */}
@@ -124,7 +212,7 @@ export function ProductDetailClient({ product, relatedProducts }: ProductDetailC
                                     <div className="space-y-4">
                                         <div className="flex justify-between items-baseline">
                                             <span className="text-[10px] uppercase tracking-[0.25em] text-white/40 font-black">Select Size</span>
-                                            <button className="text-[10px] uppercase tracking-[0.2em] text-accent hover:text-white underline decoration-accent/30 hover:decoration-white underline-offset-4">Size Guide</button>
+                                            <FitGuideModal />
                                         </div>
                                         <div className="grid grid-cols-4 gap-2">
                                             {sizes.map((size) => (

@@ -3,117 +3,144 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
-export function OpeningSequence({ onComplete }: { onComplete: () => void }) {
+export function OpeningSequence({ onComplete, products = [] }: { onComplete: () => void; products?: any[] }) {
     const [isVisible, setIsVisible] = useState(true);
-    const [isLoaded, setIsLoaded] = useState(false);
+    const [currentImage, setCurrentImage] = useState(0);
+    const [isLooping, setIsLooping] = useState(true);
+
+    // Filter valid images (ensure accessible URLs)
+    const validProducts = products.filter(p => p?.featuredImage?.url || p?.images?.[0]?.url);
+    const images = validProducts.map(p => p.featuredImage?.url || p.images[0].url);
 
     useEffect(() => {
-        // Simulate asset loading
-        const timer = setTimeout(() => setIsLoaded(true), 2500);
-        return () => clearTimeout(timer);
-    }, []);
+        // Preload images
+        images.forEach((src) => {
+            const img = new Image();
+            img.src = src;
+        });
+
+        // Fast Loop Animation (Hype Cycle)
+        const loopInterval = setInterval(() => {
+            setCurrentImage((prev) => (prev + 1) % (images.length || 1));
+        }, 350); // Fast pacing for hype
+
+        // End loop and enter after 3.5s
+        const timer = setTimeout(() => {
+            clearInterval(loopInterval);
+            setIsLooping(false);
+            // Auto enter or show "Enter" button? User likely wants auto-reveal or button.
+            // Keeping existing logic: Show Enter button or Auto if desired.
+            // Let's make it auto-transition to a "Logo Reveal" then allow enter
+        }, 3500);
+
+        return () => {
+            clearInterval(loopInterval);
+            clearTimeout(timer);
+        };
+    }, [images.length]);
 
     const handleEnter = () => {
         setIsVisible(false);
-        setTimeout(onComplete, 1200); // Wait for exit animation
+        setTimeout(onComplete, 1000);
     };
 
     return (
         <AnimatePresence>
             {isVisible && (
                 <motion.div
-                    className="fixed inset-0 z-[9999] bg-black flex items-center justify-center overflow-hidden cursor-pointer"
+                    className="fixed inset-0 z-[9999] bg-[#050505] flex items-center justify-center overflow-hidden cursor-pointer"
                     initial={{ opacity: 1 }}
                     exit={{
-                        opacity: 0,
-                        scale: 1.1,
-                        filter: "blur(20px)",
-                        transition: { duration: 1.2, ease: [0.76, 0, 0.24, 1] }
+                        y: "-100%",
+                        transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] }
                     }}
-                    onClick={isLoaded ? handleEnter : undefined}
+                    onClick={handleEnter}
                 >
-                    <div className="relative w-full h-full flex flex-col items-center justify-center">
-                        {/* Glitch/Distortion Layers */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 1.2, filter: "blur(20px)" }}
-                            animate={{ opacity: 0.5, scale: 1, filter: "blur(0px)" }}
-                            exit={{ opacity: 0, scale: 2, filter: "blur(50px)" }}
-                            transition={{ duration: 2, ease: "circOut" }}
-                            className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                        >
-                            <h1 className="text-[12vw] md:text-[15vw] font-black text-red-600/20 mix-blend-color-dodge ml-2 mt-2">RIIQX</h1>
-                        </motion.div>
-                        <motion.div
-                            initial={{ opacity: 0, scale: 1.2, filter: "blur(20px)" }}
-                            animate={{ opacity: 0.5, scale: 1, filter: "blur(0px)" }}
-                            exit={{ opacity: 0, scale: 2, filter: "blur(50px)" }}
-                            transition={{ duration: 2, ease: "circOut", delay: 0.1 }}
-                            className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                        >
-                            <h1 className="text-[12vw] md:text-[15vw] font-black text-blue-600/20 mix-blend-color-dodge -ml-2 -mt-2">RIIQX</h1>
-                        </motion.div>
+                    {/* Background Product Loop */}
+                    <div className="absolute inset-0 z-0 opacity-40 mix-blend-color-dodge">
+                        <AnimatePresence mode="popLayout">
+                            {images.length > 0 && isLooping && (
+                                <motion.img
+                                    key={currentImage}
+                                    src={images[currentImage]}
+                                    alt="Sequence"
+                                    initial={{ opacity: 0, scale: 1.2, filter: "blur(10px)" }}
+                                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="w-full h-full object-cover"
+                                />
+                            )}
+                        </AnimatePresence>
+                    </div>
 
-                        {/* Main Title */}
-                        <div className="overflow-hidden relative z-10">
+                    <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
+                        {/* Glitch RIIQX Text */}
+                        <div className="relative">
                             <motion.h1
-                                initial={{ y: "100%" }}
-                                animate={{ y: 0 }}
-                                exit={{ y: "-150%", opacity: 0 }}
-                                transition={{ duration: 1.5, ease: [0.76, 0, 0.24, 1] }}
-                                className="text-[12vw] md:text-[15vw] font-black text-white leading-none tracking-tighter mix-blend-difference"
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 1.5, opacity: 0 }}
+                                className="text-[15vw] font-black text-white italic tracking-tighter mix-blend-difference"
+                            >
+                                RIIQX
+                            </motion.h1>
+                            {/* Glitch Layers */}
+                            <motion.h1
+                                animate={{
+                                    x: [-2, 2, -2],
+                                    opacity: [0.5, 0.8, 0.5]
+                                }}
+                                transition={{ repeat: Infinity, duration: 0.1 }}
+                                className="absolute top-0 left-0 text-[15vw] font-black text-[#B4F000] italic tracking-tighter mix-blend-screen opacity-50 z-[-1] ml-[2px]"
+                            >
+                                RIIQX
+                            </motion.h1>
+                            <motion.h1
+                                animate={{
+                                    x: [2, -2, 2],
+                                    opacity: [0.5, 0.8, 0.5]
+                                }}
+                                transition={{ repeat: Infinity, duration: 0.1 }}
+                                className="absolute top-0 left-0 text-[15vw] font-black text-red-600 italic tracking-tighter mix-blend-screen opacity-50 z-[-1] -ml-[2px]"
                             >
                                 RIIQX
                             </motion.h1>
                         </div>
 
-                        {/* Interactive Enter Button / Loading State */}
-                        <div className="absolute bottom-12 md:bottom-24 z-20">
-                            <AnimatePresence mode="wait">
-                                {!isLoaded ? (
-                                    <motion.div
-                                        key="loading"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className="flex flex-col items-center gap-4"
-                                    >
-                                        <div className="w-48 h-[2px] bg-white/10 overflow-hidden">
-                                            <motion.div
-                                                className="h-full bg-white"
-                                                initial={{ width: 0 }}
-                                                animate={{ width: "100%" }}
-                                                transition={{ duration: 2.5, ease: "easeInOut" }}
-                                            />
-                                        </div>
-                                        <div className="font-mono text-xs text-white/50 uppercase tracking-widest animate-pulse">
-                                            Initializing System...
-                                        </div>
-                                    </motion.div>
-                                ) : (
-                                    <motion.button
-                                        key="enter"
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        whileHover={{ scale: 1.05, letterSpacing: "0.5em" }}
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={(e) => { e.stopPropagation(); handleEnter(); }}
-                                        className="group relative px-8 py-4 bg-transparent overflow-hidden"
-                                    >
-                                        <span className="relative z-10 font-black text-xl md:text-2xl text-white uppercase tracking-[0.3em] transition-all duration-500 group-hover:text-black mix-blend-difference">
-                                            [ Enter ]
-                                        </span>
+                        {/* Status/Call to Action */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 1 }}
+                            className="mt-8"
+                        >
+                            {!isLooping ? (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleEnter(); }}
+                                    className="px-8 py-3 bg-[#B4F000] text-black font-black uppercase tracking-[0.2em] transform hover:scale-105 transition-transform"
+                                >
+                                    Enter System
+                                </button>
+                            ) : (
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className="w-12 h-1 bg-white/20 overflow-hidden rounded-full">
                                         <motion.div
-                                            className="absolute inset-0 bg-white"
-                                            initial={{ scaleX: 0 }}
-                                            whileHover={{ scaleX: 1 }}
-                                            transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
-                                            style={{ originX: 0.5 }}
+                                            className="h-full bg-[#B4F000]"
+                                            animate={{ width: ["0%", "100%"] }}
+                                            transition={{ duration: 3.5, ease: "linear" }}
                                         />
-                                    </motion.button>
-                                )}
-                            </AnimatePresence>
-                        </div>
+                                    </div>
+                                    <span className="text-[9px] font-mono text-[#B4F000] uppercase tracking-widest animate-pulse">
+                                        Loading Assets...
+                                    </span>
+                                </div>
+                            )}
+                        </motion.div>
                     </div>
+
+                    {/* Scanlines */}
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-[50] bg-[length:100%_2px,3px_100%] pointer-events-none" />
                 </motion.div>
             )}
         </AnimatePresence>

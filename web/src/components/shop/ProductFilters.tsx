@@ -2,8 +2,9 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { X, Check, Minus } from "lucide-react";
+import { X, Check, Minus, SlidersHorizontal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface ProductFiltersProps {
     availableTypes: string[];
@@ -22,6 +23,7 @@ export function ProductFilters({
 }: ProductFiltersProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const [isOpenMobile, setIsOpenMobile] = useState(false);
 
     // State for local inputs
     const [localMinPrice, setLocalMinPrice] = useState(searchParams.get("min_price") || "");
@@ -57,7 +59,7 @@ export function ProductFilters({
 
             if (value === "All" || !value) {
                 params.delete(name);
-            } else { // Toggle logic could go here, but stick to single select for now for simplicity
+            } else {
                 params.set(name, value);
             }
             return params.toString();
@@ -75,10 +77,9 @@ export function ProductFilters({
         setLocalMaxPrice("");
     };
 
-    // Helper: Categorize Sizes (Simple Heuristic)
+    // Helper: Categorize Sizes
     const categorizedSizes = availableSizes.reduce((acc, size) => {
         const lowerSize = size.toLowerCase();
-        // Check for phone models
         if (lowerSize.includes("iphone") || /\d/.test(size) && (lowerSize.includes("pro") || lowerSize.includes("max") || lowerSize.includes("mini") || lowerSize.includes("plus"))) {
             acc.tech.push(size);
         } else if (['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', 'small', 'medium', 'large'].some(s => lowerSize.includes(s))) {
@@ -104,133 +105,159 @@ export function ProductFilters({
     const hasActiveFilters = currentCategory || currentColor || currentSize || localMinPrice || localMaxPrice;
 
     return (
-        <aside className="w-full md:w-72 flex-shrink-0 space-y-12 pr-4">
+        <>
+            {/* Mobile Filter Toggle */}
+            <button
+                onClick={() => setIsOpenMobile(!isOpenMobile)}
+                className="md:hidden w-full flex items-center justify-between p-4 border border-white/10 bg-[#050505] text-white uppercase tracking-widest text-sm font-bold font-mono mb-4"
+            >
+                <span>Filter Protocol</span>
+                <SlidersHorizontal className="w-4 h-4 text-[#B4F000]" />
+            </button>
 
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <h2 className="text-sm font-black text-white uppercase tracking-[0.2em] font-mono">
-                    Filter By
-                </h2>
-                {hasActiveFilters && (
-                    <button
-                        onClick={clearAll}
-                        className="text-[10px] font-bold text-accent hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1 group"
-                    >
-                        Clear All <X className="w-3 h-3 group-hover:rotate-90 transition-transform" />
-                    </button>
-                )}
-            </div>
+            <aside className={cn(
+                "w-full md:w-72 flex-shrink-0 space-y-12 pr-4 md:block",
+                isOpenMobile ? "block" : "hidden"
+            )}>
 
-            {/* Categories */}
-            <FilterSection title="Category" isOpen={true}>
-                <div className="space-y-1">
-                    <FilterOption
-                        label="All Products"
-                        isActive={!currentCategory}
-                        onClick={() => handleFilterChange("category", "All")}
-                    />
-                    {availableTypes.map((type) => (
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-4 relative">
+                    <h2 className="text-xl font-black text-white uppercase tracking-tighter font-[family-name:var(--font-oswald)]">
+                        Filter By
+                    </h2>
+                    {hasActiveFilters && (
+                        <button
+                            onClick={clearAll}
+                            className="text-[10px] font-bold text-black hover:bg-white hover:text-black transition-colors uppercase tracking-widest flex items-center gap-1 group bg-[#B4F000] px-3 py-1"
+                        >
+                            Reset <X className="w-3 h-3 group-hover:rotate-90 transition-transform" />
+                        </button>
+                    )}
+                    {/* Decorative Dot */}
+                    <div className="absolute -bottom-[1px] right-0 w-8 h-[2px] bg-[#B4F000]" />
+                </div>
+
+                {/* Categories */}
+                <FilterSection title="Category" isOpen={true}>
+                    <div className="space-y-1">
                         <FilterOption
-                            key={type}
-                            label={type}
-                            isActive={currentCategory === type}
-                            onClick={() => handleFilterChange("category", type)}
+                            label="All"
+                            isActive={!currentCategory}
+                            onClick={() => handleFilterChange("category", "All")}
                         />
-                    ))}
-                </div>
-            </FilterSection>
-
-            {/* Price Range */}
-            <FilterSection title="Price (INR)" isOpen={true}>
-                <div className="grid grid-cols-2 gap-4">
-                    <PriceInput
-                        label="Min"
-                        value={localMinPrice}
-                        onChange={setLocalMinPrice}
-                        placeholder={Math.floor(minPrice).toString()}
-                    />
-                    <PriceInput
-                        label="Max"
-                        value={localMaxPrice}
-                        onChange={setLocalMaxPrice}
-                        placeholder={Math.ceil(maxPrice).toString()}
-                    />
-                </div>
-            </FilterSection>
-
-            {/* Colors */}
-            {availableColors.length > 0 && (
-                <FilterSection title="Color" isOpen={true}>
-                    <div className="grid grid-cols-5 gap-2">
-                        {availableColors.map((color) => {
-                            const isActive = currentColor === color;
-                            const colorHex = getColorStyle(color);
-                            const isWhite = colorHex.toLowerCase() === '#ffffff' || color.toLowerCase() === 'white';
-
-                            return (
-                                <button
-                                    key={color}
-                                    onClick={() => handleFilterChange("color", isActive ? "" : color)}
-                                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all relative group ${isActive ? 'border-accent scale-110' : 'border-white/10 hover:border-white/40'}`}
-                                    style={{ backgroundColor: colorHex }}
-                                    title={color}
-                                >
-                                    {isActive && <Check className={`w-4 h-4 ${isWhite ? 'text-black' : 'text-white'}`} />}
-                                    <span className="sr-only">{color}</span>
-                                </button>
-                            );
-                        })}
+                        {availableTypes.map((type) => (
+                            <FilterOption
+                                key={type}
+                                label={type}
+                                isActive={currentCategory === type}
+                                onClick={() => handleFilterChange("category", type)}
+                            />
+                        ))}
                     </div>
                 </FilterSection>
-            )}
 
-            {/* Sizes */}
-            {availableSizes.length > 0 && (
-                <FilterSection title="Size" isOpen={true}>
-                    {/* Clothing Sizes */}
-                    {categorizedSizes.clothing.length > 0 && (
-                        <div className="mb-4">
-                            <h4 className="text-[10px] text-white/30 uppercase font-bold tracking-widest mb-2">Apparel</h4>
-                            <div className="grid grid-cols-4 gap-2">
-                                {categorizedSizes.clothing.map(size => (
-                                    <SizeButton
-                                        key={size}
-                                        label={size}
-                                        isActive={currentSize === size}
-                                        onClick={() => handleFilterChange("size", currentSize === size ? "" : size)}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Tech/Other Sizes */}
-                    {(categorizedSizes.tech.length > 0 || categorizedSizes.other.length > 0) && (
-                        <div>
-                            <h4 className="text-[10px] text-white/30 uppercase font-bold tracking-widest mb-2">Accessories / Tech</h4>
-                            <div className="grid grid-cols-2 gap-2">
-                                {[...categorizedSizes.tech, ...categorizedSizes.other].map(size => (
-                                    <SizeButton
-                                        key={size}
-                                        label={size}
-                                        isActive={currentSize === size}
-                                        onClick={() => handleFilterChange("size", currentSize === size ? "" : size)}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                {/* Price Range */}
+                <FilterSection title="Price (INR)" isOpen={true}>
+                    <div className="grid grid-cols-2 gap-4">
+                        <PriceInput
+                            label="Min"
+                            value={localMinPrice}
+                            onChange={setLocalMinPrice}
+                            placeholder={Math.floor(minPrice).toString()}
+                        />
+                        <PriceInput
+                            label="Max"
+                            value={localMaxPrice}
+                            onChange={setLocalMaxPrice}
+                            placeholder={Math.ceil(maxPrice).toString()}
+                        />
+                    </div>
                 </FilterSection>
-            )}
 
-        </aside>
+                {/* Colors */}
+                {availableColors.length > 0 && (
+                    <FilterSection title="Colorway" isOpen={true}>
+                        <div className="grid grid-cols-5 gap-2">
+                            {availableColors.map((color) => {
+                                const isActive = currentColor === color;
+                                const colorHex = getColorStyle(color);
+                                const isWhite = colorHex.toLowerCase() === '#ffffff' || color.toLowerCase() === 'white';
+
+                                return (
+                                    <button
+                                        key={color}
+                                        onClick={() => handleFilterChange("color", isActive ? "" : color)}
+                                        className={cn(
+                                            "w-10 h-10 flex items-center justify-center transition-all relative group clip-path-slant-right",
+                                            isActive ? "scale-110" : "hover:opacity-80"
+                                        )}
+                                        style={{ backgroundColor: colorHex }}
+                                        title={color}
+                                    >
+                                        {/* Border Overlay */}
+                                        <div className={cn(
+                                            "absolute inset-0 border-[2px] pointer-events-none transition-colors",
+                                            isActive ? "border-[#B4F000]" : "border-transparent group-hover:border-white/20"
+                                        )} />
+
+                                        {isActive && <Check className={cn("w-4 h-4", isWhite ? "text-black" : "text-white")} />}
+                                        <span className="sr-only">{color}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </FilterSection>
+                )}
+
+                {/* Sizes */}
+                {availableSizes.length > 0 && (
+                    <FilterSection title="specs / Size" isOpen={true}>
+                        {/* Clothing Sizes */}
+                        {categorizedSizes.clothing.length > 0 && (
+                            <div className="mb-4">
+                                <h4 className="text-[10px] text-[#B4F000] uppercase font-bold tracking-widest mb-2 font-mono">Apparel</h4>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {categorizedSizes.clothing.map(size => (
+                                        <SizeButton
+                                            key={size}
+                                            label={size}
+                                            isActive={currentSize === size}
+                                            onClick={() => handleFilterChange("size", currentSize === size ? "" : size)}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Tech/Other Sizes */}
+                        {(categorizedSizes.tech.length > 0 || categorizedSizes.other.length > 0) && (
+                            <div>
+                                <h4 className="text-[10px] text-[#B4F000] uppercase font-bold tracking-widest mb-2 font-mono">Tech Specs</h4>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {[...categorizedSizes.tech, ...categorizedSizes.other].map(size => (
+                                        <SizeButton
+                                            key={size}
+                                            label={size}
+                                            isActive={currentSize === size}
+                                            onClick={() => handleFilterChange("size", currentSize === size ? "" : size)}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </FilterSection>
+                )}
+
+            </aside>
+        </>
     );
 }
 
 // Sub-components for cleaner code
 const FilterSection = ({ title, children, isOpen = true }: { title: string, children: React.ReactNode, isOpen?: boolean }) => (
     <div className="space-y-4">
-        <h3 className="text-xs font-bold text-white/50 uppercase tracking-[0.2em] flex items-center justify-between">
+        <h3 className="text-xs font-black text-white/50 uppercase tracking-[0.2em] flex items-center gap-2 font-[family-name:var(--font-oswald)]">
+            <span className="w-2 h-2 bg-white/20" />
             {title}
         </h3>
         {children}
@@ -240,27 +267,38 @@ const FilterSection = ({ title, children, isOpen = true }: { title: string, chil
 const FilterOption = ({ label, isActive, onClick }: { label: string, isActive: boolean, onClick: () => void }) => (
     <button
         onClick={onClick}
-        className={`w-full text-left flex items-center justify-between group py-1`}
+        className="w-full text-left flex items-center group py-2"
     >
-        <span className={`text-sm uppercase tracking-wider font-bold transition-colors ${isActive ? "text-accent" : "text-white/60 group-hover:text-white"}`}>
+        <div className={cn(
+            "w-4 h-4 mr-3 border flex items-center justify-center transition-all duration-300",
+            isActive ? "bg-[#B4F000] border-[#B4F000]" : "border-white/20 bg-transparent group-hover:border-[#B4F000]"
+        )}>
+            {isActive && <Check className="w-3 h-3 text-black" strokeWidth={3} />}
+        </div>
+        <span className={cn(
+            "text-sm uppercase tracking-wider font-bold transition-all duration-300 font-mono",
+            isActive ? "text-white" : "text-white/60 group-hover:text-white"
+        )}>
             {label}
         </span>
-        {isActive && <div className="w-1.5 h-1.5 bg-accent rounded-full" />}
     </button>
 );
 
 const PriceInput = ({ label, value, onChange, placeholder }: { label: string, value: string, onChange: (v: string) => void, placeholder: string }) => (
     <div className="space-y-1">
-        <label className="text-[10px] text-white/30 uppercase font-bold">{label}</label>
+        <label className="text-[9px] text-[#B4F000] uppercase font-bold tracking-widest font-mono">{label}</label>
         <div className="relative group">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-xs font-bold">₹</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#B4F000] text-xs font-bold">₹</span>
             <input
                 type="number"
                 placeholder={placeholder}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full bg-neutral-900/50 border border-white/10 rounded-none py-3 pl-7 pr-2 text-xs text-white font-mono focus:border-accent focus:outline-none transition-all placeholder:text-white/10"
+                className="w-full bg-[#0A0A0A] border border-white/10 text-xs text-white font-mono py-3 pl-7 pr-2 focus:border-[#B4F000] focus:ring-1 focus:ring-[#B4F000]/50 placeholder:text-white/10 transition-all outline-none"
             />
+            {/* Corner Markers */}
+            <div className="absolute top-0 right-0 w-1 h-1 bg-white/20 group-focus-within:bg-[#B4F000]" />
+            <div className="absolute bottom-0 left-0 w-1 h-1 bg-white/20 group-focus-within:bg-[#B4F000]" />
         </div>
     </div>
 );
@@ -268,12 +306,15 @@ const PriceInput = ({ label, value, onChange, placeholder }: { label: string, va
 const SizeButton = ({ label, isActive, onClick }: { label: string, isActive: boolean, onClick: () => void }) => (
     <button
         onClick={onClick}
-        className={`border py-2 px-1 text-[10px] font-bold uppercase transition-all truncate hover:border-white/40 ${isActive
-                ? "bg-white text-black border-white"
-                : "bg-transparent text-white/70 border-white/10"
-            }`}
+        className={cn(
+            "py-2 px-1 text-[10px] font-bold uppercase transition-all truncate border relative overflow-hidden",
+            isActive
+                ? "bg-[#B4F000] text-black border-[#B4F000]"
+                : "bg-transparent text-white/60 border-white/10 hover:border-white/30 hover:text-white"
+        )}
         title={label}
     >
-        {label}
+        <span className="relative z-10">{label}</span>
+        {isActive && <div className="absolute inset-0 bg-white/20 animate-pulse" />}
     </button>
 );

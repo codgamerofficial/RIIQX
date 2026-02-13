@@ -108,7 +108,9 @@ export function ParticleSystem({
         };
     }, [count, color, size, speed, interactive, shouldReduceMotion]);
 
-    if (shouldReduceMotion) return null;
+    if (shouldReduceMotion) {
+        return <div className="fixed inset-0 z-0 pointer-events-none" />;
+    }
 
     return (
         <div

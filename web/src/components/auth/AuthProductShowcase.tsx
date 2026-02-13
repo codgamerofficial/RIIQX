@@ -8,9 +8,9 @@ import { Group } from "three";
 import { Play, Pause, SkipForward, Maximize, Aperture, Video, Disc } from "lucide-react";
 
 const PRODUCTS = [
-    "/assets/marketing/hero-bold.png",
-    "/assets/marketing/hero-fearless.png",
-    "/assets/marketing/hero-future.png"
+    "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=1887&auto=format&fit=crop", // Phantom Black (Yellow/Green "No Filter")
+    "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=2070&auto=format&fit=crop", // Cyberpunk Hoodie
+    "https://images.unsplash.com/photo-1517445312882-5632f77eec86?q=80&w=2069&auto=format&fit=crop"  // Street Cargo
 ];
 
 function FloatingProduct({ url, index }: { url: string; index: number }) {
@@ -45,7 +45,8 @@ function Scene() {
             {/* Main Product */}
             <FloatingProduct url={PRODUCTS[0]} index={0} />
 
-            <Environment preset="city" />
+            {/* Environment removed to prevent fetch error - relying on lights */}
+            {/* <Environment preset="city" /> */}
         </>
     );
 }
@@ -76,72 +77,11 @@ export function AuthProductShowcase() {
                 </Canvas>
             </div>
 
-            {/* Premiere Pro / Camera UI Overlays */}
-            <div className="absolute inset-0 z-10 pointer-events-none p-8 flex flex-col justify-between">
-
-                {/* Top UI */}
-                <div className="flex justify-between items-start">
-                    <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2 text-red-500 font-black uppercase tracking-widest text-xs animate-pulse">
-                            <div className="w-2 h-2 bg-red-500 rounded-full" />
-                            REC
-                        </div>
-                        <div className="font-mono text-white/60 text-xs">
-                            00:04:23:12
-                        </div>
-                    </div>
-
-                    <div className="flex gap-4 text-white/40">
-                        <div className="border border-white/20 px-2 py-1 text-[9px] font-mono uppercase">
-                            4K / 60FPS
-                        </div>
-                        <div className="border border-white/20 px-2 py-1 text-[9px] font-mono uppercase">
-                            ISO 800
-                        </div>
-                    </div>
-                </div>
-
-                {/* Center Safe Area Markers */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] border border-white/5 border-dashed rounded-lg opacity-30 pointer-events-none" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-accent/50">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-full bg-accent/50" />
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[1px] bg-accent/50" />
-                </div>
-
-                {/* Bottom Timeline UI */}
-                <div className="space-y-4">
-                    {/* Audio Waveform Mock */}
-                    <div className="flex items-end gap-[2px] h-8 opacity-40">
-                        {waveform.map((height, i) => (
-                            <div
-                                key={i}
-                                className="w-1 bg-accent transition-all duration-300 ease-in-out"
-                                style={{ height: `${height}%` }}
-                            />
-                        ))}
-                    </div>
-
-                    {/* Timeline Controls */}
-                    <div className="flex items-center justify-between border-t border-white/10 pt-4 pointer-events-auto">
-                        <div className="flex items-center gap-4 text-white/50">
-                            <button className="hover:text-white transition-colors"><Disc className="w-4 h-4" /></button>
-                            <button className="hover:text-white transition-colors"><Video className="w-4 h-4" /></button>
-                            <button className="hover:text-white transition-colors"><Aperture className="w-4 h-4" /></button>
-                        </div>
-
-                        <div className="flex items-center gap-4 text-white">
-                            <Play className="w-4 h-4 fill-white hover:text-accent transition-colors cursor-pointer" />
-                            <div className="w-64 h-1 bg-white/10 relative overflow-hidden rounded-full">
-                                <div className="absolute top-0 left-0 h-full bg-accent w-1/3" />
-                            </div>
-                            <span className="font-mono text-[9px]">33%</span>
-                        </div>
-
-                        <div className="text-white/50">
-                            <Maximize className="w-4 h-4 hover:text-white transition-colors cursor-pointer" />
-                        </div>
-                    </div>
-                </div>
+            {/* Glitch Overlay Text */}
+            <div className="absolute top-1/2 left-10 -translate-y-1/2 z-0 pointer-events-none mix-blend-overlay opacity-20">
+                <h1 className="text-[120px] font-black font-display text-white italic rotate-90 origin-left">
+                    RIIQX
+                </h1>
             </div>
 
             {/* Glitch Overlay Text */}

@@ -232,7 +232,7 @@ export function Footer() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-x-8 gap-y-10 md:gap-y-16 mb-16 md:mb-24 pt-8 md:pt-12 border-t border-white/5">
                     {/* Support Column */}
                     <motion.div variants={linkColumnVariants}>
-                        <h3 className="text-[10px] font-black font-mono text-white/30 uppercase tracking-[0.2em] mb-4 md:mb-8 border-b border-white/10 pb-2">
+                        <h3 className="text-[14px] font-black font-[family-name:var(--font-oswald)] text-white uppercase tracking-wider mb-4 md:mb-8 border-l-2 border-[#B4F000] pl-3 py-1">
                             Support
                         </h3>
                         <ul className="space-y-2 md:space-y-4">
@@ -240,10 +240,10 @@ export function Footer() {
                                 <motion.li key={link.href} variants={linkItemVariants}>
                                     <Link
                                         href={link.href}
-                                        className="group flex items-center text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/60 hover:text-accent transition-all duration-300"
+                                        className="group flex items-center text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/60 hover:text-[#B4F000] transition-colors duration-300"
                                     >
-                                        <span className="group-hover:translate-x-1 transition-transform duration-300">
-                                            {link.name}
+                                        <span className="group-hover:translate-x-2 transition-transform duration-300">
+                                            // {link.name}
                                         </span>
                                     </Link>
                                 </motion.li>
@@ -253,7 +253,7 @@ export function Footer() {
 
                     {/* Company Column */}
                     <motion.div variants={linkColumnVariants}>
-                        <h3 className="text-[10px] font-black font-mono text-white/30 uppercase tracking-[0.2em] mb-4 md:mb-8 border-b border-white/10 pb-2">
+                        <h3 className="text-[14px] font-black font-[family-name:var(--font-oswald)] text-white uppercase tracking-wider mb-4 md:mb-8 border-l-2 border-[#B4F000] pl-3 py-1">
                             Company
                         </h3>
                         <ul className="space-y-2 md:space-y-4">
@@ -261,10 +261,10 @@ export function Footer() {
                                 <motion.li key={link.href} variants={linkItemVariants}>
                                     <Link
                                         href={link.href}
-                                        className="group flex items-center text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/60 hover:text-accent transition-all duration-300"
+                                        className="group flex items-center text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/60 hover:text-[#B4F000] transition-colors duration-300"
                                     >
-                                        <span className="group-hover:translate-x-1 transition-transform duration-300">
-                                            {link.name}
+                                        <span className="group-hover:translate-x-2 transition-transform duration-300">
+                                            // {link.name}
                                         </span>
                                     </Link>
                                 </motion.li>
@@ -274,7 +274,7 @@ export function Footer() {
 
                     {/* Trust Column */}
                     <motion.div variants={linkColumnVariants}>
-                        <h3 className="text-[10px] font-black font-mono text-white/30 uppercase tracking-[0.2em] mb-4 md:mb-8 border-b border-white/10 pb-2">
+                        <h3 className="text-[14px] font-black font-[family-name:var(--font-oswald)] text-white uppercase tracking-wider mb-4 md:mb-8 border-l-2 border-[#B4F000] pl-3 py-1">
                             Trust
                         </h3>
                         <div className="space-y-3 md:space-y-4">
@@ -304,7 +304,7 @@ export function Footer() {
 
                     {/* Social Column */}
                     <motion.div variants={linkColumnVariants}>
-                        <h3 className="text-[10px] font-black font-mono text-white/30 uppercase tracking-[0.2em] mb-4 md:mb-8 border-b border-white/10 pb-2">
+                        <h3 className="text-[14px] font-black font-[family-name:var(--font-oswald)] text-white uppercase tracking-wider mb-4 md:mb-8 border-l-2 border-[#B4F000] pl-3 py-1">
                             Follow
                         </h3>
                         <div className="flex gap-2 md:gap-4">

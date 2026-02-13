@@ -1,9 +1,8 @@
 "use client";
 
-import { CinematicHero } from "@/components/ui/CinematicHero";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, HelpCircle } from "lucide-react";
 
 const faqs = [
     {
@@ -30,22 +29,38 @@ const faqs = [
 
 export default function FAQPage() {
     return (
-        <main className="bg-black min-h-screen pb-20">
-            <CinematicHero
-                title="KNOWLEDGE BASE"
-                subtitle="Frequently Asked Questions"
-            />
+        <main className="min-h-screen bg-[#050505] text-[#F5F5F5] font-sans selection:bg-[#B4F000] selection:text-black pt-32 pb-20 px-6">
 
-            <section className="max-w-3xl mx-auto px-4 -mt-10 relative z-20 space-y-4">
-                {faqs.map((faq, idx) => (
-                    <AccordionItem key={idx} question={faq.question} answer={faq.answer} />
-                ))}
-            </section>
+            {/* Background Grid */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20" />
+            </div>
+
+            <div className="max-w-4xl mx-auto relative z-10">
+                {/* Header */}
+                <div className="text-center mb-20">
+                    <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-[#B4F000]/10 border border-[#B4F000]/20 rounded-sm backdrop-blur-md">
+                        <HelpCircle className="w-4 h-4 text-[#B4F000]" />
+                        <span className="text-xs font-mono uppercase tracking-[0.3em] font-bold text-[#B4F000]">
+                            Knowledge Base
+                        </span>
+                    </div>
+                    <h1 className="text-6xl md:text-9xl font-black font-oswald uppercase tracking-tighter mb-6 leading-[0.8] text-white">
+                        Common <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B4F000] to-white/20">Questions</span>
+                    </h1>
+                </div>
+
+                <div className="space-y-4">
+                    {faqs.map((faq, idx) => (
+                        <AccordionItem key={idx} question={faq.question} answer={faq.answer} index={idx} />
+                    ))}
+                </div>
+            </div>
         </main>
     );
 }
 
-function AccordionItem({ question, answer }: { question: string, answer: string }) {
+function AccordionItem({ question, answer, index }: { question: string, answer: string, index: number }) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -53,15 +68,21 @@ function AccordionItem({ question, answer }: { question: string, answer: string 
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden"
+            transition={{ delay: index * 0.1 }}
+            className={`border border-white/5 bg-[#121212] overflow-hidden transition-all duration-300 ${isOpen ? 'border-[#B4F000]/50' : 'hover:border-white/20'}`}
         >
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors"
+                className="w-full flex items-center justify-between p-8 text-left group"
             >
-                <span className="text-lg font-bold text-white">{question}</span>
-                <div className={`p-2 rounded-full border border-white/20 transition-all ${isOpen ? 'bg-white text-black rotate-180' : 'text-white'}`}>
-                    {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                <div className="flex items-center gap-6">
+                    <span className="font-mono text-[#B4F000] text-sm opacity-50">0{index + 1}</span>
+                    <span className={`text-xl font-bold font-oswald uppercase transition-colors ${isOpen ? 'text-[#B4F000]' : 'text-white group-hover:text-white/80'}`}>
+                        {question}
+                    </span>
+                </div>
+                <div className={`p-1 transition-all duration-300 ${isOpen ? 'rotate-180 text-[#B4F000]' : 'text-white/30'}`}>
+                    {isOpen ? <Minus className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
                 </div>
             </button>
 
@@ -71,10 +92,12 @@ function AccordionItem({ question, answer }: { question: string, answer: string 
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
                     >
-                        <div className="px-6 pb-6 text-gray-400 leading-relaxed border-t border-white/5 pt-4">
-                            {answer}
+                        <div className="px-8 pb-8 pl-[4.5rem] pt-0">
+                            <p className="text-white/40 font-mono text-sm leading-relaxed border-l-2 border-[#B4F000]/20 pl-6 py-2">
+                                {answer}
+                            </p>
                         </div>
                     </motion.div>
                 )}

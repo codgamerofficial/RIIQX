@@ -1,33 +1,35 @@
 "use client";
 
-import { ReactLenis } from "@studio-freight/react-lenis";
-import { useEffect, useState } from "react";
+import Lenis from "lenis";
+import { useEffect, useRef } from "react";
 
-export function LivingScrollProvider({ children }: { children: any }) {
-    const [mounted, setMounted] = useState(false);
+export function LivingScrollProvider({ children }: { children: React.ReactNode }) {
+    const lenisRef = useRef<Lenis | null>(null);
 
     useEffect(() => {
-        setMounted(true);
+        const lenis = new Lenis({
+            lerp: 0.08,
+            duration: 1.2,
+            smoothWheel: true,
+            wheelMultiplier: 1,
+            touchMultiplier: 2,
+            infinite: false,
+        });
+
+        lenisRef.current = lenis;
+
+        function raf(time: number) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+
+        requestAnimationFrame(raf);
+
+        return () => {
+            lenis.destroy();
+            lenisRef.current = null;
+        };
     }, []);
 
-    // Prevent hydration mismatch
-    if (!mounted) {
-        return <>{children}</>;
-    }
-
-    return (
-        <ReactLenis
-            root
-            options={{
-                lerp: 0.08,
-                duration: 1.2,
-                smoothWheel: true,
-                wheelMultiplier: 1,
-                touchMultiplier: 2,
-                infinite: false,
-            }}
-        >
-            {children}
-        </ReactLenis>
-    );
+    return <>{children}</>;
 }

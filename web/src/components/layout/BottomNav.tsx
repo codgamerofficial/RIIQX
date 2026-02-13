@@ -53,14 +53,11 @@ export function BottomNav() {
     if (!mounted || pathname?.startsWith("/product/")) return null;
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden pointer-events-none">
-            {/* Gradient Fade from bottom */}
-            <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none" />
-
-            <div className="pointer-events-auto px-6 pb-8 pt-4 flex justify-center">
-                <div className="bg-[#0f0f0f]/80 backdrop-blur-2xl border border-white/10 rounded-full px-6 py-4 flex items-center gap-8 shadow-[0_10px_40px_rgba(0,0,0,0.5)] relative overflow-hidden">
+        <div className="fixed bottom-8 left-0 right-0 z-50 md:hidden pointer-events-none flex justify-center">
+            <div className="pointer-events-auto">
+                <div className="bg-[#050505] border border-white/10 rounded-full px-2 py-2 flex items-center gap-2 shadow-[0_20px_50px_rgba(0,0,0,0.9)] relative backdrop-blur-3xl">
                     {/* Glass Reflection */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none rounded-full" />
 
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
@@ -71,35 +68,27 @@ export function BottomNav() {
                                 key={item.label}
                                 href={item.href}
                                 onClick={vibrate}
-                                className="relative flex items-center justify-center"
+                                className="relative flex items-center justify-center w-12 h-12"
                             >
-                                <div className="relative z-10 p-1">
-                                    <Icon
-                                        className={cn(
-                                            "w-6 h-6 transition-all duration-500",
-                                            isActive
-                                                ? "text-white fill-white"
-                                                : "text-white/40 hover:text-white/80"
-                                        )}
-                                        strokeWidth={isActive ? 2.5 : 1.5}
-                                    />
-                                </div>
-
                                 {isActive && (
                                     <motion.div
                                         layoutId="bottomNavPill"
-                                        className="absolute inset-0 bg-white/10 rounded-full blur-[2px] -z-0 scale-150"
+                                        className="absolute inset-0 bg-[#B4F000] rounded-full shadow-[0_0_20px_rgba(180,240,0,0.3)]"
                                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                     />
                                 )}
 
-                                {isActive && (
-                                    <motion.div
-                                        layoutId="bottomNavGlow"
-                                        className="absolute top-full mt-2 w-1 h-1 bg-accent rounded-full shadow-[0_0_10px_2px_rgba(255,255,255,0.5)]"
-                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                <div className="relative z-10 transition-transform duration-300">
+                                    <Icon
+                                        className={cn(
+                                            "w-5 h-5 transition-colors duration-300",
+                                            isActive
+                                                ? "text-black fill-black"
+                                                : "text-white/40 hover:text-white"
+                                        )}
+                                        strokeWidth={isActive ? 2.5 : 2}
                                     />
-                                )}
+                                </div>
                             </Link>
                         );
                     })}

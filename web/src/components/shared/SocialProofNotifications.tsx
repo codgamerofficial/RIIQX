@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, TrendingUp } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 
 interface PurchaseNotification {
     id: string;
@@ -55,25 +55,34 @@ export function SocialProofNotifications() {
         <AnimatePresence>
             {currentNotification && (
                 <motion.div
-                    initial={{ opacity: 0, y: 50, scale: 0.3 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-                    className="fixed top-24 right-4 md:right-8 w-[calc(100%-2rem)] md:w-96 z-50"
+                    initial={{ opacity: 0, y: -50, scale: 0.8, x: "-50%" }}
+                    animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
+                    exit={{ opacity: 0, y: -20, scale: 0.9, x: "-50%", transition: { duration: 0.2 } }}
+                    className="fixed top-6 left-1/2 z-[100] transform -translate-x-1/2"
                 >
-                    <div className="bg-gradient-to-r from-cherry/10 to-gold/10 backdrop-blur-xl border border-cherry/20 rounded-2xl p-4 shadow-2xl">
-                        <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 bg-cherry/20 rounded-full flex items-center justify-center flex-shrink-0">
-                                <ShoppingBag className="w-5 h-5 text-cherry" />
+                    <div className="bg-[#050505]/90 backdrop-blur-2xl border border-white/10 rounded-full py-2 pl-2 pr-6 shadow-[0_10px_40px_rgba(0,0,0,0.5)] flex items-center gap-4 min-w-[320px]">
+
+                        {/* Avatar/Icon */}
+                        <div className="relative w-10 h-10 rounded-full overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                            <ShoppingBag className="w-5 h-5 text-[#B4F000]" />
+                            <div className="absolute inset-0 bg-[#B4F000]/20 animate-pulse" />
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 flex flex-col justify-center min-w-0">
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Verified Purchase</span>
+                                <span className="w-1 h-1 rounded-full bg-[#B4F000] shadow-[0_0_5px_#B4F000]" />
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-white font-semibold text-sm truncate">
-                                    {currentNotification.productName}
-                                </p>
-                                <p className="text-gray-400 text-xs mt-1">
-                                    Someone from {currentNotification.location} purchased this {currentNotification.timeAgo}
-                                </p>
-                            </div>
-                            <TrendingUp className="w-4 h-4 text-gold flex-shrink-0" />
+                            <p className="text-xs text-white font-medium truncate max-w-[200px]">
+                                {currentNotification.productName}
+                            </p>
+                        </div>
+
+                        {/* Location/Time */}
+                        <div className="text-right shrink-0">
+                            <div className="text-[10px] font-mono text-white/60 uppercase">{currentNotification.location}</div>
+                            <div className="text-[9px] text-[#B4F000] font-mono">{currentNotification.timeAgo}</div>
                         </div>
                     </div>
                 </motion.div>

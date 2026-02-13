@@ -9,7 +9,7 @@ export default function AccessibilityPage() {
                         <Accessibility className="w-8 h-8" />
                         <span className="text-xs font-mono uppercase tracking-widest">Legal Document 003</span>
                     </div>
-                    <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter font-display italic text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50 mb-4">
+                    <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter font-[family-name:var(--font-oswald)] text-white mb-4">
                         Accessibility
                     </h1>
                     <p className="text-white/40 text-sm font-mono max-w-xl">
@@ -19,15 +19,15 @@ export default function AccessibilityPage() {
 
                 <div className="space-y-12 font-sans text-white/70 leading-relaxed">
                     <section>
-                        <h2 className="text-2xl font-black text-white uppercase mb-4 font-display">Our Commitment</h2>
+                        <h2 className="text-2xl font-black text-white uppercase mb-4 font-[family-name:var(--font-oswald)] border-l-4 border-[#B4F000] pl-4">Our Commitment</h2>
                         <p>
                             We believe that fashion is for everyone. We are continuously optimizing the RIIQX platform to ensure it is accessible to individuals with disabilities, aiming to meet or exceed WCAG 2.1 Level AA standards.
                         </p>
                     </section>
 
                     <section>
-                        <h2 className="text-2xl font-black text-white uppercase mb-4 font-display">Accessibility Features</h2>
-                        <ul className="list-disc pl-5 space-y-2 marker:text-accent">
+                        <h2 className="text-2xl font-black text-white uppercase mb-4 font-[family-name:var(--font-oswald)] border-l-4 border-[#B4F000] pl-4">Accessibility Features</h2>
+                        <ul className="list-disc pl-5 space-y-2 marker:text-[#B4F000]">
                             <li>High contrast text ratios for readability.</li>
                             <li>Semantic HTML markup for screen reader compatibility.</li>
                             <li>Keyboard navigation support for all interactive elements.</li>
@@ -36,11 +36,11 @@ export default function AccessibilityPage() {
                     </section>
 
                     <section>
-                        <h2 className="text-2xl font-black text-white uppercase mb-4 font-display">Feedback</h2>
+                        <h2 className="text-2xl font-black text-white uppercase mb-4 font-[family-name:var(--font-oswald)] border-l-4 border-[#B4F000] pl-4">Feedback</h2>
                         <p>
                             If you encounter any accessibility barriers while using our secure terminal, please reach out immediately. We treat these reports with high priority.
                         </p>
-                        <a href="mailto:support@riiqx.com" className="inline-block mt-4 text-accent font-bold uppercase tracking-widest text-xs border-b border-accent pb-1 hover:text-white hover:border-white transition-all">
+                        <a href="mailto:support@riiqx.com" className="inline-block mt-4 text-[#B4F000] font-bold uppercase tracking-widest text-xs border-b border-[#B4F000] pb-1 hover:text-white hover:border-white transition-all">
                             Report an Issue
                         </a>
                     </section>

@@ -65,32 +65,43 @@ export function ProductControlPanel({ product, relatedProducts }: ProductControl
                 <div className="relative bg-[#080808]">
 
                     {/* View Switcher/Interactive Badge */}
-                    <div className="absolute top-6 left-6 z-20">
-                        <div className="bg-black/50 backdrop-blur-md border border-white/10 p-1 flex rounded-sm">
+                    {/* View Switcher/Interactive Badge */}
+                    <div className="absolute top-6 left-6 z-20 flex flex-col gap-2">
+                        <div className="flex items-center gap-1 bg-black/80 backdrop-blur-md border border-white/10 p-1 rounded-sm shadow-[0_0_20px_rgba(0,0,0,0.5)]">
                             <button
                                 onClick={() => setShow3D(false)}
                                 className={cn(
-                                    "p-3 rounded-sm transition-all",
-                                    !show3D ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)]" : "text-white/50 hover:text-white"
+                                    "relative p-2 transition-all duration-300 group",
+                                    !show3D
+                                        ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                                        : "text-white/40 hover:text-white hover:bg-white/5"
                                 )}
+                                aria-label="2D View"
                             >
-                                <ImageIcon className="w-5 h-5" />
+                                <ImageIcon className="w-4 h-4" />
                             </button>
                             <button
                                 onClick={() => setShow3D(true)}
                                 className={cn(
-                                    "p-3 rounded-sm transition-all",
-                                    show3D ? "bg-[#B4F000] text-black shadow-[0_0_15px_rgba(180,240,0,0.5)]" : "text-white/50 hover:text-white"
+                                    "relative p-2 transition-all duration-300 group",
+                                    show3D
+                                        ? "bg-[#B4F000] text-black shadow-[0_0_15px_rgba(180,240,0,0.5)]"
+                                        : "text-white/40 hover:text-[#B4F000] hover:bg-[#B4F000]/10"
                                 )}
+                                aria-label="3D Model"
                             >
-                                <Box className="w-5 h-5" />
+                                <Box className="w-4 h-4" />
                             </button>
                         </div>
                     </div>
 
                     {show3D ? (
                         <div className="h-[50dvh] lg:h-[100dvh] w-full relative bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#111] to-[#050505]">
-                            <ProductViewer3D className="w-full h-full" modelUrl={undefined} />
+                            <ProductViewer3D
+                                className="w-full h-full"
+                                modelUrl={product.tags?.find(t => t.startsWith('model:'))?.replace('model:', '')}
+                                color={selectedOptions['Color'] || selectedOptions['Colour'] || selectedOptions['Colorway'] || '#ffffff'}
+                            />
                             <div className="absolute bottom-10 left-10 pointer-events-none">
                                 <span className="text-[#B4F000] font-black font-[family-name:var(--font-oswald)] text-4xl uppercase opacity-20 select-none">
                                     3D INTERACTIVE

@@ -25,37 +25,39 @@ export function DynamicIslandCart() {
         }
     }, [items.length]);
 
-    if (!isVisible || !lastAdded) return null;
-
     return (
-        <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
-            <motion.div
-                initial={{ width: 0, opacity: 0, height: 0 }}
-                animate={{ width: "auto", opacity: 1, height: "auto" }}
-                exit={{ width: 0, opacity: 0, height: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="bg-black/80 backdrop-blur-md border border-white/10 rounded-full flex items-center gap-4 px-2 py-2 overflow-hidden shadow-2xl"
-            >
-                <div className="relative w-10 h-10 rounded-full overflow-hidden border border-white/5">
-                    {lastAdded.image && (
-                        <Image
-                            src={lastAdded.image}
-                            alt={lastAdded.title}
-                            fill
-                            className="object-cover"
-                        />
-                    )}
-                </div>
+        <AnimatePresence>
+            {isVisible && lastAdded && (
+                <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+                    <motion.div
+                        initial={{ width: 0, opacity: 0, height: 0 }}
+                        animate={{ width: "auto", opacity: 1, height: "auto" }}
+                        exit={{ width: 0, opacity: 0, height: 0 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className="bg-black/80 backdrop-blur-md border border-white/10 rounded-full flex items-center gap-4 px-2 py-2 overflow-hidden shadow-2xl"
+                    >
+                        <div className="relative w-10 h-10 rounded-full overflow-hidden border border-white/5">
+                            {lastAdded.image && (
+                                <Image
+                                    src={lastAdded.image}
+                                    alt={lastAdded.title}
+                                    fill
+                                    className="object-cover"
+                                />
+                            )}
+                        </div>
 
-                <div className="flex flex-col min-w-[100px] pr-2">
-                    <span className="text-[10px] text-white/50 uppercase tracking-widest font-bold">Added to Bag</span>
-                    <span className="text-xs text-white font-bold truncate max-w-[150px]">{lastAdded.title}</span>
-                </div>
+                        <div className="flex flex-col min-w-[100px] pr-2">
+                            <span className="text-[10px] text-white/50 uppercase tracking-widest font-bold">Added to Bag</span>
+                            <span className="text-xs text-white font-bold truncate max-w-[150px]">{lastAdded.title}</span>
+                        </div>
 
-                <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center shrink-0">
-                    <Check className="w-4 h-4 text-black" />
+                        <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center shrink-0">
+                            <Check className="w-4 h-4 text-black" />
+                        </div>
+                    </motion.div>
                 </div>
-            </motion.div>
-        </div>
+            )}
+        </AnimatePresence>
     );
 }

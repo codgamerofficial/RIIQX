@@ -7,22 +7,18 @@ module.exports = {
     extend: {
       colors: {
         background: '#050505',
-        surface: '#121212',
+        surface: '#0A0A0A',
         foreground: '#FFFFFF',
 
         // RIIQX Brand Colors
         brand: {
-          DEFAULT: '#CCFF00', // Electric Lime
-          cyan: '#00F0FF',    // Electric Cyan
-          purple: '#7C3AED',  // Neon Violet
-          pink: '#f472b6',
-          ipl: {
-            mi: '#0057E7',
-            rcb: '#D71920',
-            csk: '#F2CB05',
-            pitch: '#00FF7F'
-          }
+          DEFAULT: '#B4F000', // RIIQX Neon
+          dim: '#B4F00033',   // 20% Opacity
+          cyan: '#00F0FF',
+          purple: '#7C3AED',
         },
+
+        neon: '#B4F000',
 
         // Utility
         muted: '#A1A1AA',

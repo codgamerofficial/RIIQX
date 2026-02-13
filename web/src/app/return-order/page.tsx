@@ -22,28 +22,39 @@ export default function ReturnOrderPage() {
     };
 
     return (
-        <main className="bg-black min-h-screen flex items-center justify-center p-4 pt-32 pb-20">
-            <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <main className="bg-[#050505] min-h-screen flex items-center justify-center p-4 pt-32 pb-20 relative overflow-hidden">
+            {/* Background Grid */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20 pointer-events-none" />
+
+            <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-start relative z-10">
 
                 {/* Left Column: Form Card */}
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, ease: [0.2, 0, 0, 1] }}
-                    className="w-full bg-[#121212] border border-white/10 rounded-[32px] p-8 shadow-2xl overflow-hidden relative"
+                    className="w-full bg-[#0A0A0A] border border-white/10 p-8 shadow-2xl overflow-hidden relative group"
                 >
-                    {/* Ambient Glow */}
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 blur-[60px] rounded-full pointer-events-none opacity-50" />
+                    {/* Corner Markers */}
+                    <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-[#B4F000]" />
+                    <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-[#B4F000]" />
+                    <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-[#B4F000]" />
+                    <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-[#B4F000]" />
 
                     <div className="relative z-10 flex flex-col items-start space-y-8">
                         {/* Header Group */}
-                        <div className="space-y-6 w-full">
-                            {/* Rotating Icon */}
-                            <div className="w-12 h-12 rounded-full border-2 border-white text-white flex items-center justify-center">
-                                <RotateCcw className="w-6 h-6" strokeWidth={2.5} />
+                        <div className="space-y-4 w-full border-b border-white/10 pb-6">
+                            {/* Icon */}
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-[#B4F000] flex items-center justify-center">
+                                    <RotateCcw className="w-4 h-4 text-black" strokeWidth={2.5} />
+                                </div>
+                                <span className="text-[10px] uppercase tracking-widest text-[#B4F000] font-bold font-mono">
+                                    Protocol: Refund_Init
+                                </span>
                             </div>
 
-                            <h1 className="text-3xl font-bold text-white tracking-tight">
+                            <h1 className="text-4xl font-black text-white tracking-tighter uppercase font-oswald">
                                 Start a Return
                             </h1>
                         </div>
@@ -51,35 +62,36 @@ export default function ReturnOrderPage() {
                         {/* Form Group */}
                         <div className="w-full space-y-6">
                             {/* Order ID */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold ml-1">Order ID</label>
+                            <div className="space-y-1">
+                                <label className="text-[10px] uppercase tracking-widest text-[#B4F000]/70 font-bold ml-1 font-mono">Order ID</label>
                                 <input
                                     type="text"
                                     value={formData.orderId}
                                     onChange={(e) => setFormData({ ...formData, orderId: e.target.value.toUpperCase() })}
-                                    className="w-full bg-[#1c1c1e] border border-white/5 rounded-2xl px-5 py-4 text-white text-base font-medium focus:outline-none focus:border-white/20 transition-all placeholder:text-white/20 font-mono uppercase"
+                                    className="w-full bg-[#050505] border border-white/10 px-5 py-4 text-white text-sm font-mono focus:outline-none focus:border-[#B4F000] transition-all placeholder:text-white/20 uppercase"
                                     placeholder="ORD-XXXX"
                                 />
                             </div>
 
                             {/* Email / Phone */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold ml-1">Email / Phone</label>
+                            <div className="space-y-1">
+                                <label className="text-[10px] uppercase tracking-widest text-[#B4F000]/70 font-bold ml-1 font-mono">Email / Signal</label>
                                 <input
                                     type="text"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full bg-[#1c1c1e] border border-white/5 rounded-2xl px-5 py-4 text-white text-base font-medium focus:outline-none focus:border-white/20 transition-all placeholder:text-white/20"
+                                    className="w-full bg-[#050505] border border-white/10 px-5 py-4 text-white text-sm font-mono focus:outline-none focus:border-[#B4F000] transition-all placeholder:text-white/20"
                                     placeholder="Registered Contact"
                                 />
                             </div>
 
                             {/* Spacer */}
-                            <div className="h-4" />
+                            <div className="h-2" />
 
                             {/* Action Button */}
-                            <button className="w-full bg-[#1c1c1e] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-white hover:text-black transition-all duration-300">
-                                <span>Proceed</span>
+                            <button className="w-full bg-white text-black font-black uppercase tracking-widest py-4 text-xs hover:bg-[#B4F000] transition-colors duration-300 flex items-center justify-center gap-2 clip-path-slant-right">
+                                <span>Proceed to Verification</span>
+                                <ArrowRight className="w-4 h-4" />
                             </button>
                         </div>
                     </div>
@@ -90,24 +102,23 @@ export default function ReturnOrderPage() {
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="space-y-4"
+                    className="space-y-4 pt-4"
                 >
                     {/* Header Text */}
-                    <motion.div variants={itemVariants} className="mb-6 px-2">
-                        <p className="text-xl font-medium text-white leading-relaxed">
-                            Initiate a return protocol for your gear.
+                    <motion.div variants={itemVariants} className="mb-6 px-2 border-l-2 border-[#B4F000] pl-4">
+                        <p className="text-xl font-bold uppercase font-oswald text-white leading-none">
+                            Initiate return protocol <br /> for your gear.
                         </p>
                     </motion.div>
 
                     {/* Card 1: 15-Day Policy */}
-                    <motion.div variants={itemVariants} className="bg-[#121212] border border-white/10 rounded-[24px] p-6 hover:bg-[#1a1a1a] transition-colors group">
-                        <div className="flex gap-5">
-                            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
-                                <CheckCircle2 className="w-5 h-5 text-green-500" strokeWidth={2.5} />
-                            </div>
+                    <motion.div variants={itemVariants} className="bg-[#0A0A0A] border border-white/10 p-6 hover:border-[#B4F000]/50 transition-colors group relative overflow-hidden">
+                        <div className="absolute right-0 top-0 w-20 h-full bg-gradient-to-l from-white/5 to-transparent skew-x-12 pointer-events-none" />
+                        <div className="flex gap-4 items-start relative z-10">
+                            <CheckCircle2 className="w-5 h-5 text-[#B4F000] mt-1" strokeWidth={2.5} />
                             <div>
-                                <h3 className="text-white font-bold text-base mb-2 group-hover:text-green-400 transition-colors">15-Day Policy</h3>
-                                <p className="text-white/40 text-sm leading-relaxed">
+                                <h3 className="text-white font-bold text-sm uppercase tracking-wider mb-1 font-oswald">15-Day Policy</h3>
+                                <p className="text-white/40 text-xs font-mono leading-relaxed">
                                     Return unwashed, unworn items with tags within 15 days of delivery.
                                 </p>
                             </div>
@@ -115,14 +126,13 @@ export default function ReturnOrderPage() {
                     </motion.div>
 
                     {/* Card 2: Instant Refund */}
-                    <motion.div variants={itemVariants} className="bg-[#121212] border border-white/10 rounded-[24px] p-6 hover:bg-[#1a1a1a] transition-colors group">
-                        <div className="flex gap-5">
-                            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
-                                <CheckCircle2 className="w-5 h-5 text-green-500" strokeWidth={2.5} />
-                            </div>
+                    <motion.div variants={itemVariants} className="bg-[#0A0A0A] border border-white/10 p-6 hover:border-[#B4F000]/50 transition-colors group relative overflow-hidden">
+                        <div className="absolute right-0 top-0 w-20 h-full bg-gradient-to-l from-white/5 to-transparent skew-x-12 pointer-events-none" />
+                        <div className="flex gap-4 items-start relative z-10">
+                            <CheckCircle2 className="w-5 h-5 text-[#B4F000] mt-1" strokeWidth={2.5} />
                             <div>
-                                <h3 className="text-white font-bold text-base mb-2 group-hover:text-green-400 transition-colors">Instant Refund</h3>
-                                <p className="text-white/40 text-sm leading-relaxed">
+                                <h3 className="text-white font-bold text-sm uppercase tracking-wider mb-1 font-oswald">Instant Refund</h3>
+                                <p className="text-white/40 text-xs font-mono leading-relaxed">
                                     Refunds are initiated instantly to your source account after quality check.
                                 </p>
                             </div>
@@ -130,14 +140,12 @@ export default function ReturnOrderPage() {
                     </motion.div>
 
                     {/* Card 3: Non-Returnable */}
-                    <motion.div variants={itemVariants} className="bg-[#0f0a15] border border-purple-500/20 rounded-[24px] p-6 hover:bg-[#150d1e] transition-colors group">
-                        <div className="flex gap-5">
-                            <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center shrink-0">
-                                <AlertCircle className="w-5 h-5 text-purple-400" strokeWidth={2.5} />
-                            </div>
+                    <motion.div variants={itemVariants} className="bg-[#0A0A0A] border border-red-500/20 p-6 hover:bg-red-950/20 transition-colors group relative overflow-hidden">
+                        <div className="flex gap-4 items-start relative z-10">
+                            <AlertCircle className="w-5 h-5 text-red-500 mt-1" strokeWidth={2.5} />
                             <div>
-                                <h3 className="text-white font-bold text-base mb-2 group-hover:text-purple-400 transition-colors">Non-Returnable</h3>
-                                <p className="text-white/40 text-sm leading-relaxed">
+                                <h3 className="text-white font-bold text-sm uppercase tracking-wider mb-1 font-oswald group-hover:text-red-400 transition-colors">Non-Returnable</h3>
+                                <p className="text-white/40 text-xs font-mono leading-relaxed group-hover:text-red-200/50">
                                     Boxers, innerwear, and free gifts are not eligible for returns.
                                 </p>
                             </div>
