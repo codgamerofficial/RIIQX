@@ -15,6 +15,11 @@ CREATE TABLE IF NOT EXISTS public.categories (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Ensure Qikink columns exist on pre-existing products and variants tables
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS qikink_product_id VARCHAR(100);
+ALTER TABLE public.product_variants ADD COLUMN IF NOT EXISTS qikink_variant_id VARCHAR(100);
+ALTER TABLE public.product_variants ADD COLUMN IF NOT EXISTS qikink_sku VARCHAR(100);
+
 -- 2. PRODUCTS TABLE (Maps RIIQX Core Product to Qikink Base Product)
 CREATE TABLE IF NOT EXISTS public.products (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

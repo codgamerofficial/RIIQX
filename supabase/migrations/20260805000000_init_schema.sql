@@ -12,46 +12,66 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- 1. ENUM DEFINITIONS
 -- ============================================================================
 
-CREATE TYPE public.user_role AS ENUM (
-  'admin',
-  'customer'
-);
+DO $$ BEGIN
+  CREATE TYPE public.user_role AS ENUM (
+    'admin',
+    'customer'
+  );
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
-CREATE TYPE public.order_status AS ENUM (
-  'pending',
-  'processing',
-  'printed',
-  'shipped',
-  'delivered',
-  'cancelled',
-  'refunded'
-);
+DO $$ BEGIN
+  CREATE TYPE public.order_status AS ENUM (
+    'pending',
+    'processing',
+    'printed',
+    'shipped',
+    'delivered',
+    'cancelled',
+    'refunded'
+  );
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
-CREATE TYPE public.payment_status AS ENUM (
-  'unpaid',
-  'paid',
-  'failed',
-  'refunded'
-);
+DO $$ BEGIN
+  CREATE TYPE public.payment_status AS ENUM (
+    'unpaid',
+    'paid',
+    'failed',
+    'refunded'
+  );
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
-CREATE TYPE public.inventory_status AS ENUM (
-  'in_stock',
-  'low_stock',
-  'out_of_stock',
-  'pre_order'
-);
+DO $$ BEGIN
+  CREATE TYPE public.inventory_status AS ENUM (
+    'in_stock',
+    'low_stock',
+    'out_of_stock',
+    'pre_order'
+  );
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
-CREATE TYPE public.coupon_discount_type AS ENUM (
-  'flat',
-  'percentage'
-);
+DO $$ BEGIN
+  CREATE TYPE public.coupon_discount_type AS ENUM (
+    'flat',
+    'percentage'
+  );
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
 -- ============================================================================
 -- 2. CORE TABLES
 -- ============================================================================
 
 -- PROFILES (Linked to Supabase Auth users)
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT UNIQUE NOT NULL,
   full_name TEXT,
@@ -64,7 +84,7 @@ CREATE TABLE public.profiles (
 );
 
 -- CATEGORIES
-CREATE TABLE public.categories (
+CREATE TABLE IF NOT EXISTS public.categories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
@@ -75,7 +95,7 @@ CREATE TABLE public.categories (
 );
 
 -- PRODUCTS
-CREATE TABLE public.products (
+CREATE TABLE IF NOT EXISTS public.products (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
@@ -90,7 +110,7 @@ CREATE TABLE public.products (
 );
 
 -- PRODUCT VARIANTS
-CREATE TABLE public.product_variants (
+CREATE TABLE IF NOT EXISTS public.product_variants (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   sku TEXT UNIQUE NOT NULL,
@@ -105,7 +125,7 @@ CREATE TABLE public.product_variants (
 );
 
 -- PRODUCT IMAGES
-CREATE TABLE public.product_images (
+CREATE TABLE IF NOT EXISTS public.product_images (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   url TEXT NOT NULL,
@@ -115,7 +135,7 @@ CREATE TABLE public.product_images (
 );
 
 -- ORDERS
-CREATE TABLE public.orders (
+CREATE TABLE IF NOT EXISTS public.orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   order_number TEXT UNIQUE NOT NULL,
@@ -133,7 +153,7 @@ CREATE TABLE public.orders (
 );
 
 -- ORDER ITEMS
-CREATE TABLE public.order_items (
+CREATE TABLE IF NOT EXISTS public.order_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
   product_variant_id UUID REFERENCES public.product_variants(id) ON DELETE SET NULL,
@@ -144,7 +164,7 @@ CREATE TABLE public.order_items (
 );
 
 -- WISHLISTS
-CREATE TABLE public.wishlists (
+CREATE TABLE IF NOT EXISTS public.wishlists (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
@@ -153,7 +173,7 @@ CREATE TABLE public.wishlists (
 );
 
 -- COUPONS
-CREATE TABLE public.coupons (
+CREATE TABLE IF NOT EXISTS public.coupons (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   code TEXT UNIQUE NOT NULL,
   discount_type public.coupon_discount_type NOT NULL DEFAULT 'percentage',
@@ -171,19 +191,19 @@ CREATE TABLE public.coupons (
 -- 3. INDEXING & PERFORMANCE OPTIMIZATION
 -- ============================================================================
 
-CREATE INDEX idx_products_slug ON public.products(slug);
-CREATE INDEX idx_products_category ON public.products(category_id);
-CREATE INDEX idx_products_published ON public.products(is_published);
-CREATE INDEX idx_product_variants_product ON public.product_variants(product_id);
-CREATE INDEX idx_product_variants_sku ON public.product_variants(sku);
-CREATE INDEX idx_product_images_product ON public.product_images(product_id);
-CREATE INDEX idx_orders_user_id ON public.orders(user_id);
-CREATE INDEX idx_orders_status ON public.orders(status);
-CREATE INDEX idx_orders_payment_status ON public.orders(payment_status);
-CREATE INDEX idx_order_items_order_id ON public.order_items(order_id);
-CREATE INDEX idx_order_items_variant ON public.order_items(product_variant_id);
-CREATE INDEX idx_wishlists_user_id ON public.wishlists(user_id);
-CREATE INDEX idx_coupons_code ON public.coupons(code);
+CREATE INDEX IF NOT EXISTS idx_products_slug ON public.products(slug);
+CREATE INDEX IF NOT EXISTS idx_products_category ON public.products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_published ON public.products(is_published);
+CREATE INDEX IF NOT EXISTS idx_product_variants_product ON public.product_variants(product_id);
+CREATE INDEX IF NOT EXISTS idx_product_variants_sku ON public.product_variants(sku);
+CREATE INDEX IF NOT EXISTS idx_product_images_product ON public.product_images(product_id);
+CREATE INDEX IF NOT EXISTS idx_orders_user_id ON public.orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON public.orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_status ON public.orders(payment_status);
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON public.order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_variant ON public.order_items(product_variant_id);
+CREATE INDEX IF NOT EXISTS idx_wishlists_user_id ON public.wishlists(user_id);
+CREATE INDEX IF NOT EXISTS idx_coupons_code ON public.coupons(code);
 
 -- ============================================================================
 -- 4. AUTOMATED FUNCTIONS & TRIGGERS
@@ -199,26 +219,32 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Apply updated_at triggers
+DROP TRIGGER IF EXISTS trg_profiles_updated_at ON public.profiles;
 CREATE TRIGGER trg_profiles_updated_at
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS trg_categories_updated_at ON public.categories;
 CREATE TRIGGER trg_categories_updated_at
   BEFORE UPDATE ON public.categories
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS trg_products_updated_at ON public.products;
 CREATE TRIGGER trg_products_updated_at
   BEFORE UPDATE ON public.products
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS trg_product_variants_updated_at ON public.product_variants;
 CREATE TRIGGER trg_product_variants_updated_at
   BEFORE UPDATE ON public.product_variants
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS trg_orders_updated_at ON public.orders;
 CREATE TRIGGER trg_orders_updated_at
   BEFORE UPDATE ON public.orders
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS trg_coupons_updated_at ON public.coupons;
 CREATE TRIGGER trg_coupons_updated_at
   BEFORE UPDATE ON public.coupons
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
@@ -245,7 +271,8 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Trigger for auth.users creation
-CREATE OR REPLACE TRIGGER trg_on_auth_user_created
+DROP TRIGGER IF EXISTS trg_on_auth_user_created ON auth.users;
+CREATE TRIGGER trg_on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.on_auth_user_created();
 
@@ -279,6 +306,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Trigger for inventory deduction
+DROP TRIGGER IF EXISTS trg_deduct_inventory_on_order ON public.orders;
 CREATE TRIGGER trg_deduct_inventory_on_order
   AFTER UPDATE OF status ON public.orders
   FOR EACH ROW EXECUTE FUNCTION public.deduct_inventory_on_order();
@@ -313,10 +341,12 @@ ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
 -- ----------------------------------------------------------------------------
 -- PROFILES POLICIES
 -- ----------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Users can read own profile or admin can read all" ON public.profiles;
 CREATE POLICY "Users can read own profile or admin can read all"
   ON public.profiles FOR SELECT
   USING (auth.uid() = id OR public.is_admin());
 
+DROP POLICY IF EXISTS "Users can update own profile (role immutability enforced for non-admin)" ON public.profiles;
 CREATE POLICY "Users can update own profile (role immutability enforced for non-admin)"
   ON public.profiles FOR UPDATE
   USING (auth.uid() = id OR public.is_admin())
@@ -325,6 +355,7 @@ CREATE POLICY "Users can update own profile (role immutability enforced for non-
     OR public.is_admin()
   );
 
+DROP POLICY IF EXISTS "Users can insert own profile or admin can insert" ON public.profiles;
 CREATE POLICY "Users can insert own profile or admin can insert"
   ON public.profiles FOR INSERT
   WITH CHECK (auth.uid() = id OR public.is_admin());
@@ -332,10 +363,12 @@ CREATE POLICY "Users can insert own profile or admin can insert"
 -- ----------------------------------------------------------------------------
 -- CATEGORIES POLICIES
 -- ----------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Public categories read access" ON public.categories;
 CREATE POLICY "Public categories read access"
   ON public.categories FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS "Admin full write access to categories" ON public.categories;
 CREATE POLICY "Admin full write access to categories"
   ON public.categories FOR ALL
   USING (public.is_admin())
@@ -344,10 +377,12 @@ CREATE POLICY "Admin full write access to categories"
 -- ----------------------------------------------------------------------------
 -- PRODUCTS POLICIES
 -- ----------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Public read published products or admin read all" ON public.products;
 CREATE POLICY "Public read published products or admin read all"
   ON public.products FOR SELECT
   USING (is_published = true OR public.is_admin());
 
+DROP POLICY IF EXISTS "Admin full write access to products" ON public.products;
 CREATE POLICY "Admin full write access to products"
   ON public.products FOR ALL
   USING (public.is_admin())
@@ -356,6 +391,7 @@ CREATE POLICY "Admin full write access to products"
 -- ----------------------------------------------------------------------------
 -- PRODUCT VARIANTS POLICIES
 -- ----------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Public read published product variants or admin read all" ON public.product_variants;
 CREATE POLICY "Public read published product variants or admin read all"
   ON public.product_variants FOR SELECT
   USING (
@@ -365,6 +401,7 @@ CREATE POLICY "Public read published product variants or admin read all"
     )
   );
 
+DROP POLICY IF EXISTS "Admin full write access to product variants" ON public.product_variants;
 CREATE POLICY "Admin full write access to product variants"
   ON public.product_variants FOR ALL
   USING (public.is_admin())
@@ -373,10 +410,12 @@ CREATE POLICY "Admin full write access to product variants"
 -- ----------------------------------------------------------------------------
 -- PRODUCT IMAGES POLICIES
 -- ----------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Public read product images" ON public.product_images;
 CREATE POLICY "Public read product images"
   ON public.product_images FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS "Admin full write access to product images" ON public.product_images;
 CREATE POLICY "Admin full write access to product images"
   ON public.product_images FOR ALL
   USING (public.is_admin())
@@ -385,19 +424,23 @@ CREATE POLICY "Admin full write access to product images"
 -- ----------------------------------------------------------------------------
 -- ORDERS POLICIES
 -- ----------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Users can read own orders or admin read all" ON public.orders;
 CREATE POLICY "Users can read own orders or admin read all"
   ON public.orders FOR SELECT
   USING (user_id = auth.uid() OR public.is_admin());
 
+DROP POLICY IF EXISTS "Authenticated users can create orders for themselves" ON public.orders;
 CREATE POLICY "Authenticated users can create orders for themselves"
   ON public.orders FOR INSERT
   WITH CHECK (user_id = auth.uid() OR public.is_admin());
 
+DROP POLICY IF EXISTS "Admin update orders status & tracking" ON public.orders;
 CREATE POLICY "Admin update orders status & tracking"
   ON public.orders FOR UPDATE
   USING (public.is_admin())
   WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Admin delete orders" ON public.orders;
 CREATE POLICY "Admin delete orders"
   ON public.orders FOR DELETE
   USING (public.is_admin());
@@ -405,6 +448,7 @@ CREATE POLICY "Admin delete orders"
 -- ----------------------------------------------------------------------------
 -- ORDER ITEMS POLICIES
 -- ----------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Users can read own order items or admin read all" ON public.order_items;
 CREATE POLICY "Users can read own order items or admin read all"
   ON public.order_items FOR SELECT
   USING (
@@ -414,6 +458,7 @@ CREATE POLICY "Users can read own order items or admin read all"
     )
   );
 
+DROP POLICY IF EXISTS "Authenticated users can insert order items for own order" ON public.order_items;
 CREATE POLICY "Authenticated users can insert order items for own order"
   ON public.order_items FOR INSERT
   WITH CHECK (
@@ -423,6 +468,7 @@ CREATE POLICY "Authenticated users can insert order items for own order"
     )
   );
 
+DROP POLICY IF EXISTS "Admin full write access to order items" ON public.order_items;
 CREATE POLICY "Admin full write access to order items"
   ON public.order_items FOR ALL
   USING (public.is_admin())
@@ -431,6 +477,7 @@ CREATE POLICY "Admin full write access to order items"
 -- ----------------------------------------------------------------------------
 -- WISHLISTS POLICIES
 -- ----------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Users manage own wishlist entries" ON public.wishlists;
 CREATE POLICY "Users manage own wishlist entries"
   ON public.wishlists FOR ALL
   USING (user_id = auth.uid())
@@ -439,6 +486,7 @@ CREATE POLICY "Users manage own wishlist entries"
 -- ----------------------------------------------------------------------------
 -- COUPONS POLICIES
 -- ----------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Public read active coupons or admin read all" ON public.coupons;
 CREATE POLICY "Public read active coupons or admin read all"
   ON public.coupons FOR SELECT
   USING (
@@ -446,7 +494,9 @@ CREATE POLICY "Public read active coupons or admin read all"
     OR public.is_admin()
   );
 
+DROP POLICY IF EXISTS "Admin full write access to coupons" ON public.coupons;
 CREATE POLICY "Admin full write access to coupons"
   ON public.coupons FOR ALL
   USING (public.is_admin())
   WITH CHECK (public.is_admin());
+
