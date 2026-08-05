@@ -1,15 +1,17 @@
 'use client';
 
 import React from 'react';
+import { motion, HTMLMotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'cyan' | 'outline' | 'gold' | 'champagne';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -28,7 +30,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-mono font-bold uppercase tracking-wider transition-all duration-200 ease-magnetic select-none active:scale-95 disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/50';
+      'inline-flex items-center justify-center font-mono font-bold uppercase tracking-wider transition-colors duration-200 ease-magnetic select-none disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/50';
 
     const variantStyles = {
       primary:
@@ -56,8 +58,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     return (
-      <button
+      <motion.button
         ref={ref}
+        whileTap={{ scale: disabled || isLoading ? 1 : 0.96 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
         disabled={disabled || isLoading}
         className={cn(baseStyles, variantStyles[variant], sizeStyles[size], className)}
         {...props}
@@ -71,7 +75,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {!isLoading && rightIcon && (
           <span className="inline-flex shrink-0">{rightIcon}</span>
         )}
-      </button>
+      </motion.button>
     );
   }
 );

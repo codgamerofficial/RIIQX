@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { ShoppingBag, Heart, Check, Sparkles } from 'lucide-react';
@@ -44,7 +45,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      whileHover={{ y: -6 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 24 }}
       className="group relative flex flex-col bg-[#141312] border border-[#D4AF37]/20 rounded-md overflow-hidden hover:border-[#D4AF37]/60 hover:shadow-glow-gold transition-all duration-300"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -56,10 +62,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             aspectRatio === 'portrait' ? 'aspect-[3/4]' : 'aspect-square'
           } relative overflow-hidden`}
         >
-          <img
+          <motion.img
             src={primaryImage}
             alt={product.name}
-            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+            animate={{ scale: isHovered ? 1.07 : 1 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full h-full object-cover object-center filter contrast-110"
           />
 
           <div className="absolute inset-0 bg-gradient-to-t from-[#0C0B0A] via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-300" />
@@ -88,7 +96,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Floating Wishlist Trigger */}
         <div className="absolute top-3 right-3 z-10">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             type="button"
             onClick={handleWishlistToggle}
             className={`w-9 h-9 rounded-sm flex items-center justify-center backdrop-blur-md transition-all duration-200 cursor-pointer ${
@@ -99,27 +109,39 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             aria-label="Wishlist item"
           >
             <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
-          </button>
+          </motion.button>
         </div>
 
         {/* Quick Add CTA Overlay on Hover */}
-        <div className="absolute bottom-3 inset-x-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <Button
-            variant="gold"
-            size="sm"
-            className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B38F28] text-[#0C0B0A] font-bold shadow-glow-gold font-mono text-xs py-2.5"
-            onClick={handleQuickAdd}
-            leftIcon={
-              isAddedToCart ? (
-                <Check className="w-3.5 h-3.5 text-[#0C0B0A]" />
-              ) : (
-                <ShoppingBag className="w-3.5 h-3.5" />
-              )
-            }
-          >
-            {isAddedToCart ? 'ADDED TO BAG' : 'QUICK ADD // BAG'}
-          </Button>
-        </div>
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="absolute bottom-3 inset-x-3 z-10"
+            >
+              <motion.div whileTap={{ scale: 0.97 }}>
+                <Button
+                  variant="gold"
+                  size="sm"
+                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B38F28] text-[#0C0B0A] font-bold shadow-glow-gold font-mono text-xs py-2.5"
+                  onClick={handleQuickAdd}
+                  leftIcon={
+                    isAddedToCart ? (
+                      <Check className="w-3.5 h-3.5 text-[#0C0B0A]" />
+                    ) : (
+                      <ShoppingBag className="w-3.5 h-3.5" />
+                    )
+                  }
+                >
+                  {isAddedToCart ? 'ADDED TO BAG' : 'QUICK ADD // BAG'}
+                </Button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Link>
 
       {/* Content Details */}
@@ -155,6 +177,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
