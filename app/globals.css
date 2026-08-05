@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&family=Space+Grotesk:wght@300..700&family=Syne:wght@400..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    border-color: var(--riiqx-glass-border-subtle);
+  }
+
+  body {
+    background-color: var(--riiqx-color-obsidian-base);
+    color: var(--riiqx-color-text-primary);
+    font-family: var(--riiqx-font-sans);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  :root {
+    --background: #050508;
+    --foreground: #ffffff;
+    --card: #12131c;
+    --card-foreground: #ffffff;
+    --popover: #12131c;
+    --popover-foreground: #ffffff;
+    --primary: #ff003c;
+    --primary-foreground: #ffffff;
+    --secondary: #181926;
+    --secondary-foreground: #ffffff;
+    --muted: #181926;
+    --muted-foreground: #64748b;
+    --accent: #00f0ff;
+    --accent-foreground: #050508;
+    --destructive: #ff024e;
+    --border: rgba(255, 255, 255, 0.1);
+    --input: rgba(255, 255, 255, 0.15);
+    --ring: #ff003c;
+    --radius: 0.25rem;
+  }
+}
+
+/* Custom Scrollbar for Cyber Aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--riiqx-color-obsidian-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--riiqx-color-charcoal-elevated);
+  border-radius: var(--riiqx-radius-sm);
+  border: 1px solid var(--riiqx-glass-border-subtle);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--riiqx-color-accent-crimson);
+  box-shadow: var(--riiqx-shadow-glow-crimson);
+}

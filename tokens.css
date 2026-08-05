@@ -1,0 +1,192 @@
+/**
+ * RIIQX DESIGN TOKEN SYSTEM v2.0 — "GOLDEN OBSIDIAN" EDITION
+ * Official Single Source of Truth for Web, Mobile, and Desktop
+ * Aesthetic: Haute Couture / Whispering Luxury / Liquid Gold & Matte Obsidian
+ */
+
+:root {
+  /* ==========================================================================
+     1. COLOR SYSTEM (HEX, OKLCH & RGBA)
+     ========================================================================== */
+
+  /* Base & Background Surface Palette */
+  --riiqx-color-obsidian-base: #0C0B0A;
+  --riiqx-color-obsidian-base-oklch: oklch(0.13 0.01 60);
+  --riiqx-color-obsidian-void: #060605;
+  --riiqx-color-obsidian-void-oklch: oklch(0.09 0.005 60);
+  --riiqx-color-charcoal-matte: #141312;
+  --riiqx-color-charcoal-matte-oklch: oklch(0.16 0.01 60);
+  --riiqx-color-charcoal-elevated: #1C1B18;
+  --riiqx-color-charcoal-elevated-oklch: oklch(0.20 0.015 60);
+  --riiqx-color-surface-hover: #24221E;
+
+  /* Glassmorphism Surfaces */
+  --riiqx-glass-surface-base: rgba(20, 19, 18, 0.70);
+  --riiqx-glass-surface-elevated: rgba(28, 27, 24, 0.60);
+  --riiqx-glass-border-subtle: rgba(212, 175, 55, 0.12);
+  --riiqx-glass-border-medium: rgba(212, 175, 55, 0.25);
+  --riiqx-glass-border-active: rgba(212, 175, 55, 0.45);
+  --riiqx-glass-border-accent: rgba(212, 175, 55, 0.70);
+
+  /* Liquid Gold Accent Palette */
+  --riiqx-color-gold-primary: #D4AF37;
+  --riiqx-color-gold-primary-oklch: oklch(0.76 0.14 85);
+  --riiqx-color-gold-glow: rgba(212, 175, 55, 0.30);
+
+  --riiqx-color-gold-light: #F3E5AB;
+  --riiqx-color-gold-light-oklch: oklch(0.92 0.08 85);
+  --riiqx-color-gold-light-glow: rgba(243, 229, 171, 0.35);
+
+  --riiqx-color-gold-dark: #8B7321;
+  --riiqx-color-gold-dark-oklch: oklch(0.55 0.12 85);
+  --riiqx-color-gold-dark-border: rgba(139, 115, 33, 0.40);
+
+  --riiqx-color-accent-crimson: #FF003C;
+  --riiqx-color-accent-cyan: #00F0FF;
+
+  /* Typography & Foreground Palette */
+  --riiqx-color-text-primary: #F7F7F7;
+  --riiqx-color-text-secondary: #D4D0C8;
+  --riiqx-color-text-muted: #9E9A93;
+  --riiqx-color-text-disabled: #4A4742;
+  --riiqx-color-text-gold: #D4AF37;
+
+  /* State & Functional Colors */
+  --riiqx-color-state-success: #D4AF37;
+  --riiqx-color-state-error: #E53935;
+  --riiqx-color-state-warning: #F5A623;
+  --riiqx-color-state-info: #F3E5AB;
+
+  /* ==========================================================================
+     2. TYPOGRAPHY SYSTEM
+     ========================================================================== */
+
+  /* Font Families */
+  --riiqx-font-display: 'Cormorant Garamond', 'Playfair Display', 'Cinzel', Georgia, serif;
+  --riiqx-font-sans: 'Space Grotesk', 'Inter', 'SF Pro Display', system-ui, sans-serif;
+  --riiqx-font-mono: 'JetBrains Mono', 'Space Mono', monospace;
+
+  /* Type Scale */
+  --riiqx-text-xs-size: 0.75rem;
+  --riiqx-text-xs-lh: 1.0rem;
+  --riiqx-text-xs-tracking: 0.05em;
+
+  --riiqx-text-sm-size: 0.875rem;
+  --riiqx-text-sm-lh: 1.25rem;
+  --riiqx-text-sm-tracking: 0.02em;
+
+  --riiqx-text-base-size: 1.0rem;
+  --riiqx-text-base-lh: 1.5rem;
+  --riiqx-text-base-tracking: 0em;
+
+  --riiqx-text-lg-size: 1.125rem;
+  --riiqx-text-lg-lh: 1.75rem;
+  --riiqx-text-lg-tracking: -0.01em;
+
+  --riiqx-text-xl-size: 1.25rem;
+  --riiqx-text-xl-lh: 1.75rem;
+  --riiqx-text-xl-tracking: -0.01em;
+
+  --riiqx-text-2xl-size: 1.5rem;
+  --riiqx-text-2xl-lh: 2.0rem;
+  --riiqx-text-2xl-tracking: -0.02em;
+
+  --riiqx-text-3xl-size: 2.0rem;
+  --riiqx-text-3xl-lh: 2.5rem;
+  --riiqx-text-3xl-tracking: -0.03em;
+
+  --riiqx-text-4xl-size: 2.75rem;
+  --riiqx-text-4xl-lh: 3.25rem;
+  --riiqx-text-4xl-tracking: -0.04em;
+
+  --riiqx-text-5xl-size: 3.75rem;
+  --riiqx-text-5xl-lh: 4.25rem;
+  --riiqx-text-5xl-tracking: -0.04em;
+
+  --riiqx-text-6xl-size: 4.75rem;
+  --riiqx-text-6xl-lh: 5.0rem;
+  --riiqx-text-6xl-tracking: -0.05em;
+
+  /* Font Weights */
+  --riiqx-weight-regular: 400;
+  --riiqx-weight-medium: 500;
+  --riiqx-weight-semibold: 600;
+  --riiqx-weight-bold: 700;
+  --riiqx-weight-black: 900;
+
+  /* ==========================================================================
+     3. SPATIAL & GEOMETRIC TOKENS
+     ========================================================================== */
+
+  --riiqx-space-0: 0px;
+  --riiqx-space-1: 4px;
+  --riiqx-space-2: 8px;
+  --riiqx-space-3: 12px;
+  --riiqx-space-4: 16px;
+  --riiqx-space-6: 24px;
+  --riiqx-space-8: 32px;
+  --riiqx-space-12: 48px;
+
+  --riiqx-radius-none: 0px;
+  --riiqx-radius-sm: 2px;
+  --riiqx-radius-md: 4px;
+  --riiqx-radius-lg: 8px;
+  --riiqx-radius-xl: 16px;
+  --riiqx-radius-full: 9999px;
+
+  --riiqx-blur-subtle: blur(12px);
+  --riiqx-blur-medium: blur(20px);
+  --riiqx-blur-heavy: blur(40px);
+
+  --riiqx-shadow-glass-sm: 0 2px 10px -2px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(212, 175, 55, 0.15);
+  --riiqx-shadow-glass-md: 0 8px 30px -4px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 rgba(212, 175, 55, 0.20);
+  --riiqx-shadow-glow-gold: 0 0 25px rgba(212, 175, 55, 0.35), 0 0 50px rgba(212, 175, 55, 0.12);
+  --riiqx-shadow-glow-champagne: 0 0 25px rgba(243, 229, 171, 0.35);
+
+  --riiqx-ease-magnetic: cubic-bezier(0.16, 1, 0.3, 1);
+  --riiqx-duration-fast: 150ms;
+  --riiqx-duration-normal: 300ms;
+}
+
+body {
+  background-color: var(--riiqx-color-obsidian-base);
+  color: var(--riiqx-color-text-primary);
+  font-family: var(--riiqx-font-sans);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.riiqx-glass-panel {
+  background: var(--riiqx-glass-surface-base);
+  backdrop-filter: var(--riiqx-blur-medium);
+  -webkit-backdrop-filter: var(--riiqx-blur-medium);
+  border: 1px solid var(--riiqx-glass-border-subtle);
+  box-shadow: var(--riiqx-shadow-glass-md);
+  border-radius: var(--riiqx-radius-md);
+}
+
+.riiqx-glass-panel:hover {
+  border-color: var(--riiqx-glass-border-medium);
+  box-shadow: var(--riiqx-shadow-glow-gold);
+  transition: all var(--riiqx-duration-fast) var(--riiqx-ease-magnetic);
+}
+
+.riiqx-btn-primary {
+  background: linear-gradient(135deg, #D4AF37 0%, #B38F28 100%);
+  color: #0C0B0A;
+  font-family: var(--riiqx-font-mono);
+  font-weight: var(--riiqx-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.85rem 1.75rem;
+  border: 1px solid rgba(243, 229, 171, 0.4);
+  border-radius: var(--riiqx-radius-sm);
+  cursor: pointer;
+  transition: all var(--riiqx-duration-fast) var(--riiqx-ease-magnetic);
+}
+
+.riiqx-btn-primary:hover {
+  box-shadow: var(--riiqx-shadow-glow-gold);
+  transform: translateY(-1px);
+}
