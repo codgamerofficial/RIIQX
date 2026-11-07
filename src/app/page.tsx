@@ -18,6 +18,10 @@ import { TwinDigestView } from '@/components/twin/TwinDigestView';
 import { TwinConnectionsView } from '@/components/twin/TwinConnectionsView';
 import { TwinActivityView } from '@/components/twin/TwinActivityView';
 import { TwinSettingsView } from '@/components/twin/TwinSettingsView';
+import { RiiqxCreatorStudio } from '@/components/riiqx/RiiqxCreatorStudio';
+import { RiiqxVideoEditor } from '@/components/riiqx/RiiqxVideoEditor';
+import { RiiqxAnalyticsView } from '@/components/riiqx/RiiqxAnalyticsView';
+import { RiiqxFilesView } from '@/components/riiqx/RiiqxFilesView';
 
 export default function RiiqxWorkspacePage() {
   const { activeTab } = useRiiqx();
@@ -26,6 +30,7 @@ export default function RiiqxWorkspacePage() {
     case 'home':
       return <TwinDashboardView />;
     case 'twin':
+    case 'chat':
       return <TwinChatView />;
     case 'decisions':
       return <TwinDecisionsView />;
@@ -42,9 +47,18 @@ export default function RiiqxWorkspacePage() {
       return <TwinConnectionsView />;
     case 'activity':
     case 'tasks':
+    case 'autopilot':
       return <TwinActivityView />;
     case 'settings':
       return <TwinSettingsView />;
+    case 'creator':
+      return <RiiqxCreatorStudio />;
+    case 'editor':
+      return <RiiqxVideoEditor />;
+    case 'analytics':
+      return <RiiqxAnalyticsView />;
+    case 'files':
+      return <RiiqxFilesView />;
     default:
       return <TwinDashboardView />;
   }

@@ -253,6 +253,10 @@ export interface RiiqxApiClient {
     targetHeight?: number;
   }): Promise<{ success: boolean; jobId: string; status: string }>;
   getRenderJob(jobId: string): Promise<any>;
+  analyzeProduct(params: { url?: string; screenshotBase64?: string; screenshotMimeType?: string }): Promise<any>;
+  purchaseGiftCard(params: { platform: string; faceValue: number; paymentMethod?: string; autoCreditToShoppingWallet?: boolean }): Promise<any>;
+  trackDropshippingOrder(orderId: string): Promise<any>;
+  getMarketplaceProducts(params?: { category?: string; query?: string; sortBy?: string }): Promise<any>;
 }
 
 export const api: RiiqxApiClient = {

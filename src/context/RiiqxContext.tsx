@@ -125,11 +125,7 @@ const RiiqxContext = createContext<RiiqxContextType | undefined>(undefined);
 export function RiiqxProvider({ children }: { children: ReactNode }) {
   const [activeTab, setActiveTabState] = useState<RiiqxViewTab>('home');
   const setActiveTab = useCallback((tab: RiiqxViewTab) => {
-    if (tab === 'shopping' || tab === 'creator') {
-      setActiveTabState('twin');
-    } else {
-      setActiveTabState(tab);
-    }
+    setActiveTabState(tab);
   }, []);
   const [theme, setThemeState] = useState<'light' | 'dark'>('dark');
   const [globalPrompt, setGlobalPrompt] = useState<string>('');

@@ -189,7 +189,7 @@ export default function MobileHomeScreen() {
         <View style={styles.header}>
           <View style={styles.headerTitleRow}>
             <View style={{ flex: 1, paddingRight: 8 }}>
-              <Text style={styles.badgeText}>AI CREATOR OS • PRODUCTION CORE</Text>
+              <Text style={styles.badgeText}>AI CREATOR OS • PRODUCTION CORE • ₹0/mo FREE TIER</Text>
               <Text style={styles.titleText}>Welcome to RIIQX</Text>
               <Text style={styles.subtitleText}>
                 Autonomous vertical video production, multi-model AI routing, and social growth.
@@ -451,6 +451,19 @@ export default function MobileHomeScreen() {
 
             <View style={styles.connectorItem}>
               <View style={styles.connectorIconBox}>
+                <Ionicons name="sparkles" size={16} color="#38BDF8" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.connectorName}>Gemini 2.5 Flash</Text>
+                <Text style={styles.connectorSub}>Google DeepMind • ₹0/mo FREE TIER</Text>
+              </View>
+              <View style={styles.connectedBadge}>
+                <Text style={styles.connectedBadgeText}>Online Live</Text>
+              </View>
+            </View>
+
+            <View style={styles.connectorItem}>
+              <View style={styles.connectorIconBox}>
                 <Ionicons name="hardware-chip-outline" size={16} color="#10B981" />
               </View>
               <View style={{ flex: 1 }}>
@@ -467,8 +480,8 @@ export default function MobileHomeScreen() {
                 <Ionicons name="flash-outline" size={16} color="#FFD43B" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.connectorName}>Groq LPU Free Tier</Text>
-                <Text style={styles.connectorSub}>Qwen 3.8 27B • ~460ms</Text>
+                <Text style={styles.connectorName}>Groq Qwen 27B</Text>
+                <Text style={styles.connectorSub}>LPU Free Tier • ~460ms</Text>
               </View>
               <View style={styles.connectedBadge}>
                 <Text style={styles.connectedBadgeText}>Active</Text>

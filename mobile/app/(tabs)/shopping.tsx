@@ -14,7 +14,6 @@ import {
   ActivityIndicator,
   Image,
   Alert,
-  Clipboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -55,7 +54,10 @@ export default function MobileShoppingScreen() {
 
   const handlePasteClipboard = async () => {
     try {
-      const text = await Clipboard.getString();
+      let text = '';
+      if (typeof navigator !== 'undefined' && (navigator as any).clipboard?.readText) {
+        text = await (navigator as any).clipboard.readText();
+      }
       if (text && text.startsWith('http')) {
         setProductUrl(text);
         runAnalysis(text);
@@ -63,7 +65,7 @@ export default function MobileShoppingScreen() {
         Alert.alert('Clipboard Notice', 'No valid URL found in clipboard.');
       }
     } catch (e: any) {
-      Alert.alert('Error', e.message);
+      Alert.alert('Error', e?.message || 'Unable to read from clipboard.');
     }
   };
 

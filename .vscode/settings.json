@@ -17,12 +17,15 @@
   },
   "json.schemas": [
     {
-      "fileMatch": ["package.json", "**/package.json"],
+      "fileMatch": [
+        "package.json",
+        "**/package.json"
+      ],
       "url": "https://json.schemastore.org/package.json"
     }
   ],
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.preferences.includePackageJsonAutoImports": "on",
-  "typescript.validate.enable": true
+  "typescript.validate.enable": true,
+  "db2forzosdeveloperextension.db2sqlservice.port": "53001"
 }
-

@@ -11,6 +11,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "node tests/test-riiqx-finance.mjs",
+    "test:all": "node tests/test-riiqx.mjs && node tests/test-riiqx-finance.mjs && node tests/test-mobile-app.mjs",
     "test:riiqx": "node tests/test-riiqx.mjs",
     "test:finance": "node tests/test-riiqx-finance.mjs",
     "test:ai": "node tests/test-ai-infrastructure.mjs",

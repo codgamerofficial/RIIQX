@@ -51,6 +51,45 @@ const INITIAL_PROJECTS: CreatorProject[] = [
     p.performance = undefined;
     return p;
   })(),
+  (() => {
+    const p = createDefaultProject({
+      topic: 'Autonomous Multi-Agent Swarm Orchestration in 2026',
+      niche: 'TECH & AI',
+      durationSeconds: 30,
+      platform: 'both',
+    });
+    p.id = 'proj_003_ai_agent_breakthrough';
+    p.name = 'Autonomous Multi-Agent Swarm Orchestration in 2026';
+    p.status = 'scripting';
+    p.performance = undefined;
+    return p;
+  })(),
+  (() => {
+    const p = createDefaultProject({
+      topic: 'Carto Hyperlocal Price Arbitrage Scanner Demo',
+      niche: 'FINTECH & E-COMMERCE',
+      durationSeconds: 30,
+      platform: 'youtube_shorts',
+    });
+    p.id = 'proj_005_hyperlocal_arbitrage';
+    p.name = 'Carto Hyperlocal Price Arbitrage Scanner Demo';
+    p.status = 'idea';
+    p.performance = undefined;
+    return p;
+  })(),
+  (() => {
+    const p = createDefaultProject({
+      topic: 'Deep Research Synthesis & Instant Financial Fact-Checking',
+      niche: 'AI & PRODUCTIVITY',
+      durationSeconds: 60,
+      platform: 'both',
+    });
+    p.id = 'proj_006_deep_research_synthesis';
+    p.name = 'Deep Research Synthesis & Instant Financial Fact-Checking';
+    p.status = 'editing';
+    p.performance = undefined;
+    return p;
+  })(),
 ];
 
 // In-memory cache synced with disk
@@ -188,7 +227,13 @@ export function listCreatorProjects(): CreatorProject[] {
   }
 
   // Combine real channel content with studio drafts
-  const combined = [...liveProjects, ...(validDrafts.length > 0 ? validDrafts : INITIAL_PROJECTS)];
+  const baseDrafts = validDrafts.length >= 6
+    ? validDrafts
+    : [
+        ...validDrafts,
+        ...INITIAL_PROJECTS.filter((ip) => !validDrafts.some((vd) => vd.id === ip.id)),
+      ];
+  const combined = [...liveProjects, ...baseDrafts];
 
   cachedProjects = combined;
   safeWriteJson(PROJECTS_FILE, combined);
