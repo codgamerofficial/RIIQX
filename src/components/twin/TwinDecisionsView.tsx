@@ -780,7 +780,7 @@ export function TwinDecisionsView() {
             Compare &amp; Verify Any Purchase
           </h1>
           <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-2xl leading-relaxed">
-            Exact Product Matching &bull; Direct Buying Links &bull; True Lowest Final Payable Price &bull; Zero Simulated Deals
+            Exact Product Matching • Direct Buying Links • True Lowest Final Payable Price • Zero Simulated Deals
           </p>
         </div>
 
@@ -1035,17 +1035,17 @@ export function TwinDecisionsView() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <div className="p-4 rounded-2xl bg-zinc-950/60 border border-white/[0.08] space-y-1.5">
-              <span className="text-[10px] font-black text-rose-400 uppercase tracking-wider">01 &bull; Snap Checkout</span>
+              <span className="text-[10px] font-black text-rose-400 uppercase tracking-wider">01 • Snap Checkout</span>
               <p className="text-xs font-bold text-white">Upload Your Order Summary</p>
               <p className="text-[11px] text-zinc-400">Take a screenshot of the final payment breakdown before clicking pay.</p>
             </div>
             <div className="p-4 rounded-2xl bg-zinc-950/60 border border-white/[0.08] space-y-1.5">
-              <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider">02 &bull; Forensic OCR</span>
+              <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider">02 • Forensic OCR</span>
               <p className="text-xs font-bold text-white">Auto-Detect Hidden Traps</p>
               <p className="text-[11px] text-zinc-400">Computer vision isolates sneaky opt-ins and platform fee markups.</p>
             </div>
             <div className="p-4 rounded-2xl bg-zinc-950/60 border border-white/[0.08] space-y-1.5">
-              <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider">03 &bull; Uncheck &amp; Save</span>
+              <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider">03 • Uncheck &amp; Save</span>
               <p className="text-xs font-bold text-white">Instant Uncheck Checklist</p>
               <p className="text-[11px] text-zinc-400">Follow plain-language steps to drop the payable total by ₹50 to ₹350.</p>
             </div>
@@ -1076,17 +1076,17 @@ export function TwinDecisionsView() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <div className="p-4 rounded-2xl bg-zinc-950/60 border border-white/[0.08] space-y-1.5">
-              <span className="text-[10px] font-black text-cyan-400 uppercase tracking-wider">01 &bull; 15 km Radius Scan</span>
+              <span className="text-[10px] font-black text-cyan-400 uppercase tracking-wider">01 • 15 km Radius Scan</span>
               <p className="text-xs font-bold text-white">Live Store Inventory</p>
               <p className="text-[11px] text-zinc-400">Detect verified electronics retail branches around your pincode with real driving times.</p>
             </div>
             <div className="p-4 rounded-2xl bg-zinc-950/60 border border-white/[0.08] space-y-1.5">
-              <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider">02 &bull; POS Swipe Cashbacks</span>
+              <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider">02 • POS Swipe Cashbacks</span>
               <p className="text-xs font-bold text-white">PineLabs &amp; Innoviti Deals</p>
               <p className="text-[11px] text-zinc-400">Calculate instant terminal swipe discounts and manager spot coupons that beat online prices.</p>
             </div>
             <div className="p-4 rounded-2xl bg-zinc-950/60 border border-white/[0.08] space-y-1.5">
-              <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider">03 &bull; Same-Day Take Home</span>
+              <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider">03 • Same-Day Take Home</span>
               <p className="text-xs font-bold text-white">Zero Shipping Wait</p>
               <p className="text-[11px] text-zinc-400">Take your device home today with one-tap Google Maps turn-by-turn driving directions.</p>
             </div>
@@ -1223,7 +1223,7 @@ export function TwinDecisionsView() {
                       <span>Cheapest Eligible Price</span>
                     </div>
                     <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                      Ranking 2 &bull; Your Deal
+                      Ranking 2 • Your Deal
                     </span>
                   </div>
                   <div className="text-2xl font-black text-emerald-400 font-mono tracking-tight">
@@ -1824,7 +1824,7 @@ export function TwinDecisionsView() {
                     AI Twin Price Drop Sniper
                   </h3>
                   <p className="text-xs text-zinc-400">
-                    24/7 Background Price Intelligence &bull; Zero Spam Deduplication
+                    24/7 Background Price Intelligence • Zero Spam Deduplication
                   </p>
                 </div>
               </div>
@@ -1971,7 +1971,7 @@ export function TwinDecisionsView() {
                     Affiliate Revenue &amp; Monetization Engine
                   </h3>
                   <p className="text-xs text-zinc-400">
-                    Real-time Outbound Purchase Attribution &bull; Amazon, Flipkart, Tata CLiQ &bull; Zero Simulated Clicks
+                    Real-time Outbound Purchase Attribution • Amazon, Flipkart, Tata CLiQ • Zero Simulated Clicks
                   </p>
                 </div>
               </div>
@@ -2048,7 +2048,7 @@ export function TwinDecisionsView() {
                           <div className="flex items-center justify-between text-[11px]">
                             <span className="font-bold text-zinc-200">{r.retailerName}</span>
                             <span className="font-mono text-emerald-400 font-bold">
-                              ₹{r.projectedCommissionINR.toLocaleString('en-IN')} ({r.clicks} clicks &bull; {r.sharePct}%)
+                              ₹{r.projectedCommissionINR.toLocaleString('en-IN')} ({r.clicks} clicks • {r.sharePct}%)
                             </span>
                           </div>
                           <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
@@ -2111,7 +2111,7 @@ export function TwinDecisionsView() {
                           <div className="min-w-0 flex-1">
                             <span className="font-bold text-white truncate block">{c.productTitle}</span>
                             <span className="text-[10px] text-zinc-400 font-mono">
-                              {c.retailerName} &bull; Cart: ₹{Number(c.sellingPrice || 0).toLocaleString('en-IN')} &bull; Tier: {c.expectedCommissionPct}%
+                              {c.retailerName} • Cart: ₹{Number(c.sellingPrice || 0).toLocaleString('en-IN')} • Tier: {c.expectedCommissionPct}%
                             </span>
                           </div>
                           <div className="text-right shrink-0">
@@ -2172,7 +2172,7 @@ export function TwinDecisionsView() {
                     </span>
                   </h3>
                   <p className="text-[11px] text-zinc-400">
-                    Physical 9:16 Video Synthesis &bull; FFmpeg &bull; High-Converting Viral Copy &bull; Affiliate Link
+                    Physical 9:16 Video Synthesis • FFmpeg • High-Converting Viral Copy • Affiliate Link
                   </p>
                 </div>
               </div>
@@ -2210,7 +2210,7 @@ export function TwinDecisionsView() {
                     </div>
                     <div className="flex items-center justify-between text-[11px] text-zinc-400 font-mono px-1">
                       <span>{generatedShort.width}x{generatedShort.height} ({generatedShort.aspectRatio})</span>
-                      <span>{generatedShort.durationSeconds}s &bull; {(generatedShort.fileSizeBytes / 1024).toFixed(0)} KB</span>
+                      <span>{generatedShort.durationSeconds}s • {(generatedShort.fileSizeBytes / 1024).toFixed(0)} KB</span>
                     </div>
                     <a
                       href={generatedShort.videoUrl}
@@ -2337,7 +2337,7 @@ export function TwinDecisionsView() {
                 {/* Footer */}
                 <div className="flex items-center justify-between pt-3 border-t border-white/[0.08]">
                   <span className="text-[10px] text-zinc-500 font-mono">
-                    Zero manual editing required &bull; 100% automated video pipeline.
+                    Zero manual editing required • 100% automated video pipeline.
                   </span>
                   <button
                     type="button"
