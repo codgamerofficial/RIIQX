@@ -183,3 +183,4 @@ export class AutonomousDealPipeline {
     return logs.slice(0, limit);
   }
 }
+

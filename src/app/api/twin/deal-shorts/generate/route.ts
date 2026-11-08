@@ -8,6 +8,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { resolveAuthUserId } from '@/lib/riiqx/session-helper';
 import { DealShortsVideoFactory, DealShortsRequest } from '@/services/video/deal-shorts-factory';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);

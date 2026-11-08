@@ -2006,7 +2006,7 @@ export function TwinDecisionsView() {
                   <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-1">
                     <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">Purchase Clicks</span>
                     <div className="text-2xl font-black text-white font-mono">{earningsData?.totalClicks || 0}</div>
-                    <span className="text-[10px] text-zinc-500">Outbound 'Buy' CTAs</span>
+                    <span className="text-[10px] text-zinc-500">Outbound &apos;Buy&apos; CTAs</span>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-1">
@@ -2129,7 +2129,7 @@ export function TwinDecisionsView() {
                     <div className="p-6 rounded-2xl bg-zinc-950/70 border border-white/[0.08] text-center space-y-1">
                       <p className="text-zinc-400 font-medium">No outbound purchase clicks recorded yet.</p>
                       <p className="text-[11px] text-zinc-500">
-                        Clicking 'BUY FROM STORE' on any product will automatically register real-time revenue telemetry here.
+                        Clicking &apos;BUY FROM STORE&apos; on any product will automatically register real-time revenue telemetry here.
                       </p>
                     </div>
                   )}

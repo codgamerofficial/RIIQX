@@ -9,6 +9,8 @@ import { resolveAuthUserId } from '@/lib/riiqx/session-helper';
 import { publishProjectToSocial, PublishPlatform } from '@/lib/riiqx/social/publishing-engine';
 import { getConnectedAccounts } from '@/lib/riiqx/social/account-repository';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
@@ -113,3 +115,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
