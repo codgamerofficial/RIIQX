@@ -896,33 +896,105 @@ export function TwinDecisionsView() {
                 </div>
               </div>
 
-              {/* Cheapest Verified Floor Price Hero Badge */}
-              <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-5 text-right shrink-0 min-w-[240px] space-y-1 shadow-lg shadow-emerald-500/5">
-                <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest block">
-                  Lowest Verified Floor Price
-                </span>
-                {result.pricingMatrix.finalCheckoutPrice > 0 ? (
-                  <>
-                    <div className="text-3xl sm:text-4xl font-black text-emerald-400 font-mono tracking-tight">
-                      ₹{result.pricingMatrix.finalCheckoutPrice.toLocaleString('en-IN')}
+              {/* 3-Tier Lowest Final Price Truth Highlights (Section 6 Requirements) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                {/* Card 1: Cheapest Market Price */}
+                <div
+                  onClick={() => setActiveRankingTab('standard')}
+                  className={`p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden group ${
+                    activeRankingTab === 'standard'
+                      ? 'border-zinc-300 bg-zinc-800/90 shadow-xl ring-1 ring-zinc-400/40'
+                      : 'border-white/[0.08] hover:border-white/[0.2] bg-zinc-950/60'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <div className="flex items-center gap-1 text-zinc-400 text-[11px] font-black uppercase tracking-wider">
+                      <DollarSign className="h-3.5 w-3.5 text-zinc-300" />
+                      <span>Cheapest Market Price</span>
                     </div>
-                    <div className="text-[11px] text-zinc-300">
-                      At <span className="font-bold text-white">{result.pricingMatrix.bestRetailer}</span>
-                      {result.pricingMatrix.totalSavings > 0 && (
-                        <span className="text-emerald-300"> &bull; Save ₹{result.pricingMatrix.totalSavings.toLocaleString('en-IN')}</span>
-                      )}
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-white/[0.1]">
+                      Ranking 1
+                    </span>
+                  </div>
+                  <div className="text-2xl font-black text-white font-mono tracking-tight">
+                    {result.report?.priceTruth?.lowestStandardPrice
+                      ? `₹${result.report.priceTruth.lowestStandardPrice.toLocaleString('en-IN')}`
+                      : `₹${result.pricingMatrix.lowestListedPrice.toLocaleString('en-IN')}`}
+                  </div>
+                  <div className="text-xs text-zinc-300 mt-1 flex items-center justify-between">
+                    <span>At <strong className="text-white">{result.report?.cheapestStandardOffer?.retailerName || result.pricingMatrix.bestRetailer}</strong></span>
+                    <span className="text-[10px] text-zinc-400 font-mono">Standard floor</span>
+                  </div>
+                  <p className="text-[11px] text-zinc-400 mt-1 line-clamp-1">
+                    Lowest verified standard price across all stores.
+                  </p>
+                </div>
+
+                {/* Card 2: Cheapest Eligible Price (User Personal Deal) */}
+                <div
+                  onClick={() => setActiveRankingTab('eligible')}
+                  className={`p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden group ${
+                    activeRankingTab === 'eligible'
+                      ? 'border-emerald-500/60 bg-emerald-950/30 shadow-2xl shadow-emerald-500/10 ring-1 ring-emerald-500/40'
+                      : 'border-emerald-500/30 hover:border-emerald-500/50 bg-zinc-950/60'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <div className="flex items-center gap-1 text-emerald-400 text-[11px] font-black uppercase tracking-wider">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      <span>Cheapest Eligible Price</span>
                     </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="text-xl font-black text-amber-400 font-heading">
-                      Price Check Pending
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      Ranking 2 &bull; Your Deal
+                    </span>
+                  </div>
+                  <div className="text-2xl font-black text-emerald-400 font-mono tracking-tight">
+                    {result.report?.priceTruth?.lowestEligiblePrice
+                      ? `₹${result.report.priceTruth.lowestEligiblePrice.toLocaleString('en-IN')}`
+                      : `₹${result.pricingMatrix.finalCheckoutPrice.toLocaleString('en-IN')}`}
+                  </div>
+                  <div className="text-xs text-zinc-300 mt-1 flex items-center justify-between">
+                    <span>At <strong className="text-white">{result.report?.cheapestEligibleOffer?.retailerName || result.pricingMatrix.bestRetailer}</strong></span>
+                    {result.pricingMatrix.totalSavings > 0 && (
+                      <span className="text-emerald-300 font-bold font-mono">Save ₹{result.pricingMatrix.totalSavings.toLocaleString('en-IN')}</span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-zinc-400 mt-1 line-clamp-1">
+                    Real payable price for your {userPreferences.preferredBanks.length} active banks &amp; cards.
+                  </p>
+                </div>
+
+                {/* Card 3: Best Conditional Deal */}
+                <div
+                  onClick={() => setActiveRankingTab('conditional')}
+                  className={`p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden group ${
+                    activeRankingTab === 'conditional'
+                      ? 'border-orange-500/60 bg-orange-950/30 shadow-2xl shadow-orange-500/10 ring-1 ring-orange-500/40'
+                      : 'border-orange-500/30 hover:border-orange-500/50 bg-zinc-950/60'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <div className="flex items-center gap-1 text-orange-400 text-[11px] font-black uppercase tracking-wider">
+                      <Tag className="h-3.5 w-3.5" />
+                      <span>Best Conditional Deal</span>
                     </div>
-                    <div className="text-[11px] text-zinc-400">
-                      Visit merchant store for live checkout price
-                    </div>
-                  </>
-                )}
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                      Ranking 3
+                    </span>
+                  </div>
+                  <div className="text-2xl font-black text-orange-400 font-mono tracking-tight">
+                    {result.report?.priceTruth?.lowestConditionalPrice
+                      ? `₹${result.report.priceTruth.lowestConditionalPrice.toLocaleString('en-IN')}`
+                      : `₹${result.pricingMatrix.finalCheckoutPrice.toLocaleString('en-IN')}`}
+                  </div>
+                  <div className="text-xs text-zinc-300 mt-1 flex items-center justify-between">
+                    <span>At <strong className="text-white">{result.report?.cheapestConditionalOffer?.retailerName || 'Top Store'}</strong></span>
+                    <span className="text-[10px] text-amber-300 font-mono">Conditional</span>
+                  </div>
+                  <p className="text-[11px] text-zinc-400 mt-1 line-clamp-1">
+                    Lowest possible price requiring specific card or EMI plan.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -1013,6 +1085,37 @@ export function TwinDecisionsView() {
                         )}
                       </div>
 
+                      {/* Seller & Verification Status Pills */}
+                      <div className="space-y-1.5">
+                        <div className="text-[11px] text-zinc-400 truncate">
+                          Seller: <span className="text-zinc-200 font-semibold">{offer.sellerName || `${offer.retailerName} Official`}</span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {offer.directLinkVerified ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
+                              <CheckCircle2 className="h-3 w-3" />
+                              <span>Verified Direct PDP</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-400 text-[10px] font-bold border border-amber-500/30">
+                              <AlertTriangle className="h-3 w-3" />
+                              <span>Direct link unverified</span>
+                            </span>
+                          )}
+
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300 text-[10px] font-mono border border-white/[0.06]">
+                            {offer.availability === 'in_stock' ? (
+                              <span className="text-emerald-400">● In Stock</span>
+                            ) : offer.availability === 'out_of_stock' ? (
+                              <span className="text-rose-400">● Out of Stock</span>
+                            ) : (
+                              <span className="text-zinc-400">● Check Merchant</span>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+
                       {/* Store Authentic Product Image (Resilient loader, zero broken images) */}
                       <VerifiedProductImage
                         src={
@@ -1064,10 +1167,10 @@ export function TwinDecisionsView() {
                             </div>
                           )}
 
-                          {displayScenario.bankDiscount > 0 && (
-                            <div className="flex justify-between text-emerald-400 font-bold">
-                              <span>Bank Instant Discount:</span>
-                              <span>-₹{displayScenario.bankDiscount.toLocaleString('en-IN')}</span>
+                          {displayScenario.mandatoryFees > 0 && (
+                            <div className="flex justify-between text-zinc-400">
+                              <span>Platform / Handling Fee:</span>
+                              <span className="font-bold text-amber-400">+₹{displayScenario.mandatoryFees}</span>
                             </div>
                           )}
 
@@ -1078,10 +1181,38 @@ export function TwinDecisionsView() {
                             </div>
                           )}
 
+                          {displayScenario.bankDiscount > 0 && (
+                            <div className="flex justify-between text-emerald-400 font-bold">
+                              <span>Bank Instant Discount:</span>
+                              <span>-₹{displayScenario.bankDiscount.toLocaleString('en-IN')}</span>
+                            </div>
+                          )}
+
+                          {displayScenario.appliedGiftCardValue > 0 && (
+                            <div className="flex justify-between text-amber-300 font-bold">
+                              <span>Gift Card Consumed:</span>
+                              <span>-₹{displayScenario.appliedGiftCardValue.toLocaleString('en-IN')} (Stored)</span>
+                            </div>
+                          )}
+
+                          <div className="flex justify-between items-center text-white font-bold pt-1.5 border-t border-white/[0.08] text-xs">
+                            <span>Final Cash Payable:</span>
+                            <span className="text-emerald-400 font-mono text-sm">₹{displayScenario.finalCashPayable.toLocaleString('en-IN')}</span>
+                          </div>
+
                           {displayScenario.expectedCashback > 0 && (
-                            <div className="flex justify-between text-blue-400 font-bold pt-1 border-t border-white/[0.06]">
-                              <span>Post-Purchase Cashback:</span>
-                              <span>+₹{displayScenario.expectedCashback.toLocaleString('en-IN')}</span>
+                            <div className="space-y-0.5 pt-1.5 border-t border-white/[0.06] text-[10px]">
+                              <div className="flex justify-between text-blue-400 font-bold">
+                                <span>Expected Cashback:</span>
+                                <span className="font-mono">+₹{displayScenario.expectedCashback.toLocaleString('en-IN')}</span>
+                              </div>
+                              <div className="flex justify-between text-zinc-400">
+                                <span>Effective Post-Cashback:</span>
+                                <span className="text-white font-mono font-bold">₹{displayScenario.effectiveCostAfterCashback.toLocaleString('en-IN')}</span>
+                              </div>
+                              <span className="text-[9px] text-zinc-500 block italic leading-tight">
+                                *Credited post-billing; NOT deducted from checkout cash.
+                              </span>
                             </div>
                           )}
                         </div>
@@ -1107,8 +1238,9 @@ export function TwinDecisionsView() {
                         </a>
                       ) : (
                         <div className="space-y-1.5">
-                          <span className="block text-[10px] text-amber-400 font-bold text-center">
-                            Direct purchase link pending
+                          <span className="block text-[10px] text-amber-400 font-bold text-center flex items-center justify-center gap-1">
+                            <AlertTriangle className="h-3 w-3" />
+                            <span>Direct purchase link not verified.</span>
                           </span>
                           <a
                             href={offer.purchaseUrl || offer.productUrl}
