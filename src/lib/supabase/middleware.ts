@@ -50,6 +50,7 @@ const PUBLIC_PATHS = [
   '/api/social/accounts',
   '/api/social/analytics',
   '/api/social/publish',
+  '/api/cron',
   '/terms',
   '/privacy',
   '/about',

@@ -263,6 +263,8 @@ export function TwinDecisionsView() {
   const [generatedShort, setGeneratedShort] = useState<any | null>(null);
   const [copiedCaption, setCopiedCaption] = useState(false);
   const [dealShortLanguage, setDealShortLanguage] = useState<'en' | 'bn' | 'hi'>('en');
+  const [isPublishing, setIsPublishing] = useState<string | null>(null);
+  const [publishFeedback, setPublishFeedback] = useState<string | null>(null);
 
   // Screenshot upload state
   const [screenshotBase64, setScreenshotBase64] = useState<string | null>(null);
@@ -651,6 +653,41 @@ export function TwinDecisionsView() {
       console.error('Failed to generate deal short:', err);
     } finally {
       setDealShortLoading(false);
+    }
+  };
+
+  // Publish Deal Short to YouTube Shorts / Instagram Reels
+  const handlePublishDealShort = async (platform: 'youtube' | 'instagram') => {
+    if (!generatedShort) return;
+    setIsPublishing(platform);
+    setPublishFeedback(null);
+    try {
+      const res = await fetch('/api/twin/deal-shorts/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dealShortId: generatedShort.id,
+          platform,
+          title: generatedShort.title,
+          caption: generatedShort.caption,
+          videoUrl: generatedShort.videoUrl,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        if (data.status === 'published') {
+          setPublishFeedback(`Successfully published to ${platform.toUpperCase()}! Media ID: ${data.platformMediaId || 'Active'}`);
+        } else {
+          setPublishFeedback(`Queued for ${platform.toUpperCase()} Shorts! ${data.message || 'Auto-publishing pipeline ready.'}`);
+        }
+      } else {
+        setPublishFeedback(`Publish notice: ${data.error || 'Failed to dispatch'}`);
+      }
+    } catch {
+      setPublishFeedback('Failed to contact publishing dispatcher.');
+    } finally {
+      setIsPublishing(null);
     }
   };
 
@@ -2228,6 +2265,47 @@ export function TwinDecisionsView() {
                       {copiedCaption ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
                       <span>{copiedCaption ? 'Copied Full Caption & Link!' : 'Copy Caption & Affiliate Link'}</span>
                     </button>
+
+                    {/* One-Click Social Auto-Publish (Engine 2) */}
+                    <div className="space-y-2 pt-1">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 flex items-center justify-between">
+                        <span>One-Click Social Auto-Publish</span>
+                        <span className="text-purple-400 font-mono">Meta &amp; YouTube API</span>
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => handlePublishDealShort('youtube')}
+                          disabled={Boolean(isPublishing)}
+                          className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-red-600/15 hover:bg-red-600/25 text-red-300 border border-red-500/30 text-xs font-bold transition-all cursor-pointer disabled:opacity-50 active:scale-95"
+                        >
+                          {isPublishing === 'youtube' ? (
+                            <RefreshCw className="h-3.5 w-3.5 animate-spin text-red-400" />
+                          ) : (
+                            <Share2 className="h-3.5 w-3.5 text-red-400" />
+                          )}
+                          <span>YouTube Shorts</span>
+                        </button>
+
+                        <button
+                          onClick={() => handlePublishDealShort('instagram')}
+                          disabled={Boolean(isPublishing)}
+                          className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-pink-600/15 hover:bg-pink-600/25 text-pink-300 border border-pink-500/30 text-xs font-bold transition-all cursor-pointer disabled:opacity-50 active:scale-95"
+                        >
+                          {isPublishing === 'instagram' ? (
+                            <RefreshCw className="h-3.5 w-3.5 animate-spin text-pink-400" />
+                          ) : (
+                            <Share2 className="h-3.5 w-3.5 text-pink-400" />
+                          )}
+                          <span>Instagram Reels</span>
+                        </button>
+                      </div>
+
+                      {publishFeedback && (
+                        <div className="p-2.5 rounded-xl bg-zinc-950 border border-purple-500/30 text-[11px] text-purple-300 font-medium">
+                          {publishFeedback}
+                        </div>
+                      )}
+                    </div>
 
                     {/* Language Switcher */}
                     <div className="flex items-center justify-between text-xs pt-1">

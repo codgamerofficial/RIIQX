@@ -85,6 +85,7 @@ export interface CreateWatchlistInput {
   productTitle: string;
   productUrl?: string;
   currentPrice: number;
+  initialPrice?: number;
   targetPrice: number;
   productIdentifier?: string;
   retailerName?: string;
@@ -218,7 +219,7 @@ export class PriceMonitoringService {
                 retailer_name: retailer,
                 seller_name: seller,
                 target_price: input.targetPrice,
-                initial_price: input.currentPrice,
+                initial_price: input.initialPrice || input.currentPrice,
                 lowest_recorded_price: input.currentPrice,
                 variant_attributes: variants,
                 preferred_platform: retailer.toLowerCase().includes('amazon') ? 'amazon' : 'flipkart',
@@ -271,7 +272,7 @@ export class PriceMonitoringService {
         retailerName: retailer,
         sellerName: seller,
         targetPrice: input.targetPrice,
-        initialPrice: input.currentPrice,
+        initialPrice: input.initialPrice || input.currentPrice,
         lowestRecordedPrice: input.currentPrice,
         currentPrice: input.currentPrice,
         variantAttributes: variants,
