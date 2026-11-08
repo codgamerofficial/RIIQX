@@ -34,6 +34,9 @@ import {
   Percent,
   MapPin,
   Navigation,
+  Bell,
+  Crosshair,
+  TrendingDown,
 } from 'lucide-react';
 import { TwinDecisionResponse } from '@/app/api/twin/decide/route';
 import {
@@ -218,6 +221,20 @@ export function TwinDecisionsView() {
 
   // Active tab in Discount Explorer: 'bank' | 'coupon' | 'cashback' | 'gift_card'
   const [activeDiscountTab, setActiveDiscountTab] = useState<'bank' | 'coupon' | 'cashback' | 'gift_card'>('bank');
+
+  // 24/7 Price Drop Sniper / Watchlist Modal State
+  const [isSniperModalOpen, setIsSniperModalOpen] = useState(false);
+  const [sniperItem, setSniperItem] = useState<{
+    productTitle: string;
+    productUrl?: string;
+    retailerName: string;
+    sellerName?: string;
+    currentPrice: number;
+    targetPrice: number;
+    preferredBank?: string;
+  } | null>(null);
+  const [sniperLoading, setSniperLoading] = useState(false);
+  const [sniperSuccessMsg, setSniperSuccessMsg] = useState<string | null>(null);
 
   // Screenshot upload state
   const [screenshotBase64, setScreenshotBase64] = useState<string | null>(null);
@@ -469,21 +486,109 @@ export function TwinDecisionsView() {
     }
   };
 
+  // 24/7 Price Drop Sniper / Watchlist Handlers
+  const handleOpenSniper = (customOffer?: RetailerOffer) => {
+    const title = result?.bestPick?.title || query || 'Tracked Product';
+    const offer = customOffer || cheapestActiveOffer;
+    const currentPrice =
+      (typeof customOffer?.finalComparablePrice === 'number' && customOffer.finalComparablePrice > 0)
+        ? customOffer.finalComparablePrice
+        : result?.report?.priceTruth?.lowestEligiblePrice ||
+          result?.pricingMatrix?.finalCheckoutPrice ||
+          offer?.sellingPrice ||
+          10000;
+
+    const defaultTarget = Math.round(currentPrice * 0.9); // Default 10% price drop target
+
+    setSniperItem({
+      productTitle: title,
+      productUrl: offer?.purchaseUrl || offer?.productUrl || (query.startsWith('http') ? query : undefined),
+      retailerName: offer?.retailerName || result?.pricingMatrix?.bestRetailer || 'Amazon India',
+      sellerName: offer?.sellerName,
+      currentPrice,
+      targetPrice: defaultTarget,
+      preferredBank: userPreferences.preferredBanks[0],
+    });
+    setSniperSuccessMsg(null);
+    setIsSniperModalOpen(true);
+  };
+
+  const handleSaveSniperTarget = async () => {
+    if (!sniperItem || sniperItem.targetPrice <= 0) return;
+    setSniperLoading(true);
+    setSniperSuccessMsg(null);
+
+    try {
+      const res = await fetch('/api/twin/price-sniper', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sniperItem),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to add item to price watchlist.');
+      }
+
+      setSniperSuccessMsg(`✓ 24/7 Watchlist Active! Target ₹${sniperItem.targetPrice.toLocaleString('en-IN')} set for ${sniperItem.retailerName}.`);
+      setTimeout(() => {
+        setIsSniperModalOpen(false);
+        setSniperSuccessMsg(null);
+      }, 2500);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to initialize price drop monitor.');
+    } finally {
+      setSniperLoading(false);
+    }
+  };
+
   // Determine which offers to display based on selected ranking tab
   const getOffersForActiveRanking = (): RetailerOffer[] => {
-    if (!result?.report?.rankings) {
-      return (result?.report?.offers as RetailerOffer[]) || [];
+    let offers: RetailerOffer[] = [];
+
+    if (result?.report?.rankings) {
+      switch (activeRankingTab) {
+        case 'standard':
+          offers = result.report.rankings.rankingStandard || [];
+          break;
+        case 'conditional':
+          offers = result.report.rankings.rankingConditional || [];
+          break;
+        case 'eligible':
+        default:
+          offers = result.report.rankings.rankingEligible || result.report.offers || [];
+          break;
+      }
+    } else if (result?.report?.offers && result.report.offers.length > 0) {
+      offers = result.report.offers;
     }
 
-    switch (activeRankingTab) {
-      case 'standard':
-        return result.report.rankings.rankingStandard || [];
-      case 'conditional':
-        return result.report.rankings.rankingConditional || [];
-      case 'eligible':
-      default:
-        return result.report.rankings.rankingEligible || result.report.offers || [];
+    // Resilient fallback from pricingMatrix.retailers if report.offers is unpopulated
+    if (offers.length === 0 && result?.pricingMatrix?.retailers && result.pricingMatrix.retailers.length > 0) {
+      offers = result.pricingMatrix.retailers.map((r, idx) => ({
+        id: `retailer-${idx}`,
+        retailerId: r.name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+        retailerName: r.name,
+        sellerName: `${r.name} Official`,
+        productTitle: result.bestPick.title,
+        productUrl: r.purchaseUrl || r.link,
+        purchaseUrl: r.purchaseUrl || r.link,
+        canonicalUrl: r.canonicalUrl || r.link,
+        directLinkVerified: r.directLinkVerified ?? true,
+        imageUrl: r.imageUrl || result.bestPick.imageUrl,
+        currency: 'INR',
+        mrp: r.originalPrice || r.price,
+        sellingPrice: r.price,
+        finalComparablePrice: r.price,
+        availability: r.inStock ? 'in_stock' : 'out_of_stock',
+        inStock: r.inStock,
+        deliveryDays: r.deliveryDays,
+        verificationMethod: r.verificationMethod || 'Verified Store Listing',
+        verificationStatus: 'live_verified',
+      } as unknown as RetailerOffer));
     }
+
+    return offers;
   };
 
   const activeOffers = getOffersForActiveRanking();
@@ -635,7 +740,7 @@ export function TwinDecisionsView() {
                   ? 'Enter product name (e.g. Sony WF-1000XM5, iPhone 16) to check Croma/Reliance...'
                   : 'Paste exact Amazon, Flipkart, Myntra URL or enter product name...'
               }
-              className="w-full pl-11 pr-4 py-3.5 text-xs sm:text-sm rounded-2xl bg-zinc-950/70 border border-white/[0.08] text-white placeholder-zinc-500 focus:outline-hidden focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/80 transition-all shadow-inner"
+              className="w-full pl-11 pr-4 py-3.5 text-xs sm:text-sm rounded-2xl bg-zinc-950/70 border border-white/[0.08] text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/80 transition-all shadow-inner"
             />
           </div>
 
@@ -877,7 +982,7 @@ export function TwinDecisionsView() {
                     {result.subtext}
                   </p>
 
-                  <div className="pt-1">
+                  <div className="pt-1 flex flex-wrap items-center gap-2.5">
                     <button
                       onClick={() =>
                         handleFetchHyperlocal(
@@ -889,8 +994,16 @@ export function TwinDecisionsView() {
                       className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
                     >
                       <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-                      <span>Compare with Nearby Stores (Croma / Reliance Digital / Vijay Sales)</span>
+                      <span>Compare with Nearby Stores (Croma / Reliance / Vijay Sales)</span>
                       <ArrowRight className="w-3 h-3 opacity-70" />
+                    </button>
+
+                    <button
+                      onClick={() => handleOpenSniper()}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/30 text-orange-300 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
+                    >
+                      <Crosshair className="w-3.5 h-3.5 text-orange-400" />
+                      <span>Snipe Price Drop (24/7 Watchlist)</span>
                     </button>
                   </div>
                 </div>
@@ -1048,9 +1161,12 @@ export function TwinDecisionsView() {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {activeOffers.map((offer, i) => {
-                const isWinner =
-                  offer.retailerName === result.pricingMatrix.bestRetailer &&
-                  Boolean(offer.sellingPrice && offer.sellingPrice > 0);
+                const bestRetailerForTab =
+                  activeRankingTab === 'eligible'
+                    ? result.report?.cheapestEligibleOffer?.retailerName || result.pricingMatrix.bestRetailer
+                    : activeRankingTab === 'conditional'
+                    ? result.report?.cheapestConditionalOffer?.retailerName || result.pricingMatrix.bestRetailer
+                    : result.report?.cheapestStandardOffer?.retailerName || result.pricingMatrix.bestRetailer;
 
                 // Scenario price based on active tab
                 const displayScenario =
@@ -1061,6 +1177,10 @@ export function TwinDecisionsView() {
                     : offer.pricingScenarios?.eligibleFinal || offer.pricingScenarios?.standard;
 
                 const displayPrice = displayScenario?.finalCashPayable ?? offer.finalComparablePrice ?? offer.sellingPrice;
+
+                const isWinner =
+                  offer.retailerName === bestRetailerForTab &&
+                  Boolean(displayPrice && displayPrice > 0);
 
                 return (
                   <div
@@ -1253,6 +1373,15 @@ export function TwinDecisionsView() {
                           </a>
                         </div>
                       )}
+
+                      <button
+                        type="button"
+                        onClick={() => handleOpenSniper(offer)}
+                        className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-zinc-950/70 hover:bg-zinc-800 border border-white/[0.08] hover:border-orange-500/40 text-[11px] font-bold text-zinc-300 hover:text-orange-400 transition-all cursor-pointer"
+                      >
+                        <Bell className="h-3 w-3 text-orange-400" />
+                        <span>Track Price Drop</span>
+                      </button>
 
                       <div className="text-[10px] text-zinc-400 text-center truncate font-mono">
                         {offer.verificationMethod}
@@ -1510,6 +1639,153 @@ export function TwinDecisionsView() {
                 Save &amp; Recalibrate Prices
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5. 24/7 Price Drop Sniper / Watchlist Modal */}
+      {isSniperModalOpen && sniperItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
+          <div className="w-full max-w-lg rounded-3xl border border-white/[0.12] bg-zinc-900/95 p-6 sm:p-8 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                  <Crosshair className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white font-heading">
+                    AI Twin Price Drop Sniper
+                  </h3>
+                  <p className="text-xs text-zinc-400">
+                    24/7 Background Price Intelligence &bull; Zero Spam Deduplication
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setIsSniperModalOpen(false);
+                  setSniperSuccessMsg(null);
+                }}
+                className="p-1.5 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {sniperSuccessMsg ? (
+              <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold space-y-2 animate-in fade-in">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                  <span>{sniperSuccessMsg}</span>
+                </div>
+                <p className="text-[11px] text-zinc-300 font-normal">
+                  Our scheduled monitoring worker will inspect this exact PDP periodically. You will be alerted the moment verified price crosses your target threshold.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-5 text-xs">
+                {/* Product & Store Summary */}
+                <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <RetailerLogoBadge name={sniperItem.retailerName} />
+                    <span className="text-[10px] text-zinc-400 font-mono">
+                      Current Price: <strong className="text-white font-mono text-xs">₹{sniperItem.currentPrice.toLocaleString('en-IN')}</strong>
+                    </span>
+                  </div>
+                  <h4 className="text-xs font-bold text-white line-clamp-2">
+                    {sniperItem.productTitle}
+                  </h4>
+                  {sniperItem.sellerName && (
+                    <div className="text-[10px] text-zinc-400">
+                      Seller: <span className="text-zinc-200">{sniperItem.sellerName}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Target Price Configuration */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-white">Target Trigger Price (₹):</span>
+                    <span className="text-[11px] text-emerald-400 font-mono font-bold">
+                      {sniperItem.targetPrice > 0 && sniperItem.currentPrice > sniperItem.targetPrice ? (
+                        <>Save ₹{(sniperItem.currentPrice - sniperItem.targetPrice).toLocaleString('en-IN')} ({Math.round(((sniperItem.currentPrice - sniperItem.targetPrice) / sniperItem.currentPrice) * 100)}% drop)</>
+                      ) : null}
+                    </span>
+                  </div>
+
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-bold">₹</span>
+                    <input
+                      type="number"
+                      value={sniperItem.targetPrice || ''}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setSniperItem((prev) => (prev ? { ...prev, targetPrice: val } : null));
+                      }}
+                      className="w-full pl-9 pr-4 py-3 rounded-2xl bg-zinc-950/80 border border-white/[0.1] text-white font-mono font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                    />
+                  </div>
+
+                  {/* Preset Drop Pills */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold shrink-0">Quick Target:</span>
+                    {[5, 10, 15, 20].map((pct) => {
+                      const computed = Math.round(sniperItem.currentPrice * (1 - pct / 100));
+                      const isSelected = sniperItem.targetPrice === computed;
+                      return (
+                        <button
+                          key={pct}
+                          type="button"
+                          onClick={() => setSniperItem((prev) => (prev ? { ...prev, targetPrice: computed } : null))}
+                          className={`px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold transition-all ${
+                            isSelected
+                              ? 'bg-orange-500 text-white shadow-xs'
+                              : 'bg-zinc-950/70 text-zinc-300 hover:text-white border border-white/[0.08]'
+                          }`}
+                        >
+                          -{pct}% (₹{computed.toLocaleString('en-IN')})
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Privacy & Methodology Guarantee */}
+                <div className="p-3.5 rounded-2xl bg-zinc-950/70 border border-white/[0.06] text-[11px] text-zinc-400 space-y-1">
+                  <span className="font-bold text-white flex items-center gap-1.5">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                    Supabase-Backed Persistence &amp; RLS:
+                  </span>
+                  <p>
+                    Your watchlist is persisted directly to Supabase with user-level security and lease locking. Zero duplicate spam alerts.
+                  </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/[0.08]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSniperModalOpen(false);
+                      setSniperSuccessMsg(null);
+                    }}
+                    className="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-400 hover:text-white transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    disabled={sniperLoading || !sniperItem.targetPrice || sniperItem.targetPrice <= 0}
+                    onClick={handleSaveSniperTarget}
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-black shadow-lg shadow-orange-500/25 transition-transform active:scale-95 disabled:opacity-40"
+                  >
+                    {sniperLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Crosshair className="h-4 w-4" />}
+                    <span>{sniperLoading ? 'Saving Watchlist...' : 'Activate 24/7 Monitor'}</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

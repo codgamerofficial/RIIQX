@@ -11,10 +11,11 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "node tests/test-riiqx-finance.mjs",
-    "test:all": "node tests/test-riiqx.mjs && node tests/test-riiqx-finance.mjs && node tests/test-mobile-app.mjs",
+    "test:all": "node tests/test-riiqx.mjs && node tests/test-riiqx-finance.mjs && node tests/test-ai-infrastructure.mjs && npx tsx tests/test-verified-buying-links-and-pricing-engine.mjs && npx tsx tests/test-price-monitoring-and-watchlist.mjs && node tests/test-mobile-app.mjs",
     "test:riiqx": "node tests/test-riiqx.mjs",
     "test:buying-engine": "npx tsx tests/test-verified-buying-links-and-pricing-engine.mjs",
     "test:price-monitoring": "npx tsx tests/test-price-monitoring-and-watchlist.mjs",
+    "test:monitoring": "npx tsx tests/test-price-monitoring-and-watchlist.mjs",
     "test:finance": "node tests/test-riiqx-finance.mjs",
     "test:ai": "node tests/test-ai-infrastructure.mjs",
     "test:creator": "node tests/test-creator-studio-production.mjs",
@@ -59,6 +60,7 @@
     "eslint-config-next": "14.2.18",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
+    "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }
 }

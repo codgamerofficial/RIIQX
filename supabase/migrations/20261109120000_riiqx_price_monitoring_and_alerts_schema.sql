@@ -154,3 +154,4 @@ DROP POLICY IF EXISTS "Service role can insert price drop alerts" ON public.pric
 CREATE POLICY "Service role can insert price drop alerts"
   ON public.price_drop_alerts FOR INSERT
   WITH CHECK (auth.role() = 'service_role');
+
