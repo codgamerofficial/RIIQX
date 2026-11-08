@@ -22,7 +22,8 @@ export function decodeHtmlEntities(str: string): string {
 
 export class ProductURLExtractor {
   /**
-   * SSRF Protection: Blocks loopback, private IPv4/IPv6, link-local, and cloud metadata targets
+   * SSRF Protection: Blocks loopback, private IPv4/IPv6, link-local, cloud metadata targets,
+   * integer/hex IP formats, and internal local domains
    */
   public static isSafeUrl(rawUrl: string): boolean {
     try {
@@ -33,9 +34,10 @@ export class ProductURLExtractor {
         return false;
       }
 
-      const host = parsed.hostname.toLowerCase();
+      // Strip port and enclosing brackets for IPv6
+      const host = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, '');
 
-      // Block localhost, loopback, private subnets, cloud metadata
+      // Block known dangerous hostnames
       const blockedHosts = [
         'localhost',
         '127.0.0.1',
@@ -43,13 +45,41 @@ export class ProductURLExtractor {
         '::1',
         '169.254.169.254', // AWS / GCP metadata
         'metadata.google.internal',
+        'instance-data',
       ];
 
       if (blockedHosts.includes(host)) {
         return false;
       }
 
-      // Block RFC1918 private IPv4 ranges: 10.x.x.x, 172.16-31.x.x, 192.168.x.x
+      // Block internal domain suffixes
+      if (host.endsWith('.local') || host.endsWith('.internal') || host.endsWith('.lan') || host.endsWith('.corp')) {
+        return false;
+      }
+
+      // Block integer IP representations (e.g. http://2130706433)
+      if (/^\d+$/.test(host)) {
+        return false;
+      }
+
+      // Block hex IP representations (e.g. 0x7f.0.0.1)
+      if (/0x[0-9a-f]+/i.test(host)) {
+        return false;
+      }
+
+      // Block IPv6 link-local, site-local, and IPv4-mapped loopback
+      if (
+        host.startsWith('fe80:') ||
+        host.startsWith('fc00:') ||
+        host.startsWith('fd00:') ||
+        host.startsWith('::ffff:127.') ||
+        host.startsWith('::ffff:10.') ||
+        host.startsWith('::ffff:192.168.')
+      ) {
+        return false;
+      }
+
+      // Block RFC1918 private IPv4 ranges: 10.x.x.x, 172.16-31.x.x, 192.168.x.x, 127.x.x.x, 169.254.x.x
       const ipv4Regex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
       const match = host.match(ipv4Regex);
       if (match) {
@@ -61,6 +91,7 @@ export class ProductURLExtractor {
         if (octet1 === 192 && octet2 === 168) return false;
         if (octet1 === 127) return false;
         if (octet1 === 169 && octet2 === 254) return false;
+        if (octet1 === 0) return false;
       }
 
       return true;
@@ -190,6 +221,11 @@ export class ProductURLExtractor {
       if (response.status === 403 || response.status === 503) {
         isAntiBotBlocked = true;
       } else if (response.ok) {
+        // Enforce safe destination validation on the final resolved redirect URL before reading response
+        if (response.url && !this.isSafeUrl(response.url)) {
+          throw new Error('SSRF Block: Redirect target is an unsafe or private destination.');
+        }
+
         html = await response.text();
 
         // Update canonical URL and metadata from the resolved destination URL

@@ -21,6 +21,7 @@ mobile/node_modules/
 *.pem
 scratch/
 .temp/
+.data/
 *.log
 public/uploads/generated/
 public/uploads/videos/

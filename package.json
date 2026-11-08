@@ -14,6 +14,7 @@
     "test:all": "node tests/test-riiqx.mjs && node tests/test-riiqx-finance.mjs && node tests/test-mobile-app.mjs",
     "test:riiqx": "node tests/test-riiqx.mjs",
     "test:buying-engine": "npx tsx tests/test-verified-buying-links-and-pricing-engine.mjs",
+    "test:price-monitoring": "npx tsx tests/test-price-monitoring-and-watchlist.mjs",
     "test:finance": "node tests/test-riiqx-finance.mjs",
     "test:ai": "node tests/test-ai-infrastructure.mjs",
     "test:creator": "node tests/test-creator-studio-production.mjs",

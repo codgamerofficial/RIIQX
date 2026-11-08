@@ -4,7 +4,7 @@
 // =============================================================================
 
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/lib/types/database.types';
+import type { Database } from '../types/database.types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ojtngzqsrdralrhipjzt.supabase.co';
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
