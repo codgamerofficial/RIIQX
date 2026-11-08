@@ -214,6 +214,19 @@ export class TwinRepository {
       // Seed default transparent baseline memories
       const initial: TwinMemory[] = [
         {
+          id: `mem-${userId}-0`,
+          userId,
+          category: 'lifestyle',
+          memoryText: 'User is Saswata Dey (Riik) — Founder, Lead Architect, and Creator of RIIQX. Academic background from KIIT University. Hometown is Contai (Kanthi), Purba Medinipur, West Bengal, India.',
+          memoryType: 'confirmed_preference',
+          confidenceScore: 1.0,
+          sourceType: 'direct_user_statement',
+          verifiedByUser: true,
+          isActive: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
           id: `mem-${userId}-1`,
           userId,
           category: 'brand',
@@ -241,6 +254,19 @@ export class TwinRepository {
         },
         {
           id: `mem-${userId}-3`,
+          userId,
+          category: 'lifestyle',
+          memoryText: 'Bilingual in Bengali (বাংলা) and English. Appreciates culturally authentic and geographically precise regional knowledge of West Bengal and Contai.',
+          memoryType: 'confirmed_preference',
+          confidenceScore: 0.99,
+          sourceType: 'direct_user_statement',
+          verifiedByUser: true,
+          isActive: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: `mem-${userId}-4`,
           userId,
           category: 'health',
           memoryText: 'Sensitive skin type in humid Indian climates; rejects heavy comedogenic oils.',

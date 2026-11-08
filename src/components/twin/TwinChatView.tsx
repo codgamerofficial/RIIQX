@@ -6,20 +6,16 @@
 // Ultra-Modern Trending Obsidian Glassmorphism • Zero Simulation
 // =============================================================================
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Sparkles,
   Send,
-  Paperclip,
   ShieldCheck,
   Brain,
   CheckCircle2,
   AlertCircle,
-  HelpCircle,
   RefreshCw,
   ExternalLink,
-  ChevronRight,
-  Sliders,
   Plus,
   Trash2,
   Scale,
@@ -39,7 +35,7 @@ interface Message {
   timestamp?: string;
 }
 
-// AI Twin Glyph / Avatar Component (Replaces legacy single-letter avatar)
+// AI Twin Glyph / Avatar Component
 function TwinAvatar({ isThinking = false }: { isThinking?: boolean }) {
   return (
     <div className="relative flex items-center justify-center shrink-0">
@@ -54,12 +50,228 @@ function TwinAvatar({ isThinking = false }: { isThinking?: boolean }) {
   );
 }
 
+// Code Block with Copy Action
+function TwinCodeBlock({ code, lang }: { code: string; lang?: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="my-3 rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-950 text-zinc-100 font-mono text-xs shadow-xl">
+      <div className="flex items-center justify-between px-3.5 py-1.5 bg-zinc-900 border-b border-zinc-800 text-[11px] text-zinc-400">
+        <span className="font-bold uppercase tracking-wider text-orange-400">{lang || 'CODE'}</span>
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
+        >
+          {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+          <span>{copied ? 'Copied' : 'Copy'}</span>
+        </button>
+      </div>
+      <pre className="p-3.5 overflow-x-auto text-[11.5px] leading-relaxed">
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
+}
+
+// Tokenizes inline text with citations [^1], **bold**, `code`, *italic*, and [link](url)
+function renderTwinInlineText(text: string): React.ReactNode {
+  if (!text) return '';
+
+  const tokenRegex = /(\[\^[0-9]+\]|\[[0-9]+\]|\[[^\]]+\]\([^)]+\)|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+  const parts = text.split(tokenRegex);
+
+  return parts.map((part, i) => {
+    if (!part) return null;
+
+    // Citation marker [^1] or [1]
+    const citeMatch = part.match(/^\[(?:\^)?([0-9]+)\]$/);
+    if (citeMatch) {
+      return (
+        <span
+          key={i}
+          className="inline-flex items-center px-1.5 py-0.2 mx-0.5 rounded-md bg-orange-500/15 border border-orange-500/30 text-orange-400 text-[10px] font-mono font-bold align-middle hover:bg-orange-500/30 transition-colors select-none"
+          title={`Verified Source [${citeMatch[1]}]`}
+        >
+          {citeMatch[1]}
+        </span>
+      );
+    }
+
+    // Markdown link [Label](url)
+    const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (linkMatch) {
+      return (
+        <a
+          key={i}
+          href={linkMatch[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-orange-400 hover:text-orange-300 underline inline-flex items-center gap-0.5 font-medium transition-colors"
+        >
+          <span>{linkMatch[1]}</span>
+          <ExternalLink className="w-2.5 h-2.5 inline shrink-0" />
+        </a>
+      );
+    }
+
+    // Bold text **bold**
+    if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
+      return (
+        <strong key={i} className="font-bold text-white tracking-wide">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+
+    // Inline code `code`
+    if (part.startsWith('`') && part.endsWith('`') && part.length >= 2) {
+      return (
+        <code
+          key={i}
+          className="px-1.5 py-0.5 mx-0.5 rounded-md bg-zinc-800 border border-white/10 font-mono text-[11px] text-amber-300"
+        >
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+
+    // Italic text *italic*
+    if (part.startsWith('*') && part.endsWith('*') && part.length >= 2) {
+      return (
+        <em key={i} className="italic text-zinc-400">
+          {part.slice(1, -1)}
+        </em>
+      );
+    }
+
+    return <React.Fragment key={i}>{part}</React.Fragment>;
+  });
+}
+
+// Master Twin Markdown & Section Formatter
+function TwinMarkdownRenderer({ content }: { content: string }) {
+  const parts = useMemo(() => {
+    const segments: Array<{ type: 'text' | 'code'; text: string; lang?: string }> = [];
+    const blockRegex = /(?:```([a-zA-Z0-9_-]*)\n([\s\S]*?)```)/g;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = blockRegex.exec(content)) !== null) {
+      if (match.index > lastIndex) {
+        segments.push({ type: 'text', text: content.slice(lastIndex, match.index) });
+      }
+      segments.push({
+        type: 'code',
+        lang: match[1] || 'plaintext',
+        text: (match[2] || '').trimEnd(),
+      });
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < content.length) {
+      segments.push({ type: 'text', text: content.slice(lastIndex) });
+    }
+
+    return segments;
+  }, [content]);
+
+  return (
+    <div className="space-y-3 text-xs sm:text-sm leading-relaxed text-zinc-100 font-sans">
+      {parts.map((part, pIdx) => {
+        if (part.type === 'code') {
+          return <TwinCodeBlock key={pIdx} code={part.text} lang={part.lang} />;
+        }
+
+        const lines = part.text.split('\n');
+        return (
+          <div key={pIdx} className="space-y-2">
+            {lines.map((rawLine, lIdx) => {
+              const line = rawLine.trim();
+              if (!line) return <div key={lIdx} className="h-1.5" />;
+
+              // Clean up malformed headings like "* Heading **" or "** Heading **" or "Heading **" or "### Heading"
+              const headingMatch =
+                line.match(/^\*?\s*\*\*?([^*]+)\*\*?\s*$/) ||
+                line.match(/^(?:###|##|#)\s+(.*)/) ||
+                (line.endsWith('**') && !line.startsWith('- ') && !line.startsWith('1. ') && line.match(/^([^:*]+)\s*\*\*$/));
+
+              if (headingMatch && !line.startsWith('- ') && !line.startsWith('1. ') && !line.startsWith('>')) {
+                const headingText = (headingMatch[1] || headingMatch[0])
+                  .replace(/^(?:###|##|#|\*|\*)\s*/, '')
+                  .replace(/\*+$/, '')
+                  .trim();
+                return (
+                  <div key={lIdx} className="pt-2 pb-0.5 flex items-center gap-2">
+                    <span className="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-orange-400 to-amber-500 shadow-[0_0_8px_#f97316] shrink-0" />
+                    <h4 className="text-xs sm:text-sm font-black text-white tracking-wide font-heading">
+                      {renderTwinInlineText(headingText)}
+                    </h4>
+                  </div>
+                );
+              }
+
+              // Blockquotes "> quote"
+              if (line.startsWith('> ')) {
+                return (
+                  <blockquote key={lIdx} className="border-l-2 border-orange-400/80 bg-orange-500/5 rounded-r-xl pl-3 py-1.5 my-1 text-zinc-300 italic">
+                    {renderTwinInlineText(line.slice(2))}
+                  </blockquote>
+                );
+              }
+
+              // Numbered list items e.g. "1. Item"
+              const numMatch = line.match(/^(\d+)\.\s+(.*)/);
+              if (numMatch) {
+                return (
+                  <div key={lIdx} className="flex items-start gap-2.5 pl-1 my-1">
+                    <span className="flex h-5 w-5 rounded-lg bg-orange-500/15 border border-orange-500/30 text-orange-400 text-[10px] font-bold font-mono items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                      {numMatch[1]}
+                    </span>
+                    <div className="flex-1 text-zinc-200 leading-relaxed">
+                      {renderTwinInlineText(numMatch[2])}
+                    </div>
+                  </div>
+                );
+              }
+
+              // Bullet list items e.g. "- Item" or "* Item"
+              if (line.startsWith('- ') || line.startsWith('* ')) {
+                return (
+                  <div key={lIdx} className="flex items-start gap-2.5 pl-1 my-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400 mt-2 shrink-0 shadow-[0_0_6px_#f97316]" />
+                    <div className="flex-1 text-zinc-200 leading-relaxed">
+                      {renderTwinInlineText(line.slice(2))}
+                    </div>
+                  </div>
+                );
+              }
+
+              // Normal text line
+              return (
+                <p key={lIdx} className="text-zinc-200 leading-relaxed">
+                  {renderTwinInlineText(line)}
+                </p>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function TwinChatView() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
       content:
-        'Hello! I am your RIIQX Personal Intelligence Twin. I remember your budget tiers, preferred brands, and dietary specs. What decision, purchase, or opportunity would you like to explore today?',
+        'Hello Saswata! I am your RIIQX Personal Intelligence Twin. Grounded in your budget rules, regional context (Contai, West Bengal), and preferred tech ecosystem. What decision, research, or opportunity would you like to explore today?',
       timestamp: 'Just now',
     },
   ]);
@@ -160,7 +372,6 @@ export function TwinChatView() {
         }
       }
     } catch {
-      // Fallback response with grounded tone
       setMessages((prev) => [
         ...prev,
         {
@@ -225,6 +436,13 @@ export function TwinChatView() {
     return m.category === memoryFilter;
   });
 
+  const suggestedChips = [
+    '📍 Contai local services & RTO guide',
+    '🎓 KIIT University tech projects',
+    '💰 Best non-comedogenic sunscreen under ₹700',
+    '⚡ Optimize subscription spend this month',
+  ];
+
   return (
     <div className="flex-1 flex overflow-hidden bg-[#09090b] text-[#F4F4F6] relative selection:bg-orange-500/30">
       {/* Background Ambient Radial Glows */}
@@ -257,7 +475,7 @@ export function TwinChatView() {
 
           <button
             onClick={() => setIsMemoryDrawerOpen(!isMemoryDrawerOpen)}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all shadow-md active:scale-95 ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer ${
               isMemoryDrawerOpen
                 ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-orange-500/20'
                 : 'bg-zinc-900/80 hover:bg-zinc-800 text-zinc-200 border border-white/[0.08] hover:border-orange-500/40'
@@ -344,17 +562,21 @@ export function TwinChatView() {
                       : 'bg-zinc-900/80 backdrop-blur-xl text-zinc-100 border border-white/[0.08] rounded-tl-xs shadow-xl'
                   }`}
                 >
-                  <div className="whitespace-pre-wrap">{m.content}</div>
+                  {m.role === 'user' ? (
+                    <div className="whitespace-pre-wrap">{m.content}</div>
+                  ) : (
+                    <TwinMarkdownRenderer content={m.content} />
+                  )}
 
                   {/* Footnotes & Citations */}
                   {m.citations && m.citations.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-white/[0.08] space-y-1.5">
                       <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3 text-emerald-400" /> Verifiable Footnotes:
+                        <CheckCircle2 className="h-3 w-3 text-emerald-400" /> Verifiable Sources:
                       </span>
                       <ul className="text-[11px] space-y-1">
                         {m.citations.map((c, i) => (
-                          <li key={i} className="text-blue-400 flex items-center gap-1.5 hover:underline">
+                          <li key={i} className="text-orange-400 flex items-center gap-1.5 hover:underline">
                             <ExternalLink className="h-3 w-3 shrink-0" />
                             <span className="truncate">{c}</span>
                           </li>
@@ -368,7 +590,7 @@ export function TwinChatView() {
                     <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => handleCopyMessage(m.content, idx)}
-                        className="p-1 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+                        className="p-1 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
                         title="Copy message"
                       >
                         {copiedIndex === idx ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
@@ -391,7 +613,7 @@ export function TwinChatView() {
               <TwinAvatar isThinking={true} />
               <div className="p-4 sm:p-5 rounded-3xl bg-zinc-900/80 backdrop-blur-xl border border-white/[0.08] rounded-tl-xs flex items-center gap-3 text-xs text-zinc-300 shadow-xl">
                 <RefreshCw className="h-4 w-4 animate-spin text-orange-400" />
-                <span>Consulting your memory &amp; verified price truth ledger...</span>
+                <span>Consulting your memory &amp; verified knowledge ledger...</span>
               </div>
             </div>
           )}
@@ -402,18 +624,13 @@ export function TwinChatView() {
         {/* Quick Suggestion Chips */}
         <div className="px-6 py-2.5 flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-white/[0.06] bg-zinc-950/60 backdrop-blur-md">
           <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider shrink-0">
-            Suggested Moves:
+            Suggested:
           </span>
-          {[
-            'Should I buy Apple AirPods Pro 2 or Sony XM5?',
-            'Best non-comedogenic sunscreen under ₹700',
-            'Find lowest price for Philips Air Fryer',
-            'Save ₹5,000 this month: optimize subscriptions',
-          ].map((chip, idx) => (
+          {suggestedChips.map((chip, idx) => (
             <button
               key={idx}
               onClick={() => handleSendMessage(chip)}
-              className="shrink-0 text-[11px] font-medium text-zinc-300 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 border border-white/[0.08] hover:border-orange-500/40 px-3.5 py-1.5 rounded-full transition-all"
+              className="shrink-0 text-[11px] font-medium text-zinc-300 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 border border-white/[0.08] hover:border-orange-500/40 px-3.5 py-1.5 rounded-full transition-all cursor-pointer"
             >
               {chip}
             </button>
@@ -433,13 +650,13 @@ export function TwinChatView() {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Ask your Twin a question, compare a product, or paste a shopping URL..."
+              placeholder="Ask your Twin a question, local context, or analyze a decision..."
               className="flex-1 bg-transparent text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-hidden"
             />
             <button
               type="submit"
               disabled={!inputText.trim() || loading}
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg shadow-orange-500/25 disabled:opacity-30 transition-transform active:scale-95"
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg shadow-orange-500/25 disabled:opacity-30 transition-transform active:scale-95 cursor-pointer"
             >
               <Send className="h-4 w-4" />
             </button>
@@ -464,11 +681,11 @@ export function TwinChatView() {
 
           {/* Category Filter Pills */}
           <div className="p-3 border-b border-white/[0.06] flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-            {['all', 'brand', 'budget', 'food', 'tech', 'health'].map((cat) => (
+            {['all', 'lifestyle', 'brand', 'budget', 'food', 'tech', 'health'].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setMemoryFilter(cat)}
-                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer ${
                   memoryFilter === cat
                     ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs'
                     : 'bg-zinc-800/80 text-zinc-400 hover:text-white'
@@ -488,7 +705,7 @@ export function TwinChatView() {
               type="text"
               value={newMemoryText}
               onChange={(e) => setNewMemoryText(e.target.value)}
-              placeholder="e.g. Never buy synthetic polyester clothing"
+              placeholder="e.g. Creator & Architect of RIIQX"
               className="w-full text-xs p-3 rounded-xl bg-zinc-950/80 border border-white/[0.08] text-white placeholder-zinc-500 focus:outline-hidden focus:border-orange-500"
             />
             <div className="flex items-center justify-between gap-2">
@@ -497,17 +714,17 @@ export function TwinChatView() {
                 onChange={(e) => setNewMemoryCat(e.target.value as any)}
                 className="text-[11px] p-2 rounded-xl bg-zinc-950/80 border border-white/[0.08] text-white focus:outline-hidden font-bold"
               >
+                <option value="lifestyle">Lifestyle</option>
                 <option value="brand">Brand</option>
                 <option value="budget">Budget</option>
                 <option value="food">Food</option>
-                <option value="lifestyle">Lifestyle</option>
                 <option value="tech">Tech</option>
                 <option value="health">Health</option>
               </select>
               <button
                 type="submit"
                 disabled={!newMemoryText.trim()}
-                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-4 py-2 text-xs font-bold disabled:opacity-40 transition-transform active:scale-95 shadow-md shadow-orange-500/20"
+                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-4 py-2 text-xs font-bold disabled:opacity-40 transition-transform active:scale-95 shadow-md shadow-orange-500/20 cursor-pointer"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>Save</span>
@@ -538,7 +755,7 @@ export function TwinChatView() {
                     </span>
                     <button
                       onClick={() => handleDeleteMemory(m.id)}
-                      className="text-zinc-500 hover:text-rose-400 transition-colors p-1"
+                      className="text-zinc-500 hover:text-rose-400 transition-colors p-1 cursor-pointer"
                       title="Delete memory"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
