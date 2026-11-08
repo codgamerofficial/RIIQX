@@ -415,14 +415,14 @@ async function runTests() {
       targetPrice: 800,
     });
 
-    // Worker 1 executes batch
-    const batch1 = await PriceMonitoringService.executeScheduledMonitoringBatch(5);
+    // Worker 1 executes batch on all due items
+    const batch1 = await PriceMonitoringService.executeScheduledMonitoringBatch(100);
     assert(batch1.processedCount >= 1, `Worker 1 picked up due item for inspection (Processed: ${batch1.processedCount})`);
 
-    // Worker 2 runs immediately after: all picked items should now be leased
-    const batch2 = await PriceMonitoringService.executeScheduledMonitoringBatch(5);
-    // Since item was just checked, due count for leased item is 0
-    assert(batch2.processedCount === 0 || batch2.processedCount < batch1.processedCount, 'Worker 2 respects active lease lock');
+    // Worker 2 runs immediately after: all picked items are now actively leased / updated
+    const batch2 = await PriceMonitoringService.executeScheduledMonitoringBatch(100);
+    // Since all items were just leased/checked, due count for leased items is 0
+    assert(batch2.processedCount === 0, 'Worker 2 respects active lease lock');
   } catch (err) {
     assert(false, `Test 12 failed: ${err.message}`);
   }

@@ -37,6 +37,10 @@ import {
   Bell,
   Crosshair,
   TrendingDown,
+  Video,
+  Download,
+  Copy,
+  Share2,
 } from 'lucide-react';
 import { TwinDecisionResponse } from '@/app/api/twin/decide/route';
 import {
@@ -252,6 +256,13 @@ export function TwinDecisionsView() {
     recentClicks: any[];
   } | null>(null);
   const [earningsLoading, setEarningsLoading] = useState(false);
+
+  // Deal Short Video Studio State
+  const [isDealShortModalOpen, setIsDealShortModalOpen] = useState(false);
+  const [dealShortLoading, setDealShortLoading] = useState(false);
+  const [generatedShort, setGeneratedShort] = useState<any | null>(null);
+  const [copiedCaption, setCopiedCaption] = useState(false);
+  const [dealShortLanguage, setDealShortLanguage] = useState<'en' | 'bn' | 'hi'>('en');
 
   // Screenshot upload state
   const [screenshotBase64, setScreenshotBase64] = useState<string | null>(null);
@@ -598,6 +609,48 @@ export function TwinDecisionsView() {
       });
     } catch {
       // Non-blocking telemetry
+    }
+  };
+
+  // Generate Viral Deal Short (9:16 Video) Handler
+  const handleGenerateDealShort = async (customOffer?: RetailerOffer, lang: 'en' | 'bn' | 'hi' = dealShortLanguage) => {
+    setIsDealShortModalOpen(true);
+    setDealShortLoading(true);
+    setGeneratedShort(null);
+    setCopiedCaption(false);
+
+    try {
+      const activeOffer = customOffer || cheapestActiveOffer;
+      const title = result?.bestPick?.title || query || 'Verified Product';
+      const origPrice = activeOffer?.mrp || (activeOffer as any)?.originalPrice || activeOffer?.sellingPrice || 10000;
+      const lowPrice = activeOffer?.finalComparablePrice || activeOffer?.sellingPrice || origPrice;
+      const retailer = activeOffer?.retailerName || 'Amazon India';
+      const productUrl = activeOffer?.purchaseUrl || activeOffer?.productUrl || (result?.bestPick as any)?.productUrl || 'https://www.amazon.in';
+
+      const res = await fetch('/api/twin/deal-shorts/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productTitle: title,
+          retailerName: retailer,
+          originalPrice: origPrice,
+          lowestPrice: lowPrice,
+          productUrl,
+          category: result?.bestPick?.category,
+          language: lang,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.dealShort) {
+          setGeneratedShort(data.dealShort);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to generate deal short:', err);
+    } finally {
+      setDealShortLoading(false);
     }
   };
 
@@ -1071,6 +1124,14 @@ export function TwinDecisionsView() {
                     >
                       <Crosshair className="w-3.5 h-3.5 text-orange-400" />
                       <span>Snipe Price Drop (24/7 Watchlist)</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleGenerateDealShort()}
+                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-300 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
+                    >
+                      <Video className="w-3.5 h-3.5 text-purple-400" />
+                      <span>Generate Viral Deal Short (9:16 Video)</span>
                     </button>
                   </div>
                 </div>
@@ -2052,6 +2113,164 @@ export function TwinDecisionsView() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* 5. Autonomous Deal Shorts & Reels Studio Modal */}
+      {isDealShortModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-2xl rounded-3xl bg-zinc-900 border border-white/[0.1] p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                  <Video className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                    <span>Autonomous Deal Shorts &amp; Reels Studio</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                      Engine 2 Active
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-zinc-400">
+                    Physical 9:16 Video Synthesis &bull; FFmpeg &bull; High-Converting Viral Copy &bull; Affiliate Link
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsDealShortModalOpen(false)}
+                className="h-8 w-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {dealShortLoading ? (
+              <div className="py-16 text-center space-y-4">
+                <RefreshCw className="h-10 w-10 text-purple-400 animate-spin mx-auto" />
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-white">Synthesizing 9:16 Vertical Video via FFmpeg...</p>
+                  <p className="text-xs text-zinc-400">Compositing Scene Cards, Audio Stream, and Injecting Verified Affiliate Attribution</p>
+                </div>
+              </div>
+            ) : generatedShort ? (
+              <div className="space-y-5">
+                {/* 2-Column Layout: Video Player + Viral Copy */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {/* Left Column: Responsive 9:16 Vertical Video Player */}
+                  <div className="space-y-3">
+                    <div className="rounded-2xl overflow-hidden border border-white/[0.1] bg-black aspect-[9/16] shadow-xl relative group">
+                      <video
+                        src={generatedShort.videoUrl}
+                        controls
+                        autoPlay
+                        loop
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400 font-mono px-1">
+                      <span>{generatedShort.width}x{generatedShort.height} ({generatedShort.aspectRatio})</span>
+                      <span>{generatedShort.durationSeconds}s &bull; {(generatedShort.fileSizeBytes / 1024).toFixed(0)} KB</span>
+                    </div>
+                    <a
+                      href={generatedShort.videoUrl}
+                      download={`riiqx_deal_short_${Date.now()}.mp4`}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all cursor-pointer shadow-md active:scale-95"
+                    >
+                      <Download className="h-4 w-4" />
+                      <span>Download Ready MP4 Video</span>
+                    </a>
+                  </div>
+
+                  {/* Right Column: Viral Copy & Affiliate Economics */}
+                  <div className="space-y-4">
+                    {/* Affiliate Projected Earnings Box */}
+                    <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold text-emerald-400">
+                        <span>Projected Affiliate Payout</span>
+                        <span className="font-mono text-sm">+₹{Number(generatedShort.projectedCommissionINR || 0).toLocaleString('en-IN')}</span>
+                      </div>
+                      <p className="text-[10px] text-emerald-300/80">
+                        {generatedShort.expectedCommissionPct}% commission on every conversion via the bio/description link.
+                      </p>
+                    </div>
+
+                    {/* Viral Title */}
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Viral Short Title</label>
+                      <div className="p-2.5 rounded-xl bg-zinc-950 border border-white/[0.08] text-xs font-bold text-white select-all">
+                        {generatedShort.title}
+                      </div>
+                    </div>
+
+                    {/* Script Breakdown */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Script Breakdown</label>
+                      <div className="space-y-1.5 text-xs text-zinc-300 max-h-36 overflow-y-auto p-2.5 rounded-xl bg-zinc-950/70 border border-white/[0.08]">
+                        <p><span className="text-purple-400 font-bold">Hook:</span> {generatedShort.script.hook}</p>
+                        <p><span className="text-emerald-400 font-bold">Offer:</span> {generatedShort.script.body}</p>
+                        <p><span className="text-amber-400 font-bold">CTA:</span> {generatedShort.script.callToAction}</p>
+                      </div>
+                    </div>
+
+                    {/* Copy Caption Button */}
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(generatedShort.caption);
+                        setCopiedCaption(true);
+                        setTimeout(() => setCopiedCaption(false), 2000);
+                      }}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white font-bold text-xs transition-all cursor-pointer border border-white/[0.08]"
+                    >
+                      {copiedCaption ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
+                      <span>{copiedCaption ? 'Copied Full Caption & Link!' : 'Copy Caption & Affiliate Link'}</span>
+                    </button>
+
+                    {/* Language Switcher */}
+                    <div className="flex items-center justify-between text-xs pt-1">
+                      <span className="text-zinc-400">Re-generate in:</span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => { setDealShortLanguage('en'); handleGenerateDealShort(undefined, 'en'); }}
+                          className={`px-2 py-1 rounded-lg text-[10px] font-bold cursor-pointer ${dealShortLanguage === 'en' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-zinc-800 text-zinc-400'}`}
+                        >
+                          English
+                        </button>
+                        <button
+                          onClick={() => { setDealShortLanguage('bn'); handleGenerateDealShort(undefined, 'bn'); }}
+                          className={`px-2 py-1 rounded-lg text-[10px] font-bold cursor-pointer ${dealShortLanguage === 'bn' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-zinc-800 text-zinc-400'}`}
+                        >
+                          বাংলা
+                        </button>
+                        <button
+                          onClick={() => { setDealShortLanguage('hi'); handleGenerateDealShort(undefined, 'hi'); }}
+                          className={`px-2 py-1 rounded-lg text-[10px] font-bold cursor-pointer ${dealShortLanguage === 'hi' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-zinc-800 text-zinc-400'}`}
+                        >
+                          हिंदी
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between pt-3 border-t border-white/[0.08]">
+                  <span className="text-[10px] text-zinc-500 font-mono">
+                    Zero manual editing required &bull; 100% automated video pipeline.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsDealShortModalOpen(false)}
+                    className="px-5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs transition-colors cursor-pointer"
+                  >
+                    Close Studio
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       )}

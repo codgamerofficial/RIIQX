@@ -694,8 +694,9 @@ export class PriceMonitoringService {
         const failCount = (wl.consecutiveFailures || 0) + 1;
         wl.consecutiveFailures = failCount;
         wl.lastError = err.message || 'Extraction failed';
+        wl.lastCheckedAt = new Date().toISOString();
         wl.monitoringLeaseUntil = undefined;
-        this.saveWatchlistLease(wl.id, null, undefined, failCount, err.message);
+        this.saveWatchlistLease(wl.id, null, wl.lastCheckedAt, failCount, err.message);
       }
     }
 

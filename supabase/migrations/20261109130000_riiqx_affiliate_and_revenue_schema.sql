@@ -68,3 +68,4 @@ CREATE POLICY "Service role full access on affiliate summary"
     FOR ALL
     USING (true)
     WITH CHECK (true);
+
