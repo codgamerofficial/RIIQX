@@ -49,12 +49,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`dark ${inter.variable}`}>
       <head>
-        <script
-          src="https://quge5.com/88/tag.min.js"
-          data-zone="307132"
-          async
-          data-cfasync="false"
-        />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
