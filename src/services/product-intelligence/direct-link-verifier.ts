@@ -5,12 +5,15 @@
 
 import { LinkVerificationStatus } from './types';
 import { ProductURLExtractor } from './url-extractor';
+import { AffiliateSmartRouter } from './affiliate-router';
 
 export interface VerifiedBuyingLinkResult {
   isValid: boolean;
   isDirectPdp: boolean;
   canonicalProductUrl: string;
   purchaseUrl: string;
+  affiliateUrl?: string;
+  expectedCommissionPct?: number;
   status: LinkVerificationStatus;
   retailerDomain: string;
   retailerName: string;
@@ -119,11 +122,17 @@ export class DirectLinkVerifier {
         isVerifiedPdp = path.length > 5 && !isSearchOrCategory;
       }
 
+      const affiliate = isVerifiedPdp
+        ? AffiliateSmartRouter.resolveAffiliateUrl(canonicalUrl, retailerName)
+        : null;
+
       return {
         isValid: true,
         isDirectPdp: isVerifiedPdp,
         canonicalProductUrl: canonicalUrl,
-        purchaseUrl: rawUrl,
+        purchaseUrl: affiliate ? affiliate.affiliateUrl : rawUrl,
+        affiliateUrl: affiliate?.affiliateUrl,
+        expectedCommissionPct: affiliate?.commissionPct,
         status: isVerifiedPdp ? 'verified_pdp' : 'direct_link_unverified',
         retailerDomain: cleanDomain,
         retailerName,

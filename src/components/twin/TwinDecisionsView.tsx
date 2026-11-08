@@ -236,6 +236,23 @@ export function TwinDecisionsView() {
   const [sniperLoading, setSniperLoading] = useState(false);
   const [sniperSuccessMsg, setSniperSuccessMsg] = useState<string | null>(null);
 
+  // Affiliate Revenue Dashboard State
+  const [isEarningsModalOpen, setIsEarningsModalOpen] = useState(false);
+  const [earningsData, setEarningsData] = useState<{
+    totalClicks: number;
+    totalGrossOrderValueINR: number;
+    totalProjectedCommissionINR: number;
+    averageCommissionPct: number;
+    topRetailers: {
+      retailerName: string;
+      clicks: number;
+      projectedCommissionINR: number;
+      sharePct: number;
+    }[];
+    recentClicks: any[];
+  } | null>(null);
+  const [earningsLoading, setEarningsLoading] = useState(false);
+
   // Screenshot upload state
   const [screenshotBase64, setScreenshotBase64] = useState<string | null>(null);
   const [screenshotMimeType, setScreenshotMimeType] = useState<string>('image/jpeg');
@@ -542,6 +559,48 @@ export function TwinDecisionsView() {
     }
   };
 
+  // Affiliate Revenue Dashboard Fetcher
+  const handleOpenEarningsModal = async () => {
+    setIsEarningsModalOpen(true);
+    setEarningsLoading(true);
+    try {
+      const res = await fetch('/api/twin/affiliate/click?dashboard=true');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.dashboard) {
+          setEarningsData(data.dashboard);
+        }
+      }
+    } catch {
+      // Keep existing state
+    } finally {
+      setEarningsLoading(false);
+    }
+  };
+
+  // Outbound Purchase Click Intent Beacon
+  const handleBuyFromStoreClick = (offer: RetailerOffer) => {
+    try {
+      fetch('/api/twin/affiliate/click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productIdentifier: result?.report?.identity?.modelNumber || result?.bestPick?.title?.slice(0, 32),
+          productTitle: result?.bestPick?.title || (offer as unknown as { productTitle?: string }).productTitle || 'Verified Product',
+          retailerName: offer.retailerName,
+          sellerName: offer.sellerName,
+          sellingPrice: offer.finalComparablePrice || offer.sellingPrice || 0,
+          destinationUrl: offer.purchaseUrl || offer.productUrl,
+          category: result?.bestPick?.category,
+          referrerPage: 'Decision Lab',
+        }),
+        keepalive: true,
+      });
+    } catch {
+      // Non-blocking telemetry
+    }
+  };
+
   // Determine which offers to display based on selected ranking tab
   const getOffersForActiveRanking = (): RetailerOffer[] => {
     let offers: RetailerOffer[] = [];
@@ -637,8 +696,16 @@ export function TwinDecisionsView() {
 
         <div className="flex items-center gap-3">
           <button
+            onClick={() => handleOpenEarningsModal()}
+            className="flex items-center gap-2 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 px-3.5 py-2.5 text-xs font-bold text-emerald-400 shadow-md transition-all active:scale-95 cursor-pointer"
+          >
+            <DollarSign className="h-4 w-4 text-emerald-400" />
+            <span>Affiliate Revenue Engine</span>
+          </button>
+
+          <button
             onClick={() => setIsPreferencesOpen(true)}
-            className="flex items-center gap-2 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-white/[0.08] hover:border-orange-500/40 px-4 py-2.5 text-xs font-bold text-zinc-200 shadow-md transition-all active:scale-95"
+            className="flex items-center gap-2 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-white/[0.08] hover:border-orange-500/40 px-4 py-2.5 text-xs font-bold text-zinc-200 shadow-md transition-all active:scale-95 cursor-pointer"
           >
             <Sliders className="h-4 w-4 text-orange-400" />
             <span>My Shopping Offers ({userPreferences.preferredBanks.length} Banks)</span>
@@ -1351,6 +1418,7 @@ export function TwinDecisionsView() {
                           href={offer.purchaseUrl || offer.productUrl}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={() => handleBuyFromStoreClick(offer)}
                           className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-black shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all duration-200 active:scale-95 text-center group/btn"
                         >
                           <span>BUY FROM STORE</span>
@@ -1366,6 +1434,7 @@ export function TwinDecisionsView() {
                             href={offer.purchaseUrl || offer.productUrl}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={() => handleBuyFromStoreClick(offer)}
                             className="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-2xl bg-zinc-800/80 hover:bg-zinc-700 border border-white/[0.08] hover:border-white/[0.16] text-[11px] font-bold text-zinc-300 hover:text-white text-center transition-all"
                           >
                             <span>Search Store Catalog</span>
@@ -1782,6 +1851,203 @@ export function TwinDecisionsView() {
                   >
                     {sniperLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Crosshair className="h-4 w-4" />}
                     <span>{sniperLoading ? 'Saving Watchlist...' : 'Activate 24/7 Monitor'}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 6. Affiliate Revenue & Commission Engine Modal */}
+      {isEarningsModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
+          <div className="w-full max-w-2xl rounded-3xl border border-emerald-500/30 bg-zinc-900/95 p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  <DollarSign className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white font-heading">
+                    Affiliate Revenue &amp; Monetization Engine
+                  </h3>
+                  <p className="text-xs text-zinc-400">
+                    Real-time Outbound Purchase Attribution &bull; Amazon, Flipkart, Tata CLiQ &bull; Zero Simulated Clicks
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleOpenEarningsModal}
+                  disabled={earningsLoading}
+                  className="p-2 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                  title="Refresh Revenue Data"
+                >
+                  <RefreshCw className={`h-4 w-4 ${earningsLoading ? 'animate-spin text-emerald-400' : ''}`} />
+                </button>
+                <button
+                  onClick={() => setIsEarningsModalOpen(false)}
+                  className="p-1.5 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {earningsLoading && !earningsData ? (
+              <div className="py-12 flex flex-col items-center justify-center text-center space-y-3">
+                <RefreshCw className="h-8 w-8 text-emerald-400 animate-spin" />
+                <p className="text-xs text-zinc-400">Aggregating telemetry from Supabase and local storage...</p>
+              </div>
+            ) : (
+              <div className="space-y-6 text-xs">
+                {/* 4-Stat Metrics Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-1">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">Purchase Clicks</span>
+                    <div className="text-2xl font-black text-white font-mono">{earningsData?.totalClicks || 0}</div>
+                    <span className="text-[10px] text-zinc-500">Outbound 'Buy' CTAs</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-1">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">Gross Order Value</span>
+                    <div className="text-2xl font-black text-white font-mono">
+                      ₹{(earningsData?.totalGrossOrderValueINR || 0).toLocaleString('en-IN')}
+                    </div>
+                    <span className="text-[10px] text-zinc-500">Directed Merchant Cart</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 space-y-1">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">Projected Revenue</span>
+                    <div className="text-2xl font-black text-emerald-400 font-mono">
+                      ₹{(earningsData?.totalProjectedCommissionINR || 0).toLocaleString('en-IN')}
+                    </div>
+                    <span className="text-[10px] text-emerald-300">Estimated Earnings</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-1">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">Avg Commission</span>
+                    <div className="text-2xl font-black text-amber-400 font-mono">
+                      {earningsData?.averageCommissionPct || 3.5}%
+                    </div>
+                    <span className="text-[10px] text-zinc-500">Blended Partner Tier</span>
+                  </div>
+                </div>
+
+                {/* Retailer Revenue Share Breakdown */}
+                {earningsData?.topRetailers && earningsData.topRetailers.length > 0 && (
+                  <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-3">
+                    <h4 className="text-xs font-bold text-white flex items-center justify-between">
+                      <span>Retailer Conversion Share</span>
+                      <span className="text-[10px] text-zinc-400 font-normal">Ranked by Outbound Purchase Volume</span>
+                    </h4>
+
+                    <div className="space-y-2.5">
+                      {earningsData.topRetailers.map((r, idx) => (
+                        <div key={idx} className="space-y-1">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="font-bold text-zinc-200">{r.retailerName}</span>
+                            <span className="font-mono text-emerald-400 font-bold">
+                              ₹{r.projectedCommissionINR.toLocaleString('en-IN')} ({r.clicks} clicks &bull; {r.sharePct}%)
+                            </span>
+                          </div>
+                          <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
+                              style={{ width: `${Math.max(5, r.sharePct)}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Active Partner Tag Attribution Status */}
+                <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-2">
+                  <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                    <span>Configured Partner Attribution Networks:</span>
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+                    <div className="p-2.5 rounded-xl bg-zinc-900 border border-white/[0.06]">
+                      <span className="text-[10px] text-zinc-400 block">Amazon India</span>
+                      <span className="text-xs font-mono font-bold text-white">tag=riiqx-21</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-zinc-900 border border-white/[0.06]">
+                      <span className="text-[10px] text-zinc-400 block">Flipkart Affiliate</span>
+                      <span className="text-xs font-mono font-bold text-white">affid=riiqx_aff</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-zinc-900 border border-white/[0.06]">
+                      <span className="text-[10px] text-zinc-400 block">Tata CLiQ Network</span>
+                      <span className="text-xs font-mono font-bold text-white">cid=af:riiqx:pdp</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-zinc-900 border border-white/[0.06]">
+                      <span className="text-[10px] text-zinc-400 block">Croma Retail</span>
+                      <span className="text-xs font-mono font-bold text-white">utm=riiqx_partner</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-zinc-900 border border-white/[0.06]">
+                      <span className="text-[10px] text-zinc-400 block">Myntra Partner</span>
+                      <span className="text-xs font-mono font-bold text-white">aff_id=riiqx_affiliate</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-zinc-900 border border-white/[0.06]">
+                      <span className="text-[10px] text-zinc-400 block">Reliance &amp; Nykaa</span>
+                      <span className="text-xs font-mono font-bold text-white">utm=riiqx_shopping</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Outbound Purchase Clicks Log */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold text-white flex items-center justify-between">
+                    <span>Recent Purchase Intent Clicks</span>
+                    <span className="text-[10px] text-zinc-400 font-mono">Live Telemetry Stream</span>
+                  </h4>
+
+                  {earningsData?.recentClicks && earningsData.recentClicks.length > 0 ? (
+                    <div className="divide-y divide-white/[0.06] rounded-2xl bg-zinc-950/70 border border-white/[0.08] max-h-48 overflow-y-auto">
+                      {earningsData.recentClicks.map((c, i) => (
+                        <div key={i} className="p-3 flex items-center justify-between gap-3 text-[11px]">
+                          <div className="min-w-0 flex-1">
+                            <span className="font-bold text-white truncate block">{c.productTitle}</span>
+                            <span className="text-[10px] text-zinc-400 font-mono">
+                              {c.retailerName} &bull; Cart: ₹{Number(c.sellingPrice || 0).toLocaleString('en-IN')} &bull; Tier: {c.expectedCommissionPct}%
+                            </span>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <span className="text-emerald-400 font-mono font-bold block">
+                              +₹{Number(c.projectedEarningsINR || 0).toLocaleString('en-IN')}
+                            </span>
+                            <span className="text-[9px] text-zinc-500 font-mono">
+                              {new Date(c.createdAt).toLocaleTimeString()}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-6 rounded-2xl bg-zinc-950/70 border border-white/[0.08] text-center space-y-1">
+                      <p className="text-zinc-400 font-medium">No outbound purchase clicks recorded yet.</p>
+                      <p className="text-[11px] text-zinc-500">
+                        Clicking 'BUY FROM STORE' on any product will automatically register real-time revenue telemetry here.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Modal Footer */}
+                <div className="flex items-center justify-between pt-3 border-t border-white/[0.08]">
+                  <span className="text-[10px] text-zinc-500 font-mono">
+                    All commissions subject to merchant 30-day return window reconciliation.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsEarningsModalOpen(false)}
+                    className="px-5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs transition-colors cursor-pointer"
+                  >
+                    Close Dashboard
                   </button>
                 </div>
               </div>
