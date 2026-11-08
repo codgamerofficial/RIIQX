@@ -1,0 +1,23 @@
+name: Autonomous Deal Pipeline Cron
+
+on:
+  schedule:
+    # Runs every 6 hours (00:00, 06:00, 12:00, 18:00 UTC)
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  trigger-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deal Pipeline Endpoint
+        run: |
+          if [ -z "${{ secrets.CRON_SECRET }}" ]; then
+            echo "CRON_SECRET secret is not configured in GitHub Secrets yet. Skipping automated trigger..."
+            exit 0
+          fi
+          echo "Triggering RIIQX Autonomous Deal Pipeline..."
+          curl -s -X POST "https://riiqx.vercel.app/api/cron/deal-pipeline" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --fail-with-body || echo "Deal pipeline job trigger finished."
