@@ -73,3 +73,5 @@ AI Video Editor/export/final-videos/*.mp4
 AI Video Editor/export/preview-renders/*.mp4
 AI Video Editor/export/thumbnails/*.jpg
 AI Video Editor/Exports/*.mp4
+
+.vercel

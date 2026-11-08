@@ -21,3 +21,4 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
             --fail-with-body || echo "Deal pipeline job trigger finished."
+
