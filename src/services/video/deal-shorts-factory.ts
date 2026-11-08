@@ -10,6 +10,7 @@ import sharp from 'sharp';
 import ffmpeg from 'fluent-ffmpeg';
 import { resolveFfmpegBinary, FFmpegService } from '@/lib/video/ffmpeg-service';
 import { AffiliateSmartRouter } from '@/services/product-intelligence/affiliate-router';
+import { createAdminClient, isServiceRoleConfigured } from '@/lib/supabase/admin';
 
 ffmpeg.setFfmpegPath(resolveFfmpegBinary());
 
@@ -410,6 +411,48 @@ export class DealShortsVideoFactory {
     const stat = fs.statSync(finalVideoPath);
     const mediaProbe = await FFmpegService.probeMedia(finalVideoPath);
 
+    let videoUrl = `/uploads/rendered/${finalVideoFileName}`;
+    let thumbnailUrl = `/uploads/rendered/${thumbnailFileName}`;
+
+    // Durable Cloud Object Storage upload (Supabase Storage) for serverless resilience & public CDN reachability
+    if (isServiceRoleConfigured()) {
+      try {
+        const sb = createAdminClient();
+        const videoBuffer = fs.readFileSync(finalVideoPath);
+        const thumbBuffer = fs.readFileSync(thumbnailPath);
+
+        const videoUpload = await sb.storage
+          .from('deal-shorts')
+          .upload(finalVideoFileName, videoBuffer, {
+            contentType: 'video/mp4',
+            upsert: true,
+          });
+
+        if (!videoUpload.error) {
+          const { data: pubData } = sb.storage.from('deal-shorts').getPublicUrl(finalVideoFileName);
+          if (pubData?.publicUrl) {
+            videoUrl = pubData.publicUrl;
+          }
+        }
+
+        const thumbUpload = await sb.storage
+          .from('deal-shorts')
+          .upload(thumbnailFileName, thumbBuffer, {
+            contentType: 'image/jpeg',
+            upsert: true,
+          });
+
+        if (!thumbUpload.error) {
+          const { data: thumbData } = sb.storage.from('deal-shorts').getPublicUrl(thumbnailFileName);
+          if (thumbData?.publicUrl) {
+            thumbnailUrl = thumbData.publicUrl;
+          }
+        }
+      } catch (storageErr) {
+        console.warn('[DealShortsVideoFactory] Supabase Storage upload skipped/failed:', storageErr);
+      }
+    }
+
     const result: DealShortsResult = {
       id: jobId,
       title: script.title,
@@ -425,8 +468,8 @@ export class DealShortsVideoFactory {
       expectedCommissionPct: affiliate.commissionPct,
       savingsINR,
       savingsPercentage,
-      videoUrl: `/uploads/rendered/${finalVideoFileName}`,
-      thumbnailUrl: `/uploads/rendered/${thumbnailFileName}`,
+      videoUrl,
+      thumbnailUrl,
       durationSeconds: Math.round(mediaProbe.durationSeconds),
       aspectRatio: '9:16',
       width: mediaProbe.width,

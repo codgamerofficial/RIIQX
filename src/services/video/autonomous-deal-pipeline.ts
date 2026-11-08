@@ -71,18 +71,18 @@ export class AutonomousDealPipeline {
     let totalProjectedCommissionINR = 0;
 
     // 1. Get all active watchlists
-    const userId = params?.userId || 'usr_riiqx_primary';
+    const userId = params?.userId;
     let allWatchlists: WatchlistRecord[] = [];
     try {
-      allWatchlists = await PriceMonitoringService.getUserWatchlists(userId);
+      if (userId) {
+        allWatchlists = await PriceMonitoringService.getUserWatchlists(userId);
+      } else {
+        // Background system cron sweep: scan all active watchlists across system
+        const localWatchlistsFile = path.resolve(this.DATA_DIR, 'price_watchlists.json');
+        allWatchlists = this.readJson<WatchlistRecord>(localWatchlistsFile).filter((w) => w.isActive);
+      }
     } catch (err: any) {
       errors.push(`Failed to fetch watchlists: ${err.message}`);
-    }
-
-    // Also check local watchlist storage if empty
-    if (allWatchlists.length === 0) {
-      const localWatchlistsFile = path.resolve(this.DATA_DIR, 'price_watchlists.json');
-      allWatchlists = this.readJson<WatchlistRecord>(localWatchlistsFile);
     }
 
     const previouslyGeneratedDropKeys = new Set(this.readJson<string>(this.GENERATED_KEYS_FILE));
@@ -125,14 +125,15 @@ export class AutonomousDealPipeline {
         totalProjectedCommissionINR += video.projectedCommissionINR;
         previouslyGeneratedDropKeys.add(dropKey);
 
-        // 4. Check for connected social accounts and queue publishing
-        if (params?.autoPublish !== false) {
+        // 4. Check for connected social accounts and queue publishing with verified owner
+        const targetUserId = item.userId || userId;
+        if (params?.autoPublish !== false && targetUserId) {
           try {
-            const accounts = await getConnectedAccounts(item.userId || userId);
+            const accounts = await getConnectedAccounts(targetUserId);
             for (const acc of accounts) {
               if (acc.status === 'connected' && (acc.provider === 'youtube' || acc.provider === 'instagram')) {
                 await publishProjectToSocial({
-                  userId: item.userId || userId,
+                  userId: targetUserId,
                   projectId: video.id,
                   accountId: acc.id,
                   platform: acc.provider,

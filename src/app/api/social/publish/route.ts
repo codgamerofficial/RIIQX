@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { publishProjectToSocial } from '@/lib/riiqx/social/publishing-engine';
 import { resolveAuthUserId } from '@/lib/riiqx/session-helper';
+import { getConnectedAccounts } from '@/lib/riiqx/social/account-repository';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Authentication required. Please sign in to publish.' },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const {
       projectId,
@@ -18,12 +27,20 @@ export async function POST(req: NextRequest) {
       scheduledFor,
     } = body;
 
-    const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
-
     if (!accountId) {
       return NextResponse.json(
         { error: 'Target social accountId is required. Please connect an account first.' },
         { status: 400 }
+      );
+    }
+
+    // Verify ownership of target social account
+    const accounts = await getConnectedAccounts(userId);
+    const hasAccount = accounts.some((a) => a.id === accountId);
+    if (!hasAccount) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Target social account does not belong to the authenticated user.' },
+        { status: 403 }
       );
     }
 

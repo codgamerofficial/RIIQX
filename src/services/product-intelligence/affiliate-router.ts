@@ -19,6 +19,22 @@ export interface AffiliatePartnerConfig {
   nykaaUtmSource: string;
 }
 
+export interface AffiliateConversionRecord {
+  id: string;
+  clickId?: string;
+  userId?: string;
+  retailerName: string;
+  orderId: string;
+  orderAmountINR: number;
+  commissionAmountINR: number;
+  commissionRatePct: number;
+  status: 'pending' | 'approved' | 'returned' | 'settled';
+  partnerSource: string;
+  transactionTimestamp: string;
+  settledAt?: string;
+  createdAt: string;
+}
+
 export interface CommissionSchedule {
   category: string;
   amazonPct: number;
@@ -55,21 +71,31 @@ export interface AffiliateClickEvent extends AffiliateClickInput {
 
 export interface AffiliateEarningsReport {
   totalClicks: number;
-  totalGrossOrderValueINR: number;
-  totalProjectedCommissionINR: number;
+  directedCartVolumeINR: number;
+  totalGrossOrderValueINR: number; // Backward-compatible alias for directedCartVolumeINR
+  estimatedPotentialCommissionINR: number;
+  totalProjectedCommissionINR: number; // Backward-compatible alias for estimatedPotentialCommissionINR
+  confirmedConversionsCount: number;
+  confirmedOrderValueINR: number;
+  confirmedCommissionINR: number;
+  settledPayoutsINR: number;
   averageCommissionPct: number;
   topRetailers: {
     retailerName: string;
     clicks: number;
     projectedCommissionINR: number;
+    confirmedCommissionINR: number;
     sharePct: number;
   }[];
+  partnerStatuses: Record<string, { configured: boolean; partnerTag?: string; status: 'verified_partner' | 'unconfigured' }>;
   recentClicks: AffiliateClickEvent[];
+  recentConversions: AffiliateConversionRecord[];
 }
 
 export class AffiliateSmartRouter {
   private static DATA_DIR = path.resolve(process.cwd(), '.data');
   private static CLICKS_FILE = path.resolve(AffiliateSmartRouter.DATA_DIR, 'affiliate_clicks.json');
+  private static CONVERSIONS_FILE = path.resolve(AffiliateSmartRouter.DATA_DIR, 'affiliate_conversions.json');
   private static SUMMARY_FILE = path.resolve(AffiliateSmartRouter.DATA_DIR, 'affiliate_earnings_summary.json');
 
   /**
@@ -156,17 +182,17 @@ export class AffiliateSmartRouter {
   };
 
   /**
-   * Reads configured affiliate credentials from environment with robust defaults
+   * Reads genuine affiliate credentials strictly from environment without fabricating IDs
    */
   public static getPartnerConfig(): AffiliatePartnerConfig {
     return {
-      amazonTag: process.env.AMAZON_ASSOCIATE_TAG || 'riiqx-21',
-      flipkartAffId: process.env.FLIPKART_AFFILIATE_ID || 'riiqx_aff',
-      tataCliqCid: process.env.TATA_CLIQ_AFFILIATE_TAG || 'af:riiqx:pdp',
-      cromaUtmSource: process.env.CROMA_AFFILIATE_TAG || 'riiqx_partner',
-      myntraAffId: process.env.MYNTRA_AFFILIATE_TAG || 'riiqx_affiliate',
-      relianceDigitalUtmSource: process.env.RELIANCE_DIGITAL_AFFILIATE_TAG || 'riiqx_retail',
-      nykaaUtmSource: process.env.NYKAA_AFFILIATE_TAG || 'riiqx_beauty',
+      amazonTag: process.env.AMAZON_ASSOCIATE_TAG?.trim() || '',
+      flipkartAffId: process.env.FLIPKART_AFFILIATE_ID?.trim() || '',
+      tataCliqCid: process.env.TATA_CLIQ_AFFILIATE_TAG?.trim() || '',
+      cromaUtmSource: process.env.CROMA_AFFILIATE_TAG?.trim() || '',
+      myntraAffId: process.env.MYNTRA_AFFILIATE_TAG?.trim() || '',
+      relianceDigitalUtmSource: process.env.RELIANCE_DIGITAL_AFFILIATE_TAG?.trim() || '',
+      nykaaUtmSource: process.env.NYKAA_AFFILIATE_TAG?.trim() || '',
     };
   }
 
@@ -271,7 +297,8 @@ export class AffiliateSmartRouter {
   }
 
   /**
-   * Resolves canonical product URL and safely appends authorized partner affiliate attribution
+   * Resolves canonical product URL and appends genuine affiliate tags ONLY if verified and configured.
+   * If partner tags are unconfigured, keeps canonical URL clean and returns transparent unconfigured status.
    */
   public static resolveAffiliateUrl(
     rawUrl: string,
@@ -284,13 +311,14 @@ export class AffiliateSmartRouter {
     commissionPct: number;
     expectedEarningsINR: number;
     retailer: string;
+    isAttributed: boolean;
+    partnerStatus: 'verified_partner' | 'unconfigured';
   } {
     const config = this.getPartnerConfig();
     const canonical = ProductURLExtractor.canonicalizeUrl(rawUrl);
     const resolvedRetailer = retailerName || canonical.retailerName;
     const norm = resolvedRetailer.toLowerCase();
     const commissionPct = this.getCommissionPercentage(resolvedRetailer, categoryOrTitle);
-    const expectedEarningsINR = Math.round((sellingPrice * (commissionPct / 100)) * 100) / 100;
 
     let targetUrl: URL;
     try {
@@ -299,59 +327,85 @@ export class AffiliateSmartRouter {
       targetUrl = new URL('https://www.amazon.in');
     }
 
+    let isAttributed = false;
+
     // 1. Amazon India Format: ?tag={AMAZON_TAG}&linkCode=as2
     if (norm.includes('amazon')) {
-      targetUrl.searchParams.set('tag', config.amazonTag);
-      targetUrl.searchParams.set('linkCode', 'as2');
-      targetUrl.searchParams.set('camp', '3638');
-      targetUrl.searchParams.set('creative', '165953');
+      if (config.amazonTag) {
+        targetUrl.searchParams.set('tag', config.amazonTag);
+        targetUrl.searchParams.set('linkCode', 'as2');
+        targetUrl.searchParams.set('camp', '3638');
+        targetUrl.searchParams.set('creative', '165953');
+        isAttributed = true;
+      }
     }
     // 2. Flipkart Format: ?affid={FLIPKART_AFFID}
     else if (norm.includes('flipkart')) {
-      targetUrl.searchParams.set('affid', config.flipkartAffId);
+      if (config.flipkartAffId) {
+        targetUrl.searchParams.set('affid', config.flipkartAffId);
+        isAttributed = true;
+      }
     }
     // 3. Tata CLiQ Format: ?cid={TATA_CLIQ_CID}
     else if (norm.includes('tatacliq') || norm.includes('tata cliq')) {
-      targetUrl.searchParams.set('cid', config.tataCliqCid);
-      targetUrl.searchParams.set('utm_source', 'affiliate');
-      targetUrl.searchParams.set('utm_medium', 'riiqx');
+      if (config.tataCliqCid) {
+        targetUrl.searchParams.set('cid', config.tataCliqCid);
+        targetUrl.searchParams.set('utm_source', 'affiliate');
+        targetUrl.searchParams.set('utm_medium', 'riiqx');
+        isAttributed = true;
+      }
     }
-    // 4. Croma Format: ?utm_source=affiliate&utm_medium=riiqx
+    // 4. Croma Format: ?utm_campaign={CROMA_TAG}
     else if (norm.includes('croma')) {
-      targetUrl.searchParams.set('utm_source', 'affiliate');
-      targetUrl.searchParams.set('utm_medium', 'riiqx');
-      targetUrl.searchParams.set('utm_campaign', config.cromaUtmSource);
+      if (config.cromaUtmSource) {
+        targetUrl.searchParams.set('utm_source', 'affiliate');
+        targetUrl.searchParams.set('utm_medium', 'riiqx');
+        targetUrl.searchParams.set('utm_campaign', config.cromaUtmSource);
+        isAttributed = true;
+      }
     }
     // 5. Myntra Format: ?aff_id={MYNTRA_AFFID}
     else if (norm.includes('myntra')) {
-      targetUrl.searchParams.set('aff_id', config.myntraAffId);
-      targetUrl.searchParams.set('utm_source', 'affiliate');
-      targetUrl.searchParams.set('utm_medium', 'riiqx');
+      if (config.myntraAffId) {
+        targetUrl.searchParams.set('aff_id', config.myntraAffId);
+        targetUrl.searchParams.set('utm_source', 'affiliate');
+        targetUrl.searchParams.set('utm_medium', 'riiqx');
+        isAttributed = true;
+      }
     }
     // 6. Reliance Digital Format
     else if (norm.includes('reliance')) {
-      targetUrl.searchParams.set('utm_source', 'affiliate');
-      targetUrl.searchParams.set('utm_medium', 'riiqx');
-      targetUrl.searchParams.set('utm_campaign', config.relianceDigitalUtmSource);
+      if (config.relianceDigitalUtmSource) {
+        targetUrl.searchParams.set('utm_source', 'affiliate');
+        targetUrl.searchParams.set('utm_medium', 'riiqx');
+        targetUrl.searchParams.set('utm_campaign', config.relianceDigitalUtmSource);
+        isAttributed = true;
+      }
     }
     // 7. Nykaa Format
     else if (norm.includes('nykaa')) {
-      targetUrl.searchParams.set('utm_source', 'affiliate');
-      targetUrl.searchParams.set('utm_medium', 'riiqx');
-      targetUrl.searchParams.set('utm_campaign', config.nykaaUtmSource);
-    }
-    // Generic fallback: UTM partner tagging
-    else {
-      targetUrl.searchParams.set('utm_source', 'riiqx_shopping');
-      targetUrl.searchParams.set('utm_medium', 'partner');
+      if (config.nykaaUtmSource) {
+        targetUrl.searchParams.set('utm_source', 'affiliate');
+        targetUrl.searchParams.set('utm_medium', 'riiqx');
+        targetUrl.searchParams.set('utm_campaign', config.nykaaUtmSource);
+        isAttributed = true;
+      }
     }
 
+    const partnerStatus = isAttributed ? 'verified_partner' : 'unconfigured';
+    // If partner is not verified/configured, projected earnings must honestly be 0
+    const expectedEarningsINR = isAttributed
+      ? Math.round((sellingPrice * (commissionPct / 100)) * 100) / 100
+      : 0;
+
     return {
-      affiliateUrl: targetUrl.toString(),
+      affiliateUrl: isAttributed ? targetUrl.toString() : (canonical.canonicalUrl || rawUrl),
       canonicalUrl: canonical.canonicalUrl,
       commissionPct,
       expectedEarningsINR,
       retailer: resolvedRetailer,
+      isAttributed,
+      partnerStatus,
     };
   }
 
@@ -439,7 +493,116 @@ export class AffiliateSmartRouter {
   }
 
   /**
-   * Generates real-time affiliate earnings analytics report
+   * Records a confirmed affiliate purchase conversion via webhook/postback from partner network
+   */
+  public static async recordConversionPostback(input: {
+    clickId?: string;
+    userId?: string;
+    retailerName: string;
+    orderId: string;
+    orderAmountINR: number;
+    commissionAmountINR: number;
+    commissionRatePct?: number;
+    status?: 'pending' | 'approved' | 'returned' | 'settled';
+    partnerSource: string;
+    transactionTimestamp?: string;
+    settledAt?: string;
+  }): Promise<AffiliateConversionRecord> {
+    const now = new Date().toISOString();
+    const conversion: AffiliateConversionRecord = {
+      id: `conv_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      clickId: input.clickId,
+      userId: input.userId,
+      retailerName: input.retailerName,
+      orderId: input.orderId,
+      orderAmountINR: Number(input.orderAmountINR) || 0,
+      commissionAmountINR: Number(input.commissionAmountINR) || 0,
+      commissionRatePct: Number(input.commissionRatePct) || 0,
+      status: input.status || 'pending',
+      partnerSource: input.partnerSource,
+      transactionTimestamp: input.transactionTimestamp || now,
+      settledAt: input.settledAt,
+      createdAt: now,
+    };
+
+    // 1. Supabase Persistence
+    if (isServiceRoleConfigured()) {
+      try {
+        const sb = this.getAdminClient();
+        await sb.from('affiliate_conversions').upsert({
+          id: conversion.id,
+          click_id: conversion.clickId,
+          user_id: conversion.userId,
+          retailer_name: conversion.retailerName,
+          order_id: conversion.orderId,
+          order_amount: conversion.orderAmountINR,
+          commission_amount: conversion.commissionAmountINR,
+          commission_rate: conversion.commissionRatePct,
+          status: conversion.status,
+          partner_source: conversion.partnerSource,
+          transaction_timestamp: conversion.transactionTimestamp,
+          settled_at: conversion.settledAt,
+        }, { onConflict: 'retailer_name,order_id' });
+      } catch {
+        // Fall through to local storage
+      }
+    }
+
+    // 2. Local JSON Persistence
+    const localConversions = this.readLocalJson<AffiliateConversionRecord>(this.CONVERSIONS_FILE);
+    const existingIdx = localConversions.findIndex(
+      (c) => c.retailerName === conversion.retailerName && c.orderId === conversion.orderId
+    );
+    if (existingIdx >= 0) {
+      localConversions[existingIdx] = { ...localConversions[existingIdx], ...conversion };
+    } else {
+      localConversions.unshift(conversion);
+    }
+    this.writeLocalJson(this.CONVERSIONS_FILE, localConversions);
+
+    return conversion;
+  }
+
+  /**
+   * Retrieves recorded affiliate conversions
+   */
+  public static async getConversionHistory(userId?: string): Promise<AffiliateConversionRecord[]> {
+    if (isServiceRoleConfigured()) {
+      try {
+        const sb = this.getAdminClient();
+        let query = sb.from('affiliate_conversions').select('*').order('created_at', { ascending: false });
+        if (userId && userId !== 'all') {
+          query = query.eq('user_id', userId);
+        }
+        const { data, error } = await query;
+        if (!error && Array.isArray(data) && data.length > 0) {
+          return data.map((d: any) => ({
+            id: d.id,
+            clickId: d.click_id,
+            userId: d.user_id,
+            retailerName: d.retailer_name,
+            orderId: d.order_id,
+            orderAmountINR: Number(d.order_amount),
+            commissionAmountINR: Number(d.commission_amount),
+            commissionRatePct: Number(d.commission_rate),
+            status: d.status,
+            partnerSource: d.partner_source,
+            transactionTimestamp: d.transaction_timestamp,
+            settledAt: d.settled_at,
+            createdAt: d.created_at,
+          }));
+        }
+      } catch {
+        // Fall through to local store
+      }
+    }
+    const local = this.readLocalJson<AffiliateConversionRecord>(this.CONVERSIONS_FILE);
+    return userId && userId !== 'all' ? local.filter((c) => c.userId === userId) : local;
+  }
+
+  /**
+   * Generates genuine real-time affiliate earnings analytics report.
+   * Honest accounting: Separates directed click volume from confirmed orders and settled payouts.
    */
   public static async getEarningsDashboard(userId?: string): Promise<AffiliateEarningsReport> {
     const localClicks = this.readLocalJson<AffiliateClickEvent>(this.CLICKS_FILE);
@@ -448,44 +611,113 @@ export class AffiliateSmartRouter {
       : localClicks;
 
     const totalClicks = filteredClicks.length;
-    let totalGrossOrderValueINR = 0;
-    let totalProjectedCommissionINR = 0;
+    let directedCartVolumeINR = 0;
+    let estimatedPotentialCommissionINR = 0;
 
-    const retailerMap: Record<string, { clicks: number; commission: number }> = {};
+    const retailerMap: Record<string, { clicks: number; projected: number; confirmed: number }> = {};
 
     for (const c of filteredClicks) {
-      totalGrossOrderValueINR += Number(c.sellingPrice || 0);
-      totalProjectedCommissionINR += Number(c.projectedEarningsINR || 0);
+      directedCartVolumeINR += Number(c.sellingPrice || 0);
+      estimatedPotentialCommissionINR += Number(c.projectedEarningsINR || 0);
 
       const r = c.retailerName || 'Verified Merchant';
       if (!retailerMap[r]) {
-        retailerMap[r] = { clicks: 0, commission: 0 };
+        retailerMap[r] = { clicks: 0, projected: 0, confirmed: 0 };
       }
       retailerMap[r].clicks += 1;
-      retailerMap[r].commission += Number(c.projectedEarningsINR || 0);
+      retailerMap[r].projected += Number(c.projectedEarningsINR || 0);
+    }
+
+    // Read real conversions from postback stream
+    const conversions = await this.getConversionHistory(userId);
+    let confirmedOrderValueINR = 0;
+    let confirmedCommissionINR = 0;
+    let settledPayoutsINR = 0;
+
+    for (const conv of conversions) {
+      if (conv.status === 'approved' || conv.status === 'settled') {
+        confirmedOrderValueINR += conv.orderAmountINR;
+        confirmedCommissionINR += conv.commissionAmountINR;
+        const r = conv.retailerName || 'Verified Merchant';
+        if (!retailerMap[r]) {
+          retailerMap[r] = { clicks: 0, projected: 0, confirmed: 0 };
+        }
+        retailerMap[r].confirmed += conv.commissionAmountINR;
+      }
+      if (conv.status === 'settled') {
+        settledPayoutsINR += conv.commissionAmountINR;
+      }
     }
 
     const topRetailers = Object.entries(retailerMap)
       .map(([retailerName, stats]) => ({
         retailerName,
         clicks: stats.clicks,
-        projectedCommissionINR: Math.round(stats.commission * 100) / 100,
+        projectedCommissionINR: Math.round(stats.projected * 100) / 100,
+        confirmedCommissionINR: Math.round(stats.confirmed * 100) / 100,
         sharePct: totalClicks > 0 ? Math.round((stats.clicks / totalClicks) * 100) : 0,
       }))
       .sort((a, b) => b.clicks - a.clicks);
 
     const averageCommissionPct =
-      totalGrossOrderValueINR > 0
-        ? Math.round((totalProjectedCommissionINR / totalGrossOrderValueINR) * 1000) / 10
+      directedCartVolumeINR > 0
+        ? Math.round((estimatedPotentialCommissionINR / directedCartVolumeINR) * 1000) / 10
         : 3.5;
+
+    const config = this.getPartnerConfig();
+    const partnerStatuses: Record<string, { configured: boolean; partnerTag?: string; status: 'verified_partner' | 'unconfigured' }> = {
+      'Amazon India': {
+        configured: Boolean(config.amazonTag),
+        partnerTag: config.amazonTag || undefined,
+        status: config.amazonTag ? 'verified_partner' : 'unconfigured',
+      },
+      'Flipkart': {
+        configured: Boolean(config.flipkartAffId),
+        partnerTag: config.flipkartAffId || undefined,
+        status: config.flipkartAffId ? 'verified_partner' : 'unconfigured',
+      },
+      'Tata CLiQ': {
+        configured: Boolean(config.tataCliqCid),
+        partnerTag: config.tataCliqCid || undefined,
+        status: config.tataCliqCid ? 'verified_partner' : 'unconfigured',
+      },
+      'Croma': {
+        configured: Boolean(config.cromaUtmSource),
+        partnerTag: config.cromaUtmSource || undefined,
+        status: config.cromaUtmSource ? 'verified_partner' : 'unconfigured',
+      },
+      'Myntra': {
+        configured: Boolean(config.myntraAffId),
+        partnerTag: config.myntraAffId || undefined,
+        status: config.myntraAffId ? 'verified_partner' : 'unconfigured',
+      },
+      'Reliance Digital': {
+        configured: Boolean(config.relianceDigitalUtmSource),
+        partnerTag: config.relianceDigitalUtmSource || undefined,
+        status: config.relianceDigitalUtmSource ? 'verified_partner' : 'unconfigured',
+      },
+      'Nykaa': {
+        configured: Boolean(config.nykaaUtmSource),
+        partnerTag: config.nykaaUtmSource || undefined,
+        status: config.nykaaUtmSource ? 'verified_partner' : 'unconfigured',
+      },
+    };
 
     return {
       totalClicks,
-      totalGrossOrderValueINR: Math.round(totalGrossOrderValueINR * 100) / 100,
-      totalProjectedCommissionINR: Math.round(totalProjectedCommissionINR * 100) / 100,
+      directedCartVolumeINR: Math.round(directedCartVolumeINR * 100) / 100,
+      totalGrossOrderValueINR: Math.round(directedCartVolumeINR * 100) / 100,
+      estimatedPotentialCommissionINR: Math.round(estimatedPotentialCommissionINR * 100) / 100,
+      totalProjectedCommissionINR: Math.round(estimatedPotentialCommissionINR * 100) / 100,
+      confirmedConversionsCount: conversions.filter((c) => c.status === 'approved' || c.status === 'settled').length,
+      confirmedOrderValueINR: Math.round(confirmedOrderValueINR * 100) / 100,
+      confirmedCommissionINR: Math.round(confirmedCommissionINR * 100) / 100,
+      settledPayoutsINR: Math.round(settledPayoutsINR * 100) / 100,
       averageCommissionPct,
       topRetailers,
+      partnerStatuses,
       recentClicks: filteredClicks.slice(0, 20),
+      recentConversions: conversions.slice(0, 20),
     };
   }
 

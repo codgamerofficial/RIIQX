@@ -216,6 +216,7 @@ export async function saveConnectedAccount(params: SaveAccountParams): Promise<C
  * Returns all connected accounts for a user WITHOUT sensitive tokens
  */
 export async function getConnectedAccounts(userId: string): Promise<ConnectedAccountRecord[]> {
+  if (!userId) return [];
   const supabase = getServiceSupabase();
 
   if (supabase) {
@@ -223,7 +224,7 @@ export async function getConnectedAccounts(userId: string): Promise<ConnectedAcc
       const { data, error } = await supabase
         .from('connected_accounts')
         .select('*')
-        .or(`user_id.eq.${userId},user_id.eq.usr_riiqx_primary`)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (!error && data && data.length > 0) {
@@ -235,35 +236,8 @@ export async function getConnectedAccounts(userId: string): Promise<ConnectedAcc
   }
 
   const store = readLocalStore();
-  // Match accounts for this specific user OR primary workspace owner
-  let matches = store.accounts.filter(
-    (a) => a.user_id === userId || a.user_id === 'usr_riiqx_primary'
-  );
-
-  // Fallback to all existing accounts in local dev/resilient workspace vault
-  if ((userId === 'usr_riiqx_primary' || matches.length === 0) && store.accounts.length > 0) {
-    matches = [...store.accounts];
-  }
-
-  // Auto-align any legacy 'usr_riiqx_primary' records to the active authenticated userId
-  if (userId && userId !== 'usr_riiqx_primary' && matches.length > 0) {
-    let needsWrite = false;
-    for (const a of store.accounts) {
-      if (a.user_id === 'usr_riiqx_primary' || (matches.length > 0 && !a.user_id)) {
-        a.user_id = userId;
-        needsWrite = true;
-      }
-    }
-    for (const c of store.credentials) {
-      if (c.user_id === 'usr_riiqx_primary' || !c.user_id) {
-        c.user_id = userId;
-        needsWrite = true;
-      }
-    }
-    if (needsWrite) {
-      writeLocalStore(store);
-    }
-  }
+  // Strictly filter for authenticated user accounts (no fallback to other users)
+  const matches = store.accounts.filter((a) => a.user_id === userId);
 
   // Deduplicate matches by provider + platformAccountId
   const deduped: ConnectedAccountRecord[] = [];
@@ -286,6 +260,7 @@ export async function getAccountWithCredentials(
   accountId: string,
   userId: string
 ): Promise<{ account: ConnectedAccountRecord; accessToken: string; refreshToken?: string } | null> {
+  if (!accountId || !userId) return null;
   const supabase = getServiceSupabase();
 
   let account: ConnectedAccountRecord | null = null;
@@ -297,7 +272,7 @@ export async function getAccountWithCredentials(
         .from('connected_accounts')
         .select('*')
         .eq('id', accountId)
-        .or(`user_id.eq.${userId},user_id.eq.usr_riiqx_primary`)
+        .eq('user_id', userId)
         .single();
 
       if (accData) {
@@ -306,6 +281,7 @@ export async function getAccountWithCredentials(
           .from('oauth_credentials')
           .select('*')
           .eq('connected_account_id', accountId)
+          .eq('user_id', userId)
           .single();
 
         if (credData) {
@@ -319,24 +295,13 @@ export async function getAccountWithCredentials(
 
   if (!account || !credentials) {
     const store = readLocalStore();
-    account =
-      store.accounts.find(
-        (a) => a.id === accountId && (a.user_id === userId || a.user_id === 'usr_riiqx_primary' || userId === 'usr_riiqx_primary')
-      ) ||
-      store.accounts.find((a) => a.id === accountId) ||
-      null;
-    credentials =
-      store.credentials.find(
-        (c) =>
-          c.connected_account_id === accountId &&
-          (c.user_id === userId || c.user_id === 'usr_riiqx_primary' || userId === 'usr_riiqx_primary' || !c.user_id)
-      ) ||
-      store.credentials.find((c) => c.connected_account_id === accountId) ||
-      null;
+    // Strictly verify account and credentials belong to the authenticated caller
+    account = store.accounts.find((a) => a.id === accountId && a.user_id === userId) || null;
+    credentials = store.credentials.find((c) => c.connected_account_id === accountId && c.user_id === userId) || null;
   }
 
   if (!account || !credentials) {
-    console.warn('[getAccountWithCredentials] Missing account or credentials:', {
+    console.warn('[getAccountWithCredentials] Missing account or unauthorized access attempt:', {
       accountId,
       userId,
       hasAccount: Boolean(account),
@@ -419,40 +384,43 @@ export async function updateAccountStatus(
 }
 
 /**
- * Disconnects an account and deletes stored credentials
+ * Disconnects an account and deletes stored credentials with strict user ownership validation
  */
 export async function deleteConnectedAccount(accountId: string, userId: string): Promise<boolean> {
+  if (!accountId || !userId) return false;
   const supabase = getServiceSupabase();
 
   if (supabase) {
     try {
-      await supabase.from('oauth_credentials').delete().eq('connected_account_id', accountId);
+      await supabase
+        .from('oauth_credentials')
+        .delete()
+        .eq('connected_account_id', accountId)
+        .eq('user_id', userId);
       await supabase
         .from('connected_accounts')
         .delete()
         .eq('id', accountId)
-        .or(`user_id.eq.${userId},user_id.eq.usr_riiqx_primary`);
+        .eq('user_id', userId);
     } catch {
       // Fall through
     }
   }
 
   const store = readLocalStore();
-  const beforeCount = store.accounts.length;
-  store.accounts = store.accounts.filter(
-    (a) => !(a.id === accountId && (a.user_id === userId || a.user_id === 'usr_riiqx_primary' || userId === 'usr_riiqx_primary'))
-  );
-  if (store.accounts.length === beforeCount) {
-    store.accounts = store.accounts.filter((a) => a.id !== accountId);
+  const targetAcc = store.accounts.find((a) => a.id === accountId && a.user_id === userId);
+  if (!targetAcc) {
+    return false;
   }
-  store.credentials = store.credentials.filter((c) => c.connected_account_id !== accountId);
+
+  store.accounts = store.accounts.filter((a) => !(a.id === accountId && a.user_id === userId));
+  store.credentials = store.credentials.filter((c) => !(c.connected_account_id === accountId && c.user_id === userId));
   writeLocalStore(store);
-  return true;
 
   await logSocialAudit({
     userId,
     action: 'account_disconnected',
-    provider: 'youtube', // generic
+    provider: targetAcc.provider,
     accountId,
     details: { accountId },
   });

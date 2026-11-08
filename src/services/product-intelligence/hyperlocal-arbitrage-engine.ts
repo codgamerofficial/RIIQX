@@ -345,13 +345,12 @@ export class HyperlocalArbitrageEngine {
       const distance = this.calculateHaversineDistanceKm(loc.lat, loc.lng, seed.lat, seed.lng);
       const drivingMins = Math.max(10, Math.round(distance * 3.5));
 
-      // Realistic physical store pricing logic:
-      // Base store price is typically within 1-3% of online MRP/Selling Price.
-      // But physical retailers offer instant credit card swipe terminal cashbacks (PineLabs/Innoviti).
-      const priceJitter = idx === 0 ? 0.98 : idx === 1 ? 1.01 : 0.99;
-      const baseStorePrice = Math.round(onlineDeliveredPrice * priceJitter);
+      // Transparent Physical Store Pricing:
+      // Zero fabricated jitter: use verified online delivered price as the catalog benchmark floor.
+      const baseStorePrice = onlineDeliveredPrice;
 
-      // In-Store Point-of-Sale Terminal Swipe Cashback (PineLabs / Innoviti / Paytm POS)
+      // In-Store Point-of-Sale Terminal Cashback (PineLabs / Innoviti)
+      // Clearly marked as indicative terminal promotions subject to cashier terminal verification.
       const posOffers: {
         bankName: string;
         instantCashbackRupees: number;
@@ -366,27 +365,12 @@ export class HyperlocalArbitrageEngine {
           terminalProvider: 'PineLabs',
           cardType: 'credit',
         });
-        posOffers.push({
-          bankName: 'ICICI Bank Credit Card',
-          instantCashbackRupees: Math.min(2500, Math.round(baseStorePrice * 0.08)),
-          terminalProvider: 'Innoviti',
-          cardType: 'credit',
-        });
-      } else if (baseStorePrice >= 3000) {
-        posOffers.push({
-          bankName: 'SBI Card',
-          instantCashbackRupees: 500,
-          terminalProvider: 'PineLabs',
-          cardType: 'credit',
-        });
       }
 
-      // Store Manager Spot Negotiation / Bill-Buster Discount
-      const managerDiscount =
-        baseStorePrice >= 20000 ? 1000 : baseStorePrice >= 8000 ? 500 : 0;
-
+      // Zero fabricated manager discount without official store agreement
+      const managerDiscount = 0;
       const highestPosCashback = posOffers.length > 0 ? posOffers[0].instantCashbackRupees : 0;
-      const netPayable = Math.max(0, baseStorePrice - highestPosCashback - managerDiscount);
+      const netPayable = Math.max(0, baseStorePrice - highestPosCashback);
 
       // Google Maps directions deep-link
       const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${seed.lat},${seed.lng}&destination_place_id=${encodeURIComponent(
@@ -406,16 +390,20 @@ export class HyperlocalArbitrageEngine {
         drivingMinutes: drivingMins,
         phone: seed.phone,
         inStock: true,
-        stockLevel: idx === 0 ? 'high_stock' : idx === 1 ? 'last_units' : 'high_stock',
+        stockLevel: 'call_to_check',
         storePrice: baseStorePrice,
+        isPriceVerified: false,
+        priceVerificationType: 'market_benchmark_estimate',
+        priceDisclaimer: 'In-store price is an estimated market benchmark based on online baseline. Call store to verify live counter quote.',
+        posOfferStatus: 'indicative_terminal_scheme',
         posTerminalCashback: posOffers,
         managerDiscountPotentialRupees: managerDiscount,
         netInStorePayablePrice: netPayable,
         openBoxAlternativeAvailable: idx === 2 && baseStorePrice > 10000,
         openBoxPriceRupees:
-          idx === 2 && baseStorePrice > 10000 ? Math.round(baseStorePrice * 0.82) : undefined,
+          idx === 2 && baseStorePrice > 10000 ? Math.round(baseStorePrice * 0.85) : undefined,
         directionsUrl,
-        badge: idx === 0 ? 'Lowest In-Store Price' : undefined,
+        badge: idx === 0 ? 'Nearest Verified Branch' : undefined,
       };
     });
 

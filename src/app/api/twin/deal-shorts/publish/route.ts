@@ -13,7 +13,13 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required. Please sign in to view connected accounts.' },
+        { status: 401 }
+      );
+    }
     const accounts = await getConnectedAccounts(userId);
 
     return NextResponse.json({
@@ -37,7 +43,13 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required. Please sign in to publish videos.' },
+        { status: 401 }
+      );
+    }
     const body = await req.json();
 
     const {
@@ -65,8 +77,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Resolve connected account
+    // 1. Resolve connected account with strict ownership validation
     const accounts = await getConnectedAccounts(userId);
+    if (accountId) {
+      const isOwner = accounts.some((a) => a.id === accountId);
+      if (!isOwner) {
+        return NextResponse.json(
+          { success: false, error: 'Unauthorized: Account does not belong to the authenticated user.' },
+          { status: 403 }
+        );
+      }
+    }
+
     let targetAccount = accountId
       ? accounts.find((a) => a.id === accountId)
       : accounts.find((a) => a.provider === targetPlatform && a.status === 'connected');

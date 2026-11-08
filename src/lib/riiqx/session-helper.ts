@@ -41,12 +41,7 @@ export async function resolveAuthUserId(req: NextRequest): Promise<string | null
     }
   }
 
-  // 4. Query param fallback if explicitly specified in internal requests
-  const url = new URL(req.url);
-  const paramUserId = url.searchParams.get('userId');
-  if (paramUserId) {
-    return paramUserId;
-  }
-
+  // Strict Production Auth: Never allow query param ?userId= fallback,
+  // as it permits unauthenticated IDOR spoofing.
   return null;
 }

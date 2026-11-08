@@ -282,6 +282,10 @@ export interface PhysicalStoreLocation {
   inStock: boolean;
   stockLevel: 'high_stock' | 'low_stock' | 'last_units' | 'call_to_check';
   storePrice: number;
+  isPriceVerified: boolean;
+  priceVerificationType: 'verified_store_quote' | 'market_benchmark_estimate';
+  priceDisclaimer?: string;
+  posOfferStatus: 'verified_active_brand_campaign' | 'indicative_terminal_scheme';
   posTerminalCashback: {
     bankName: string;
     instantCashbackRupees: number;

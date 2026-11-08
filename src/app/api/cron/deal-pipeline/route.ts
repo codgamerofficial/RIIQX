@@ -11,15 +11,26 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get('authorization');
+    const authHeader = req.headers.get('authorization') || '';
+    const xCronSecret = req.headers.get('x-cron-secret') || '';
     const cronSecret = process.env.CRON_SECRET;
 
-    // Validate authorization if CRON_SECRET is configured
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      const urlSecret = new URL(req.url).searchParams.get('key');
-      if (urlSecret !== cronSecret) {
-        return NextResponse.json({ error: 'Unauthorized cron request.' }, { status: 401 });
-      }
+    // Strict Cron Security: CRON_SECRET is mandatory in production environment
+    if (!cronSecret) {
+      return NextResponse.json(
+        { success: false, error: 'Server configuration error: CRON_SECRET environment variable is required to execute deal pipeline sweeps.' },
+        { status: 500 }
+      );
+    }
+
+    const isBearerValid = authHeader === `Bearer ${cronSecret}`;
+    const isHeaderValid = xCronSecret === cronSecret;
+
+    if (!isBearerValid && !isHeaderValid) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized: Invalid or missing CRON_SECRET authorization.' },
+        { status: 401 }
+      );
     }
 
     const { searchParams } = new URL(req.url);

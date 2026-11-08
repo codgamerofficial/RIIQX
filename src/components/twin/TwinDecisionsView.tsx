@@ -244,16 +244,25 @@ export function TwinDecisionsView() {
   const [isEarningsModalOpen, setIsEarningsModalOpen] = useState(false);
   const [earningsData, setEarningsData] = useState<{
     totalClicks: number;
+    directedCartVolumeINR?: number;
     totalGrossOrderValueINR: number;
+    estimatedPotentialCommissionINR?: number;
     totalProjectedCommissionINR: number;
+    confirmedConversionsCount?: number;
+    confirmedOrderValueINR?: number;
+    confirmedCommissionINR?: number;
+    settledPayoutsINR?: number;
     averageCommissionPct: number;
     topRetailers: {
       retailerName: string;
       clicks: number;
       projectedCommissionINR: number;
+      confirmedCommissionINR?: number;
       sharePct: number;
     }[];
+    partnerStatuses?: Record<string, { configured: boolean; partnerTag?: string; status: 'verified_partner' | 'unconfigured' }>;
     recentClicks: any[];
+    recentConversions?: any[];
   } | null>(null);
   const [earningsLoading, setEarningsLoading] = useState(false);
 
@@ -2001,7 +2010,7 @@ export function TwinDecisionsView() {
               </div>
             ) : (
               <div className="space-y-6 text-xs">
-                {/* 4-Stat Metrics Grid */}
+                {/* 4-Stat Metrics Grid: Honest Accounting Separating Clicks from Confirmed Earnings */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-1">
                     <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">Purchase Clicks</span>
@@ -2010,27 +2019,27 @@ export function TwinDecisionsView() {
                   </div>
 
                   <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">Gross Order Value</span>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">Directed Cart Traffic</span>
                     <div className="text-2xl font-black text-white font-mono">
-                      ₹{(earningsData?.totalGrossOrderValueINR || 0).toLocaleString('en-IN')}
+                      ₹{(earningsData?.directedCartVolumeINR || earningsData?.totalGrossOrderValueINR || 0).toLocaleString('en-IN')}
                     </div>
-                    <span className="text-[10px] text-zinc-500">Directed Merchant Cart</span>
+                    <span className="text-[10px] text-zinc-500">Outbound Click Value</span>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">Projected Revenue</span>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">Estimated Commission</span>
                     <div className="text-2xl font-black text-emerald-400 font-mono">
-                      ₹{(earningsData?.totalProjectedCommissionINR || 0).toLocaleString('en-IN')}
+                      ₹{(earningsData?.estimatedPotentialCommissionINR || earningsData?.totalProjectedCommissionINR || 0).toLocaleString('en-IN')}
                     </div>
-                    <span className="text-[10px] text-emerald-300">Estimated Earnings</span>
+                    <span className="text-[10px] text-emerald-300">Projected on Clicks</span>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">Avg Commission</span>
-                    <div className="text-2xl font-black text-amber-400 font-mono">
-                      {earningsData?.averageCommissionPct || 3.5}%
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">Confirmed / Settled</span>
+                    <div className="text-2xl font-black text-cyan-400 font-mono">
+                      ₹{(earningsData?.confirmedCommissionINR || 0).toLocaleString('en-IN')}
                     </div>
-                    <span className="text-[10px] text-zinc-500">Blended Partner Tier</span>
+                    <span className="text-[10px] text-zinc-500">{earningsData?.confirmedConversionsCount || 0} Postback Orders</span>
                   </div>
                 </div>
 
@@ -2063,37 +2072,53 @@ export function TwinDecisionsView() {
                   </div>
                 )}
 
-                {/* Active Partner Tag Attribution Status */}
+                {/* Genuine Partner Tag Attribution Status — Transparent Unconfigured State */}
                 <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-2">
-                  <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
-                    <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                    <span>Configured Partner Attribution Networks:</span>
+                  <h4 className="text-xs font-bold text-white flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                      <span>Configured Partner Attribution Networks:</span>
+                    </div>
+                    <span className="text-[10px] text-zinc-400 font-normal">Zero fabricated affiliate tags</span>
                   </h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
-                    <div className="p-2.5 rounded-xl bg-zinc-900 border border-white/[0.06]">
-                      <span className="text-[10px] text-zinc-400 block">Amazon India</span>
-                      <span className="text-xs font-mono font-bold text-white">tag=riiqx-21</span>
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-zinc-900 border border-white/[0.06]">
-                      <span className="text-[10px] text-zinc-400 block">Flipkart Affiliate</span>
-                      <span className="text-xs font-mono font-bold text-white">affid=riiqx_aff</span>
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-zinc-900 border border-white/[0.06]">
-                      <span className="text-[10px] text-zinc-400 block">Tata CLiQ Network</span>
-                      <span className="text-xs font-mono font-bold text-white">cid=af:riiqx:pdp</span>
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-zinc-900 border border-white/[0.06]">
-                      <span className="text-[10px] text-zinc-400 block">Croma Retail</span>
-                      <span className="text-xs font-mono font-bold text-white">utm=riiqx_partner</span>
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-zinc-900 border border-white/[0.06]">
-                      <span className="text-[10px] text-zinc-400 block">Myntra Partner</span>
-                      <span className="text-xs font-mono font-bold text-white">aff_id=riiqx_affiliate</span>
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-zinc-900 border border-white/[0.06]">
-                      <span className="text-[10px] text-zinc-400 block">Reliance &amp; Nykaa</span>
-                      <span className="text-xs font-mono font-bold text-white">utm=riiqx_shopping</span>
-                    </div>
+                    {Object.entries(
+                      earningsData?.partnerStatuses || {
+                        'Amazon India': { configured: false, status: 'unconfigured' },
+                        'Flipkart': { configured: false, status: 'unconfigured' },
+                        'Tata CLiQ': { configured: false, status: 'unconfigured' },
+                        'Croma': { configured: false, status: 'unconfigured' },
+                        'Myntra': { configured: false, status: 'unconfigured' },
+                        'Reliance Digital': { configured: false, status: 'unconfigured' },
+                      }
+                    ).map(([name, info]: [string, any], idx) => (
+                      <div
+                        key={idx}
+                        className={`p-2.5 rounded-xl border ${
+                          info.configured
+                            ? 'bg-emerald-950/20 border-emerald-500/30'
+                            : 'bg-zinc-900 border-white/[0.06]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-[10px] text-zinc-400 block truncate">{name}</span>
+                          <span
+                            className={`text-[8px] font-mono px-1 py-0.2 rounded font-bold ${
+                              info.configured
+                                ? 'bg-emerald-500/20 text-emerald-300'
+                                : 'bg-zinc-800 text-zinc-500'
+                            }`}
+                          >
+                            {info.configured ? 'Configured' : 'Unconfigured'}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono font-bold text-white block mt-1 truncate">
+                          {info.configured && info.partnerTag
+                            ? `tag=${info.partnerTag}`
+                            : 'Canonical (No fake tags)'}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
