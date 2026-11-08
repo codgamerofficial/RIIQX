@@ -130,10 +130,12 @@ export class PriceCalculatorService {
 
     // 6. Cashback Calculation (Scenario F)
     // Rule: Cashback is NEVER subtracted from the immediate checkout invoice price
+    // Note: Credit card cashback only accrues on the net amount charged to the card (finalCashPayable),
+    // excluding stored gift card value balances.
     if (cashbackOffers.length > 0) {
       const cb = cashbackOffers[0];
       if (cb.verificationStatus !== 'expired') {
-        let calcBase = checkoutPayableBeforeGiftCard;
+        const calcBase = finalCashPayable;
         let cbAmount = 0;
         if (cb.discountType === 'percentage') {
           cbAmount = Math.round((calcBase * cb.discountValue) / 100);
@@ -151,7 +153,7 @@ export class PriceCalculatorService {
       }
     }
 
-    const effectiveCostAfterCashback = Math.max(0, checkoutPayableBeforeGiftCard - expectedCashback);
+    const effectiveCostAfterCashback = Math.max(0, finalCashPayable - expectedCashback);
 
     return {
       scenarioName: scenarioType,

@@ -281,6 +281,12 @@ async function runTests() {
     assert(scenario.finalCashPayable === 20000, `Immediate cash payable is ₹20,000 (NOT deducted at checkout)`);
     assert(scenario.expectedCashback === 1000, `Expected cashback is separated: ₹1,000`);
     assert(scenario.effectiveCostAfterCashback === 19000, `Effective cost after cashback is ₹19,000`);
+
+    // Regression Test: Card cashback must ONLY accrue on net cash charged to card when gift card is consumed
+    const scenarioWithGiftCard = PriceCalculatorService.calculateScenario(20000, 0, 0, [flipkartAxisCb], 5000);
+    assert(scenarioWithGiftCard.finalCashPayable === 15000, `Net card cash payable after ₹5,000 gift card is ₹15,000`);
+    assert(scenarioWithGiftCard.expectedCashback === 750, `Card cashback strictly calculated on net card spend (5% of ₹15,000 = ₹750, Got ₹${scenarioWithGiftCard.expectedCashback})`);
+    assert(scenarioWithGiftCard.effectiveCostAfterCashback === 14250, `Effective net cash cost post-cashback is ₹14,250`);
   } catch (err) {
     assert(false, `Test 8 failed with error: ${err.message}`);
   }
