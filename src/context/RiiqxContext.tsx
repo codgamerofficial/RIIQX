@@ -269,7 +269,7 @@ export function RiiqxProvider({ children }: { children: ReactNode }) {
   const [projects, setProjects] = useState<RiiqxProject[]>([
     {
       id: 'prj_starter_intel',
-      userId: 'usr_riiqx_primary',
+      userId: '',
       title: 'Enterprise AI Strategy',
       description: 'Online agent execution, AWS Bedrock integration, and autonomous content generation.',
       color: '#06B6D4',
@@ -311,13 +311,13 @@ export function RiiqxProvider({ children }: { children: ReactNode }) {
     refreshSession();
 
     // Real-time Supabase auth state listener
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event) => {
+    const authListener = supabase?.auth ? supabase.auth.onAuthStateChange(async (event: any) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
         refreshSession();
       } else if (event === 'SIGNED_OUT') {
         setIsAuthenticated(false);
       }
-    });
+    }) : null;
 
     const loadedConversations = loadConversationsFromStorage();
     const loadedProjects = loadProjectsFromStorage();
@@ -370,6 +370,10 @@ export function RiiqxProvider({ children }: { children: ReactNode }) {
     }
 
     refreshHealth();
+
+    return () => {
+      authListener?.data?.subscription?.unsubscribe();
+    };
   }, [refreshHealth, refreshSession, selectedModel.name]);
 
   const createNewConversation = useCallback(

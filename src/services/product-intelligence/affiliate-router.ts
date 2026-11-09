@@ -435,7 +435,7 @@ export class AffiliateSmartRouter {
       try {
         const sb = this.getAdminClient();
         await sb.from('affiliate_click_events').insert({
-          user_id: input.userId || 'usr_guest_local',
+          user_id: input.userId || null,
           product_identifier: input.productIdentifier,
           product_title: input.productTitle,
           retailer_name: input.retailerName,

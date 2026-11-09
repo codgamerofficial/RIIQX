@@ -66,7 +66,7 @@ export async function GET() {
     // 3. Process Pandal Counts & Verification Status
     const pandals = pandalsListRes.data || [];
     const pandalSources = pandalSourcesRes.data || [];
-    const verifiedPandalIds = new Set(pandalSources.map(s => s.pandal_id));
+    const verifiedPandalIds = new Set(pandalSources.map((s: any) => s.pandal_id));
 
     let verifiedCount = 0;
     let unknownCount = 0;
@@ -74,7 +74,7 @@ export async function GET() {
     let earlyOpeningCount = 0;
     let underPreparationCount = 0;
 
-    pandals.forEach(p => {
+    pandals.forEach((p: any) => {
       if (verifiedPandalIds.has(p.id)) verifiedCount++;
       if (p.status === 'UNKNOWN') unknownCount++;
       else if (p.status === 'OPEN') openCount++;
@@ -85,7 +85,7 @@ export async function GET() {
     // 4. Process Metro Breakdown by Line
     const metroStations = metroStationsRes.data || [];
     const metroLineCounts: Record<string, number> = {};
-    metroStations.forEach(s => {
+    metroStations.forEach((s: any) => {
       const line = s.line || 'Blue Line';
       metroLineCounts[line] = (metroLineCounts[line] || 0) + 1;
     });
@@ -97,7 +97,7 @@ export async function GET() {
 
     // 6. Traffic Filter: active right now vs future/expired
     const allActiveTraffic = trafficActiveRes.data || [];
-    const currentlyActiveTraffic = allActiveTraffic.filter(t => {
+    const currentlyActiveTraffic = allActiveTraffic.filter((t: any) => {
       const from = new Date(t.valid_from).getTime();
       const until = new Date(t.valid_until).getTime();
       const now = Date.now();
@@ -137,7 +137,7 @@ export async function GET() {
       },
       sources: {
         total: sourcesRes.data?.length || 0,
-        official: sourcesRes.data?.filter(s => s.is_official).length || 0,
+        official: sourcesRes.data?.filter((s: any) => s.is_official).length || 0,
         list: sourcesRes.data || [],
       },
       metro: {

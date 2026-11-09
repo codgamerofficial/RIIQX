@@ -23,7 +23,10 @@ export interface ResearchRequest {
 
 export class ProductResearchOrchestrator {
   public static async executeResearch(req: ResearchRequest): Promise<PurchaseAnalysisReport> {
-    const userId = req.userId || 'usr_guest_local';
+    const userId = req.userId;
+    if (!userId || userId.trim() === '') {
+      throw new Error('Unauthorized: Authentication required to execute product research.');
+    }
     let identity: ProductIdentity;
     let initialOffers: RetailerOffer[] = [];
 

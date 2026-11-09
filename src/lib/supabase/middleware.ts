@@ -7,10 +7,8 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import type { Database } from '@/lib/types/database.types';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ojtngzqsrdralrhipjzt.supabase.co';
-const anonKey =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qdG5nenFzcmRyYWxyaGlwanp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODA1NzcsImV4cCI6MjEwNjk1NjU3N30.TuZdeSyZpWSYJmUz6VP3EJPduM9t5dxeV1rPQrrnMko';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 // Public routes accessible without authentication
 const PUBLIC_PATHS = [
@@ -71,6 +69,18 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/static') ||
     pathname.includes('.') // favicon.ico, images, fonts, etc.
   ) {
+    return supabaseResponse;
+  }
+
+  // Fail-closed security: If required Supabase credentials are missing, block private routes
+  if (!supabaseUrl || !anonKey) {
+    const isPublic = PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(path + '/'));
+    if (!isPublic) {
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ error: 'Supabase authentication service unconfigured' }, { status: 500 });
+      }
+      return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
     return supabaseResponse;
   }
 

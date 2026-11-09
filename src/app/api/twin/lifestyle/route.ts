@@ -55,7 +55,13 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Authentication required.' },
+        { status: 401 }
+      );
+    }
     const body = await req.json();
 
     const mode = body.mode === 'eat_out' ? 'eat_out' : 'cook_home';

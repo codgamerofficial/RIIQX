@@ -49,14 +49,14 @@ export async function POST(req: Request) {
 
     // 2. Separate Expo tokens from Web tokens
     const expoTokens = activeTokens
-      .filter((t) => t.push_token.startsWith('ExponentPushToken[') || t.push_token.startsWith('ExpoPushToken['))
-      .map((t) => t.push_token);
+      .filter((t: any) => t.push_token.startsWith('ExponentPushToken[') || t.push_token.startsWith('ExpoPushToken['))
+      .map((t: any) => t.push_token);
 
     // 3. Dispatch to Expo Push Gateway if any mobile tokens exist
     let expoReceipt = null;
     if (expoTokens.length > 0) {
       try {
-        const expoMessages = expoTokens.map((token) => ({
+        const expoMessages = expoTokens.map((token: any) => ({
           to: token,
           sound: 'default',
           title,

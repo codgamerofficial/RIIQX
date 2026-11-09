@@ -1,14 +1,24 @@
 // =============================================================================
 // RIIQX — Supabase Browser Client (SSR-Compatible)
 // Uses @supabase/ssr createBrowserClient with Cookie-Backed Sessions
-// Public Anon Access Only • Never exposes Service Role Key
+// Public Anon Access Only • Never exposes Service Role Key • Fail-Closed
 // =============================================================================
 
 import { createBrowserClient } from '@supabase/ssr';
 import type { Database } from '@/lib/types/database.types';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ojtngzqsrdralrhipjzt.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qdG5nenFzcmRyYWxyaGlwanp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODA1NzcsImV4cCI6MjEwNjk1NjU3N30.TuZdeSyZpWSYJmUz6VP3EJPduM9t5dxeV1rPQrrnMko';
+function getBrowserSupabaseConfig(): { supabaseUrl: string; supabaseAnonKey: string } {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      'FATAL CONFIGURATION ERROR: Supabase browser environment variables (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY) are required. Client must fail closed.'
+    );
+  }
+
+  return { supabaseUrl, supabaseAnonKey };
+}
 
 export const isSupabaseConfigured = (): boolean => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -22,8 +32,9 @@ export const isSupabaseConfigured = (): boolean => {
 };
 
 export const createClient = () => {
+  const { supabaseUrl, supabaseAnonKey } = getBrowserSupabaseConfig();
   return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
 };
 
-// Singleton instance for client components
-export const supabase = createClient();
+// Singleton instance for client components (guarded against runtime unconfigured state)
+export const supabase = isSupabaseConfigured() ? createClient() : (null as any);

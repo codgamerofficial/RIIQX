@@ -1,13 +1,19 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { resolveAuthUserId } from '@/lib/riiqx/session-helper';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const userId = await resolveAuthUserId(req);
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized: Authentication required.' }, { status: 401 });
+  }
+
   const exportData = {
     exportedAt: new Date().toISOString(),
     system: 'RIIQX Agentic Platform',
     version: '2.0.0',
-    userId: 'usr_riiqx_primary',
+    userId,
     projects: [
       {
         id: 'prj_starter_intel',

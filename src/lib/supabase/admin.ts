@@ -6,7 +6,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../types/database.types';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ojtngzqsrdralrhipjzt.supabase.co';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 export const isServiceRoleConfigured = (): boolean => {
@@ -19,6 +19,10 @@ export const isServiceRoleConfigured = (): boolean => {
 export const createAdminClient = () => {
   if (typeof window !== 'undefined') {
     throw new Error('SECURITY VIOLATION: createAdminClient cannot be called from the browser client.');
+  }
+
+  if (!supabaseUrl) {
+    throw new Error('FATAL CONFIGURATION ERROR: NEXT_PUBLIC_SUPABASE_URL is missing in server environment.');
   }
 
   if (!serviceRoleKey) {

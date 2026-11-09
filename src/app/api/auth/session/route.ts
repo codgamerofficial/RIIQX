@@ -6,13 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { getUserProfile, ensureUserProfile } from '@/lib/riiqx/profiles';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ojtngzqsrdralrhipjzt.supabase.co';
-const anonKey =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qdG5nenFzcmRyYWxyaGlwanp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODA1NzcsImV4cCI6MjEwNjk1NjU3N30.TuZdeSyZpWSYJmUz6VP3EJPduM9t5dxeV1rPQrrnMko';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,20 +15,17 @@ export async function GET(req: NextRequest) {
     const authHeader = req.headers.get('Authorization');
     const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
+    const supabase = await createClient();
     let user: any = null;
     let authError: any = null;
 
-    if (bearerToken && anonKey) {
-      const client = createSupabaseClient(supabaseUrl, anonKey);
-      const { data, error } = await client.auth.getUser(bearerToken);
-      user = data.user;
+    if (bearerToken) {
+      const { data, error } = await supabase.auth.getUser(bearerToken);
+      user = data?.user;
       authError = error;
-    }
-
-    if (!user) {
-      const supabase = await createClient();
+    } else {
       const { data, error } = await supabase.auth.getUser();
-      user = data.user;
+      user = data?.user;
       authError = error;
     }
 

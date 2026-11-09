@@ -36,7 +36,7 @@ function fail(testName, err) {
   console.error(`  [FAIL] ${testName}: ${err.message || err}`);
 }
 
-async function runHttpRequest(method, path, body = null) {
+async function runHttpRequest(method, path, body = null, customHeaders = {}) {
   return new Promise((resolve, reject) => {
     const url = new URL(path, BASE_URL);
     const options = {
@@ -46,6 +46,7 @@ async function runHttpRequest(method, path, body = null) {
       path: url.pathname + url.search,
       headers: {
         'Content-Type': 'application/json',
+        ...customHeaders,
       },
     };
 
@@ -72,6 +73,25 @@ async function runHttpRequest(method, path, body = null) {
     }
     req.end();
   });
+}
+
+async function getAuthCookie() {
+  try {
+    const authRes = await runHttpRequest('POST', '/api/riiqx/auth', {
+      action: 'login',
+      email: 'qa_security_verifier@riiqx.com',
+      password: 'SecurityVerified@2026!',
+    });
+    const setCookie = authRes.headers['set-cookie'];
+    if (Array.isArray(setCookie)) {
+      return setCookie.map((c) => c.split(';')[0]).join('; ');
+    } else if (typeof setCookie === 'string') {
+      return setCookie.split(';')[0];
+    }
+    return '';
+  } catch {
+    return '';
+  }
 }
 
 async function runTests() {
@@ -179,10 +199,10 @@ async function runTests() {
     fail('History & Persistence', err);
   }
 
-  // --- Test 4: Live HTTP API - POST /api/twin/deal-shorts/generate ---
+  // --- Test 4: Live HTTP API - POST /api/twin/deal-shorts/generate (Auth Gate & Execution) ---
   console.log('\n--- Test 4: Live HTTP API - POST /api/twin/deal-shorts/generate ---');
   try {
-    const res = await runHttpRequest('POST', '/api/twin/deal-shorts/generate', {
+    const payload = {
       productTitle: 'Apple MacBook Air M3 16GB RAM 512GB SSD',
       productIdentifier: 'MACBOOK-M3',
       retailerName: 'Flipkart',
@@ -191,6 +211,17 @@ async function runTests() {
       productUrl: 'https://www.flipkart.com/apple-macbook-air-m3/p/itm123',
       category: 'electronics',
       language: 'en',
+    };
+
+    // 4a: Unauthenticated caller rejected with 401
+    const unauthRes = await runHttpRequest('POST', '/api/twin/deal-shorts/generate', payload);
+    assert.strictEqual(unauthRes.statusCode, 401, `Unauthenticated request must be rejected with 401, got ${unauthRes.statusCode}`);
+    pass('POST /api/twin/deal-shorts/generate strictly rejects unauthenticated callers with HTTP 401');
+
+    // 4b: Authenticated caller executes successfully
+    const authCookie = await getAuthCookie();
+    const res = await runHttpRequest('POST', '/api/twin/deal-shorts/generate', payload, {
+      Cookie: authCookie,
     });
 
     assert.strictEqual(res.statusCode, 200, `Expected 200, got ${res.statusCode}`);

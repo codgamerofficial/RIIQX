@@ -116,7 +116,10 @@ export class FestiveDropSniperService {
   /**
    * Evaluates and returns complete Sniper Dashboard Report from persistent storage
    */
-  public static async getDashboardReport(userId = 'usr_guest_local'): Promise<FestiveSniperDashboardReport> {
+  public static async getDashboardReport(userId: string): Promise<FestiveSniperDashboardReport> {
+    if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+      throw new Error('Unauthorized: User ID is required to access Sniper Dashboard.');
+    }
     const weeklyCycle = this.getBankRotationCalendar();
     const currentActiveBank =
       weeklyCycle.find((b) => b.status === 'active_now') || weeklyCycle[0];
@@ -196,8 +199,11 @@ export class FestiveDropSniperService {
       sellerName?: string;
       variantAttributes?: Record<string, string>;
     },
-    userId = 'usr_guest_local'
+    userId: string
   ): Promise<SniperWatchlistItem> {
+    if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+      throw new Error('Unauthorized: User ID is required to add sniper target.');
+    }
     const persisted = await PriceMonitoringService.addOrUpdateWatchlist(userId, {
       productTitle: item.productTitle,
       productUrl: item.productUrl,

@@ -16,7 +16,10 @@ export async function GET(req: NextRequest) {
 
     // If dashboard query requested, return earnings metrics
     if (searchParams.get('dashboard') === 'true') {
-      const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+      const userId = await resolveAuthUserId(req);
+      if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized: Authentication required.' }, { status: 401 });
+      }
       const dashboard = await AffiliateSmartRouter.getEarningsDashboard(userId);
       return NextResponse.json({ success: true, dashboard });
     }
@@ -31,9 +34,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Missing destination URL parameter.' }, { status: 400 });
     }
 
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
     const clickEvent = await AffiliateSmartRouter.recordOutboundClick({
-      userId,
+      userId: userId || undefined,
       productIdentifier: identifier,
       productTitle: title,
       retailerName: retailer,
@@ -66,7 +69,13 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Authentication required.' },
+        { status: 401 }
+      );
+    }
     const body = await req.json();
 
     const {

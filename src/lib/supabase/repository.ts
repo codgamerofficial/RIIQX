@@ -63,7 +63,7 @@ class ResilientPujaStore {
       id: 'supabase',
       service_name: 'Supabase PostgreSQL',
       status: 'CONNECTED',
-      endpoint: process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ojtngzqsrdralrhipjzt.supabase.co',
+      endpoint: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
       latency_ms: 12,
       last_tested_at: new Date().toISOString(),
     },

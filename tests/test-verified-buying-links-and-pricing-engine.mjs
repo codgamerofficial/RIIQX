@@ -36,12 +36,38 @@ async function runTests() {
   // ---------------------------------------------------------------------------
   console.log('--- Test 1: Same Product Multi-Retailer Discovery & Isolation ---');
   try {
-    const res = await fetch(`${BASE_URL}/api/twin/decide`, {
+    const payload = {
+      prompt: 'Sony WF-1000XM5 Wireless Noise Cancelling Earbuds',
+    };
+
+    // 1a: Unauthenticated caller strictly rejected with 401
+    const unauthRes = await fetch(`${BASE_URL}/api/twin/decide`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    assert(unauthRes.status === 401, `Unauthenticated POST /api/twin/decide returned 401 (Got ${unauthRes.status})`);
+
+    // 1b: Authenticate with test user
+    const authRes = await fetch(`${BASE_URL}/api/riiqx/auth`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        prompt: 'Sony WF-1000XM5 Wireless Noise Cancelling Earbuds',
+        action: 'login',
+        email: 'qa_security_verifier@riiqx.com',
+        password: 'SecurityVerified@2026!',
       }),
+    });
+    const setCookie = authRes.headers.get('set-cookie') || '';
+
+    // 1c: Authenticated request succeeds
+    const res = await fetch(`${BASE_URL}/api/twin/decide`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: setCookie,
+      },
+      body: JSON.stringify(payload),
     });
     assert(res.status === 200, `POST /api/twin/decide returned 200 (Got ${res.status})`);
     const data = await res.json();

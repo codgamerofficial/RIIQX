@@ -36,11 +36,13 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const minSavings = Number(searchParams.get('minDrop')) || 10;
     const maxVideos = Number(searchParams.get('maxVideos')) || 3;
+    const autoPublish =
+      searchParams.get('autoPublish') === 'true' && process.env.AUTONOMOUS_PUBLISHING === 'true';
 
     const result = await AutonomousDealPipeline.runAutonomousSweep({
       minSavingsPct: minSavings,
       maxVideosPerRun: maxVideos,
-      autoPublish: true,
+      autoPublish,
     });
 
     return NextResponse.json({

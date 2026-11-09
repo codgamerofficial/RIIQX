@@ -17,7 +17,10 @@ export async function POST(
 ) {
   try {
     const capabilityId = params.capabilityId as CapabilityId;
-    const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const body = await req.json().catch(() => ({}));
 
     const {

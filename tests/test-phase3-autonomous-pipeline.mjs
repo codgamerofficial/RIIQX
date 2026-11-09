@@ -199,7 +199,14 @@ async function runTests() {
     pass('GET /api/cron/deal-pipeline strictly rejects unauthenticated callers without CRON_SECRET (HTTP 401)');
 
     // 5b: Authenticated cron request with valid CRON_SECRET succeeds with 200
-    const cronSecret = process.env.CRON_SECRET || '3024da5cf18a7be3e725f469fbefcf9f3c551b18adf713e2f84c102393adaf63';
+    let cronSecret = process.env.CRON_SECRET;
+    if (!cronSecret) {
+      try {
+        const envLocal = fs.readFileSync(path.resolve('.env.local'), 'utf8');
+        const m = envLocal.match(/CRON_SECRET=([^\r\n]+)/);
+        if (m) cronSecret = m[1].trim();
+      } catch {}
+    }
     const authRes = await runHttpRequest('GET', '/api/cron/deal-pipeline?minDrop=10&maxVideos=2', null, {
       'Authorization': `Bearer ${cronSecret}`,
     });

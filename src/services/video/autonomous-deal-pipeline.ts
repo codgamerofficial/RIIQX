@@ -125,9 +125,9 @@ export class AutonomousDealPipeline {
         totalProjectedCommissionINR += video.projectedCommissionINR;
         previouslyGeneratedDropKeys.add(dropKey);
 
-        // 4. Check for connected social accounts and queue publishing with verified owner
+        // 4. Check for connected social accounts and queue publishing only when explicitly enabled
         const targetUserId = item.userId || userId;
-        if (params?.autoPublish !== false && targetUserId) {
+        if (params?.autoPublish === true && targetUserId) {
           try {
             const accounts = await getConnectedAccounts(targetUserId);
             for (const acc of accounts) {

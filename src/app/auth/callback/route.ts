@@ -7,7 +7,6 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { ensureUserProfile } from '@/lib/riiqx/profiles';
-import { createSessionToken } from '@/lib/riiqx/auth';
 import type { Database } from '@/lib/types/database.types';
 
 export const dynamic = 'force-dynamic';
@@ -74,10 +73,12 @@ export async function GET(request: Request) {
     response.cookies.delete('riiqx_auth_next');
 
     // 3. Create SSR server client bound directly to the response object with explicit root path
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ojtngzqsrdralrhipjzt.supabase.co';
-    const supabaseAnonKey =
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qdG5nenFzcmRyYWxyaGlwanp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODA1NzcsImV4cCI6MjEwNjk1NjU3N30.TuZdeSyZpWSYJmUz6VP3EJPduM9t5dxeV1rPQrrnMko';
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return NextResponse.redirect(`${effectiveOrigin}/auth/login?error=Configuration+missing`);
+    }
 
     const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
       cookies: {
@@ -109,16 +110,6 @@ export async function GET(request: Request) {
         } catch (profileErr) {
           console.warn('[OAuth Callback] User profile sync warning (proceeding with session):', profileErr);
         }
-
-        // Set dual-mode resilient local session token with path='/'
-        const token = createSessionToken(data.user.id);
-        response.cookies.set('riiqx_session', token, {
-          path: '/',
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          maxAge: 7 * 24 * 60 * 60,
-          sameSite: 'lax',
-        });
 
         console.info('[OAuth Callback Success] User session established for:', data.user.id);
         return response;

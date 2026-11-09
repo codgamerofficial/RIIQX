@@ -27,7 +27,7 @@ export function TwinActivityView() {
   const [approvals, setApprovals] = useState<ActionApproval[]>([
     {
       id: 'act-001',
-      userId: 'usr_guest_local',
+      userId: '',
       actionType: 'Price Drop Watchlist Alert',
       parameters: { product: 'Apple AirPods Pro 2', targetFloorPrice: 17500 },
       status: 'pending',

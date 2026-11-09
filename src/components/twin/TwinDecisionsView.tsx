@@ -215,7 +215,7 @@ export function TwinDecisionsView() {
   // "My Shopping Offers" Preferences State
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
   const [userPreferences, setUserPreferences] = useState<UserShoppingPreferences>({
-    userId: 'usr_guest_local',
+    userId: '',
     preferredBanks: ['HDFC Bank', 'ICICI Bank', 'SBI Card', 'Axis Bank'],
     preferredCardTypes: ['credit', 'debit', 'emi'],
     preferredPaymentMethods: ['upi', 'card', 'netbanking'],
