@@ -67,7 +67,7 @@ export class DirectLinkVerifier {
       const accessRestrictions: string[] = [];
 
       // Check mobile app share vectors
-      if (parsed.hostname.toLowerCase().startsWith('dl.') || rawUrl.includes('/s/')) {
+      if (parsed.hostname.toLowerCase().startsWith('dl.') || rawUrl.includes('/s/') || parsed.hostname.toLowerCase().includes('amzn.in')) {
         accessRestrictions.push('Mobile share link: redirects to canonical web storefront');
       }
 
@@ -96,7 +96,7 @@ export class DirectLinkVerifier {
       // Exact PDP Path Verification by Indian Retailer:
       let isVerifiedPdp = false;
 
-      if (cleanDomain.includes('amazon.')) {
+      if (cleanDomain.includes('amazon.') || cleanDomain.includes('amzn.in') || cleanDomain === 'amzn.in') {
         // Amazon PDP format: /dp/ASIN or /gp/product/ASIN
         isVerifiedPdp = Boolean(canonicalIdentifier && /^[A-Z0-9]{10}$/i.test(canonicalIdentifier));
       } else if (cleanDomain.includes('flipkart.com')) {

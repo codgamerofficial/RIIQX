@@ -125,9 +125,14 @@ export class RetailerDiscoveryService {
       .trim()
       .slice(0, 60);
 
+    let targetSearch = cleanSearchTitle;
+    if (targetSearch.length <= 2 && benchmark.canonicalIdentifier) {
+      targetSearch = `${benchmark.brand !== 'Verified Brand' ? benchmark.brand : ''} ${benchmark.canonicalIdentifier}`.trim();
+    }
+
     try {
       // Natural search query that works across SearXNG & DuckDuckGo
-      const searchQuery = `${cleanSearchTitle} buy online India Amazon Flipkart`;
+      const searchQuery = `${targetSearch} buy online India Amazon Flipkart`;
       const searchResult = await executeLiveResearch(searchQuery);
 
       if (searchResult.citations && searchResult.citations.length > 0) {

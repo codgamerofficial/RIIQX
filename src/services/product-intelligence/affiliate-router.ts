@@ -265,7 +265,7 @@ export class AffiliateSmartRouter {
     const catKey = this.inferCategoryKey(categoryOrTitle);
     const schedule = this.COMMISSION_SCHEDULES[catKey] || this.COMMISSION_SCHEDULES.general;
 
-    if (normRetailer.includes('amazon')) return schedule.amazonPct;
+    if (normRetailer.includes('amazon') || normRetailer.includes('amzn')) return schedule.amazonPct;
     if (normRetailer.includes('flipkart')) return schedule.flipkartPct;
     if (normRetailer.includes('tatacliq') || normRetailer.includes('tata cliq')) return schedule.tataCliqPct;
     if (normRetailer.includes('croma')) return schedule.cromaPct;
@@ -330,7 +330,7 @@ export class AffiliateSmartRouter {
     let isAttributed = false;
 
     // 1. Amazon India Format: ?tag={AMAZON_TAG}&linkCode=as2
-    if (norm.includes('amazon')) {
+    if (norm.includes('amazon') || norm.includes('amzn')) {
       if (config.amazonTag) {
         targetUrl.searchParams.set('tag', config.amazonTag);
         targetUrl.searchParams.set('linkCode', 'as2');

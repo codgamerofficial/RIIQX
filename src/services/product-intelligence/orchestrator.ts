@@ -41,6 +41,35 @@ export class ProductResearchOrchestrator {
       if (extracted.initialOffer) {
         initialOffers.push(extracted.initialOffer);
       }
+
+      // Multimodal fusion: If user attached a screenshot with the URL, leverage visual OCR to enrich identity & pricing
+      if (req.screenshotBase64 && req.screenshotBase64.trim()) {
+        try {
+          const recognized = await VisualProductRecognizer.recognizeScreenshot(
+            req.screenshotBase64,
+            req.screenshotMimeType || 'image/jpeg',
+            identity.title || req.queryHint
+          );
+          if (recognized.identity.title && (!identity.title || identity.title.length <= 2 || identity.title.toLowerCase() === 'verified product')) {
+            identity.title = recognized.identity.title;
+          }
+          if (recognized.identity.brand && recognized.identity.brand !== 'Verified Brand') {
+            identity.brand = recognized.identity.brand;
+          }
+          if (recognized.detectedOffer?.sellingPrice && (!initialOffers[0]?.sellingPrice || initialOffers[0].sellingPrice <= 0)) {
+            if (initialOffers[0]) {
+              initialOffers[0].sellingPrice = recognized.detectedOffer.sellingPrice;
+              initialOffers[0].listedPrice = recognized.detectedOffer.listedPrice || recognized.detectedOffer.sellingPrice;
+              initialOffers[0].mrp = recognized.detectedOffer.mrp;
+              initialOffers[0].finalComparablePrice = recognized.detectedOffer.sellingPrice;
+              initialOffers[0].verificationStatus = 'provider_reported';
+            }
+          }
+          identity.rawInputType = 'hybrid';
+        } catch {
+          // Keep URL extraction
+        }
+      }
     } else if (req.screenshotBase64 && req.screenshotBase64.trim()) {
       const recognized = await VisualProductRecognizer.recognizeScreenshot(
         req.screenshotBase64,

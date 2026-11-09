@@ -116,12 +116,17 @@ export class ProductURLExtractor {
     let canonicalIdentifier: string | undefined;
     let canonicalUrl = rawUrl.trim();
 
-    if (host.includes('amazon.')) {
+    if (host.includes('amazon.') || host === 'amzn.in' || host.endsWith('.amzn.in')) {
       retailerName = 'Amazon India';
       const asinMatch = parsed.pathname.match(/(?:\/dp\/|\/gp\/product\/)([A-Z0-9]{10})/i);
       if (asinMatch) {
         canonicalIdentifier = asinMatch[1].toUpperCase();
         canonicalUrl = `https://www.amazon.in/dp/${canonicalIdentifier}`;
+      } else {
+        const shortMatch = parsed.pathname.match(/\/d\/([a-zA-Z0-9]+)/i);
+        if (shortMatch) {
+          canonicalIdentifier = shortMatch[1];
+        }
       }
     } else if (host.includes('flipkart.com')) {
       retailerName = 'Flipkart';
@@ -199,13 +204,14 @@ export class ProductURLExtractor {
 
     let html = '';
     let isAntiBotBlocked = false;
+    let effectiveUrl = rawUrl.trim();
 
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 7000);
 
-      // Fetch with redirect follow enabled to resolve mobile share URLs like dl.flipkart.com/s/...
-      const response = await fetch(rawUrl, {
+      // Fetch with redirect follow enabled to resolve mobile share URLs like amzn.in/d/..., dl.flipkart.com/s/...
+      const response = await fetch(effectiveUrl, {
         redirect: 'follow',
         signal: controller.signal,
         headers: {
@@ -230,6 +236,7 @@ export class ProductURLExtractor {
 
         // Update canonical URL and metadata from the resolved destination URL
         if (response.url && response.url !== rawUrl) {
+          effectiveUrl = response.url;
           const resolved = this.canonicalizeUrl(response.url);
           canonicalUrl = resolved.canonicalUrl;
           domain = resolved.domain;
@@ -238,6 +245,17 @@ export class ProductURLExtractor {
             canonicalIdentifier = resolved.canonicalIdentifier;
           }
         }
+
+        // Anti-bot challenge detection (Amazon robot check, captcha, cloudflare challenge)
+        if (
+          html.includes('validateCaptcha') ||
+          html.includes('api-services-support@amazon.com') ||
+          html.includes('Robot Check') ||
+          html.includes('Type the characters you see in this image') ||
+          html.includes('Checking your browser before accessing')
+        ) {
+          isAntiBotBlocked = true;
+        }
       }
     } catch (fetchErr: any) {
       isAntiBotBlocked = true;
@@ -245,7 +263,7 @@ export class ProductURLExtractor {
 
     // 1. Try JSON-LD Schema.org parsing
     let jsonLdProduct: any = null;
-    if (html) {
+    if (html && !isAntiBotBlocked) {
       const jsonLdMatches = html.match(/<script\s+type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi);
       if (jsonLdMatches) {
         for (const match of jsonLdMatches) {
@@ -263,9 +281,9 @@ export class ProductURLExtractor {
       }
     }
 
-    // 2. OpenGraph / Meta tags parsing
+    // 2. OpenGraph / Meta tags / DOM elements parsing
     const getMeta = (prop: string): string => {
-      if (!html) return '';
+      if (!html || isAntiBotBlocked) return '';
       const reg = new RegExp(`<meta\\s+(?:property|name)=["']${prop}["']\\s+content=["'](.*?)["']`, 'i');
       const m = html.match(reg);
       return m ? m[1].trim() : '';
@@ -276,8 +294,24 @@ export class ProductURLExtractor {
     const ogPrice = getMeta('og:price:amount') || getMeta('product:price:amount');
     const ogDesc = getMeta('og:description') || getMeta('description');
 
+    // DOM-based product title extraction (Amazon, Flipkart, generic H1)
+    let domTitle = '';
+    if (html && !isAntiBotBlocked) {
+      const amazonTitleMatch = html.match(/id=["']productTitle["'][^>]*>([\s\S]*?)<\/span>/i);
+      const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+      const titleTagMatch = html.match(/<title>([^<]+)<\/title>/i);
+
+      if (amazonTitleMatch) {
+        domTitle = amazonTitleMatch[1].replace(/<[^>]+>/g, '').trim();
+      } else if (h1Match) {
+        domTitle = h1Match[1].replace(/<[^>]+>/g, '').trim();
+      } else if (titleTagMatch && !titleTagMatch[1].toLowerCase().includes('amazon.in')) {
+        domTitle = titleTagMatch[1].trim();
+      }
+    }
+
     // Title resolution and clean marketing suffixes
-    let resolvedTitle = jsonLdProduct?.name || ogTitle || '';
+    let resolvedTitle = jsonLdProduct?.name || ogTitle || domTitle || '';
     if (resolvedTitle) {
       resolvedTitle = decodeHtmlEntities(resolvedTitle)
         .replace(/\s*-\s*Price in India.*$/i, '')
@@ -286,20 +320,25 @@ export class ProductURLExtractor {
         .replace(/:\s*Buy Online at Best Prices.*$/i, '')
         .replace(/\s*\|\s*Amazon\.in.*$/i, '')
         .replace(/\s*-\s*Amazon\.in.*$/i, '')
+        .replace(/Amazon\.in\s*:\s*/i, '')
         .replace(/\s*\|\s*Myntra.*$/i, '')
         .replace(/\s*\|\s*Tata CLiQ.*$/i, '')
         .replace(/\s*\|\s*Croma.*$/i, '')
         .replace(/\s*\|\s*Nykaa.*$/i, '')
         .replace(/\s*\|\s*Reliance Digital.*$/i, '')
         .trim();
-    } else {
-      // Extract meaningful slug from rawUrl or canonicalUrl, filtering generic routing segments and ASINs
-      const urlToInspect = rawUrl.includes('/dp/') || rawUrl.includes('/p/') ? rawUrl : canonicalUrl;
+    }
+
+    // Slug fallback: Ensure generic routing segments (like single-letter 'd', 'p', 'dp') are filtered
+    if (!resolvedTitle || resolvedTitle.length <= 2 || resolvedTitle.toLowerCase() === 'amazon.in' || resolvedTitle.toLowerCase() === 'verified brand') {
+      const urlToInspect = canonicalUrl.includes('/dp/') || canonicalUrl.includes('/p/') ? canonicalUrl : effectiveUrl;
       const segments = new URL(urlToInspect).pathname
         .split('/')
-        .filter((s) => Boolean(s) && !['p', 'dp', 'gp', 'product', 'itm', 'buy', 's'].includes(s.toLowerCase()) && !/^[A-Z0-9]{10}$/i.test(s));
-      const slug = segments[0] || 'Verified Product';
-      resolvedTitle = decodeHtmlEntities(decodeURIComponent(slug)).replace(/[-_+]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
+        .filter((s) => Boolean(s) && s.length > 2 && !['p', 'dp', 'gp', 'product', 'itm', 'buy', 's', 'd', 'ref', 'share', 'redirect'].includes(s.toLowerCase()) && !/^[A-Z0-9]{10}$/i.test(s));
+      const slug = segments[0];
+      if (slug) {
+        resolvedTitle = decodeHtmlEntities(decodeURIComponent(slug)).replace(/[-_+]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
+      }
     }
 
     // Brand resolution
@@ -312,7 +351,7 @@ export class ProductURLExtractor {
       resolvedBrand = decodeHtmlEntities(resolvedBrand).trim();
     } else {
       const known = [
-        'RED TAPE', 'Red Tape', 'Apple', 'Sony', 'Samsung', 'Noise', 'boAt',
+        'HAMMER', 'RED TAPE', 'Red Tape', 'Apple', 'Sony', 'Samsung', 'Noise', 'boAt',
         'Asics', 'Minimalist', 'Lenovo', 'ASUS', 'OnePlus', 'Titan', 'Puma',
         'Nike', 'Adidas', 'Bata', 'Campus', 'Crocs', 'Sparx', 'Woodland',
         'Philips', 'Agaro', 'Dot & Key', 'Storite', 'STORITE', 'ZARA', 'H&M'
@@ -323,7 +362,6 @@ export class ProductURLExtractor {
           break;
         }
       }
-      if (!resolvedBrand) resolvedBrand = 'Verified Brand';
     }
 
     // Price and MRP resolution
@@ -348,7 +386,7 @@ export class ProductURLExtractor {
     }
 
     // B. Direct Retailer HTML Scraping fallback (Flipkart, Amazon, Myntra)
-    if (!verifiedPrice && html) {
+    if (!verifiedPrice && html && !isAntiBotBlocked) {
       const hostLower = domain.toLowerCase();
 
       // Flipkart HTML structure
@@ -370,7 +408,7 @@ export class ProductURLExtractor {
         }
       }
       // Amazon India HTML structure
-      else if (hostLower.includes('amazon.')) {
+      else if (hostLower.includes('amazon.') || hostLower.includes('amzn.in')) {
         const amazonPriceMatch = html.match(/class="[^"]*a-price-whole[^"]*"[^>]*>([\d,]+)/i) ||
           html.match(/id="priceblock_(?:ourprice|dealprice)"[^>]*>₹\s*([\d,]+)/i) ||
           html.match(/class="[^"]*a-offscreen[^"]*"[^>]*>₹\s*([\d,]+)/i);
@@ -387,13 +425,85 @@ export class ProductURLExtractor {
       }
     }
 
+    // C. Live Research Fallback: If anti-bot challenge occurred or title/price is unverified
+    if ((isAntiBotBlocked || !resolvedTitle || resolvedTitle.length <= 2 || !verifiedPrice) && (canonicalIdentifier || resolvedTitle)) {
+      try {
+        const { executeLiveResearch } = await import('@/lib/riiqx/search');
+        const targetDomain = domain.includes('amazon') || domain.includes('amzn') ? 'amazon.in' : domain;
+        const query = canonicalIdentifier
+          ? `${canonicalIdentifier} ${targetDomain}`
+          : `${resolvedTitle} ${targetDomain} buy price India`;
+        const searchResult = await executeLiveResearch(query);
+
+        if (searchResult.citations && searchResult.citations.length > 0) {
+          const relevant = searchResult.citations.find((c) =>
+            (canonicalIdentifier && c.url?.toLowerCase().includes(canonicalIdentifier.toLowerCase())) ||
+            c.url?.includes('/dp/') ||
+            c.url?.includes('/p/')
+          ) || searchResult.citations.find((c) => c.snippet?.includes('₹') || c.snippet?.toLowerCase().includes('price'))
+            || searchResult.citations[0];
+
+          if (relevant) {
+            if (!resolvedTitle || resolvedTitle.length <= 2 || resolvedTitle.toLowerCase() === 'verified product') {
+              resolvedTitle = decodeHtmlEntities(relevant.title)
+                .replace(/\s*-\s*Amazon.*$/i, '')
+                .replace(/\s*\|\s*Flipkart.*$/i, '')
+                .replace(/:\s*Buy Online.*$/i, '')
+                .replace(/Amazon\.in\s*:\s*/i, '')
+                .trim();
+            }
+
+            for (const cit of searchResult.citations) {
+              const textToSearch = `${cit.snippet} ${cit.title}`;
+              const priceMatch =
+                textToSearch.match(/(?:lowest price:?|amazon price[^:]*:?|price:?|₹|rs\.?|inr)\s*([\d,]+(?:\.\d+)?)/i);
+              if (priceMatch && !verifiedPrice) {
+                const parsed = parseFloat(priceMatch[1].replace(/,/g, ''));
+                if (!isNaN(parsed) && parsed > 20 && parsed < 1000000) {
+                  verifiedPrice = parsed;
+                  availabilityStatus = 'in_stock';
+                }
+              }
+              const mrpMatch = textToSearch.match(/mrp:?\s*(?:₹|rs\.?)?\s*([\d,]+)/i);
+              if (mrpMatch && !verifiedMrp) {
+                const parsedMrp = parseFloat(mrpMatch[1].replace(/,/g, ''));
+                if (!isNaN(parsedMrp) && parsedMrp > 20) {
+                  verifiedMrp = parsedMrp;
+                }
+              }
+            }
+          }
+        }
+      } catch {
+        // Fallback gracefully
+      }
+    }
+
+    if (!resolvedBrand) {
+      if (resolvedTitle && resolvedTitle.length > 2 && resolvedTitle.toLowerCase() !== 'verified product') {
+        resolvedBrand = resolvedTitle.split(' ')[0];
+      } else {
+        resolvedBrand = 'Verified Brand';
+      }
+    }
+
+    if (!resolvedTitle || resolvedTitle.length <= 2) {
+      resolvedTitle = 'Verified Product';
+    }
+
+    // Image resolution: Use direct CDN image if canonical Amazon ASIN is known
+    let resolvedImage = jsonLdProduct?.image?.[0] || jsonLdProduct?.image || ogImage;
+    if (!resolvedImage && canonicalIdentifier && (domain.includes('amazon') || domain.includes('amzn') || domain === 'amazon.in')) {
+      resolvedImage = `https://images-na.ssl-images-amazon.com/images/P/${canonicalIdentifier}.01.MAIN._SCRM_.jpg`;
+    }
+
     const cleanDomain = domain.replace(/^(?:dl|m|www)\./, '');
 
     const identity: ProductIdentity = {
       brand: resolvedBrand,
       title: resolvedTitle,
       category: 'Electronics & Lifestyle',
-      imageUrl: jsonLdProduct?.image?.[0] || jsonLdProduct?.image || ogImage,
+      imageUrl: resolvedImage,
       canonicalIdentifier,
       variantAttributes: {},
       specifications: ogDesc ? [ogDesc.slice(0, 120)] : ['Canonical URL verified with manufacturer / merchant identity.'],
