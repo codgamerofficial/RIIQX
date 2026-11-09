@@ -10,7 +10,10 @@ import { WeeklyDigestSection } from '@/lib/riiqx/twin-types';
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const digests = await TwinRepository.getWeeklyDigests(userId);
     return NextResponse.json({ success: true, digests });
   } catch (err: any) {
@@ -20,7 +23,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const profile = await TwinRepository.getProfile(userId);
     const goals = await TwinRepository.getGoals(userId);
     const opportunities = await TwinRepository.getOpportunities();

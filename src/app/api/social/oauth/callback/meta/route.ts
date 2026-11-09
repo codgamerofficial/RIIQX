@@ -16,12 +16,21 @@ export async function GET(req: NextRequest) {
   const cookieRedirectUri = req.cookies.get('riiqx_oauth_redirect_uri')?.value;
   const resolvedAuthId = await resolveAuthUserId(req);
   const cookieUserId = req.cookies.get('riiqx_oauth_user')?.value;
-  const userId = resolvedAuthId || cookieUserId || 'usr_riiqx_primary';
+  const userId = resolvedAuthId || cookieUserId;
 
   const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || req.nextUrl.host;
   const proto = req.headers.get('x-forwarded-proto') || (host && host.includes('localhost') ? 'http' : 'https');
   const appUrl = getTrustedAppOrigin(host, proto);
   const redirectUri = cookieRedirectUri || `${appUrl}/api/social/oauth/callback/meta`;
+
+  if (!userId) {
+    const dest = new URL(appUrl);
+    dest.searchParams.set('tab', 'integrations');
+    dest.searchParams.set('connection_status', 'error');
+    dest.searchParams.set('provider', 'meta');
+    dest.searchParams.set('message', 'Authentication required to link Meta account.');
+    return NextResponse.redirect(dest.toString());
+  }
 
   if (error) {
     const errorMsg = errorDescription || error;

@@ -1,10 +1,10 @@
 // =============================================================================
 // RIIQX — User Profile Management Service
-// Interacts with public.profiles in Supabase with Local Encrypted Persistence Fallback
+// Authoritative Supabase Database Persistence (public.profiles)
+// Zero Ephemeral Local Filesystem State • Production Durable
 // =============================================================================
 
 import { getServiceSupabase } from '@/lib/supabase/server';
-import { getSafeTempFilePath, safeReadJson, safeWriteJson } from './temp-storage';
 
 export interface RiiqxProfile {
   id: string;
@@ -17,24 +17,11 @@ export interface RiiqxProfile {
   updatedAt: string;
 }
 
-const LOCAL_STORE_PATH = getSafeTempFilePath('user_profiles_store.json');
-const inMemoryProfiles: Record<string, RiiqxProfile> = {};
-
-function readLocalProfiles(): Record<string, RiiqxProfile> {
-  const disk = safeReadJson<Record<string, RiiqxProfile>>(LOCAL_STORE_PATH, {});
-  return { ...inMemoryProfiles, ...disk };
-}
-
-function writeLocalProfiles(data: Record<string, RiiqxProfile>) {
-  Object.assign(inMemoryProfiles, data);
-  safeWriteJson(LOCAL_STORE_PATH, data);
-}
-
 /**
- * Retrieves a user's profile by their Supabase Auth User ID
+ * Retrieves a user's profile from public.profiles by their Supabase Auth User ID
  */
 export async function getUserProfile(userId: string): Promise<RiiqxProfile | null> {
-  if (!userId) return null;
+  if (!userId || typeof userId !== 'string') return null;
 
   const supabase = getServiceSupabase();
   if (supabase) {
@@ -43,31 +30,29 @@ export async function getUserProfile(userId: string): Promise<RiiqxProfile | nul
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
         return {
           id: data.id,
-          displayName: data.display_name || 'RIIQX Creator',
+          displayName: data.display_name || 'RIIQX User',
           avatarUrl: data.avatar_url || undefined,
           preferredLanguage: (data.preferred_language as 'en' | 'bn' | 'hi') || 'en',
-          role: (data.role as 'creator' | 'developer' | 'admin') || 'creator',
-          createdAt: data.created_at,
-          updatedAt: data.updated_at,
+          role: 'creator',
+          createdAt: data.created_at || new Date().toISOString(),
+          updatedAt: data.updated_at || new Date().toISOString(),
         };
       }
-    } catch {
-      // Fall through to local store
+    } catch (err) {
+      console.error('[Profiles] Error fetching profile from Supabase:', err);
     }
   }
 
-  // Local store lookup
-  const local = readLocalProfiles();
-  return local[userId] || null;
+  return null;
 }
 
 /**
- * Creates or updates a user profile
+ * Creates or updates a user profile directly in public.profiles table in Supabase
  */
 export async function upsertUserProfile(profile: {
   id: string;
@@ -83,7 +68,7 @@ export async function upsertUserProfile(profile: {
   const merged: RiiqxProfile = {
     id: profile.id,
     email: profile.email || existing?.email,
-    displayName: profile.displayName || existing?.displayName || profile.email?.split('@')[0] || 'RIIQX Creator',
+    displayName: profile.displayName || existing?.displayName || profile.email?.split('@')[0] || 'RIIQX User',
     avatarUrl: profile.avatarUrl || existing?.avatarUrl,
     preferredLanguage: profile.preferredLanguage || existing?.preferredLanguage || 'en',
     role: profile.role || existing?.role || 'creator',
@@ -94,25 +79,24 @@ export async function upsertUserProfile(profile: {
   const supabase = getServiceSupabase();
   if (supabase) {
     try {
-      await (supabase as any).from('profiles').upsert(
+      const { error } = await (supabase as any).from('profiles').upsert(
         {
           id: merged.id,
           display_name: merged.displayName,
           avatar_url: merged.avatarUrl || null,
           preferred_language: merged.preferredLanguage,
-          role: merged.role,
           updated_at: now,
         },
         { onConflict: 'id' }
       );
-    } catch {
-      // Fall through to local store
+
+      if (error) {
+        console.error('[Profiles] Supabase upsert error:', error.message);
+      }
+    } catch (err) {
+      console.error('[Profiles] Unexpected error upserting profile:', err);
     }
   }
-
-  const local = readLocalProfiles();
-  local[merged.id] = merged;
-  writeLocalProfiles(local);
 
   return merged;
 }
@@ -135,7 +119,7 @@ export async function ensureUserProfile(user: {
     user.user_metadata?.display_name ||
     user.user_metadata?.name ||
     user.email?.split('@')[0] ||
-    'RIIQX Creator';
+    'RIIQX User';
 
   const avatarUrl = user.user_metadata?.avatar_url || undefined;
   const preferredLanguage = user.user_metadata?.preferred_language || 'en';

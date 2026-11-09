@@ -13,7 +13,10 @@ import { ModelRouter } from '@/lib/riiqx/model-router';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
-  const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
+  const userId = await resolveAuthUserId(req);
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized: Authentication required.' }, { status: 401 });
+  }
 
   try {
     const { message, accountId } = await req.json();

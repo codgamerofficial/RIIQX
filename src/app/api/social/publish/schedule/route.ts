@@ -11,7 +11,10 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const posts = await getScheduledPosts(userId);
 
     return NextResponse.json({
@@ -27,14 +30,30 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
 
-    // Action 1: Trigger autonomous processing of due posts
+    // Action 1: Trigger autonomous processing of due posts (requires CRON_SECRET or authenticated user)
     if (action === 'process_due') {
+      const authHeader = req.headers.get('authorization');
+      const cronSecret = process.env.CRON_SECRET;
+      const isCronAuthorized = cronSecret && (
+        authHeader === `Bearer ${cronSecret}` ||
+        url.searchParams.get('secret') === cronSecret
+      );
+      const userId = await resolveAuthUserId(req);
+
+      if (!isCronAuthorized && !userId) {
+        return NextResponse.json({ success: false, error: 'Unauthorized: Invalid CRON_SECRET or missing authentication.' }, { status: 401 });
+      }
+
       const summary = await processDueScheduledPosts();
       return NextResponse.json({ success: true, summary });
+    }
+
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required to schedule posts.' }, { status: 401 });
     }
 
     // Action 2: Schedule a new post
@@ -81,7 +100,10 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const url = new URL(req.url);
     const jobId = url.searchParams.get('id');
 

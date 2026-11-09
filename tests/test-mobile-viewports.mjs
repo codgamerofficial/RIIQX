@@ -13,14 +13,78 @@ console.log(`Target URL: ${BASE_URL}`);
 console.log(`======================================================\n`);
 
 const VIEWPORTS = [
-  { name: 'Android Compact (360x800)', width: 360, height: 800, isMobile: true },
-  { name: 'iPhone Mini (375x812)', width: 375, height: 812, isMobile: true },
-  { name: 'iPhone Standard (390x844)', width: 390, height: 844, isMobile: true },
-  { name: 'Android Large / Pixel (412x915)', width: 412, height: 915, isMobile: true },
-  { name: 'iPhone Pro Max (430x932)', width: 430, height: 932, isMobile: true },
-  { name: 'Tablet / iPad (768x1024)', width: 768, height: 1024, isMobile: false },
-  { name: 'Laptop (1366x768)', width: 1366, height: 768, isMobile: false },
-  { name: 'Full HD Desktop (1920x1080)', width: 1920, height: 1080, isMobile: false },
+  {
+    name: 'Android Compact (360x800)',
+    width: 360,
+    height: 800,
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 2,
+    userAgent: 'Mozilla/5.0 (Linux; Android 14; SM-A536B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.113 Mobile Safari/537.36',
+  },
+  {
+    name: 'iPhone Mini (375x812)',
+    width: 375,
+    height: 812,
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 3,
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.1',
+  },
+  {
+    name: 'iPhone Standard (390x844)',
+    width: 390,
+    height: 844,
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 3,
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.1',
+  },
+  {
+    name: 'Android Large / Pixel (412x915)',
+    width: 412,
+    height: 915,
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 2.625,
+    userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.113 Mobile Safari/537.36',
+  },
+  {
+    name: 'iPhone Pro Max (430x932)',
+    width: 430,
+    height: 932,
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 3,
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.1',
+  },
+  {
+    name: 'Tablet / iPad (768x1024)',
+    width: 768,
+    height: 1024,
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 2,
+    userAgent: 'Mozilla/5.0 (iPad; CPU OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1',
+  },
+  {
+    name: 'Laptop (1366x768)',
+    width: 1366,
+    height: 768,
+    isMobile: false,
+    hasTouch: false,
+    deviceScaleFactor: 1,
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  },
+  {
+    name: 'Full HD Desktop (1920x1080)',
+    width: 1920,
+    height: 1080,
+    isMobile: false,
+    hasTouch: false,
+    deviceScaleFactor: 1,
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  },
 ];
 
 const results = [];
@@ -32,36 +96,21 @@ async function runTestSuite() {
   });
 
   try {
-    // 1. Authenticate once via API to get valid session token
-    console.log(`[AUTH] Generating authentic test session on ${BASE_URL}...`);
+    // 1. Authenticate with verified Supabase Auth credentials
+    console.log(`[AUTH] Authenticating with verified test identity on ${BASE_URL}...`);
     const initContext = await browser.newContext();
     const initPage = await initContext.newPage();
     const authRes = await initPage.request.post(`${BASE_URL}/api/riiqx/auth`, {
       data: {
-        action: 'register',
-        email: `parity_suite_${Date.now()}@gmail.com`,
-        password: 'Password@Riiqx2026!',
-        name: 'QA Mobile Parity Tester',
+        action: 'login',
+        email: 'qa_security_verifier@riiqx.com',
+        password: 'SecurityVerified@2026!',
       },
     });
 
-    const authJson = await authRes.json();
+    const authJson = await authRes.json().catch(() => ({}));
     let sessionToken = authJson.token;
-    console.log(`[AUTH] Registration outcome: success=${Boolean(authJson.success)}, token=${Boolean(sessionToken)}`);
-
-    if (!sessionToken) {
-      console.log(`[AUTH] Fallback to direct local session token generation...`);
-      // Fallback: try logging in with an established account or obtain cookie directly
-      const loginRes = await initPage.request.post(`${BASE_URL}/api/riiqx/auth`, {
-        data: {
-          action: 'login',
-          email: 'qa_verified_user@riiqx.local',
-          password: 'Password@Riiqx2026!',
-        },
-      });
-      const loginJson = await loginRes.json().catch(() => ({}));
-      sessionToken = loginJson.token;
-    }
+    console.log(`[AUTH] Login outcome: success=${Boolean(authJson.success)}, token=${Boolean(sessionToken)}`);
     await initContext.close();
 
     // 2. Iterate through all 8 viewports
@@ -69,9 +118,10 @@ async function runTestSuite() {
       console.log(`\n▶ Testing Viewport: ${vp.name} [${vp.width}x${vp.height}]`);
       const context = await browser.newContext({
         viewport: { width: vp.width, height: vp.height },
-        userAgent: vp.isMobile
-          ? 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'
-          : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        isMobile: vp.isMobile,
+        hasTouch: vp.hasTouch,
+        deviceScaleFactor: vp.deviceScaleFactor,
+        userAgent: vp.userAgent,
       });
 
       const page = await context.newPage();

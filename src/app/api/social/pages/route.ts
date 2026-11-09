@@ -42,7 +42,10 @@ export interface EligibleFacebookPage {
  * Discovers and lists all eligible Facebook Pages accessible to the authenticated Meta user
  */
 export async function GET(req: NextRequest) {
-  const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
+  const userId = await resolveAuthUserId(req);
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized: Authentication required.' }, { status: 401 });
+  }
 
   try {
     const existingAccounts = await getConnectedAccounts(userId);
@@ -205,7 +208,10 @@ export async function GET(req: NextRequest) {
  * Connects or activates a selected Facebook Page into the RIIQX unified registry
  */
 export async function POST(req: NextRequest) {
-  const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
+  const userId = await resolveAuthUserId(req);
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized: Authentication required.' }, { status: 401 });
+  }
 
   try {
     const body = await req.json().catch(() => ({}));
@@ -291,7 +297,11 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const url = new URL(req.url);
   const accountId = url.searchParams.get('id');
-  const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
+  const userId = await resolveAuthUserId(req);
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized: Authentication required.' }, { status: 401 });
+  }
 
   if (!accountId) {
     return NextResponse.json({ error: 'accountId query param is required' }, { status: 400 });

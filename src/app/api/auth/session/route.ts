@@ -1,13 +1,13 @@
 // =============================================================================
 // RIIQX — Active User Session Route Handler
-// Returns the Authenticated Identity & Profile from Supabase SSR
+// Returns Authenticated Identity & Profile Verified Exclusively from Supabase SSR
+// Zero Fake Fallback Identity • Server-Side Cryptographic Validation
 // =============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { getUserProfile, ensureUserProfile } from '@/lib/riiqx/profiles';
-import { verifySessionToken } from '@/lib/riiqx/auth';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ojtngzqsrdralrhipjzt.supabase.co';
 const anonKey =
@@ -63,28 +63,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Check fallback local session cookie (for offline/local testing)
-    const localSession = req.cookies.get('riiqx_session')?.value;
-    if (localSession) {
-      const verified = verifySessionToken(localSession);
-      if (verified.valid && verified.userId) {
-        const profile = await getUserProfile(verified.userId);
-        return NextResponse.json({
-          authenticated: true,
-          user: {
-            id: verified.userId,
-            email: profile?.email || 'user@riiqx.local',
-            name: profile?.displayName || 'Local Creator',
-            role: profile?.role || 'creator',
-            createdAt: profile?.createdAt || new Date().toISOString(),
-            avatarUrl: profile?.avatarUrl,
-          },
-          profile,
-          provider: 'local_secure',
-        });
-      }
-    }
-
+    // Fail closed: User is not authenticated in Supabase
     return NextResponse.json({
       authenticated: false,
       user: null,

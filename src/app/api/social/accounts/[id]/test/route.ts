@@ -14,9 +14,14 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   const accountId = params.id;
-  const url = new URL(req.url);
   const resolvedAuthId = await resolveAuthUserId(req);
-  const userId = resolvedAuthId || url.searchParams.get('userId') || 'usr_riiqx_primary';
+  if (!resolvedAuthId) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized: Authentication required.' },
+      { status: 401 }
+    );
+  }
+  const userId = resolvedAuthId;
 
   const authBundle = await getAccountWithCredentials(accountId, userId);
   if (!authBundle) {

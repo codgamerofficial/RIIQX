@@ -6,19 +6,47 @@ on:
     - cron: '0 */6 * * *'
   workflow_dispatch:
 
+concurrency:
+  group: deal-pipeline-cron
+  cancel-in-progress: false
+
 jobs:
   trigger-pipeline:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Deal Pipeline Endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          if [ -z "${{ secrets.CRON_SECRET }}" ]; then
-            echo "CRON_SECRET secret is not configured in GitHub Secrets yet. Skipping automated trigger..."
-            exit 0
+          set -euo pipefail
+
+          if [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::CRON_SECRET secret is not configured in GitHub Secrets. Pipeline trigger cannot proceed."
+            exit 1
           fi
-          echo "Triggering RIIQX Autonomous Deal Pipeline..."
-          curl -s -X POST "https://riiqx.vercel.app/api/cron/deal-pipeline" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+
+          echo "Triggering RIIQX Autonomous Deal Pipeline with cryptographic secret validation..."
+
+          RESPONSE=$(curl -s -S --retry 3 --retry-delay 5 --retry-connrefused \
+            -X POST "https://riiqx.vercel.app/api/cron/deal-pipeline" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
             -H "Content-Type: application/json" \
-            --fail-with-body || echo "Deal pipeline job trigger finished."
+            -w "\n%{http_code}")
+
+          HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+
+          echo "Received HTTP Status: ${HTTP_STATUS}"
+
+          if [ "${HTTP_STATUS}" -ne 200 ]; then
+            echo "::error::Pipeline failed with HTTP ${HTTP_STATUS}: ${HTTP_BODY}"
+            exit 1
+          fi
+
+          if ! echo "${HTTP_BODY}" | grep -q '"success":true'; then
+            echo "::error::Pipeline response indicated failure: ${HTTP_BODY}"
+            exit 1
+          fi
+
+          echo "Deal pipeline sweep completed successfully."
 

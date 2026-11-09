@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   const cookieRedirectUri = req.cookies.get('riiqx_oauth_redirect_uri')?.value;
   const resolvedAuthId = await resolveAuthUserId(req);
   const cookieUserId = req.cookies.get('riiqx_oauth_user')?.value;
-  const userId = resolvedAuthId || cookieUserId || 'usr_riiqx_primary';
+  const userId = resolvedAuthId || cookieUserId;
 
   // Derive origin directly from the request host to never cross-contaminate local and production
   const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || req.nextUrl.host;
@@ -26,6 +26,15 @@ export async function GET(req: NextRequest) {
 
   const appUrl = origin;
   const redirectUri = cookieRedirectUri || `${origin}/api/social/oauth/callback/youtube`;
+
+  if (!userId) {
+    const dest = new URL(appUrl);
+    dest.searchParams.set('tab', 'integrations');
+    dest.searchParams.set('connection_status', 'error');
+    dest.searchParams.set('provider', 'youtube');
+    dest.searchParams.set('message', 'Authentication required to link YouTube account.');
+    return NextResponse.redirect(dest.toString());
+  }
 
   if (error) {
     const errorMsg = errorDescription || error;

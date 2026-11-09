@@ -9,7 +9,10 @@ import { TwinRepository } from '@/lib/riiqx/twin-repository';
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const exportData = await TwinRepository.exportUserData(userId);
 
     return new Response(JSON.stringify(exportData, null, 2), {
@@ -25,7 +28,10 @@ export async function GET(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     await TwinRepository.deleteUserData(userId);
 
     return NextResponse.json({

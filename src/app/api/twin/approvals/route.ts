@@ -11,7 +11,10 @@ const pendingApprovals = new Map<string, any[]>();
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const list = pendingApprovals.get(userId) || [];
     return NextResponse.json({ success: true, approvals: list });
   } catch (err: any) {
@@ -21,7 +24,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const body = await req.json();
     const { actionId, decision } = body; // decision: 'approve' | 'reject'
 

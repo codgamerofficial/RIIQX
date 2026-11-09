@@ -9,7 +9,10 @@ import { TwinRepository } from '@/lib/riiqx/twin-repository';
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const data = await TwinRepository.getRewardAccount(userId);
 
     const referralCode = `RIIQX-${userId.slice(-6).toUpperCase()}`;

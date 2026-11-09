@@ -8,7 +8,10 @@ import { TwinRepository } from '@/lib/riiqx/twin-repository';
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const goals = await TwinRepository.getGoals(userId);
     return NextResponse.json({ success: true, goals });
   } catch (err: any) {
@@ -18,7 +21,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const body = await req.json();
 
     if (!body.title) {
@@ -46,7 +52,10 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const body = await req.json();
     const { goalId, ...updates } = body;
 
@@ -67,7 +76,10 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+    }
     const { searchParams } = new URL(req.url);
     const goalId = searchParams.get('id');
 

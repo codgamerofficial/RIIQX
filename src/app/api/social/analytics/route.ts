@@ -17,7 +17,10 @@ import {
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
-  const userId = (await resolveAuthUserId(req)) || 'usr_riiqx_primary';
+  const userId = await resolveAuthUserId(req);
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized: Authentication required.' }, { status: 401 });
+  }
   const url = new URL(req.url);
   const accountIdFilter = url.searchParams.get('accountId');
   const platformFilter = url.searchParams.get('platform');

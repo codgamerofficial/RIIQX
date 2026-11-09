@@ -10,7 +10,10 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   const resolvedAuthId = await resolveAuthUserId(req);
-  const userId = resolvedAuthId || 'usr_riiqx_primary';
+  if (!resolvedAuthId) {
+    return NextResponse.json({ success: false, error: 'Unauthorized: Authentication required.' }, { status: 401 });
+  }
+  const userId = resolvedAuthId;
 
   try {
     const body = await req.json();

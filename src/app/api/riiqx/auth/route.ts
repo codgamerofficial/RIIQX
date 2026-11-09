@@ -1,36 +1,42 @@
 // =============================================================================
 // RIIQX — Master Authentication API Route Handler
-// Real Supabase Auth Integration with Dual-Mode Resilient Local Persistence
+// Authoritative Supabase Auth Integration • Server-Side Validation
+// Zero Local In-Memory / Ephemeral Bypass • Fail-Closed Production Security
 // =============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import {
-  saveLocalCredentials,
-  verifyLocalCredentials,
-  createSessionToken,
-  verifySessionToken,
-} from '@/lib/riiqx/auth';
-import { getUserProfile, upsertUserProfile, ensureUserProfile } from '@/lib/riiqx/profiles';
+import { getUserProfile, ensureUserProfile } from '@/lib/riiqx/profiles';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
+    const authHeader = req.headers.get('Authorization');
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
-    if (!error && user) {
+    const supabase = await createClient();
+    let user: any = null;
+    let authError: any = null;
+
+    if (bearerToken) {
+      const { data, error } = await supabase.auth.getUser(bearerToken);
+      user = data?.user;
+      authError = error;
+    } else {
+      const { data, error } = await supabase.auth.getUser();
+      user = data?.user;
+      authError = error;
+    }
+
+    if (!authError && user) {
       const profile = await getUserProfile(user.id);
       return NextResponse.json({
         authenticated: true,
         user: {
           id: user.id,
           email: user.email,
-          name: profile?.displayName || user.email?.split('@')[0] || 'RIIQX User',
+          name: profile?.displayName || user.user_metadata?.full_name || user.email?.split('@')[0] || 'RIIQX User',
           role: profile?.role || 'creator',
           createdAt: user.created_at,
           avatarUrl: profile?.avatarUrl,
@@ -40,29 +46,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Verify local session cookie
-    const localToken = req.cookies.get('riiqx_session')?.value;
-    if (localToken) {
-      const verified = verifySessionToken(localToken);
-      if (verified.valid && verified.userId) {
-        const profile = await getUserProfile(verified.userId);
-        return NextResponse.json({
-          authenticated: true,
-          user: {
-            id: verified.userId,
-            email: profile?.email || 'user@riiqx.local',
-            name: profile?.displayName || 'RIIQX User',
-            role: profile?.role || 'creator',
-            createdAt: profile?.createdAt || new Date().toISOString(),
-            avatarUrl: profile?.avatarUrl,
-          },
-          profile,
-          provider: 'local_secure',
-        });
-      }
-    }
-
-    // Unauthenticated
+    // Strictly Unauthenticated (Never authenticate simply because a cookie exists)
     return NextResponse.json({
       authenticated: false,
       user: null,
@@ -79,232 +63,124 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const { action, email, password, name } = body;
 
+    // -------------------------------------------------------------------------
+    // ACTION: SIGNOUT
+    // -------------------------------------------------------------------------
     if (action === 'signout') {
       const supabase = await createClient();
       await supabase.auth.signOut();
       const res = NextResponse.json({ success: true, message: 'Signed out successfully' });
-      res.cookies.set('riiqx_session', '', { path: '/', maxAge: 0 });
+      res.cookies.delete('riiqx_session');
       return res;
     }
 
     // -------------------------------------------------------------------------
-    // ACTION: DEMO LOGIN (DISABLED FOR SECURITY)
+    // ACTION: DEMO LOGIN (EXPLICITLY REJECTED)
     // -------------------------------------------------------------------------
     if (action === 'demo_login') {
       return NextResponse.json(
-        { error: 'Unauthorized: Demo login bypass has been removed for production security.' },
+        { success: false, error: 'Unauthorized: Demo login bypass has been removed for production security.' },
         { status: 403 }
       );
     }
 
     if (!email || !password) {
-      return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Email and password are required.' }, { status: 400 });
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+    const supabase = await createClient();
 
     // -------------------------------------------------------------------------
     // ACTION: REGISTER
     // -------------------------------------------------------------------------
     if (action === 'register') {
-      const supabase = await createClient();
-      let supabaseSuccess = false;
-      let registeredUser: any = null;
-      let requiresConfirmation = false;
-
-      try {
-        const { data, error } = await supabase.auth.signUp({
-          email: normalizedEmail,
-          password,
-          options: {
-            data: {
-              full_name: name || normalizedEmail.split('@')[0],
-              display_name: name || normalizedEmail.split('@')[0],
-            },
+      const { data, error } = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password,
+        options: {
+          data: {
+            full_name: name || normalizedEmail.split('@')[0],
+            display_name: name || normalizedEmail.split('@')[0],
           },
-        });
+        },
+      });
 
-        if (error) {
-          // If Supabase returned an explicit client error (e.g. user already registered or weak password)
-          // Network errors and email rate limits gracefully fall through to resilient local authentication vault
-          const isTransientOrRateLimit =
-            error.message.includes('fetch failed') ||
-            error.message.includes('ENOTFOUND') ||
-            error.message.toLowerCase().includes('rate limit');
-
-          if (!isTransientOrRateLimit) {
-            return NextResponse.json({ error: error.message }, { status: 400 });
-          }
-        } else if (data?.user) {
-          supabaseSuccess = true;
-          registeredUser = data.user;
-          requiresConfirmation = !data.session;
-
-          await ensureUserProfile({
-            id: data.user.id,
-            email: data.user.email,
-            user_metadata: data.user.user_metadata,
-          });
-        }
-      } catch {
-        // Fall through to resilient local vault
+      if (error) {
+        return NextResponse.json(
+          { success: false, error: error.message },
+          { status: 400 }
+        );
       }
 
-      if (!supabaseSuccess) {
-        // Save to local credential vault
-        const localCred = saveLocalCredentials(normalizedEmail, password);
-        const profile = await upsertUserProfile({
-          id: localCred.userId,
-          email: normalizedEmail,
-          displayName: name || normalizedEmail.split('@')[0],
-          role: 'creator',
-        });
-
-        const token = createSessionToken(localCred.userId);
-        const res = NextResponse.json({
-          success: true,
-          user: {
-            id: localCred.userId,
-            email: normalizedEmail,
-            name: profile.displayName,
-            role: profile.role,
-            createdAt: localCred.createdAt,
-          },
-          token,
-          requiresConfirmation: false,
-          provider: 'local_secure',
-        });
-
-        res.cookies.set('riiqx_session', token, {
-          path: '/',
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          maxAge: 7 * 24 * 60 * 60,
-          sameSite: 'lax',
-        });
-
-        return res;
+      if (!data.user) {
+        return NextResponse.json(
+          { success: false, error: 'Registration failed: No user returned by authoritative provider.' },
+          { status: 500 }
+        );
       }
 
-      const token = createSessionToken(registeredUser.id);
-      const res = NextResponse.json({
+      const profile = await ensureUserProfile({
+        id: data.user.id,
+        email: data.user.email,
+        user_metadata: data.user.user_metadata,
+      });
+
+      const requiresConfirmation = !data.session;
+
+      return NextResponse.json({
         success: true,
         user: {
-          id: registeredUser.id,
-          email: registeredUser.email,
-          name: name || normalizedEmail.split('@')[0],
-          role: 'creator',
-          createdAt: registeredUser.created_at,
+          id: data.user.id,
+          email: data.user.email,
+          name: profile.displayName,
+          role: profile.role,
+          createdAt: data.user.created_at,
         },
-        token,
         requiresConfirmation,
         provider: 'supabase',
       });
-
-      res.cookies.set('riiqx_session', token, {
-        path: '/',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 7 * 24 * 60 * 60,
-        sameSite: 'lax',
-      });
-
-      return res;
     }
 
     // -------------------------------------------------------------------------
     // ACTION: LOGIN
     // -------------------------------------------------------------------------
     if (action === 'login') {
-      const supabase = await createClient();
-      let supabaseSuccess = false;
-      let authenticatedUser: any = null;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
 
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: normalizedEmail,
-          password,
-        });
-
-        if (error) {
-          // Supabase auth failed; fall through to local vault verification
-          supabaseSuccess = false;
-        } else if (data?.user) {
-          supabaseSuccess = true;
-          authenticatedUser = data.user;
-        }
-      } catch {
-        supabaseSuccess = false;
+      if (error || !data.user) {
+        return NextResponse.json(
+          { success: false, error: error?.message || 'Invalid email or password.' },
+          { status: 401 }
+        );
       }
 
-      if (!supabaseSuccess) {
-        // Verify against local PBKDF2 credential vault
-        const validCred = verifyLocalCredentials(normalizedEmail, password);
-        if (!validCred) {
-          return NextResponse.json(
-            { error: 'Invalid email or password. Please verify your credentials.' },
-            { status: 401 }
-          );
-        }
+      const profile = await ensureUserProfile({
+        id: data.user.id,
+        email: data.user.email,
+        user_metadata: data.user.user_metadata,
+      });
 
-        const profile = await getUserProfile(validCred.userId);
-        const token = createSessionToken(validCred.userId);
-
-        const res = NextResponse.json({
-          success: true,
-          user: {
-            id: validCred.userId,
-            email: validCred.email,
-            name: profile?.displayName || validCred.email.split('@')[0],
-            role: profile?.role || 'creator',
-            createdAt: validCred.createdAt,
-          },
-          token,
-          provider: 'local_secure',
-        });
-
-        res.cookies.set('riiqx_session', token, {
-          path: '/',
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          maxAge: 7 * 24 * 60 * 60,
-          sameSite: 'lax',
-        });
-
-        return res;
-      }
-
-      const profile = await getUserProfile(authenticatedUser.id);
-      const token = createSessionToken(authenticatedUser.id);
-
-      const res = NextResponse.json({
+      return NextResponse.json({
         success: true,
         user: {
-          id: authenticatedUser.id,
-          email: authenticatedUser.email,
-          name: profile?.displayName || authenticatedUser.email.split('@')[0],
-          role: profile?.role || 'creator',
-          createdAt: authenticatedUser.created_at,
-          avatarUrl: profile?.avatarUrl,
+          id: data.user.id,
+          email: data.user.email,
+          name: profile.displayName || data.user.email?.split('@')[0],
+          role: profile.role,
+          createdAt: data.user.created_at,
+          avatarUrl: profile.avatarUrl,
         },
-        token,
         provider: 'supabase',
       });
-
-      res.cookies.set('riiqx_session', token, {
-        path: '/',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 7 * 24 * 60 * 60,
-        sameSite: 'lax',
-      });
-
-      return res;
     }
 
-    return NextResponse.json({ error: 'Invalid auth action' }, { status: 400 });
+    return NextResponse.json({ success: false, error: 'Invalid auth action' }, { status: 400 });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Auth error';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json({ success: false, error: msg }, { status: 500 });
   }
 }

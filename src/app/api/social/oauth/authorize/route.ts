@@ -15,7 +15,15 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const provider = url.searchParams.get('provider')?.toLowerCase();
   const resolvedAuthId = await resolveAuthUserId(req);
-  const userId = resolvedAuthId || url.searchParams.get('userId') || 'usr_riiqx_primary';
+
+  if (!resolvedAuthId) {
+    return NextResponse.json(
+      { error: 'Unauthorized: Authentication required to connect social accounts.' },
+      { status: 401 }
+    );
+  }
+
+  const userId = resolvedAuthId;
 
   if (!provider || !['youtube', 'instagram', 'facebook', 'twitter', 'linkedin'].includes(provider)) {
     return NextResponse.json(

@@ -361,24 +361,18 @@ export async function updateAccountStatus(
         .from('connected_accounts')
         .update({ status, error_message: errorMessage || null, updated_at: now })
         .eq('id', accountId)
-        .or(`user_id.eq.${userId},user_id.eq.usr_riiqx_primary`);
+        .eq('user_id', userId);
     } catch {
       // Fall through
     }
   }
 
   const store = readLocalStore();
-  const acc =
-    store.accounts.find(
-      (a) => a.id === accountId && (a.user_id === userId || a.user_id === 'usr_riiqx_primary' || userId === 'usr_riiqx_primary')
-    ) || store.accounts.find((a) => a.id === accountId);
+  const acc = store.accounts.find((a) => a.id === accountId && a.user_id === userId);
   if (acc) {
     acc.status = status;
     acc.error_message = errorMessage;
     acc.updated_at = now;
-    if (userId && userId !== 'usr_riiqx_primary') {
-      acc.user_id = userId;
-    }
     writeLocalStore(store);
   }
 }

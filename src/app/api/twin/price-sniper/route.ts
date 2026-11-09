@@ -10,7 +10,13 @@ import { FestiveDropSniperService } from '@/services/product-intelligence/festiv
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized: Authentication required to view watchlists.' },
+        { status: 401 }
+      );
+    }
     const report = await FestiveDropSniperService.getDashboardReport(userId);
     return NextResponse.json({
       success: true,
@@ -27,7 +33,13 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';
+    const userId = await resolveAuthUserId(req);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized: Authentication required to track price drops.' },
+        { status: 401 }
+      );
+    }
     const body = await req.json();
     const {
       productTitle,

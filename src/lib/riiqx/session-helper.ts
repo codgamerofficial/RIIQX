@@ -1,6 +1,7 @@
 // =============================================================================
 // RIIQX — Request Session & Authenticated User Resolver
-// Resolves Authenticated User ID from Supabase SSR and Cookie Vault
+// Resolves Authenticated User ID Exclusively from Authoritative Supabase SSR
+// and Cryptographically Signed Session Tokens
 // =============================================================================
 
 import { NextRequest } from 'next/server';
@@ -8,21 +9,30 @@ import { createClient } from '@/lib/supabase/server';
 import { verifySessionToken } from '@/lib/riiqx/auth';
 
 export async function resolveAuthUserId(req: NextRequest): Promise<string | null> {
-  // 1. Try Supabase Auth from Request Cookies
+  // 1. Try Authorization Header Bearer Token via Supabase Auth
+  const authHeader = req.headers.get('Authorization') || req.headers.get('authorization') || '';
+  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
+
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
 
-    if (user?.id) {
+    if (bearerToken) {
+      const { data: { user }, error } = await supabase.auth.getUser(bearerToken);
+      if (!error && user?.id) {
+        return user.id;
+      }
+    }
+
+    // 2. Try Supabase Auth from Request SSR Cookies
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (!error && user?.id) {
       return user.id;
     }
   } catch {
-    // Fall through
+    // Supabase validation error
   }
 
-  // 2. Try Signed Local Session Cookie
+  // 3. Try Cryptographically Verified Session Cookie (signed with mandatory SESSION_SECRET)
   const localToken = req.cookies.get('riiqx_session')?.value;
   if (localToken) {
     const verified = verifySessionToken(localToken);
@@ -31,17 +41,6 @@ export async function resolveAuthUserId(req: NextRequest): Promise<string | null
     }
   }
 
-  // 3. Try Authorization Header Bearer Token
-  const authHeader = req.headers.get('Authorization') || '';
-  const token = authHeader.replace(/^Bearer\s+/i, '');
-  if (token) {
-    const verified = verifySessionToken(token);
-    if (verified.valid && verified.userId) {
-      return verified.userId;
-    }
-  }
-
-  // Strict Production Auth: Never allow query param ?userId= fallback,
-  // as it permits unauthenticated IDOR spoofing.
+  // Strict Production Auth: Never allow query param ?userId= fallback or hardcoded fallbacks
   return null;
 }

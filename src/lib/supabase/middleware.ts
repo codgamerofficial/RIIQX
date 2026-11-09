@@ -94,21 +94,27 @@ export async function updateSession(request: NextRequest) {
 
   // Check Supabase authenticated user
   let user = null;
+  const authHeader = request.headers.get('authorization');
+  const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+
   try {
-    const { data, error } = await supabase.auth.getUser();
-    if (!error && data?.user) {
-      user = data.user;
+    if (bearerToken) {
+      const { data, error } = await supabase.auth.getUser(bearerToken);
+      if (!error && data?.user) {
+        user = data.user;
+      }
+    } else {
+      const { data, error } = await supabase.auth.getUser();
+      if (!error && data?.user) {
+        user = data.user;
+      }
     }
   } catch {
-    // If Supabase remote service is unreachable, check local session cookie fallback
     user = null;
   }
 
-  // Check fallback local session cookie (for offline/local testing) or Bearer authorization header
-  const authHeader = request.headers.get('authorization');
-  const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
-  const localSession = request.cookies.get('riiqx_session')?.value || bearerToken;
-  const isAuthenticated = Boolean(user || localSession);
+  // Authoritative identity check: User must be validated directly by Supabase
+  const isAuthenticated = Boolean(user);
 
   const isPublicPath = PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(path + '/'));
 

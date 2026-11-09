@@ -14,7 +14,7 @@
     "test:buying-engine": "npx tsx tests/test-verified-buying-links-and-pricing-engine.mjs",
     "test:price-monitoring": "npx tsx tests/test-price-monitoring-and-watchlist.mjs",
     "test:monitoring": "npx tsx tests/test-price-monitoring-and-watchlist.mjs",
-    "test:affiliate": "npx tsx tests/test-affiliate-revenue-engine.mjs",
+    "test:affiliate": "npx tsx tests/test-genuine-affiliate-engine.mjs",
     "test:shorts": "npx tsx tests/test-deal-shorts-factory.mjs",
     "test:phase3": "npx tsx tests/test-phase3-autonomous-pipeline.mjs",
     "test:all": "npm run test:buying-engine && npm run test:price-monitoring && npm run test:affiliate && npm run test:shorts && npm run test:phase3",
