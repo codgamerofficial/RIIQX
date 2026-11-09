@@ -181,3 +181,4 @@ function getRecommendedAction(d) {
 
 fs.writeFileSync('docs/ENVIRONMENT_AUDIT.md', generateAuditMarkdown(auditData));
 console.log('Generated docs/ENVIRONMENT_AUDIT.md successfully.');
+

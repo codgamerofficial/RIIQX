@@ -334,3 +334,4 @@ NEXT_PUBLIC_MOCK_MODE=false
 
 fs.writeFileSync('.env.example', envExampleContent);
 console.log('Updated .env.example successfully.');
+
