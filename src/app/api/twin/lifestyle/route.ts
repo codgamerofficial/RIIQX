@@ -34,6 +34,25 @@ export interface EatOutStrategy {
   betterSwaps: string[];
 }
 
+export async function GET() {
+  return NextResponse.json({
+    success: true,
+    engine: 'RIIQX Food & Lifestyle Decision Intelligence',
+    status: 'operational',
+    supportedDiets: [
+      'High Protein / Low Carb',
+      'Balanced Indian Vegan',
+      'Diabetic Friendly (Low GI)',
+      'Clean Bulking',
+      'Weight Loss / Satiety',
+    ],
+    supportedBudgets: ['Under ₹150', 'Under ₹400', 'Under ₹800', 'No Limit'],
+    supportedMealTypes: ['Breakfast', 'Lunch', 'Evening Snack', 'Dinner', 'Post-Workout Fuel'],
+    supportedTimes: ['10 mins', '18 mins', '25 mins', '45+ mins'],
+    defaultModes: ['cook_home', 'eat_out'],
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const userId = (await resolveAuthUserId(req)) || 'usr_guest_local';

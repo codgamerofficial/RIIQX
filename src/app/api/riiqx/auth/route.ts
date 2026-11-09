@@ -125,8 +125,14 @@ export async function POST(req: NextRequest) {
         });
 
         if (error) {
-          // If Supabase returned an explicit error (e.g. user already registered or weak password)
-          if (!error.message.includes('fetch failed') && !error.message.includes('ENOTFOUND')) {
+          // If Supabase returned an explicit client error (e.g. user already registered or weak password)
+          // Network errors and email rate limits gracefully fall through to resilient local authentication vault
+          const isTransientOrRateLimit =
+            error.message.includes('fetch failed') ||
+            error.message.includes('ENOTFOUND') ||
+            error.message.toLowerCase().includes('rate limit');
+
+          if (!isTransientOrRateLimit) {
             return NextResponse.json({ error: error.message }, { status: 400 });
           }
         } else if (data?.user) {
@@ -221,16 +227,14 @@ export async function POST(req: NextRequest) {
         });
 
         if (error) {
-          // If Supabase gave an explicit invalid credentials error
-          if (!error.message.includes('fetch failed') && !error.message.includes('ENOTFOUND')) {
-            return NextResponse.json({ error: error.message }, { status: 401 });
-          }
+          // Supabase auth failed; fall through to local vault verification
+          supabaseSuccess = false;
         } else if (data?.user) {
           supabaseSuccess = true;
           authenticatedUser = data.user;
         }
       } catch {
-        // Fall through to resilient local vault
+        supabaseSuccess = false;
       }
 
       if (!supabaseSuccess) {

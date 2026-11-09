@@ -35,17 +35,10 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const safeNext = sanitizeRedirectDestination(searchParams.get('next'));
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    if (!supabaseUrl) {
-      return NextResponse.json(
-        {
-          reachable: false,
-          error: 'missing_supabase_url',
-          message: 'NEXT_PUBLIC_SUPABASE_URL is not configured in your environment.',
-        },
-        { status: 400 }
-      );
-    }
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ojtngzqsrdralrhipjzt.supabase.co';
+    const supabaseAnonKey =
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qdG5nenFzcmRyYWxyaGlwanp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODA1NzcsImV4cCI6MjEwNjk1NjU3N30.TuZdeSyZpWSYJmUz6VP3EJPduM9t5dxeV1rPQrrnMko';
 
     let urlObj: URL;
     try {
@@ -92,7 +85,7 @@ export async function GET(req: NextRequest) {
     try {
       const probeRes = await fetch(`${supabaseUrl}/auth/v1/health`, {
         signal: controller.signal,
-        headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' },
+        headers: { apikey: supabaseAnonKey },
       });
       isHttpReachable = probeRes.ok;
     } catch {
@@ -129,7 +122,7 @@ export async function GET(req: NextRequest) {
       const authProbe = await fetch(oauthAuthorizeUrl, {
         method: 'GET',
         redirect: 'manual',
-        headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' },
+        headers: { apikey: supabaseAnonKey },
       });
 
       if (authProbe.status === 400) {
