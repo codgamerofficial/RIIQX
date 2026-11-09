@@ -1,0 +1,2350 @@
+[
+  {
+    "name": "AGENTROUTER_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:30",
+      "src/lib/riiqx/model-router.ts:65",
+      "src/lib/riiqx/orchestration.ts:26",
+      "src/lib/riiqx/provider-registry.ts:511",
+      "src/services/ai/ai-service-manager.ts:251",
+      "src/services/ai/capability-registry.ts:33"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "AGENT_ROUTER_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/agentrouter.ts:37",
+      "src/lib/ai/index.ts:56",
+      "src/lib/ai/registry/provider-registry.ts:29",
+      "src/lib/riiqx/model-router.ts:64",
+      "src/lib/riiqx/orchestration.ts:25",
+      "src/lib/riiqx/provider-registry.ts:510",
+      "src/lib/security/env-validator.ts:68",
+      "src/services/ai/capability-registry.ts:32"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "AGENT_ROUTER_BASE_URL",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/agentrouter.ts:42",
+      "src/lib/ai/registry/provider-registry.ts:152",
+      "src/lib/riiqx/orchestration.ts:17",
+      "src/lib/riiqx/provider-registry.ts:713",
+      "src/services/ai/ai-service-manager.ts:252"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "AGENT_ROUTER_MODEL",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/agentrouter.ts:47",
+      "src/lib/riiqx/models.ts:370",
+      "src/lib/riiqx/provider-registry.ts:714"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "AIML_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/app/api/riiqx/creator/generate/route.ts:150"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation",
+      "Duplicate casing variant of aiml_api_key"
+    ]
+  },
+  {
+    "name": "AI_BUDGET_MODE",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/app/api/riiqx/models/route.ts:27",
+      "src/lib/ai/router/model-router.ts:24"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "AI_MODEL",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/agentrouter.ts:48"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "AI_PROVIDER",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:353",
+      "src/lib/ai/index.ts:54"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "AMAZON_ASSOCIATE_TAG",
+    "category": "Affiliate & Commerce Routing",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/services/product-intelligence/affiliate-router.ts:189",
+      "tests/test-deal-shorts-factory.mjs:13",
+      "tests/test-genuine-affiliate-engine.mjs:40",
+      "tests/test-genuine-affiliate-engine.mjs:45",
+      "tests/test-genuine-affiliate-engine.mjs:83",
+      "tests/test-genuine-affiliate-engine.mjs:126"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "ANALYTICS_MODEL_ID",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:69",
+      "src/lib/ai/router.ts:26"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "AUTONOMOUS_PUBLISHING",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/app/api/cron/deal-pipeline/route.ts:40"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "AWS_ACCESS_KEY_ID",
+    "category": "Cloud Infrastructure (AWS & Bedrock)",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:88",
+      "src/lib/ai/bedrock-connection.ts:338",
+      "src/lib/security/env-validator.ts:74"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "AWS_BEARER_TOKEN_BEDROCK",
+    "category": "Cloud Infrastructure (AWS & Bedrock)",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:35",
+      "src/lib/nuvexa/orchestration.ts:93",
+      "src/lib/riiqx/model-router.ts:54",
+      "src/lib/riiqx/orchestration.ts:140",
+      "src/lib/riiqx/provider-registry.ts:504",
+      "src/lib/riiqx/tools.ts:660"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "AWS_PROFILE",
+    "category": "Cloud Infrastructure (AWS & Bedrock)",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:340",
+      "src/lib/ai/router.ts:62",
+      "src/lib/security/env-validator.ts:76"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "AWS_REGION",
+    "category": "Cloud Infrastructure (AWS & Bedrock)",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:86",
+      "src/lib/ai/bedrock-connection.ts:138",
+      "src/lib/ai/bedrock-connection.ts:239",
+      "src/lib/ai/bedrock-connection.ts:336",
+      "src/lib/ai/registry/provider-registry.ts:175",
+      "src/lib/ai/router.ts:54",
+      "src/lib/ai/router.ts:58",
+      "src/lib/nuvexa/orchestration.ts:89",
+      "src/lib/riiqx/orchestration.ts:136",
+      "src/lib/riiqx/provider-registry.ts:647",
+      "src/lib/riiqx/tools.ts:674",
+      "src/lib/security/env-validator.ts:72"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "AWS_SECRET_ACCESS_KEY",
+    "category": "Cloud Infrastructure (AWS & Bedrock)",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:89",
+      "src/lib/ai/bedrock-connection.ts:339",
+      "src/lib/ai/registry/provider-registry.ts:34",
+      "src/lib/ai/router.ts:60",
+      "src/lib/nuvexa/orchestration.ts:92",
+      "src/lib/riiqx/model-router.ts:53",
+      "src/lib/riiqx/orchestration.ts:139",
+      "src/lib/riiqx/provider-registry.ts:503",
+      "src/lib/riiqx/security/token-vault.ts:38",
+      "src/lib/riiqx/tools.ts:659",
+      "src/lib/security/env-validator.ts:75",
+      "src/services/ai/capability-registry.ts:39"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "AWS_SESSION_TOKEN",
+    "category": "Cloud Infrastructure (AWS & Bedrock)",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:90"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "BASE_URL",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "tests/test-new-features.mjs:12"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "BEDROCK_API_KEY",
+    "category": "Cloud Infrastructure (AWS & Bedrock)",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:87",
+      "src/lib/ai/bedrock-connection.ts:169",
+      "src/lib/ai/bedrock-connection.ts:265",
+      "src/lib/ai/bedrock-connection.ts:337",
+      "src/lib/ai/bedrock.ts:91",
+      "src/lib/ai/registry/provider-registry.ts:36",
+      "src/lib/ai/router.ts:59",
+      "src/lib/nuvexa/orchestration.ts:94",
+      "src/lib/nuvexa/orchestration.ts:240",
+      "src/lib/riiqx/model-router.ts:55",
+      "src/lib/riiqx/orchestration.ts:141",
+      "src/lib/riiqx/orchestration.ts:481",
+      "src/lib/riiqx/provider-registry.ts:505",
+      "src/lib/riiqx/tools.ts:661",
+      "src/lib/security/env-validator.ts:73",
+      "src/services/ai/capability-registry.ts:38"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "BEDROCK_API_KEY_NAME",
+    "category": "Cloud Infrastructure (AWS & Bedrock)",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "BEDROCK_MODEL_ID",
+    "category": "Cloud Infrastructure (AWS & Bedrock)",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:63",
+      "src/lib/ai/router.ts:20",
+      "src/lib/nuvexa/models.ts:123",
+      "src/lib/nuvexa/orchestration.ts:90",
+      "src/lib/nuvexa/orchestration.ts:221",
+      "src/lib/riiqx/models.ts:338",
+      "src/lib/riiqx/orchestration.ts:137",
+      "src/lib/riiqx/orchestration.ts:462",
+      "src/lib/riiqx/provider-registry.ts:648",
+      "src/lib/security/env-validator.ts:77",
+      "src/services/ai/ai-service-manager.ts:437",
+      "src/services/ai/capability-registry.ts:40"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "CHAT_MODEL_ID",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:73",
+      "src/lib/ai/router.ts:30"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "COHERE_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)"
+    ]
+  },
+  {
+    "name": "COHERE_MODEL",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": true,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)"
+    ]
+  },
+  {
+    "name": "CONTENT_MODEL_ID",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:67",
+      "src/lib/ai/router.ts:24"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "CROMA_AFFILIATE_TAG",
+    "category": "Affiliate & Commerce Routing",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/services/product-intelligence/affiliate-router.ts:192"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "CRON_SECRET",
+    "category": "Security & Session Secrets",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/app/api/cron/deal-pipeline/route.ts:16",
+      "src/app/api/social/publish/schedule/route.ts:39",
+      "src/app/api/twin/affiliate/postback/route.ts:16",
+      "src/app/api/twin/affiliate/postback/route.ts:43",
+      "src/app/api/twin/price-sniper/check/route.ts:13",
+      "tests/test-phase3-autonomous-pipeline.mjs:202",
+      "tests/test-security-and-auth-remediation.mjs:90",
+      "tests/test-security-and-auth-remediation.mjs:93",
+      "tests/test-security-and-auth-remediation.mjs:94",
+      "tests/test-security-and-auth-remediation.mjs:98",
+      "tests/test-security-and-auth-remediation.mjs:100",
+      "tests/test-security-and-auth-remediation.mjs:104"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": true,
+    "inGhSecrets": true,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "FLIPKART_AFFILIATE_ID",
+    "category": "Affiliate & Commerce Routing",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/services/product-intelligence/affiliate-router.ts:190",
+      "tests/test-deal-shorts-factory.mjs:14",
+      "tests/test-genuine-affiliate-engine.mjs:41",
+      "tests/test-genuine-affiliate-engine.mjs:46",
+      "tests/test-genuine-affiliate-engine.mjs:127"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "GEMINI_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:16",
+      "src/lib/ai/router/model-router.ts:146",
+      "src/lib/riiqx/model-router.ts:37",
+      "src/lib/riiqx/orchestration.ts:71",
+      "src/lib/riiqx/provider-registry.ts:492",
+      "src/lib/riiqx/provider-registry.ts:825",
+      "src/lib/video/video-intelligence-engine.ts:274",
+      "src/services/ai/ai-service-manager.ts:242",
+      "src/services/ai/capability-registry.ts:16",
+      "src/services/shopping/ai-shopping-assistant.ts:69",
+      "tests/test-ai-multimodal-engine.mjs:172"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "GOOGLE_AI_STUDIO_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:18",
+      "src/lib/ai/router/model-router.ts:148",
+      "src/lib/riiqx/model-router.ts:39",
+      "src/lib/riiqx/orchestration.ts:73",
+      "src/lib/riiqx/provider-registry.ts:494",
+      "src/lib/riiqx/provider-registry.ts:827",
+      "src/services/ai/ai-service-manager.ts:244",
+      "src/services/ai/capability-registry.ts:18",
+      "src/services/shopping/ai-shopping-assistant.ts:71"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "GOOGLE_API_KEY",
+    "category": "Google & YouTube Integration",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:19",
+      "src/lib/ai/router/model-router.ts:149",
+      "src/lib/riiqx/model-router.ts:40",
+      "src/lib/riiqx/orchestration.ts:74",
+      "src/lib/riiqx/provider-registry.ts:495",
+      "src/lib/riiqx/provider-registry.ts:828",
+      "src/services/ai/ai-service-manager.ts:245",
+      "src/services/ai/capability-registry.ts:19"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "GOOGLE_CLIENT_ID",
+    "category": "Google & YouTube Integration",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:92"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "GOOGLE_CLIENT_SECRET",
+    "category": "Google & YouTube Integration",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:96"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "GOOGLE_GENERATIVE_AI_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:17",
+      "src/lib/ai/router/model-router.ts:147",
+      "src/lib/riiqx/creator-generation-service.ts:160",
+      "src/lib/riiqx/creator-generation-service.ts:342",
+      "src/lib/riiqx/creator-generation-service.ts:404",
+      "src/lib/riiqx/model-router.ts:38",
+      "src/lib/riiqx/orchestration.ts:72",
+      "src/lib/riiqx/provider-registry.ts:493",
+      "src/lib/riiqx/provider-registry.ts:826",
+      "src/services/ai/ai-service-manager.ts:243",
+      "src/services/ai/capability-registry.ts:17",
+      "src/services/shopping/ai-shopping-assistant.ts:70"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "GOOGLE_REDIRECT_URI",
+    "category": "Google & YouTube Integration",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:104",
+      "src/lib/riiqx/social/oauth-engine.ts:105"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": true,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local"
+    ]
+  },
+  {
+    "name": "GROQ_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:21",
+      "src/lib/ai/router/model-router.ts:231",
+      "src/lib/riiqx/creator-generation-service.ts:161",
+      "src/lib/riiqx/creator-generation-service.ts:343",
+      "src/lib/riiqx/creator-generation-service.ts:405",
+      "src/lib/riiqx/provider-registry.ts:497",
+      "src/lib/riiqx/provider-registry.ts:842",
+      "src/lib/riiqx/tools.ts:655",
+      "src/lib/video/video-intelligence-engine.ts:80",
+      "src/services/shopping/ai-shopping-assistant.ts:73"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Duplicate casing variant of groq_api_key"
+    ]
+  },
+  {
+    "name": "GROQ_BASE_URL",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:65",
+      "src/lib/riiqx/orchestration.ts:34",
+      "src/lib/riiqx/provider-registry.ts:564",
+      "src/lib/riiqx/provider-registry.ts:846",
+      "src/services/shopping/ai-shopping-assistant.ts:74"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "GROQ_MODEL",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/orchestration.ts:178",
+      "src/lib/riiqx/orchestration.ts:419",
+      "src/lib/riiqx/orchestration.ts:446",
+      "src/lib/riiqx/orchestration.ts:550",
+      "src/lib/riiqx/orchestration.ts:586",
+      "src/lib/riiqx/orchestration.ts:626",
+      "src/lib/riiqx/orchestration.ts:641",
+      "src/lib/riiqx/orchestration.ts:661",
+      "src/lib/riiqx/orchestration.ts:716",
+      "src/lib/riiqx/orchestration.ts:737",
+      "src/services/shopping/ai-shopping-assistant.ts:75"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "INSTAGRAM_ACCESS_TOKEN",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/app/api/social/accounts/route.ts:24",
+      "src/lib/nuvexa/social/instagram.ts:22",
+      "src/lib/nuvexa/social/instagram.ts:40",
+      "src/lib/riiqx/social/instagram.ts:32",
+      "src/lib/riiqx/social/instagram.ts:40",
+      "src/lib/security/env-validator.ts:98"
+    ],
+    "inEnv": true,
+    "inEnvLocal": false,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": true,
+    "isEmpty": true,
+    "issues": [
+      "Placeholder value detected"
+    ]
+  },
+  {
+    "name": "INSTAGRAM_ACCOUNT_ID",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/app/api/social/accounts/route.ts:26",
+      "src/lib/nuvexa/social/instagram.ts:24",
+      "src/lib/nuvexa/social/instagram.ts:42",
+      "src/lib/riiqx/social/instagram.ts:34",
+      "src/lib/riiqx/social/instagram.ts:42"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "INSTAGRAM_BUSINESS_ACCOUNT_ID",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/security/env-validator.ts:99"
+    ],
+    "inEnv": true,
+    "inEnvLocal": false,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": true,
+    "isEmpty": true,
+    "issues": [
+      "Placeholder value detected"
+    ]
+  },
+  {
+    "name": "LINKEDIN_CLIENT_ID",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:186"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "LINKEDIN_CLIENT_SECRET",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:187"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "LINKEDIN_REDIRECT_URI",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:191"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "META_APP_ID",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:126",
+      "src/lib/security/env-validator.ts:96"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "META_APP_SECRET",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/security/token-vault.ts:37",
+      "src/lib/riiqx/social/oauth-engine.ts:127",
+      "src/lib/security/env-validator.ts:97"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "META_MODEL_API_KEY",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)",
+      "Missing from .env.example documentation",
+      "Duplicate casing variant of Meta_Model_Api_Key"
+    ]
+  },
+  {
+    "name": "META_REDIRECT_URI",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:132",
+      "src/lib/riiqx/social/oauth-engine.ts:134",
+      "src/lib/riiqx/social/oauth-engine.ts:136"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "MOCK_MODE",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/security/env-validator.ts:37"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "MYNTRA_AFFILIATE_TAG",
+    "category": "Affiliate & Commerce Routing",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/services/product-intelligence/affiliate-router.ts:193"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "Meta_Model_Api_Key",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)",
+      "Missing from .env.example documentation",
+      "Duplicate casing variant of META_MODEL_API_KEY"
+    ]
+  },
+  {
+    "name": "NEXT_PUBLIC_APP_URL",
+    "category": "Application & General",
+    "isPublic": true,
+    "isSecret": false,
+    "referencedFiles": [
+      "src/app/sitemap.ts:4",
+      "src/lib/riiqx/social/oauth-engine.ts:60",
+      "src/lib/riiqx/social/oauth-engine.ts:61",
+      "tests/test-android-webapp.mjs:12"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "NEXT_PUBLIC_CARTO_API_KEY",
+    "category": "Security & Session Secrets",
+    "isPublic": true,
+    "isSecret": false,
+    "referencedFiles": [
+      "src/app/api/health/maps/route.ts:13",
+      "src/components/map/MapView.tsx:53",
+      "src/services/product-intelligence/hyperlocal-arbitrage-engine.ts:449"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "NEXT_PUBLIC_GOOGLE_CLIENT_ID",
+    "category": "Google & YouTube Integration",
+    "isPublic": true,
+    "isSecret": false,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "NEXT_PUBLIC_MOCK_MODE",
+    "category": "Application & General",
+    "isPublic": true,
+    "isSecret": false,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)"
+    ]
+  },
+  {
+    "name": "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "category": "Database & Auth (Supabase)",
+    "isPublic": true,
+    "isSecret": false,
+    "referencedFiles": [
+      "scripts/final-production-audit.mjs:26",
+      "src/app/api/auth/oauth/google/route.ts:39",
+      "src/app/auth/callback/route.ts:77",
+      "src/lib/security/env-validator.ts:52",
+      "src/lib/supabase/client.ts:12",
+      "src/lib/supabase/client.ts:25",
+      "src/lib/supabase/middleware.ts:11",
+      "src/lib/supabase/server.ts:14",
+      "tests/test-supabase-security-and-rls.mjs:10"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": true,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "NEXT_PUBLIC_SUPABASE_URL",
+    "category": "Database & Auth (Supabase)",
+    "isPublic": true,
+    "isSecret": false,
+    "referencedFiles": [
+      "scripts/final-production-audit.mjs:25",
+      "scripts/inspect-supabase.js:3",
+      "scripts/seed-authoritative-data.ts:10",
+      "scripts/seed-verified-data.mjs:10",
+      "src/app/api/auth/oauth/google/route.ts:38",
+      "src/app/api/health/supabase/route.ts:139",
+      "src/app/auth/callback/route.ts:76",
+      "src/lib/security/env-validator.ts:51",
+      "src/lib/supabase/admin.ts:9",
+      "src/lib/supabase/admin.ts:13",
+      "src/lib/supabase/client.ts:11",
+      "src/lib/supabase/client.ts:24",
+      "src/lib/supabase/middleware.ts:10",
+      "src/lib/supabase/repository.ts:66",
+      "src/lib/supabase/server.ts:13",
+      "src/lib/supabase/server.ts:26",
+      "tests/test-supabase-security-and-rls.mjs:9"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": true,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "NODE_ENV",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/app/api/auth/oauth/google/route.ts:168",
+      "src/app/api/auth/signout/route.ts:42",
+      "src/app/api/nuvexa/auth/route.ts:34",
+      "src/app/api/social/oauth/authorize/route.ts:68",
+      "src/lib/security/env-validator.ts:36",
+      "src/lib/security/env-validator.ts:110"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "NVIDIA_NIM_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "NYKAA_AFFILIATE_TAG",
+    "category": "Affiliate & Commerce Routing",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/services/product-intelligence/affiliate-router.ts:195"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "Nvdia_nim_api_key",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:26",
+      "src/lib/riiqx/orchestration.ts:62",
+      "src/lib/riiqx/provider-registry.ts:507"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "OLLAMA_BASE_URL",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:193",
+      "src/lib/nuvexa/orchestration.ts:10",
+      "src/lib/riiqx/orchestration.ts:12",
+      "src/lib/riiqx/provider-registry.ts:757"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "OPENAI_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/agentrouter.ts:38",
+      "src/lib/ai/index.ts:57",
+      "src/lib/riiqx/model-router.ts:59",
+      "src/lib/riiqx/orchestration.ts:28",
+      "src/lib/riiqx/orchestration.ts:58",
+      "src/lib/riiqx/provider-registry.ts:515",
+      "src/lib/security/env-validator.ts:69"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "OPENAI_BASE_URL",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/agentrouter.ts:43",
+      "src/lib/riiqx/orchestration.ts:54"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "OPENAI_COMPATIBLE_BASE_URL",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/nuvexa/orchestration.ts:11",
+      "src/lib/riiqx/orchestration.ts:18"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "OPENROUTER_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:23",
+      "src/lib/ai/router/model-router.ts:275",
+      "src/lib/riiqx/model-router.ts:46",
+      "src/lib/riiqx/orchestration.ts:47",
+      "src/lib/riiqx/provider-registry.ts:499",
+      "src/lib/riiqx/provider-registry.ts:857",
+      "src/lib/riiqx/tools.ts:656",
+      "src/services/ai/ai-service-manager.ts:248",
+      "src/services/ai/capability-registry.ts:25",
+      "src/services/shopping/ai-shopping-assistant.ts:77"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "OPENROUTER_API_KEY_NEW",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "OPENROUTER_BASE_URL",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:82",
+      "src/lib/riiqx/orchestration.ts:42",
+      "src/lib/riiqx/provider-registry.ts:586",
+      "src/lib/riiqx/provider-registry.ts:862",
+      "src/services/shopping/ai-shopping-assistant.ts:78"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "OPENROUTER_MODEL",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/services/shopping/ai-shopping-assistant.ts:79"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "RELIANCE_DIGITAL_AFFILIATE_TAG",
+    "category": "Affiliate & Commerce Routing",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/services/product-intelligence/affiliate-router.ts:194"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "SEARXNG_BASE_URL",
+    "category": "Geospatial & Web Search Intelligence",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/nuvexa/search.ts:8"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "SEARXNG_URL",
+    "category": "Geospatial & Web Search Intelligence",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/search.ts:16"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "SESSION_SECRET",
+    "category": "Security & Session Secrets",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/auth.ts:16",
+      "src/lib/riiqx/auth.ts:55"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": true,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "SK_OR_V1_OPENROUTER_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "SUPABASE_SERVICE_ROLE_KEY",
+    "category": "Database & Auth (Supabase)",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "scripts/final-production-audit.mjs:27",
+      "scripts/inspect-supabase.js:4",
+      "scripts/seed-authoritative-data.ts:11",
+      "scripts/seed-verified-data.mjs:11",
+      "src/lib/riiqx/security/token-vault.ts:36",
+      "src/lib/security/env-validator.ts:53",
+      "src/lib/supabase/admin.ts:10",
+      "src/lib/supabase/admin.ts:14",
+      "src/lib/supabase/server.ts:27",
+      "src/lib/supabase/server.ts:28",
+      "src/lib/supabase/server.ts:72",
+      "tests/test-supabase-security-and-rls.mjs:11"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": true,
+    "inVercelProd": true,
+    "inVercelPreview": true,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": []
+  },
+  {
+    "name": "TATA_CLIQ_AFFILIATE_TAG",
+    "category": "Affiliate & Commerce Routing",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/services/product-intelligence/affiliate-router.ts:191"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "TEST_BASE_URL",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "tests/test-affiliate-revenue-engine.mjs:10",
+      "tests/test-deal-shorts-factory.mjs:16",
+      "tests/test-phase3-autonomous-pipeline.mjs:15",
+      "tests/test-phase5-dropshipping-operations.mjs:8",
+      "tests/test-phase6-ai-assistant.mjs:8",
+      "tests/test-twin-lifestyle-digest-goals.mjs:6",
+      "tests/test-verified-buying-links-and-pricing-engine.mjs:13"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "TEST_TARGET_URL",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "tests/test-mobile-viewports.mjs:12",
+      "tests/test-production-feature-parity.mjs:8"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "TEST_URL",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "tests/test-mobile-responsive-widths.mjs:14"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "THREADS_APP_ID",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "THREADS_APP_SECRET",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "THREADS_DISPLAY_NAME",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "TOKEN_ENCRYPTION_KEY",
+    "category": "Security & Session Secrets",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/security/token-vault.ts:18"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": true,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local"
+    ]
+  },
+  {
+    "name": "TREND_MODEL_ID",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:71",
+      "src/lib/ai/router.ts:28"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "TWITTER_REDIRECT_URI",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:170"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "USE_BEDROCK_BEARER",
+    "category": "Cloud Infrastructure (AWS & Bedrock)",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/bedrock-connection.ts:92"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "VERCEL",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:67"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "WAYJET_API_KEY",
+    "category": "AI Models & LLM Providers",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)",
+      "Missing from .env.example documentation",
+      "Duplicate casing variant of wayjet_api_key"
+    ]
+  },
+  {
+    "name": "WHATSAPP_ACCESS_TOKEN",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/services/messaging/whatsapp-twin-engine.ts:32"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": true,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local"
+    ]
+  },
+  {
+    "name": "WHATSAPP_BUSINESS_ACCOUNT_ID",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": true,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)"
+    ]
+  },
+  {
+    "name": "WHATSAPP_PHONE_NUMBER_ID",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/services/messaging/whatsapp-twin-engine.ts:30"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": true,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local"
+    ]
+  },
+  {
+    "name": "WHATSAPP_VERIFY_TOKEN",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/services/messaging/whatsapp-twin-engine.ts:28",
+      "tests/test-whatsapp-twin.mjs:52"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "X_CLIENT_ID",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:165"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "X_CLIENT_SECRET",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:166"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "X_REDIRECT_URI",
+    "category": "Social Media & Publishing APIs",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:171"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "YOUTUBE_API_KEY",
+    "category": "Google & YouTube Integration",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/youtube.ts:22"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "YOUTUBE_CLIENT_ID",
+    "category": "Google & YouTube Integration",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/nuvexa/social/youtube.ts:23",
+      "src/lib/riiqx/social/oauth-engine.ts:91"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "YOUTUBE_CLIENT_SECRET",
+    "category": "Google & YouTube Integration",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/nuvexa/social/youtube.ts:24",
+      "src/lib/riiqx/social/oauth-engine.ts:95"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "YOUTUBE_REDIRECT_URI",
+    "category": "Google & YouTube Integration",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/social/oauth-engine.ts:102",
+      "src/lib/riiqx/social/oauth-engine.ts:103"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "YOUTUBE_REFRESH_TOKEN",
+    "category": "Google & YouTube Integration",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/nuvexa/social/youtube.ts:25"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "agenrouter_api_key",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:31",
+      "src/lib/riiqx/model-router.ts:66",
+      "src/lib/riiqx/orchestration.ts:27",
+      "src/lib/riiqx/provider-registry.ts:512",
+      "src/services/ai/capability-registry.ts:34"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "aiml_api_key",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:27",
+      "src/lib/riiqx/provider-registry.ts:508"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation",
+      "Duplicate casing variant of AIML_API_KEY"
+    ]
+  },
+  {
+    "name": "cohera_api_key",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/ai/registry/provider-registry.ts:25",
+      "src/lib/ai/router/model-router.ts:331",
+      "src/lib/riiqx/model-router.ts:50",
+      "src/lib/riiqx/orchestration.ts:66",
+      "src/lib/riiqx/provider-registry.ts:501",
+      "src/lib/riiqx/provider-registry.ts:875",
+      "src/lib/riiqx/tools.ts:657",
+      "src/services/ai/ai-service-manager.ts:249",
+      "src/services/ai/capability-registry.ts:29"
+    ],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Missing from .env.example documentation"
+    ]
+  },
+  {
+    "name": "groq_api_key",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [
+      "src/lib/riiqx/model-router.ts:43",
+      "src/lib/riiqx/orchestration.ts:38",
+      "src/services/ai/ai-service-manager.ts:246",
+      "src/services/ai/capability-registry.ts:22"
+    ],
+    "inEnv": false,
+    "inEnvLocal": false,
+    "inEnvExample": false,
+    "inVercelProd": false,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Referenced in code but missing from local .env/.env.local",
+      "Missing from .env.example documentation",
+      "Duplicate casing variant of GROQ_API_KEY"
+    ]
+  },
+  {
+    "name": "wayjet_api_key",
+    "category": "Application & General",
+    "isPublic": false,
+    "isSecret": true,
+    "referencedFiles": [],
+    "inEnv": true,
+    "inEnvLocal": true,
+    "inEnvExample": false,
+    "inVercelProd": true,
+    "inVercelPreview": false,
+    "inGhSecrets": false,
+    "isPlaceholder": false,
+    "isEmpty": false,
+    "issues": [
+      "Unreferenced in codebase (dead variable)",
+      "Missing from .env.example documentation",
+      "Duplicate casing variant of WAYJET_API_KEY"
+    ]
+  }
+]
