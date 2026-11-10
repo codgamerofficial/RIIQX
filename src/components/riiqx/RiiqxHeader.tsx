@@ -22,6 +22,7 @@ import {
   LogOut,
   User,
   HardDriveDownload,
+  Scale,
 } from 'lucide-react';
 
 export function RiiqxHeader() {
@@ -48,6 +49,7 @@ export function RiiqxHeader() {
     { id: 'playlists', label: 'Playlists', icon: Disc3 },
     { id: 'favorites', label: 'Favorites', icon: Heart },
     { id: 'equalizer', label: 'Equalizer & DSP', icon: Sliders },
+    { id: 'decisions', label: 'Decisions Lab & Deals', icon: Scale },
     { id: 'settings', label: 'Audio Settings', icon: Settings },
   ];
 

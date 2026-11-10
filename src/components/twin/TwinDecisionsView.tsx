@@ -157,15 +157,15 @@ function VerifiedProductImage({
   // If missing or failed to load, display pristine brand card instead of broken image
   if (!src || error || src.includes('unsplash.com')) {
     return (
-      <div className={`${containerClassName} rounded-2xl bg-zinc-900/90 border border-white/[0.08] flex flex-col items-center justify-center p-3 relative overflow-hidden group`}>
+      <div className={`${containerClassName} rounded-2xl bg-zinc-100 dark:bg-zinc-900/90 border border-zinc-200 dark:border-white/[0.08] flex flex-col items-center justify-center p-3 relative overflow-hidden group transition-colors`}>
         <div className="absolute inset-0 bg-gradient-to-b from-orange-500/10 via-transparent to-transparent pointer-events-none" />
         {retailerName && (
           <div className="mb-2">
             <RetailerLogoBadge name={retailerName} />
           </div>
         )}
-        <div className="flex items-center gap-1 text-zinc-300 text-[11px] font-semibold text-center z-10 px-2 line-clamp-2">
-          <ShieldCheck className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+        <div className="flex items-center gap-1 text-zinc-700 dark:text-zinc-300 text-[11px] font-semibold text-center z-10 px-2 line-clamp-2">
+          <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400 shrink-0" />
           <span>{alt}</span>
         </div>
         <span className="text-[10px] text-zinc-500 mt-1 z-10 font-mono">Store Catalog Verified</span>
@@ -174,9 +174,9 @@ function VerifiedProductImage({
   }
 
   return (
-    <div className={`${containerClassName} rounded-2xl bg-zinc-950/60 border border-white/[0.08] p-2 flex items-center justify-center overflow-hidden relative group`}>
+    <div className={`${containerClassName} rounded-2xl bg-white dark:bg-zinc-950/60 border border-zinc-200 dark:border-white/[0.08] p-2 flex items-center justify-center overflow-hidden relative group transition-colors`}>
       {!loaded && (
-        <div className="absolute inset-0 bg-zinc-800/40 animate-pulse rounded-2xl" />
+        <div className="absolute inset-0 bg-zinc-200 dark:bg-zinc-800/40 animate-pulse rounded-2xl" />
       )}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -769,26 +769,26 @@ export function TwinDecisionsView() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#09090b] text-[#F4F4F6] p-4 sm:p-6 lg:p-8 space-y-8 relative selection:bg-orange-500/30">
+    <div className="flex-1 overflow-y-auto bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-[#F4F4F6] p-4 sm:p-6 lg:p-8 space-y-8 relative selection:bg-orange-500/30 transition-colors">
       {/* Background Ambient Radial Glow */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
       <div className="absolute top-1/3 right-10 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
 
       {/* 1. Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-zinc-200 dark:border-white/[0.08] pb-6">
         <div>
           <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-orange-500/10 text-orange-400 border border-orange-500/20">
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500 dark:text-orange-400 border border-orange-500/20">
               <Scale className="h-3.5 w-3.5" />
             </div>
-            <span className="text-[11px] font-black uppercase tracking-wider text-orange-400">
+            <span className="text-[11px] font-black uppercase tracking-wider text-orange-500 dark:text-orange-400">
               Decision Lab &amp; Price Truth Engine
             </span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white font-heading mt-2">
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-zinc-900 dark:text-white font-heading mt-2">
             Compare &amp; Verify Any Purchase
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-2xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1 max-w-2xl leading-relaxed">
             Exact Product Matching • Direct Buying Links • True Lowest Final Payable Price • Zero Simulated Deals
           </p>
         </div>
@@ -796,31 +796,31 @@ export function TwinDecisionsView() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => handleOpenEarningsModal()}
-            className="flex items-center gap-2 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 px-3.5 py-2.5 text-xs font-bold text-emerald-400 shadow-md transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-2 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 px-3.5 py-2.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 shadow-md transition-all active:scale-95 cursor-pointer"
           >
-            <DollarSign className="h-4 w-4 text-emerald-400" />
+            <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             <span>Affiliate Revenue Engine</span>
           </button>
 
           <button
             onClick={() => setIsPreferencesOpen(true)}
-            className="flex items-center gap-2 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-white/[0.08] hover:border-orange-500/40 px-4 py-2.5 text-xs font-bold text-zinc-200 shadow-md transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-2 rounded-2xl bg-white dark:bg-zinc-900/80 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-white/[0.08] hover:border-orange-500/40 px-4 py-2.5 text-xs font-bold text-zinc-700 dark:text-zinc-200 shadow-md transition-all active:scale-95 cursor-pointer"
           >
-            <Sliders className="h-4 w-4 text-orange-400" />
+            <Sliders className="h-4 w-4 text-orange-500 dark:text-orange-400" />
             <span>My Shopping Offers ({userPreferences.preferredBanks.length} Banks)</span>
           </button>
 
-          <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-2xl text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-xs">
-            <ShieldCheck className="h-4 w-4 text-emerald-400" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-2xl text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-xs">
+            <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             <span>Anti-Simulation Engine Active</span>
           </span>
         </div>
       </div>
 
       {/* 2. Mode Selector & Input Box: URL, Query, or Screenshot */}
-      <div className="rounded-3xl border border-white/[0.08] bg-zinc-900/60 backdrop-blur-xl p-6 sm:p-7 shadow-2xl space-y-5">
+      <div className="rounded-3xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-zinc-900/60 backdrop-blur-xl p-6 sm:p-7 shadow-xl dark:shadow-2xl space-y-5 transition-colors">
         {/* Mode Selector Tabs */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-white/[0.08] pb-4">
+        <div className="flex flex-wrap items-center gap-2 border-b border-zinc-200 dark:border-white/[0.08] pb-4">
           <button
             onClick={() => {
               setActiveMode('price_truth');
@@ -828,11 +828,11 @@ export function TwinDecisionsView() {
             }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeMode === 'price_truth'
-                ? 'bg-gradient-to-r from-orange-500/20 to-amber-500/10 text-white border border-orange-500/30 shadow-md shadow-orange-500/10'
-                : 'text-zinc-400 hover:text-white hover:bg-white/[0.04] border border-transparent'
+                ? 'bg-gradient-to-r from-orange-500/20 to-amber-500/10 text-orange-600 dark:text-white border border-orange-500/30 shadow-md shadow-orange-500/10'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.04] border border-transparent'
             }`}
           >
-            <Scale className="h-4 w-4 text-orange-400" />
+            <Scale className="h-4 w-4 text-orange-500 dark:text-orange-400" />
             <span>Product Price Truth &amp; Deals</span>
           </button>
 
@@ -843,13 +843,13 @@ export function TwinDecisionsView() {
             }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeMode === 'checkout_trap'
-                ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-300 border border-emerald-500/30 shadow-md shadow-emerald-500/10'
-                : 'text-zinc-400 hover:text-emerald-400 hover:bg-white/[0.04] border border-transparent'
+                ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 shadow-md shadow-emerald-500/10'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-zinc-100 dark:hover:bg-white/[0.04] border border-transparent'
             }`}
           >
-            <ShieldAlert className="h-4 w-4 text-emerald-400" />
+            <ShieldAlert className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             <span>Deceptive Fee &amp; Dark Pattern Deflector</span>
-            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
               WORLD FIRST
             </span>
           </button>
@@ -864,20 +864,20 @@ export function TwinDecisionsView() {
             }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeMode === 'hyperlocal_arbitrage'
-                ? 'bg-gradient-to-r from-blue-500/20 to-cyan-500/10 text-cyan-300 border border-cyan-500/30 shadow-md shadow-cyan-500/10'
-                : 'text-zinc-400 hover:text-cyan-400 hover:bg-white/[0.04] border border-transparent'
+                ? 'bg-gradient-to-r from-blue-500/20 to-cyan-500/10 text-blue-700 dark:text-cyan-300 border border-cyan-500/30 shadow-md shadow-cyan-500/10'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-zinc-100 dark:hover:bg-white/[0.04] border border-transparent'
             }`}
           >
-            <MapPin className="h-4 w-4 text-cyan-400" />
+            <MapPin className="h-4 w-4 text-blue-600 dark:text-cyan-400" />
             <span>Hyperlocal Online vs Offline</span>
-            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-blue-600 dark:text-cyan-400 border border-cyan-500/30">
               CARTO GIS
             </span>
           </button>
         </div>
 
         {errorMsg && (
-          <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold flex items-center justify-between animate-in fade-in">
+          <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 text-xs font-semibold flex items-center justify-between animate-in fade-in">
             <span>{errorMsg}</span>
             <button onClick={() => setErrorMsg(null)} className="p-1 hover:bg-rose-500/20 rounded-lg transition-colors">
               <X className="h-3.5 w-3.5" />
@@ -887,7 +887,7 @@ export function TwinDecisionsView() {
 
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
           <div className="relative flex-1 w-full">
-            <Search className="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" />
+            <Search className="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
             <input
               type="text"
               value={query}
@@ -906,7 +906,7 @@ export function TwinDecisionsView() {
                   ? 'Enter product name (e.g. Sony WF-1000XM5, iPhone 16) to check Croma/Reliance...'
                   : 'Paste exact Amazon, Flipkart, Myntra URL or enter product name...'
               }
-              className="w-full pl-11 pr-4 py-3.5 text-xs sm:text-sm rounded-2xl bg-zinc-950/70 border border-white/[0.08] text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/80 transition-all shadow-inner"
+              className="w-full pl-11 pr-4 py-3.5 text-xs sm:text-sm rounded-2xl bg-zinc-50 dark:bg-zinc-950/70 border border-zinc-200 dark:border-white/[0.08] text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/80 transition-all shadow-inner"
             />
           </div>
 
@@ -924,11 +924,11 @@ export function TwinDecisionsView() {
               onClick={() => fileInputRef.current?.click()}
               className={`flex items-center justify-center gap-2 px-4 py-3.5 text-xs font-bold rounded-2xl border transition-all cursor-pointer ${
                 screenshotBase64
-                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 shadow-xs'
-                  : 'bg-zinc-950/70 hover:bg-zinc-800 border-white/[0.08] text-zinc-300 hover:text-white'
+                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-700 dark:text-amber-300 shadow-xs'
+                  : 'bg-zinc-50 dark:bg-zinc-950/70 hover:bg-zinc-100 dark:hover:bg-zinc-800 border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
-              <ImageIcon className="h-4 w-4 text-orange-400" />
+              <ImageIcon className="h-4 w-4 text-orange-500 dark:text-orange-400" />
               <span>{screenshotFileName ? 'Screenshot Attached' : 'Upload Screenshot'}</span>
             </button>
           </div>
@@ -966,17 +966,17 @@ export function TwinDecisionsView() {
 
         {/* Screenshot Preview */}
         {screenshotBase64 && (
-          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-950/80 border border-white/[0.08] text-xs">
+          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-950/80 border border-zinc-200 dark:border-white/[0.08] text-xs">
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={screenshotBase64}
                 alt="Product Screenshot"
-                className="h-11 w-11 object-cover rounded-xl border border-white/[0.1] shadow-xs"
+                className="h-11 w-11 object-cover rounded-xl border border-zinc-300 dark:border-white/[0.1] shadow-xs"
               />
               <div>
-                <span className="font-bold text-white block">{screenshotFileName}</span>
-                <span className="text-[11px] text-amber-400 font-mono">
+                <span className="font-bold text-zinc-900 dark:text-white block">{screenshotFileName}</span>
+                <span className="text-[11px] text-amber-600 dark:text-amber-400 font-mono">
                   {activeMode === 'checkout_trap'
                     ? 'Multimodal OCR Active • Scanning for pre-ticked donations, hidden fees, and warranty markups'
                     : 'Multimodal vision active • Cross-checked with live merchant catalogs'}
@@ -985,7 +985,7 @@ export function TwinDecisionsView() {
             </div>
             <button
               onClick={handleClearScreenshot}
-              className="p-1.5 text-zinc-400 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition-colors cursor-pointer"
+              className="p-1.5 text-zinc-500 hover:text-rose-500 rounded-lg hover:bg-rose-500/10 transition-colors cursor-pointer"
               title="Remove Screenshot"
             >
               <X className="h-4 w-4" />
@@ -995,7 +995,7 @@ export function TwinDecisionsView() {
 
         {/* Suggestion Chips */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1">
-          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider shrink-0">
+          <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider shrink-0">
             {activeMode === 'checkout_trap' ? 'Audit Common Traps:' : 'Try Real Examples:'}
           </span>
           {(activeMode === 'checkout_trap'
@@ -1014,7 +1014,7 @@ export function TwinDecisionsView() {
                 if (activeMode === 'checkout_trap') handleAuditCheckout();
                 else handleAnalyze(item);
               }}
-              className="rounded-full bg-zinc-950/80 hover:bg-zinc-800 border border-white/[0.06] hover:border-orange-500/40 px-3 py-1 text-[11px] text-zinc-300 hover:text-white shrink-0 transition-all font-mono shadow-xs cursor-pointer"
+              className="rounded-full bg-zinc-100 dark:bg-zinc-950/80 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-white/[0.06] hover:border-orange-500/40 px-3 py-1 text-[11px] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white shrink-0 transition-all font-mono shadow-xs cursor-pointer"
             >
               {item.length > 40 ? item.substring(0, 37) + '...' : item}
             </button>
@@ -1107,7 +1107,7 @@ export function TwinDecisionsView() {
       {activeMode === 'price_truth' && result && (
         <div className="space-y-8 animate-in fade-in duration-300">
           {/* A. Product Identity Hero Section */}
-          <div className="rounded-3xl border border-white/[0.08] bg-zinc-900/60 backdrop-blur-xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden">
+          <div className="rounded-3xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-zinc-900/60 backdrop-blur-xl p-6 sm:p-8 shadow-xl dark:shadow-2xl space-y-6 relative overflow-hidden transition-colors">
             <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
 
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
@@ -1124,27 +1124,27 @@ export function TwinDecisionsView() {
 
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wide">
+                    <span className="rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wide">
                       Verdict: {result.verdict.replace(/_/g, ' ')}
                     </span>
-                    <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                    <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
                       <ShieldCheck className="h-3.5 w-3.5" />
                       <span>Identity Match: {result.bestPick.twinMatchScore}%</span>
                     </span>
-                    <span className="text-[10px] text-zinc-400 bg-zinc-950/80 px-2.5 py-0.5 rounded-full border border-white/[0.06] font-mono">
+                    <span className="text-[10px] text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-950/80 px-2.5 py-0.5 rounded-full border border-zinc-200 dark:border-white/[0.06] font-mono">
                       Condition: Brand New (Original Retail)
                     </span>
                     {result.bestPick.verificationSource && (
-                      <span className="text-[10px] text-zinc-400 bg-zinc-950/80 px-2.5 py-0.5 rounded-full border border-white/[0.06] font-mono">
+                      <span className="text-[10px] text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-950/80 px-2.5 py-0.5 rounded-full border border-zinc-200 dark:border-white/[0.06] font-mono">
                         Source: {result.bestPick.verificationSource}
                       </span>
                     )}
                   </div>
 
-                  <h2 className="text-xl sm:text-2xl font-black text-white font-heading tracking-tight leading-snug">
+                  <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-heading tracking-tight leading-snug">
                     {decodeHtmlEntities(result.bestPick.title)}
                   </h2>
-                  <p className="text-xs sm:text-sm text-zinc-300 max-w-3xl leading-relaxed">
+                  <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 max-w-3xl leading-relaxed">
                     {result.subtext}
                   </p>
 
@@ -1157,26 +1157,26 @@ export function TwinDecisionsView() {
                           result.pricingMatrix.finalCheckoutPrice
                         )
                       }
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
                     >
-                      <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                      <MapPin className="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-400" />
                       <span>Compare with Nearby Stores (Croma / Reliance / Vijay Sales)</span>
                       <ArrowRight className="w-3 h-3 opacity-70" />
                     </button>
 
                     <button
                       onClick={() => handleOpenSniper()}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/30 text-orange-300 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/30 text-orange-700 dark:text-orange-300 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
                     >
-                      <Crosshair className="w-3.5 h-3.5 text-orange-400" />
+                      <Crosshair className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
                       <span>Snipe Price Drop (24/7 Watchlist)</span>
                     </button>
 
                     <button
                       onClick={() => handleGenerateDealShort()}
-                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-300 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
+                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-700 dark:text-purple-300 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
                     >
-                      <Video className="w-3.5 h-3.5 text-purple-400" />
+                      <Video className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400" />
                       <span>Generate Viral Deal Short (9:16 Video)</span>
                     </button>
                   </div>
@@ -1190,29 +1190,29 @@ export function TwinDecisionsView() {
                   onClick={() => setActiveRankingTab('standard')}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden group ${
                     activeRankingTab === 'standard'
-                      ? 'border-zinc-300 bg-zinc-800/90 shadow-xl ring-1 ring-zinc-400/40'
-                      : 'border-white/[0.08] hover:border-white/[0.2] bg-zinc-950/60'
+                      ? 'border-zinc-400 dark:border-zinc-300 bg-zinc-100 dark:bg-zinc-800/90 shadow-xl ring-1 ring-zinc-400/40'
+                      : 'border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.2] bg-zinc-50 dark:bg-zinc-950/60'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <div className="flex items-center gap-1 text-zinc-400 text-[11px] font-black uppercase tracking-wider">
-                      <DollarSign className="h-3.5 w-3.5 text-zinc-300" />
+                    <div className="flex items-center gap-1 text-zinc-500 dark:text-zinc-400 text-[11px] font-black uppercase tracking-wider">
+                      <DollarSign className="h-3.5 w-3.5 text-zinc-700 dark:text-zinc-300" />
                       <span>Cheapest Market Price</span>
                     </div>
-                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-white/[0.1]">
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-white/[0.1]">
                       Ranking 1
                     </span>
                   </div>
-                  <div className="text-2xl font-black text-white font-mono tracking-tight">
+                  <div className="text-2xl font-black text-zinc-900 dark:text-white font-mono tracking-tight">
                     {result.report?.priceTruth?.lowestStandardPrice
                       ? `₹${result.report.priceTruth.lowestStandardPrice.toLocaleString('en-IN')}`
                       : `₹${result.pricingMatrix.lowestListedPrice.toLocaleString('en-IN')}`}
                   </div>
-                  <div className="text-xs text-zinc-300 mt-1 flex items-center justify-between">
-                    <span>At <strong className="text-white">{result.report?.cheapestStandardOffer?.retailerName || result.pricingMatrix.bestRetailer}</strong></span>
-                    <span className="text-[10px] text-zinc-400 font-mono">Standard floor</span>
+                  <div className="text-xs text-zinc-600 dark:text-zinc-300 mt-1 flex items-center justify-between">
+                    <span>At <strong className="text-zinc-900 dark:text-white">{result.report?.cheapestStandardOffer?.retailerName || result.pricingMatrix.bestRetailer}</strong></span>
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">Standard floor</span>
                   </div>
-                  <p className="text-[11px] text-zinc-400 mt-1 line-clamp-1">
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-1">
                     Lowest verified standard price across all stores.
                   </p>
                 </div>
@@ -1222,31 +1222,31 @@ export function TwinDecisionsView() {
                   onClick={() => setActiveRankingTab('eligible')}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden group ${
                     activeRankingTab === 'eligible'
-                      ? 'border-emerald-500/60 bg-emerald-950/30 shadow-2xl shadow-emerald-500/10 ring-1 ring-emerald-500/40'
-                      : 'border-emerald-500/30 hover:border-emerald-500/50 bg-zinc-950/60'
+                      ? 'border-emerald-500/60 bg-emerald-50 dark:bg-emerald-950/30 shadow-2xl shadow-emerald-500/10 ring-1 ring-emerald-500/40'
+                      : 'border-emerald-500/30 hover:border-emerald-500/50 bg-emerald-50/50 dark:bg-zinc-950/60'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <div className="flex items-center gap-1 text-emerald-400 text-[11px] font-black uppercase tracking-wider">
+                    <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-[11px] font-black uppercase tracking-wider">
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       <span>Cheapest Eligible Price</span>
                     </div>
-                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                       Ranking 2 • Your Deal
                     </span>
                   </div>
-                  <div className="text-2xl font-black text-emerald-400 font-mono tracking-tight">
+                  <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono tracking-tight">
                     {result.report?.priceTruth?.lowestEligiblePrice
                       ? `₹${result.report.priceTruth.lowestEligiblePrice.toLocaleString('en-IN')}`
                       : `₹${result.pricingMatrix.finalCheckoutPrice.toLocaleString('en-IN')}`}
                   </div>
-                  <div className="text-xs text-zinc-300 mt-1 flex items-center justify-between">
-                    <span>At <strong className="text-white">{result.report?.cheapestEligibleOffer?.retailerName || result.pricingMatrix.bestRetailer}</strong></span>
+                  <div className="text-xs text-zinc-600 dark:text-zinc-300 mt-1 flex items-center justify-between">
+                    <span>At <strong className="text-zinc-900 dark:text-white">{result.report?.cheapestEligibleOffer?.retailerName || result.pricingMatrix.bestRetailer}</strong></span>
                     {result.pricingMatrix.totalSavings > 0 && (
-                      <span className="text-emerald-300 font-bold font-mono">Save ₹{result.pricingMatrix.totalSavings.toLocaleString('en-IN')}</span>
+                      <span className="text-emerald-600 dark:text-emerald-300 font-bold font-mono">Save ₹{result.pricingMatrix.totalSavings.toLocaleString('en-IN')}</span>
                     )}
                   </div>
-                  <p className="text-[11px] text-zinc-400 mt-1 line-clamp-1">
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-1">
                     Real payable price for your {userPreferences.preferredBanks.length} active banks &amp; cards.
                   </p>
                 </div>
@@ -1256,29 +1256,29 @@ export function TwinDecisionsView() {
                   onClick={() => setActiveRankingTab('conditional')}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden group ${
                     activeRankingTab === 'conditional'
-                      ? 'border-orange-500/60 bg-orange-950/30 shadow-2xl shadow-orange-500/10 ring-1 ring-orange-500/40'
-                      : 'border-orange-500/30 hover:border-orange-500/50 bg-zinc-950/60'
+                      ? 'border-orange-500/60 bg-orange-50 dark:bg-orange-950/30 shadow-2xl shadow-orange-500/10 ring-1 ring-orange-500/40'
+                      : 'border-orange-500/30 hover:border-orange-500/50 bg-orange-50/50 dark:bg-zinc-950/60'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <div className="flex items-center gap-1 text-orange-400 text-[11px] font-black uppercase tracking-wider">
+                    <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 text-[11px] font-black uppercase tracking-wider">
                       <Tag className="h-3.5 w-3.5" />
                       <span>Best Conditional Deal</span>
                     </div>
-                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-700 dark:text-orange-300 border border-orange-500/30">
                       Ranking 3
                     </span>
                   </div>
-                  <div className="text-2xl font-black text-orange-400 font-mono tracking-tight">
+                  <div className="text-2xl font-black text-orange-600 dark:text-orange-400 font-mono tracking-tight">
                     {result.report?.priceTruth?.lowestConditionalPrice
                       ? `₹${result.report.priceTruth.lowestConditionalPrice.toLocaleString('en-IN')}`
                       : `₹${result.pricingMatrix.finalCheckoutPrice.toLocaleString('en-IN')}`}
                   </div>
-                  <div className="text-xs text-zinc-300 mt-1 flex items-center justify-between">
-                    <span>At <strong className="text-white">{result.report?.cheapestConditionalOffer?.retailerName || 'Top Store'}</strong></span>
-                    <span className="text-[10px] text-amber-300 font-mono">Conditional</span>
+                  <div className="text-xs text-zinc-600 dark:text-zinc-300 mt-1 flex items-center justify-between">
+                    <span>At <strong className="text-zinc-900 dark:text-white">{result.report?.cheapestConditionalOffer?.retailerName || 'Top Store'}</strong></span>
+                    <span className="text-[10px] text-amber-600 dark:text-amber-300 font-mono">Conditional</span>
                   </div>
-                  <p className="text-[11px] text-zinc-400 mt-1 line-clamp-1">
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-1">
                     Lowest possible price requiring specific card or EMI plan.
                   </p>
                 </div>
@@ -1287,7 +1287,7 @@ export function TwinDecisionsView() {
           </div>
 
           {/* B. 3-Way Price Ranking Dimension Selector */}
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200 dark:border-white/[0.08] pb-4">
             <div className="flex items-center gap-2 bg-zinc-950/80 p-1.5 rounded-2xl border border-white/[0.08] shadow-inner">
               <button
                 onClick={() => setActiveRankingTab('eligible')}
@@ -1361,8 +1361,8 @@ export function TwinDecisionsView() {
                     key={offer.id || i}
                     className={`rounded-3xl border transition-all duration-200 flex flex-col justify-between p-5 space-y-4 shadow-xl hover:-translate-y-1 hover:shadow-2xl relative overflow-hidden group ${
                       isWinner
-                        ? 'border-emerald-500/50 bg-gradient-to-b from-emerald-500/10 via-zinc-900/90 to-zinc-900/90 ring-1 ring-emerald-500/30'
-                        : 'border-white/[0.08] hover:border-white/[0.18] bg-zinc-900/70 backdrop-blur-xl'
+                        ? 'border-emerald-500/50 bg-emerald-50/80 dark:bg-gradient-to-b dark:from-emerald-500/10 dark:via-zinc-900/90 dark:to-zinc-900/90 ring-1 ring-emerald-500/30'
+                        : 'border-zinc-200 dark:border-white/[0.08] hover:border-zinc-300 dark:hover:border-white/[0.18] bg-white dark:bg-zinc-900/70 backdrop-blur-xl'
                     }`}
                   >
                     <div className="space-y-3">
@@ -1373,7 +1373,7 @@ export function TwinDecisionsView() {
                         </div>
 
                         {isWinner && (
-                          <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shrink-0 shadow-xs">
+                          <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 shrink-0 shadow-xs">
                             Lowest Price
                           </span>
                         )}
@@ -1381,30 +1381,30 @@ export function TwinDecisionsView() {
 
                       {/* Seller & Verification Status Pills */}
                       <div className="space-y-1.5">
-                        <div className="text-[11px] text-zinc-400 truncate">
-                          Seller: <span className="text-zinc-200 font-semibold">{offer.sellerName || `${offer.retailerName} Official`}</span>
+                        <div className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
+                          Seller: <span className="text-zinc-900 dark:text-zinc-200 font-semibold">{offer.sellerName || `${offer.retailerName} Official`}</span>
                         </div>
 
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {offer.directLinkVerified ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
                               <CheckCircle2 className="h-3 w-3" />
                               <span>Verified Direct PDP</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-400 text-[10px] font-bold border border-amber-500/30">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-400 text-[10px] font-bold border border-amber-500/30">
                               <AlertTriangle className="h-3 w-3" />
                               <span>Direct link unverified</span>
                             </span>
                           )}
 
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300 text-[10px] font-mono border border-white/[0.06]">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono border border-zinc-200 dark:border-white/[0.06]">
                             {offer.availability === 'in_stock' ? (
-                              <span className="text-emerald-400">● In Stock</span>
+                              <span className="text-emerald-600 dark:text-emerald-400">● In Stock</span>
                             ) : offer.availability === 'out_of_stock' ? (
-                              <span className="text-rose-400">● Out of Stock</span>
+                              <span className="text-rose-600 dark:text-rose-400">● Out of Stock</span>
                             ) : (
-                              <span className="text-zinc-400">● Check Merchant</span>
+                              <span className="text-zinc-500 dark:text-zinc-400">● Check Merchant</span>
                             )}
                           </span>
                         </div>
@@ -1425,17 +1425,17 @@ export function TwinDecisionsView() {
                       <div>
                         {typeof displayPrice === 'number' && displayPrice > 0 ? (
                           <div>
-                            <div className="text-2xl font-black text-white font-mono tracking-tight">
+                            <div className="text-2xl font-black text-zinc-900 dark:text-white font-mono tracking-tight">
                               ₹{displayPrice.toLocaleString('en-IN')}
                             </div>
                             {offer.mrp && offer.mrp > displayPrice && (
-                              <div className="text-[11px] text-zinc-500 line-through font-mono">
+                              <div className="text-[11px] text-zinc-400 line-through font-mono">
                                 MRP ₹{offer.mrp.toLocaleString('en-IN')}
                               </div>
                             )}
                           </div>
                         ) : (
-                          <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold text-center">
+                          <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold text-center">
                             Live Price Check at Store
                           </div>
                         )}
@@ -1443,55 +1443,55 @@ export function TwinDecisionsView() {
 
                       {/* Line-by-Line Price Math Breakdown */}
                       {displayScenario && typeof displayPrice === 'number' && displayPrice > 0 && (
-                        <div className="p-3 rounded-2xl bg-zinc-950/70 border border-white/[0.06] space-y-1.5 text-[11px] font-mono">
-                          <div className="flex justify-between text-zinc-400">
+                        <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950/70 border border-zinc-200 dark:border-white/[0.06] space-y-1.5 text-[11px] font-mono">
+                          <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
                             <span>Base Selling Price:</span>
-                            <span className="font-bold text-white">₹{displayScenario.sellingPrice.toLocaleString('en-IN')}</span>
+                            <span className="font-bold text-zinc-900 dark:text-white">₹{displayScenario.sellingPrice.toLocaleString('en-IN')}</span>
                           </div>
 
                           {displayScenario.deliveryCharge > 0 ? (
-                            <div className="flex justify-between text-zinc-400">
+                            <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
                               <span>Delivery Fee:</span>
-                              <span className="font-bold text-amber-400">+₹{displayScenario.deliveryCharge}</span>
+                              <span className="font-bold text-amber-600 dark:text-amber-400">+₹{displayScenario.deliveryCharge}</span>
                             </div>
                           ) : (
-                            <div className="flex justify-between text-emerald-400">
+                            <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
                               <span>Delivery:</span>
                               <span className="font-bold">Free</span>
                             </div>
                           )}
 
                           {displayScenario.mandatoryFees > 0 && (
-                            <div className="flex justify-between text-zinc-400">
+                            <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
                               <span>Platform / Handling Fee:</span>
-                              <span className="font-bold text-amber-400">+₹{displayScenario.mandatoryFees}</span>
+                              <span className="font-bold text-amber-600 dark:text-amber-400">+₹{displayScenario.mandatoryFees}</span>
                             </div>
                           )}
 
                           {displayScenario.couponDiscount > 0 && (
-                            <div className="flex justify-between text-emerald-400 font-bold">
+                            <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
                               <span>Store Coupon Discount:</span>
                               <span>-₹{displayScenario.couponDiscount.toLocaleString('en-IN')}</span>
                             </div>
                           )}
 
                           {displayScenario.bankDiscount > 0 && (
-                            <div className="flex justify-between text-emerald-400 font-bold">
+                            <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
                               <span>Bank Instant Discount:</span>
                               <span>-₹{displayScenario.bankDiscount.toLocaleString('en-IN')}</span>
                             </div>
                           )}
 
                           {displayScenario.appliedGiftCardValue > 0 && (
-                            <div className="flex justify-between text-amber-300 font-bold">
+                            <div className="flex justify-between text-amber-600 dark:text-amber-300 font-bold">
                               <span>Gift Card Consumed:</span>
                               <span>-₹{displayScenario.appliedGiftCardValue.toLocaleString('en-IN')} (Stored)</span>
                             </div>
                           )}
 
-                          <div className="flex justify-between items-center text-white font-bold pt-1.5 border-t border-white/[0.08] text-xs">
+                          <div className="flex justify-between items-center text-zinc-900 dark:text-white font-bold pt-1.5 border-t border-zinc-200 dark:border-white/[0.08] text-xs">
                             <span>Final Cash Payable:</span>
-                            <span className="text-emerald-400 font-mono text-sm">₹{displayScenario.finalCashPayable.toLocaleString('en-IN')}</span>
+                            <span className="text-emerald-600 dark:text-emerald-400 font-mono text-sm">₹{displayScenario.finalCashPayable.toLocaleString('en-IN')}</span>
                           </div>
 
                           {displayScenario.expectedCashback > 0 && (
@@ -1709,18 +1709,18 @@ export function TwinDecisionsView() {
 
       {/* 4. "My Shopping Offers" Preferences Modal */}
       {isPreferencesOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="w-full max-w-lg rounded-3xl border border-white/[0.12] bg-zinc-900/95 p-6 sm:p-8 shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-md animate-in fade-in">
+          <div className="w-full max-w-lg rounded-3xl border border-zinc-200 dark:border-white/[0.12] bg-white dark:bg-zinc-900/95 p-6 sm:p-8 shadow-2xl space-y-6 text-zinc-900 dark:text-white transition-colors">
+            <div className="flex items-center justify-between border-b border-zinc-200 dark:border-white/[0.08] pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500 dark:text-orange-400 border border-orange-500/20">
                   <Sliders className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-white font-heading">
+                  <h3 className="text-lg font-black text-zinc-900 dark:text-white font-heading">
                     My Shopping Offers
                   </h3>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
                     Select your active banking cards &amp; memberships to calculate your true eligible price
                   </p>
                 </div>
@@ -1728,7 +1728,7 @@ export function TwinDecisionsView() {
 
               <button
                 onClick={() => setIsPreferencesOpen(false)}
-                className="p-1.5 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+                className="p-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -1737,7 +1737,7 @@ export function TwinDecisionsView() {
             <div className="space-y-5 text-xs">
               {/* Banks Selector */}
               <div className="space-y-2">
-                <span className="font-bold text-white block">
+                <span className="font-bold text-zinc-900 dark:text-white block">
                   Preferred Banks &amp; Cards Owned:
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -1750,8 +1750,8 @@ export function TwinDecisionsView() {
                         onClick={() => handleToggleBank(bank)}
                         className={`px-3 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 ${
                           isSelected
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-xs'
-                            : 'bg-zinc-950/70 text-zinc-400 border border-white/[0.08] hover:text-white'
+                            ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 shadow-xs'
+                            : 'bg-zinc-100 dark:bg-zinc-950/70 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/[0.08] hover:text-zinc-900 dark:hover:text-white'
                         }`}
                       >
                         {isSelected && <Check className="h-3 w-3" />}
@@ -1821,18 +1821,18 @@ export function TwinDecisionsView() {
 
       {/* 5. 24/7 Price Drop Sniper / Watchlist Modal */}
       {isSniperModalOpen && sniperItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
-          <div className="w-full max-w-lg rounded-3xl border border-white/[0.12] bg-zinc-900/95 p-6 sm:p-8 shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-md animate-in fade-in">
+          <div className="w-full max-w-lg rounded-3xl border border-zinc-200 dark:border-white/[0.12] bg-white dark:bg-zinc-900/95 p-6 sm:p-8 shadow-2xl space-y-6 text-zinc-900 dark:text-white transition-colors">
+            <div className="flex items-center justify-between border-b border-zinc-200 dark:border-white/[0.08] pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500 dark:text-orange-400 border border-orange-500/20">
                   <Crosshair className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-white font-heading">
+                  <h3 className="text-lg font-black text-zinc-900 dark:text-white font-heading">
                     AI Twin Price Drop Sniper
                   </h3>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
                     24/7 Background Price Intelligence • Zero Spam Deduplication
                   </p>
                 </div>
@@ -1843,7 +1843,7 @@ export function TwinDecisionsView() {
                   setIsSniperModalOpen(false);
                   setSniperSuccessMsg(null);
                 }}
-                className="p-1.5 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+                className="p-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -1968,18 +1968,18 @@ export function TwinDecisionsView() {
 
       {/* 6. Affiliate Revenue & Commission Engine Modal */}
       {isEarningsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
-          <div className="w-full max-w-2xl rounded-3xl border border-emerald-500/30 bg-zinc-900/95 p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-md animate-in fade-in">
+          <div className="w-full max-w-2xl rounded-3xl border border-emerald-500/30 bg-white dark:bg-zinc-900/95 p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto text-zinc-900 dark:text-white transition-colors">
+            <div className="flex items-center justify-between border-b border-zinc-200 dark:border-white/[0.08] pb-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                   <DollarSign className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-white font-heading">
+                  <h3 className="text-lg font-black text-zinc-900 dark:text-white font-heading">
                     Affiliate Revenue &amp; Monetization Engine
                   </h3>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
                     Real-time Outbound Purchase Attribution • Amazon, Flipkart, Tata CLiQ • Zero Simulated Clicks
                   </p>
                 </div>
@@ -2181,22 +2181,22 @@ export function TwinDecisionsView() {
 
       {/* 5. Autonomous Deal Shorts & Reels Studio Modal */}
       {isDealShortModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-2xl rounded-3xl bg-zinc-900 border border-white/[0.1] p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-2xl rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/[0.1] p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto text-zinc-900 dark:text-white transition-colors">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+            <div className="flex items-center justify-between border-b border-zinc-200 dark:border-white/[0.08] pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
                   <Video className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                     <span>Autonomous Deal Shorts &amp; Reels Studio</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30">
                       Engine 2 Active
                     </span>
                   </h3>
-                  <p className="text-[11px] text-zinc-400">
+                  <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
                     Physical 9:16 Video Synthesis • FFmpeg • High-Converting Viral Copy • Affiliate Link
                   </p>
                 </div>

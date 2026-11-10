@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Headphones,
   HardDriveDownload,
+  Scale,
 } from 'lucide-react';
 
 export function RiiqxSidebar() {
@@ -32,6 +33,7 @@ export function RiiqxSidebar() {
     { tab: 'playlists' as any, label: 'Playlists', icon: Disc3 },
     { tab: 'favorites' as any, label: 'Favorites', icon: Heart },
     { tab: 'equalizer' as any, label: 'Equalizer & DSP', icon: Sliders },
+    { tab: 'decisions', label: 'Decisions Lab & Deals', icon: Scale },
     { tab: 'settings', label: 'Audio Settings', icon: Settings },
   ];
 
