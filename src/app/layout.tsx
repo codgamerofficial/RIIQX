@@ -52,6 +52,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined') {
+                if ('serviceWorker' in navigator) {
+                  navigator.serviceWorker.getRegistrations().then(function(regs) {
+                    for (var r of regs) { r.unregister(); }
+                  });
+                }
+              }
+            `,
+          }}
+        />
       </head>
       <body className="h-[100dvh] min-h-[100dvh] bg-[#FAF9F6] text-[#202124] dark:bg-[#0C0C0E] dark:text-[#F4F4F6] antialiased selection:bg-[#FFD43B]/40 selection:text-[#202124] flex flex-col font-sans w-full max-w-full overflow-hidden">
         <RiiqxProvider>

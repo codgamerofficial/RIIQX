@@ -9,6 +9,11 @@ import { updateSession } from '@/lib/supabase/middleware';
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  // Immediate bypass for Next.js internal chunks, CSS, and HMR
+  if (pathname.startsWith('/_next') || pathname.startsWith('/static')) {
+    return NextResponse.next();
+  }
+
   // Handle CORS Preflight for Mobile App & External HTTP Clients
   if (request.method === 'OPTIONS') {
     const response = new NextResponse(null, { status: 204 });
@@ -37,10 +42,11 @@ export const config = {
      * Match all request paths except for:
      * - _next/static (static files)
      * - _next/image (image optimization files)
+     * - _next/webpack-hmr (dev HMR WebSocket / EventSource)
      * - favicon.ico (favicon file)
      * - public and static assets (svg, png, jpg, jpeg, gif, webp, mp4, webm, css, js, etc.)
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm|css|js|html|txt|xml)$).*)',
+    '/((?!_next/static|_next/image|_next/webpack-hmr|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm|css|js|html|txt|xml)$).*)',
   ],
 };
 
