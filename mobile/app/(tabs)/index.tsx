@@ -1102,14 +1102,49 @@ export default function MobileHomeScreen() {
               {currentTrack.artist}
             </Text>
 
+            {/* Safe Touch Progress Line */}
+            <View style={{ width: '85%', marginTop: 14 }}>
+              <View style={{ width: '100%', height: 6, backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: 3, overflow: 'hidden' }}>
+                <View
+                  style={{
+                    height: '100%',
+                    backgroundColor: '#F59E0B',
+                    width: `${Math.min(100, (currentTimeMs / (durationMs || 1)) * 100)}%`,
+                  }}
+                />
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 }}>
+                <Text style={{ color: '#A1A1AA', fontSize: 11, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' }}>
+                  {formatTime(currentTimeMs)}
+                </Text>
+                <Text style={{ color: '#A1A1AA', fontSize: 11, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' }}>
+                  {formatTime(durationMs)}
+                </Text>
+              </View>
+            </View>
+
             {/* Giant Safe Controls */}
             <View style={styles.carControlsRow}>
+              <TouchableOpacity
+                onPress={() => {
+                  const target = Math.max(0, currentTimeMs - 10000);
+                  setCurrentTimeMs(target);
+                  if (Platform.OS !== 'web' && soundRef.current) {
+                    soundRef.current.setPositionAsync(target).catch(() => {});
+                  }
+                }}
+                style={styles.carSmallBtn}
+                activeOpacity={0.8}
+              >
+                <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '900' }}>-10s</Text>
+              </TouchableOpacity>
+
               <TouchableOpacity
                 onPress={handlePrevTrack}
                 style={styles.carSecondaryBtn}
                 activeOpacity={0.8}
               >
-                <Ionicons name="play-skip-back" size={28} color="#FFFFFF" />
+                <Ionicons name="play-skip-back" size={26} color="#FFFFFF" />
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -1119,7 +1154,7 @@ export default function MobileHomeScreen() {
               >
                 <Ionicons
                   name={isPlaying ? 'pause' : 'play'}
-                  size={40}
+                  size={42}
                   color="#FFFFFF"
                   style={!isPlaying ? { marginLeft: 4 } : {}}
                 />
@@ -1130,7 +1165,21 @@ export default function MobileHomeScreen() {
                 style={styles.carSecondaryBtn}
                 activeOpacity={0.8}
               >
-                <Ionicons name="play-skip-forward" size={28} color="#FFFFFF" />
+                <Ionicons name="play-skip-forward" size={26} color="#FFFFFF" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  const target = Math.min(durationMs, currentTimeMs + 10000);
+                  setCurrentTimeMs(target);
+                  if (Platform.OS !== 'web' && soundRef.current) {
+                    soundRef.current.setPositionAsync(target).catch(() => {});
+                  }
+                }}
+                style={styles.carSmallBtn}
+                activeOpacity={0.8}
+              >
+                <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '900' }}>+10s</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -1758,16 +1807,18 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   carModeCenter: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 12,
   },
   carArtwork: {
-    width: 200,
-    height: 200,
+    width: Math.min(SCREEN_WIDTH - 100, 240),
+    height: Math.min(SCREEN_WIDTH - 100, 240),
     borderRadius: 24,
     borderWidth: 2,
     borderColor: 'rgba(245, 158, 11, 0.4)',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   carTrackTitle: {
     fontSize: 22,
@@ -1788,14 +1839,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 24,
-    marginTop: 30,
+    gap: 14,
+    marginTop: 20,
   },
   carSecondaryBtn: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  carSmallBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     alignItems: 'center',
     justifyContent: 'center',
   },

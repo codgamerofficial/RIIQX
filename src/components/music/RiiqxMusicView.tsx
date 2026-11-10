@@ -274,6 +274,17 @@ export function RiiqxMusicView() {
 
   // Car Mode / Minimal Driver Mode State
   const [isCarModeOpen, setIsCarModeOpen] = useState<boolean>(false);
+  const [carClockTime, setCarClockTime] = useState<string>('12:00 PM');
+
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      setCarClockTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    };
+    updateClock();
+    const interval = setInterval(updateClock, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Custom Playlist Creator Modal State
   const [isCreatePlaylistModalOpen, setIsCreatePlaylistModalOpen] = useState<boolean>(false);
@@ -3365,27 +3376,48 @@ export function RiiqxMusicView() {
 
       {/* Car Mode / Distraction-Free Driver Cockpit Modal */}
       {isCarModeOpen && (
-        <div className="fixed inset-0 z-50 bg-[#060608] flex flex-col justify-between p-6 md:p-10 text-white select-none animate-in fade-in duration-300">
-          {/* Top Bar: Driver Mode Status & Exit */}
-          <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+        <div className="fixed inset-0 z-50 bg-[#09090d] flex flex-col justify-between overflow-hidden p-4 sm:p-6 md:p-8 text-white select-none animate-in fade-in duration-300">
+          {/* Dynamic Ambient Blur Glow from Album Art */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-25 filter blur-3xl scale-125 transition-all duration-700"
+            style={{
+              backgroundImage: `url(${currentTrack.artworkUrl || FALLBACK_ARTWORK})`,
+              backgroundPosition: 'center',
+              backgroundSize: 'cover',
+            }}
+          />
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#09090d]/80 via-[#09090d]/95 to-[#09090d]" />
+
+          {/* Top HUD Bar */}
+          <div className="relative z-10 h-14 shrink-0 flex items-center justify-between border-b border-white/[0.08] pb-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-                <Car className="w-6 h-6 animate-pulse" />
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                <Car className="w-5 h-5 animate-pulse" />
               </div>
               <div>
-                <h2 className="text-xl font-black tracking-tight flex items-center gap-2">
-                  <span>CAR & DRIVER MODE</span>
-                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base sm:text-lg font-black tracking-tight text-white font-heading">
+                    CAR & DRIVER MODE
+                  </h2>
+                  <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                     SAFE TOUCH
                   </span>
-                </h2>
-                <p className="text-xs text-zinc-400">Distraction-free high-contrast controls • 320k Lossless Stream</p>
+                </div>
+                <p className="text-[11px] text-zinc-400 hidden sm:block">
+                  CarPlay & Android Auto HUD &bull; 320k Lossless Audio
+                </p>
               </div>
+            </div>
+
+            {/* Center Live Cockpit Clock */}
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.1] text-xs font-mono font-bold text-amber-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>{carClockTime}</span>
             </div>
 
             <button
               onClick={() => setIsCarModeOpen(false)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/[0.1] hover:bg-white/[0.2] border border-white/[0.15] text-sm font-bold text-white transition-all cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-white/[0.1] hover:bg-white/[0.2] active:scale-95 border border-white/[0.15] text-xs sm:text-sm font-bold text-white transition-all cursor-pointer shadow-lg"
             >
               <X className="w-4 h-4" />
               <span>Exit Car Mode</span>
@@ -3393,144 +3425,174 @@ export function RiiqxMusicView() {
           </div>
 
           {/* Center Stage: Hero Track & Giant Tactile Transport */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 my-auto max-w-4xl mx-auto w-full">
-            {/* Giant Rotating Artwork */}
-            <div className="relative group shrink-0">
-              <div className="w-56 h-56 md:w-72 md:h-72 rounded-3xl overflow-hidden shadow-2xl shadow-rose-950/50 border-2 border-white/[0.15] ring-8 ring-white/[0.03]">
-                <img
-                  src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
-                  alt={currentTrack.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="absolute -bottom-3 -right-3 px-3 py-1 rounded-full bg-amber-500 text-black font-black text-xs shadow-lg uppercase tracking-wider">
-                320K MASTER
-              </div>
-            </div>
+          <div className="relative z-10 flex-1 flex flex-col justify-center items-center py-2 sm:py-6 w-full max-w-5xl mx-auto overflow-y-auto no-scrollbar">
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-6 sm:gap-8 lg:gap-14 w-full my-auto">
+              {/* Artwork & Spectrum Visualizer */}
+              <div className="flex flex-col items-center shrink-0">
+                <div className="relative group">
+                  <div className="w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 rounded-3xl overflow-hidden shadow-2xl shadow-rose-950/60 border-2 border-white/[0.15] ring-4 sm:ring-8 ring-white/[0.04]">
+                    <img
+                      src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
+                      alt={currentTrack.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-amber-500 text-black font-black text-[10px] sm:text-xs shadow-lg uppercase tracking-wider">
+                    320K MASTER
+                  </div>
+                </div>
 
-            {/* Giant Info & Transport Controls */}
-            <div className="flex-1 text-center md:text-left space-y-6 w-full">
-              <div>
-                <h1 className="text-3xl md:text-5xl font-black tracking-tight text-white font-heading truncate">
-                  {currentTrack.title}
-                </h1>
-                <p className="text-xl md:text-2xl text-amber-400 font-bold mt-1 truncate">
-                  {currentTrack.artist}
-                </p>
-                <p className="text-sm text-zinc-400 mt-0.5 truncate">
-                  {currentTrack.album}
-                </p>
+                {/* Subdued Real-Time Spectrum Visualizer below art */}
+                <div className="mt-4 flex items-center justify-center">
+                  <AudioVisualizer engine={audioEngineRef.current} isPlaying={isPlaying} barCount={18} height={16} />
+                </div>
               </div>
 
-              {/* Progress Line */}
-              <div className="space-y-2">
-                <div
-                  className="w-full h-4 bg-white/[0.1] rounded-full overflow-hidden cursor-pointer relative"
-                  onClick={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-                    handleSeek(ratio * durationMs);
-                  }}
-                >
+              {/* Track Metadata, Scrubber & Giant Controls */}
+              <div className="flex-1 text-center lg:text-left space-y-4 sm:space-y-6 w-full max-w-lg lg:max-w-none">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-white font-heading truncate">
+                    {currentTrack.title}
+                  </h1>
+                  <p className="text-lg sm:text-xl lg:text-2xl text-amber-400 font-bold mt-1 truncate">
+                    {currentTrack.artist}
+                  </p>
+                  <p className="text-xs sm:text-sm text-zinc-400 mt-0.5 truncate">
+                    {currentTrack.album}
+                  </p>
+                </div>
+
+                {/* Safe Scrub Line */}
+                <div className="space-y-1.5">
                   <div
-                    className="h-full bg-gradient-to-r from-amber-500 to-[#FA243C] rounded-full"
-                    style={{ width: `${(currentTimeMs / (durationMs || 1)) * 100}%` }}
-                  />
+                    className="w-full h-3 sm:h-4 bg-white/[0.1] rounded-full overflow-hidden cursor-pointer relative"
+                    onClick={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                      handleSeek(ratio * durationMs);
+                    }}
+                  >
+                    <div
+                      className="h-full bg-gradient-to-r from-amber-500 to-[#FA243C] rounded-full transition-all duration-150"
+                      style={{ width: `${(currentTimeMs / (durationMs || 1)) * 100}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between text-xs sm:text-sm font-mono font-bold text-zinc-400 px-1">
+                    <span>{formatDuration(currentTimeMs)}</span>
+                    <span>{formatDuration(durationMs)}</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-base font-mono font-bold text-zinc-400 px-1">
-                  <span>{formatDuration(currentTimeMs)}</span>
-                  <span>{formatDuration(durationMs)}</span>
+
+                {/* Giant Safe-Touch Primary Controls */}
+                <div className="flex items-center justify-center lg:justify-start gap-2.5 sm:gap-4 lg:gap-5 pt-1">
+                  {/* -10s */}
+                  <button
+                    onClick={() => handleSeek(Math.max(0, currentTimeMs - 10000))}
+                    className="w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center text-white text-[11px] sm:text-xs font-black transition-all cursor-pointer"
+                    title="Rewind 10s"
+                  >
+                    -10s
+                  </button>
+
+                  {/* Prev */}
+                  <button
+                    onClick={handlePrevTrack}
+                    className="w-13 h-13 sm:w-15 sm:h-15 lg:w-16 lg:h-16 rounded-2xl bg-white/[0.1] hover:bg-white/[0.2] active:scale-95 border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer"
+                    title="Previous Track"
+                  >
+                    <SkipBack className="w-6 h-6 sm:w-7 sm:h-7 fill-current" />
+                  </button>
+
+                  {/* Massive Play/Pause Circle */}
+                  <button
+                    onClick={togglePlayPause}
+                    className="w-18 h-18 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-tr from-amber-500 to-[#FA243C] hover:scale-105 active:scale-95 flex items-center justify-center text-white shadow-2xl shadow-rose-600/50 transition-all cursor-pointer shrink-0"
+                    title={isPlaying ? 'Pause' : 'Play'}
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 fill-current" />
+                    ) : (
+                      <Play className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 fill-current ml-1" />
+                    )}
+                  </button>
+
+                  {/* Next */}
+                  <button
+                    onClick={handleNextTrack}
+                    className="w-13 h-13 sm:w-15 sm:h-15 lg:w-16 lg:h-16 rounded-2xl bg-white/[0.1] hover:bg-white/[0.2] active:scale-95 border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer"
+                    title="Next Track"
+                  >
+                    <SkipForward className="w-6 h-6 sm:w-7 sm:h-7 fill-current" />
+                  </button>
+
+                  {/* +10s */}
+                  <button
+                    onClick={() => handleSeek(Math.min(durationMs, currentTimeMs + 10000))}
+                    className="w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center text-white text-[11px] sm:text-xs font-black transition-all cursor-pointer"
+                    title="Forward 10s"
+                  >
+                    +10s
+                  </button>
+
+                  {/* Heart Favorite */}
+                  <button
+                    onClick={() => toggleFavorite(currentTrack.id)}
+                    className="w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center transition-all cursor-pointer"
+                    title="Favorite"
+                  >
+                    <Heart
+                      className={`w-5 h-5 sm:w-6 sm:h-6 ${
+                        currentTrack.isFavorite ? 'text-[#FA243C] fill-current' : 'text-zinc-300'
+                      }`}
+                    />
+                  </button>
+
+                  {/* AI Voice Copilot */}
+                  <button
+                    onClick={toggleVoiceAssistant}
+                    className={`w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-2xl border flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
+                      isVoiceListening
+                        ? 'bg-rose-500/30 text-rose-400 border-rose-500 ring-4 ring-rose-500/20'
+                        : 'bg-white/[0.08] hover:bg-white/[0.15] border-white/[0.1] text-zinc-300'
+                    }`}
+                    title="Voice Copilot"
+                  >
+                    {isVoiceListening ? (
+                      <AIThinkingOrb state="listening" size={22} neuralActivity={false} />
+                    ) : (
+                      <Mic className="w-5 h-5 sm:w-6 sm:h-6" />
+                    )}
+                  </button>
                 </div>
-              </div>
-
-              {/* Massive Safe-Touch Controls */}
-              <div className="flex items-center justify-center md:justify-start gap-4 md:gap-6 pt-2">
-                {/* 10s Back */}
-                <button
-                  onClick={() => handleSeek(Math.max(0, currentTimeMs - 10000))}
-                  className="w-14 h-14 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.1] flex items-center justify-center text-white text-xs font-black transition-all cursor-pointer active:scale-95"
-                  title="Rewind 10 Seconds"
-                >
-                  -10s
-                </button>
-
-                {/* Prev */}
-                <button
-                  onClick={handlePrevTrack}
-                  className="w-16 h-16 rounded-2xl bg-white/[0.1] hover:bg-white/[0.2] border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer active:scale-95"
-                  title="Previous Track"
-                >
-                  <SkipBack className="w-8 h-8 fill-current" />
-                </button>
-
-                {/* Giant Play/Pause Circle */}
-                <button
-                  onClick={togglePlayPause}
-                  className="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-500 to-[#FA243C] hover:scale-105 active:scale-95 flex items-center justify-center text-white shadow-2xl shadow-rose-600/50 transition-all cursor-pointer"
-                  title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
-                >
-                  {isPlaying ? (
-                    <Pause className="w-12 h-12 fill-current" />
-                  ) : (
-                    <Play className="w-12 h-12 fill-current ml-1.5" />
-                  )}
-                </button>
-
-                {/* Next */}
-                <button
-                  onClick={handleNextTrack}
-                  className="w-16 h-16 rounded-2xl bg-white/[0.1] hover:bg-white/[0.2] border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer active:scale-95"
-                  title="Next Track"
-                >
-                  <SkipForward className="w-8 h-8 fill-current" />
-                </button>
-
-                {/* 10s Forward */}
-                <button
-                  onClick={() => handleSeek(Math.min(durationMs, currentTimeMs + 10000))}
-                  className="w-14 h-14 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.1] flex items-center justify-center text-white text-xs font-black transition-all cursor-pointer active:scale-95"
-                  title="Forward 10 Seconds"
-                >
-                  +10s
-                </button>
-
-                {/* AI Voice Copilot */}
-                <button
-                  onClick={toggleVoiceAssistant}
-                  className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
-                    isVoiceListening
-                      ? 'bg-rose-500/30 text-rose-400 border-rose-500 ring-4 ring-rose-500/20'
-                      : 'bg-white/[0.08] hover:bg-white/[0.15] border-white/[0.1] text-zinc-300'
-                  }`}
-                  title="Voice Copilot"
-                >
-                  {isVoiceListening ? (
-                    <AIThinkingOrb state="listening" size={24} neuralActivity={false} />
-                  ) : (
-                    <Mic className="w-6 h-6" />
-                  )}
-                </button>
               </div>
             </div>
           </div>
 
-          {/* Bottom Bar: Quick Station Switcher */}
-          <div className="border-t border-white/[0.08] pt-4">
-            <div className="flex items-center gap-3 overflow-x-auto pb-1 no-scrollbar justify-center">
-              {STATIONS.map((station) => {
+          {/* Bottom Vehicle Preset Stations Bar */}
+          <div className="relative z-10 shrink-0 border-t border-white/[0.08] pt-3 pb-1 w-full max-w-5xl mx-auto">
+            <div className="flex items-center justify-between mb-2 px-1">
+              <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">
+                VEHICLE PRESET STATIONS (P1 - P5)
+              </span>
+              <span className="text-[10px] text-amber-400/80 font-mono font-bold">1-TAP SWITCH</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3">
+              {STATIONS.map((station, idx) => {
                 const isCurrent = activeStation?.id === station.id;
                 return (
                   <button
                     key={station.id}
                     onClick={() => handleSelectStation(station)}
-                    className={`px-5 py-3 rounded-2xl text-sm font-extrabold flex items-center gap-2.5 transition-all shrink-0 cursor-pointer ${
+                    className={`h-11 sm:h-12 px-3 rounded-2xl text-xs font-black flex items-center gap-2 transition-all cursor-pointer active:scale-95 ${
                       isCurrent
-                        ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30'
-                        : 'bg-white/[0.08] hover:bg-white/[0.15] text-zinc-300 border border-white/[0.08]'
+                        ? 'bg-gradient-to-r from-amber-500 to-[#FA243C] text-white shadow-lg shadow-rose-600/30 ring-2 ring-white/20'
+                        : 'bg-white/[0.07] hover:bg-white/[0.12] text-zinc-200 border border-white/[0.08]'
                     }`}
                   >
-                    <span>{station.emoji}</span>
-                    <span>{station.name}</span>
+                    <span className="w-5 h-5 rounded-md bg-black/40 flex items-center justify-center text-[10px] font-mono text-amber-400 shrink-0">
+                      P{idx + 1}
+                    </span>
+                    <span className="truncate">{station.emoji} {station.name}</span>
                   </button>
                 );
               })}
