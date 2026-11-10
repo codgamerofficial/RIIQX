@@ -25,6 +25,14 @@ import { useRouter } from 'expo-router';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { useRiiqxMobile } from '../../src/context/RiiqxMobileContext';
 import { getApiBaseUrl } from '../../src/services/api';
+import {
+  getOfflineTracks,
+  downloadTrackToDevice,
+  deleteOfflineTrack,
+  isTrackOffline,
+  getOfflineStorageInfo,
+  OfflineTrackMetadata,
+} from '../../src/services/offlineStorage';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -157,6 +165,15 @@ export default function MobileHomeScreen() {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [activeStation, setActiveStation] = useState<string | null>(null);
 
+  // Offline Caching & Cloud Sync & Car Mode State
+  const [offlineTracks, setOfflineTracks] = useState<OfflineTrackMetadata[]>([]);
+  const [offlineTrackIds, setOfflineTrackIds] = useState<Set<string>>(new Set());
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadProgress, setDownloadProgress] = useState<number>(0);
+  const [offlineStorageInfo, setOfflineStorageInfo] = useState<{ count: number; formattedSize: string }>({ count: 0, formattedSize: '0 MB' });
+  const [showOfflineOnly, setShowOfflineOnly] = useState<boolean>(false);
+  const [carModeOpen, setCarModeOpen] = useState<boolean>(false);
+
   // Audio References: Native Expo Sound for Android/iOS background & Web Audio fallback
   const soundRef = useRef<Audio.Sound | null>(null);
   const webAudioRef = useRef<any>(null);
@@ -207,6 +224,87 @@ export default function MobileHomeScreen() {
     fetchTrending();
   }, []);
 
+  // Native Offline Tracks & Cloud Sync Initialization
+  useEffect(() => {
+    const loadOffline = async () => {
+      try {
+        const off = await getOfflineTracks();
+        setOfflineTracks(off);
+        setOfflineTrackIds(new Set(off.map((t) => t.id)));
+        const info = await getOfflineStorageInfo();
+        setOfflineStorageInfo({ count: info.count, formattedSize: info.formattedSize });
+      } catch (e) {
+        console.warn('Failed to load offline tracks:', e);
+      }
+    };
+    loadOffline();
+
+    const syncWithCloud = async () => {
+      try {
+        const baseUrl = getApiBaseUrl().replace('/api', '');
+        const res = await fetch(`${baseUrl}/api/music/sync`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.data?.favorites && Array.isArray(data.data.favorites)) {
+            const favSet = new Set(data.data.favorites);
+            setTracks((prev) =>
+              prev.map((t) => (favSet.has(t.id) ? { ...t, isFavorite: true } : t))
+            );
+          }
+        }
+      } catch {}
+    };
+    syncWithCloud();
+  }, []);
+
+  // Download / Delete Track for 100% Offline Playback
+  const handleDownloadTrack = async (track: MobileTrack) => {
+    if (offlineTrackIds.has(track.id)) {
+      await deleteOfflineTrack(track.id);
+      setOfflineTrackIds((prev) => {
+        const next = new Set(prev);
+        next.delete(track.id);
+        return next;
+      });
+      const updated = await getOfflineTracks();
+      setOfflineTracks(updated);
+      const info = await getOfflineStorageInfo();
+      setOfflineStorageInfo({ count: info.count, formattedSize: info.formattedSize });
+    } else {
+      try {
+        setDownloadingId(track.id);
+        setDownloadProgress(0);
+        await downloadTrackToDevice(track, (prog) => setDownloadProgress(prog));
+        setOfflineTrackIds((prev) => new Set([...prev, track.id]));
+        const updated = await getOfflineTracks();
+        setOfflineTracks(updated);
+        const info = await getOfflineStorageInfo();
+        setOfflineStorageInfo({ count: info.count, formattedSize: info.formattedSize });
+      } catch (err) {
+        console.warn('Download error:', err);
+      } finally {
+        setDownloadingId(null);
+      }
+    }
+  };
+
+  // Toggle Favorite with Cloud Sync
+  const toggleFavoriteTrack = (trackId: string) => {
+    setTracks((prev) => {
+      const updated = prev.map((t) => (t.id === trackId ? { ...t, isFavorite: !t.isFavorite } : t));
+      const favIds = updated.filter((t) => t.isFavorite).map((t) => t.id);
+      try {
+        const baseUrl = getApiBaseUrl().replace('/api', '');
+        fetch(`${baseUrl}/api/music/sync`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ favorites: favIds }),
+        }).catch(() => {});
+      } catch {}
+      return updated;
+    });
+  };
+
   // Playback status listener for Expo AV
   const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
     if (status.isLoaded) {
@@ -221,8 +319,11 @@ export default function MobileHomeScreen() {
     }
   };
 
-  // Central master track player: plays full-length 320k audio with background playback
+  // Central master track player: plays full-length 320k audio with background playback & offline priority
   const loadAndPlayTrack = async (track: MobileTrack) => {
+    const local = offlineTracks.find((o) => o.id === track.id);
+    const audioUri = local ? local.localAudioUri : track.audioUrl;
+
     if (Platform.OS !== 'web') {
       try {
         if (soundRef.current) {
@@ -230,7 +331,7 @@ export default function MobileHomeScreen() {
           soundRef.current = null;
         }
         const { sound } = await Audio.Sound.createAsync(
-          { uri: track.audioUrl },
+          { uri: audioUri },
           { shouldPlay: true, progressUpdateIntervalMillis: 500 },
           onPlaybackStatusUpdate
         );
@@ -552,26 +653,81 @@ export default function MobileHomeScreen() {
                     onPress={() => setFullscreenPlayerOpen(true)}
                   >
                     <Ionicons name="expand" size={14} color="#FFFFFF" />
-                    <Text style={styles.heroActionBtnText}>Full Player</Text>
+                    <Text style={styles.heroActionBtnText}>Full</Text>
                   </TouchableOpacity>
 
+                  {/* 1-Click Native Offline Download Button */}
                   <TouchableOpacity
-                    style={styles.heroActionBtn}
-                    onPress={() => setFullscreenPlayerOpen(true)}
+                    style={[
+                      styles.heroActionBtn,
+                      offlineTrackIds.has(currentTrack.id) && { borderColor: '#10B981', backgroundColor: '#10B98120' },
+                    ]}
+                    onPress={() => handleDownloadTrack(currentTrack)}
                   >
-                    <Ionicons name="sparkles" size={14} color="#FFD43B" />
-                    <Text style={styles.heroActionBtnText}>Lyrics</Text>
+                    {downloadingId === currentTrack.id ? (
+                      <ActivityIndicator size="small" color="#10B981" />
+                    ) : (
+                      <Ionicons
+                        name={offlineTrackIds.has(currentTrack.id) ? 'checkmark-circle' : 'cloud-download-outline'}
+                        size={14}
+                        color={offlineTrackIds.has(currentTrack.id) ? '#10B981' : '#FFFFFF'}
+                      />
+                    )}
+                    <Text
+                      style={[
+                        styles.heroActionBtnText,
+                        offlineTrackIds.has(currentTrack.id) && { color: '#10B981', fontWeight: '800' },
+                      ]}
+                    >
+                      {offlineTrackIds.has(currentTrack.id) ? 'Saved' : 'Save'}
+                    </Text>
                   </TouchableOpacity>
 
+                  {/* Car Mode Driver Launch */}
+                  <TouchableOpacity
+                    style={[styles.heroActionBtn, { borderColor: '#F59E0B40', backgroundColor: '#F59E0B15' }]}
+                    onPress={() => setCarModeOpen(true)}
+                  >
+                    <Ionicons name="car-sport" size={14} color="#F59E0B" />
+                    <Text style={[styles.heroActionBtnText, { color: '#F59E0B' }]}>Car Mode</Text>
+                  </TouchableOpacity>
+
+                  {/* Cloud Synced Favorite Toggle */}
                   <TouchableOpacity
                     style={styles.heroActionBtn}
-                    onPress={() => router.push('/(tabs)/chat' as any)}
+                    onPress={() => toggleFavoriteTrack(currentTrack.id)}
                   >
-                    <Ionicons name="mic" size={14} color="#FA243C" />
-                    <Text style={styles.heroActionBtnText}>AI DJ Host</Text>
+                    <Ionicons
+                      name={currentTrack.isFavorite ? 'heart' : 'heart-outline'}
+                      size={14}
+                      color={currentTrack.isFavorite ? '#FA243C' : '#FFFFFF'}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
+            </View>
+
+            {/* Offline vs All Tracks Toggle Pills */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, marginBottom: 16 }}>
+              <TouchableOpacity
+                onPress={() => setShowOfflineOnly(false)}
+                style={[styles.filterPill, !showOfflineOnly && styles.filterPillActive]}
+              >
+                <Ionicons name="disc" size={13} color={!showOfflineOnly ? '#FFFFFF' : '#71717A'} />
+                <Text style={[styles.filterPillText, !showOfflineOnly && styles.filterPillTextActive]}>
+                  All Tracks ({tracks.length})
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setShowOfflineOnly(true)}
+                style={[styles.filterPill, showOfflineOnly && { backgroundColor: '#10B981', borderColor: '#10B981' }]}
+              >
+                <Ionicons name="cloud-offline" size={13} color={showOfflineOnly ? '#FFFFFF' : '#10B981'} />
+                <Text style={[styles.filterPillText, showOfflineOnly && { color: '#FFFFFF', fontWeight: '800' }]}>
+                  Offline Saved ({offlineTracks.length})
+                </Text>
+              </TouchableOpacity>
             </View>
 
             {/* CURATED STATIONS & VIBES */}
@@ -735,6 +891,9 @@ export default function MobileHomeScreen() {
           <TouchableOpacity onPress={handleNextTrack} style={styles.dockedControlBtn}>
             <Ionicons name="play-skip-forward" size={16} color="#A1A1AA" />
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => setCarModeOpen(true)} style={styles.dockedControlBtn}>
+            <Ionicons name="car-sport" size={16} color="#F59E0B" />
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
 
@@ -856,6 +1015,145 @@ export default function MobileHomeScreen() {
                 color={isRepeat ? '#FA243C' : '#71717A'}
               />
             </TouchableOpacity>
+          </View>
+
+          {/* Modal Bottom Utility Bar: Offline Save, Car Mode, Favorite */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingVertical: 14, borderTopWidth: 1, borderTopColor: 'rgba(255, 255, 255, 0.08)' }}>
+            <TouchableOpacity
+              onPress={() => handleDownloadTrack(currentTrack)}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+            >
+              <Ionicons
+                name={offlineTrackIds.has(currentTrack.id) ? 'checkmark-circle' : 'cloud-download-outline'}
+                size={18}
+                color={offlineTrackIds.has(currentTrack.id) ? '#10B981' : '#A1A1AA'}
+              />
+              <Text style={{ color: offlineTrackIds.has(currentTrack.id) ? '#10B981' : '#A1A1AA', fontSize: 12, fontWeight: '700' }}>
+                {offlineTrackIds.has(currentTrack.id) ? 'Saved' : 'Download'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                setFullscreenPlayerOpen(false);
+                setCarModeOpen(true);
+              }}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+            >
+              <Ionicons name="car-sport" size={18} color="#F59E0B" />
+              <Text style={{ color: '#F59E0B', fontSize: 12, fontWeight: '700' }}>Car Mode</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => toggleFavoriteTrack(currentTrack.id)}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+            >
+              <Ionicons
+                name={currentTrack.isFavorite ? 'heart' : 'heart-outline'}
+                size={18}
+                color={currentTrack.isFavorite ? '#FA243C' : '#A1A1AA'}
+              />
+              <Text style={{ color: currentTrack.isFavorite ? '#FA243C' : '#A1A1AA', fontSize: 12, fontWeight: '700' }}>
+                Favorite
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
+
+      {/* CAR MODE / DISTRACTION-FREE DRIVER COCKPIT MODAL */}
+      <Modal
+        visible={carModeOpen}
+        animationType="fade"
+        transparent={false}
+        onRequestClose={() => setCarModeOpen(false)}
+      >
+        <SafeAreaView style={styles.carModeContainer}>
+          {/* Top Bar */}
+          <View style={styles.carModeHeader}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <View style={styles.carModeIcon}>
+                <Ionicons name="car-sport" size={20} color="#F59E0B" />
+              </View>
+              <View>
+                <Text style={styles.carModeTitle}>CAR & DRIVER MODE</Text>
+                <Text style={styles.carModeSubtitle}>Safe Touch • 320k Master Stream</Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              onPress={() => setCarModeOpen(false)}
+              style={styles.carModeExitBtn}
+            >
+              <Ionicons name="close" size={18} color="#FFFFFF" />
+              <Text style={styles.carModeExitText}>Exit</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Center Content */}
+          <View style={styles.carModeCenter}>
+            <Image
+              source={{ uri: currentTrack.artworkUrl || FALLBACK_ARTWORK }}
+              style={styles.carArtwork}
+            />
+            <Text style={styles.carTrackTitle} numberOfLines={1}>
+              {currentTrack.title}
+            </Text>
+            <Text style={styles.carTrackArtist} numberOfLines={1}>
+              {currentTrack.artist}
+            </Text>
+
+            {/* Giant Safe Controls */}
+            <View style={styles.carControlsRow}>
+              <TouchableOpacity
+                onPress={handlePrevTrack}
+                style={styles.carSecondaryBtn}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="play-skip-back" size={28} color="#FFFFFF" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={togglePlayPause}
+                style={styles.carMainPlayBtn}
+                activeOpacity={0.8}
+              >
+                <Ionicons
+                  name={isPlaying ? 'pause' : 'play'}
+                  size={40}
+                  color="#FFFFFF"
+                  style={!isPlaying ? { marginLeft: 4 } : {}}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleNextTrack}
+                style={styles.carSecondaryBtn}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="play-skip-forward" size={28} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Quick Stations Row */}
+          <View style={styles.carStationsRow}>
+            {MOBILE_STATIONS.map((station) => (
+              <TouchableOpacity
+                key={station.id}
+                onPress={() => {
+                  handleSearch(station.query);
+                  setActiveStation(station.id);
+                }}
+                style={[
+                  styles.carStationPill,
+                  activeStation === station.id && { backgroundColor: station.color },
+                ]}
+              >
+                <Text style={styles.carStationText}>
+                  {station.emoji} {station.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </SafeAreaView>
       </Modal>
@@ -1411,5 +1709,151 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.5,
     shadowRadius: 14,
+  },
+  carModeContainer: {
+    flex: 1,
+    backgroundColor: '#060608',
+    justifyContent: 'space-between',
+    padding: 24,
+  },
+  carModeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  carModeIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  carModeTitle: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  carModeSubtitle: {
+    fontSize: 11,
+    color: '#A1A1AA',
+    marginTop: 2,
+  },
+  carModeExitBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  carModeExitText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  carModeCenter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  carArtwork: {
+    width: 200,
+    height: 200,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: 'rgba(245, 158, 11, 0.4)',
+    marginBottom: 20,
+  },
+  carTrackTitle: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    width: '90%',
+  },
+  carTrackArtist: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#F59E0B',
+    marginTop: 4,
+    textAlign: 'center',
+    width: '90%',
+  },
+  carControlsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 24,
+    marginTop: 30,
+  },
+  carSecondaryBtn: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  carMainPlayBtn: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    backgroundColor: '#FA243C',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#FA243C',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.6,
+    shadowRadius: 18,
+    elevation: 10,
+  },
+  carStationsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 8,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  carStationPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  carStationText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  filterPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  filterPillActive: {
+    backgroundColor: '#FA243C',
+    borderColor: '#FA243C',
+  },
+  filterPillText: {
+    color: '#A1A1AA',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  filterPillTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '800',
   },
 });

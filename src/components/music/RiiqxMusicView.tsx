@@ -52,6 +52,7 @@ import {
   Settings,
   HardDriveDownload,
   MicOff,
+  Car,
 } from 'lucide-react';
 import { Track, Playlist, Lyrics, EqualizerSettings } from '@/types/music';
 import { INITIAL_TRACKS, INITIAL_PLAYLISTS, FALLBACK_VINYL_ARTWORK } from '@/lib/music/mock-tracks';
@@ -270,6 +271,9 @@ export function RiiqxMusicView() {
   const [isSleepTimerModalOpen, setIsSleepTimerModalOpen] = useState<boolean>(false);
   const [sleepTimerMinutes, setSleepTimerMinutes] = useState<number | null>(null);
   const [sleepTimerRemainingSeconds, setSleepTimerRemainingSeconds] = useState<number | null>(null);
+
+  // Car Mode / Minimal Driver Mode State
+  const [isCarModeOpen, setIsCarModeOpen] = useState<boolean>(false);
 
   // Custom Playlist Creator Modal State
   const [isCreatePlaylistModalOpen, setIsCreatePlaylistModalOpen] = useState<boolean>(false);
@@ -900,10 +904,32 @@ export function RiiqxMusicView() {
     }
   };
 
+  // Initial Cloud Sync with cross-device sync engine
+  useEffect(() => {
+    fetch('/api/music/sync')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.data?.favorites && Array.isArray(data.data.favorites)) {
+          const favSet = new Set(data.data.favorites);
+          setTracks((prev) =>
+            prev.map((t) => (favSet.has(t.id) ? { ...t, isFavorite: true } : t))
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const toggleFavorite = (trackId: string) => {
-    setTracks((prev) =>
-      prev.map((t) => (t.id === trackId ? { ...t, isFavorite: !t.isFavorite } : t))
-    );
+    setTracks((prev) => {
+      const updated = prev.map((t) => (t.id === trackId ? { ...t, isFavorite: !t.isFavorite } : t));
+      const favIds = updated.filter((t) => t.isFavorite).map((t) => t.id);
+      fetch('/api/music/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ favorites: favIds }),
+      }).catch(() => {});
+      return updated;
+    });
   };
 
   // Sleep Timer Setter
@@ -2710,6 +2736,13 @@ export function RiiqxMusicView() {
               <SkipForward className="w-4 h-4 fill-current" />
             </button>
             <button
+              onClick={() => setIsCarModeOpen(true)}
+              className="p-1.5 text-amber-500/80 hover:text-amber-400 cursor-pointer"
+              title="Car Mode"
+            >
+              <Car className="w-4 h-4" />
+            </button>
+            <button
               onClick={() => setIsFullscreenPlayer(true)}
               className="p-1.5 text-zinc-400 hover:text-white cursor-pointer"
               title="Expand"
@@ -2904,6 +2937,15 @@ export function RiiqxMusicView() {
               ) : (
                 <HardDriveDownload className="w-4 h-4" />
               )}
+            </button>
+
+            {/* Car Mode */}
+            <button
+              onClick={() => setIsCarModeOpen(true)}
+              className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-amber-500 dark:hover:text-amber-400 rounded-xl transition-colors cursor-pointer"
+              title="Car Mode (Driving Interface)"
+            >
+              <Car className="w-4 h-4" />
             </button>
 
             {/* Fullscreen Player Expand */}
@@ -3316,6 +3358,182 @@ export function RiiqxMusicView() {
                   <Repeat className="w-5 h-5" />
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Car Mode / Distraction-Free Driver Cockpit Modal */}
+      {isCarModeOpen && (
+        <div className="fixed inset-0 z-50 bg-[#060608] flex flex-col justify-between p-6 md:p-10 text-white select-none animate-in fade-in duration-300">
+          {/* Top Bar: Driver Mode Status & Exit */}
+          <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                <Car className="w-6 h-6 animate-pulse" />
+              </div>
+              <div>
+                <h2 className="text-xl font-black tracking-tight flex items-center gap-2">
+                  <span>CAR & DRIVER MODE</span>
+                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    SAFE TOUCH
+                  </span>
+                </h2>
+                <p className="text-xs text-zinc-400">Distraction-free high-contrast controls • 320k Lossless Stream</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsCarModeOpen(false)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/[0.1] hover:bg-white/[0.2] border border-white/[0.15] text-sm font-bold text-white transition-all cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+              <span>Exit Car Mode</span>
+            </button>
+          </div>
+
+          {/* Center Stage: Hero Track & Giant Tactile Transport */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 my-auto max-w-4xl mx-auto w-full">
+            {/* Giant Rotating Artwork */}
+            <div className="relative group shrink-0">
+              <div className="w-56 h-56 md:w-72 md:h-72 rounded-3xl overflow-hidden shadow-2xl shadow-rose-950/50 border-2 border-white/[0.15] ring-8 ring-white/[0.03]">
+                <img
+                  src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
+                  alt={currentTrack.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-3 -right-3 px-3 py-1 rounded-full bg-amber-500 text-black font-black text-xs shadow-lg uppercase tracking-wider">
+                320K MASTER
+              </div>
+            </div>
+
+            {/* Giant Info & Transport Controls */}
+            <div className="flex-1 text-center md:text-left space-y-6 w-full">
+              <div>
+                <h1 className="text-3xl md:text-5xl font-black tracking-tight text-white font-heading truncate">
+                  {currentTrack.title}
+                </h1>
+                <p className="text-xl md:text-2xl text-amber-400 font-bold mt-1 truncate">
+                  {currentTrack.artist}
+                </p>
+                <p className="text-sm text-zinc-400 mt-0.5 truncate">
+                  {currentTrack.album}
+                </p>
+              </div>
+
+              {/* Progress Line */}
+              <div className="space-y-2">
+                <div
+                  className="w-full h-4 bg-white/[0.1] rounded-full overflow-hidden cursor-pointer relative"
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                    handleSeek(ratio * durationMs);
+                  }}
+                >
+                  <div
+                    className="h-full bg-gradient-to-r from-amber-500 to-[#FA243C] rounded-full"
+                    style={{ width: `${(currentTimeMs / (durationMs || 1)) * 100}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between text-base font-mono font-bold text-zinc-400 px-1">
+                  <span>{formatDuration(currentTimeMs)}</span>
+                  <span>{formatDuration(durationMs)}</span>
+                </div>
+              </div>
+
+              {/* Massive Safe-Touch Controls */}
+              <div className="flex items-center justify-center md:justify-start gap-4 md:gap-6 pt-2">
+                {/* 10s Back */}
+                <button
+                  onClick={() => handleSeek(Math.max(0, currentTimeMs - 10000))}
+                  className="w-14 h-14 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.1] flex items-center justify-center text-white text-xs font-black transition-all cursor-pointer active:scale-95"
+                  title="Rewind 10 Seconds"
+                >
+                  -10s
+                </button>
+
+                {/* Prev */}
+                <button
+                  onClick={handlePrevTrack}
+                  className="w-16 h-16 rounded-2xl bg-white/[0.1] hover:bg-white/[0.2] border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer active:scale-95"
+                  title="Previous Track"
+                >
+                  <SkipBack className="w-8 h-8 fill-current" />
+                </button>
+
+                {/* Giant Play/Pause Circle */}
+                <button
+                  onClick={togglePlayPause}
+                  className="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-500 to-[#FA243C] hover:scale-105 active:scale-95 flex items-center justify-center text-white shadow-2xl shadow-rose-600/50 transition-all cursor-pointer"
+                  title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
+                >
+                  {isPlaying ? (
+                    <Pause className="w-12 h-12 fill-current" />
+                  ) : (
+                    <Play className="w-12 h-12 fill-current ml-1.5" />
+                  )}
+                </button>
+
+                {/* Next */}
+                <button
+                  onClick={handleNextTrack}
+                  className="w-16 h-16 rounded-2xl bg-white/[0.1] hover:bg-white/[0.2] border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer active:scale-95"
+                  title="Next Track"
+                >
+                  <SkipForward className="w-8 h-8 fill-current" />
+                </button>
+
+                {/* 10s Forward */}
+                <button
+                  onClick={() => handleSeek(Math.min(durationMs, currentTimeMs + 10000))}
+                  className="w-14 h-14 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.1] flex items-center justify-center text-white text-xs font-black transition-all cursor-pointer active:scale-95"
+                  title="Forward 10 Seconds"
+                >
+                  +10s
+                </button>
+
+                {/* AI Voice Copilot */}
+                <button
+                  onClick={toggleVoiceAssistant}
+                  className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
+                    isVoiceListening
+                      ? 'bg-rose-500/30 text-rose-400 border-rose-500 ring-4 ring-rose-500/20'
+                      : 'bg-white/[0.08] hover:bg-white/[0.15] border-white/[0.1] text-zinc-300'
+                  }`}
+                  title="Voice Copilot"
+                >
+                  {isVoiceListening ? (
+                    <AIThinkingOrb state="listening" size={24} neuralActivity={false} />
+                  ) : (
+                    <Mic className="w-6 h-6" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Bar: Quick Station Switcher */}
+          <div className="border-t border-white/[0.08] pt-4">
+            <div className="flex items-center gap-3 overflow-x-auto pb-1 no-scrollbar justify-center">
+              {STATIONS.map((station) => {
+                const isCurrent = activeStation?.id === station.id;
+                return (
+                  <button
+                    key={station.id}
+                    onClick={() => handleSelectStation(station)}
+                    className={`px-5 py-3 rounded-2xl text-sm font-extrabold flex items-center gap-2.5 transition-all shrink-0 cursor-pointer ${
+                      isCurrent
+                        ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30'
+                        : 'bg-white/[0.08] hover:bg-white/[0.15] text-zinc-300 border border-white/[0.08]'
+                    }`}
+                  >
+                    <span>{station.emoji}</span>
+                    <span>{station.name}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
