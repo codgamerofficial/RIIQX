@@ -21,6 +21,7 @@ import {
   Moon,
   LogOut,
   User,
+  HardDriveDownload,
 } from 'lucide-react';
 
 export function RiiqxHeader() {
@@ -43,6 +44,7 @@ export function RiiqxHeader() {
     { id: 'music', label: 'Listen Now', icon: Radio },
     { id: 'browse', label: 'All Tracks & Search', icon: ListMusic },
     { id: 'ai_dj', label: 'AI Music DJ & Studio', icon: Sparkles },
+    { id: 'offline', label: 'Downloaded & Offline', icon: HardDriveDownload },
     { id: 'playlists', label: 'Playlists', icon: Disc3 },
     { id: 'favorites', label: 'Favorites', icon: Heart },
     { id: 'equalizer', label: 'Equalizer & DSP', icon: Sliders },

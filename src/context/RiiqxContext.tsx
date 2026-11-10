@@ -24,6 +24,7 @@ export type RiiqxViewTab =
   | 'music'
   | 'browse'
   | 'ai_dj'
+  | 'offline'
   | 'playlists'
   | 'favorites'
   | 'equalizer'

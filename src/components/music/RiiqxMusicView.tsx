@@ -50,6 +50,8 @@ import {
   Headphones,
   CheckCircle2,
   Settings,
+  HardDriveDownload,
+  MicOff,
 } from 'lucide-react';
 import { Track, Playlist, Lyrics, EqualizerSettings } from '@/types/music';
 import { INITIAL_TRACKS, INITIAL_PLAYLISTS } from '@/lib/music/mock-tracks';
@@ -57,6 +59,16 @@ import { WebAudioEngine, EQUALIZER_PRESETS } from '@/lib/music/audio-engine';
 import { fetchLyrics } from '@/lib/music/lyrics-service';
 import { useRiiqx } from '@/context/RiiqxContext';
 import { AudioVisualizer } from './AudioVisualizer';
+import {
+  saveTrackOffline,
+  isTrackSavedOffline,
+  getAllOfflineTracks,
+  deleteOfflineTrack,
+  getOfflineStorageUsage,
+  clearAllOfflineTracks,
+  getOfflineTrackAudioUrl,
+} from '@/lib/music/offline-storage';
+import { VoiceRecognitionController, ParsedVoiceCommand } from '@/lib/music/voice-assistant';
 
 const FALLBACK_ARTWORK =
   'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80';
@@ -192,12 +204,24 @@ export function RiiqxMusicView() {
   const activeTab = useMemo(() => {
     if (contextActiveTab === 'ai_dj') return 'ai_dj';
     if (contextActiveTab === 'browse') return 'browse';
+    if (contextActiveTab === 'offline') return 'offline';
     if (contextActiveTab === 'playlists') return 'playlists';
     if (contextActiveTab === 'favorites') return 'favorites';
     if (contextActiveTab === 'equalizer') return 'equalizer';
     if (contextActiveTab === 'settings') return 'settings';
     return 'listen_now';
   }, [contextActiveTab]);
+
+  // AI Voice Assistant State
+  const [isVoiceListening, setIsVoiceListening] = useState<boolean>(false);
+  const [voiceFeedback, setVoiceFeedback] = useState<{ message: string; type: 'info' | 'success' | 'action' } | null>(null);
+  const voiceControllerRef = useRef<VoiceRecognitionController | null>(null);
+
+  // Offline Music Caching State (IndexedDB)
+  const [offlineTracks, setOfflineTracks] = useState<Track[]>([]);
+  const [offlineStorageInfo, setOfflineStorageInfo] = useState<{ count: number; formattedSize: string }>({ count: 0, formattedSize: '0 MB' });
+  const [offlineTrackIds, setOfflineTrackIds] = useState<Set<string>>(new Set());
+  const [isDownloadingOfflineId, setIsDownloadingOfflineId] = useState<string | null>(null);
 
   // Real-time Search State
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -491,6 +515,174 @@ export function RiiqxMusicView() {
     }
   }, [currentTimeMs, isLyricsOpen]);
 
+  // Load offline downloaded tracks and storage stats from IndexedDB
+  const refreshOfflineLibrary = async () => {
+    try {
+      const stored = await getAllOfflineTracks();
+      setOfflineTracks(stored);
+      setOfflineTrackIds(new Set(stored.map((t) => t.id)));
+      const stats = await getOfflineStorageUsage();
+      setOfflineStorageInfo({ count: stats.count, formattedSize: stats.formattedSize });
+    } catch (e) {
+      console.warn('Failed to refresh offline library:', e);
+    }
+  };
+
+  useEffect(() => {
+    refreshOfflineLibrary();
+  }, []);
+
+  // Offline Caching Toggle Handler
+  const handleToggleSaveOffline = async (track: Track) => {
+    const isSaved = offlineTrackIds.has(track.id);
+    if (isSaved) {
+      await deleteOfflineTrack(track.id);
+      await refreshOfflineLibrary();
+      setVoiceFeedback({ message: `Removed "${track.title}" from offline storage`, type: 'info' });
+      setTimeout(() => setVoiceFeedback(null), 3500);
+    } else {
+      setIsDownloadingOfflineId(track.id);
+      setVoiceFeedback({ message: `Caching "${track.title}" offline for 320kbps playback...`, type: 'info' });
+      const ok = await saveTrackOffline(track);
+      setIsDownloadingOfflineId(null);
+      if (ok) {
+        await refreshOfflineLibrary();
+        setVoiceFeedback({ message: `"${track.title}" saved offline! Ready for zero-buffering playback.`, type: 'success' });
+      } else {
+        setVoiceFeedback({ message: `Failed to cache "${track.title}" offline.`, type: 'info' });
+      }
+      setTimeout(() => setVoiceFeedback(null), 4000);
+    }
+  };
+
+  const handleClearAllOffline = async () => {
+    if (confirm('Are you sure you want to remove all offline downloaded tracks from this device?')) {
+      await clearAllOfflineTracks();
+      await refreshOfflineLibrary();
+      setVoiceFeedback({ message: 'All offline music wiped from local storage.', type: 'info' });
+      setTimeout(() => setVoiceFeedback(null), 3000);
+    }
+  };
+
+  // AI Voice Assistant Controller
+  const toggleVoiceAssistant = () => {
+    if (isVoiceListening) {
+      voiceControllerRef.current?.stopListening();
+      setIsVoiceListening(false);
+      setVoiceFeedback(null);
+      return;
+    }
+
+    if (!voiceControllerRef.current) {
+      voiceControllerRef.current = new VoiceRecognitionController();
+    }
+
+    if (!voiceControllerRef.current.isSupported()) {
+      alert('Speech recognition is not supported in this browser. Please use Chrome, Edge, or Android.');
+      return;
+    }
+
+    setIsVoiceListening(true);
+    setVoiceFeedback({ message: '🎙️ Listening... Speak a song name or command (e.g. "Play Guru Randhawa", "Pause", "Bass boost")', type: 'info' });
+
+    voiceControllerRef.current.startListening(
+      async (cmd: ParsedVoiceCommand) => {
+        setIsVoiceListening(false);
+        await executeVoiceCommand(cmd);
+      },
+      (err: string) => {
+        setIsVoiceListening(false);
+        console.warn('Voice error:', err);
+        setVoiceFeedback({ message: `Voice error: ${err}`, type: 'info' });
+        setTimeout(() => setVoiceFeedback(null), 3000);
+      },
+      () => {
+        setIsVoiceListening(false);
+      }
+    );
+  };
+
+  const executeVoiceCommand = async (cmd: ParsedVoiceCommand) => {
+    switch (cmd.intent) {
+      case 'pause':
+        audioEngineRef.current?.pause();
+        setVoiceFeedback({ message: '⏸️ Paused playback', type: 'action' });
+        break;
+      case 'resume':
+        audioEngineRef.current?.play();
+        setVoiceFeedback({ message: '▶️ Resumed music', type: 'action' });
+        break;
+      case 'next':
+        handleNextTrack();
+        setVoiceFeedback({ message: '⏭️ Skipping to next song', type: 'action' });
+        break;
+      case 'prev':
+        handlePrevTrack();
+        setVoiceFeedback({ message: '⏮️ Playing previous song', type: 'action' });
+        break;
+      case 'volume_up': {
+        const newVol = Math.min(1, volume + 0.15);
+        handleVolumeChange(newVol);
+        setVoiceFeedback({ message: `🔊 Volume: ${Math.round(newVol * 100)}%`, type: 'action' });
+        break;
+      }
+      case 'volume_down': {
+        const newVol = Math.max(0, volume - 0.15);
+        handleVolumeChange(newVol);
+        setVoiceFeedback({ message: `🔉 Volume: ${Math.round(newVol * 100)}%`, type: 'action' });
+        break;
+      }
+      case 'mute':
+        toggleMute();
+        setVoiceFeedback({ message: isMuted ? '🔊 Unmuted' : '🔇 Muted', type: 'action' });
+        break;
+      case 'toggle_lyrics':
+        setRightPanelTab(rightPanelTab === 'lyrics' ? null : 'lyrics');
+        setVoiceFeedback({ message: '✨ Toggled Synced Lyrics', type: 'action' });
+        break;
+      case 'bass_boost':
+        setEqSettings((prev) => ({ ...prev, bassBoostLevel: 80 }));
+        setVoiceFeedback({ message: '⚡ Bass Boost DSP set to 80%', type: 'action' });
+        break;
+      case 'light_mode':
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.style.colorScheme = 'light';
+        }
+        setVoiceFeedback({ message: '☀️ Switched to Light Mode', type: 'action' });
+        break;
+      case 'dark_mode':
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.add('dark');
+          document.documentElement.style.colorScheme = 'dark';
+        }
+        setVoiceFeedback({ message: '🌙 Switched to Dark Mode', type: 'action' });
+        break;
+      case 'open_offline':
+        setContextActiveTab('offline' as any);
+        setVoiceFeedback({ message: '💾 Opened Offline Music Library', type: 'action' });
+        break;
+      case 'play':
+      case 'search':
+        if (cmd.query) {
+          setSearchQuery(cmd.query);
+          setVoiceFeedback({ message: `🔍 Finding & playing "${cmd.query}"...`, type: 'action' });
+          try {
+            const res = await fetch(`/api/music/search?q=${encodeURIComponent(cmd.query)}`);
+            const data = await res.json();
+            if (data.success && Array.isArray(data.tracks) && data.tracks.length > 0) {
+              await playDirectTrack(data.tracks[0]);
+              setVoiceFeedback({ message: `▶️ Now Playing: ${data.tracks[0].title}`, type: 'success' });
+            }
+          } catch (e) {
+            console.warn('Voice play fetch failed:', e);
+          }
+        }
+        break;
+    }
+    setTimeout(() => setVoiceFeedback(null), 3500);
+  };
+
   // Play / Pause Toggle
   const togglePlayPause = async () => {
     const engine = audioEngineRef.current;
@@ -514,11 +706,22 @@ export function RiiqxMusicView() {
     setDurationMs(targetTrack.durationMs);
     setCurrentTimeMs(0);
 
+    let audioUrl = targetTrack.audioUrl;
+    // If it's an offline track, retrieve the blob object URL
+    if (!audioUrl || offlineTrackIds.has(targetTrack.id)) {
+      const offlineUrl = await getOfflineTrackAudioUrl(targetTrack.id);
+      if (offlineUrl) audioUrl = offlineUrl;
+    }
+
     const engine = audioEngineRef.current;
     if (engine) {
-      engine.loadTrack(targetTrack.audioUrl);
       try {
-        await engine.play();
+        if (crossfadeSeconds > 0 && isPlaying) {
+          await engine.crossfadeTo(audioUrl, crossfadeSeconds, volume);
+        } else {
+          engine.loadTrack(audioUrl);
+          await engine.play();
+        }
       } catch (e) {
         console.warn('Play error:', e);
       }
@@ -526,21 +729,32 @@ export function RiiqxMusicView() {
   };
 
   const playDirectTrack = async (track: Track) => {
-    const existingIndex = tracks.findIndex((t) => t.id === track.id || t.audioUrl === track.audioUrl);
+    let resolvedAudioUrl = track.audioUrl;
+    if (!resolvedAudioUrl || offlineTrackIds.has(track.id)) {
+      const offlineUrl = await getOfflineTrackAudioUrl(track.id);
+      if (offlineUrl) resolvedAudioUrl = offlineUrl;
+    }
+
+    const resolvedTrack = { ...track, audioUrl: resolvedAudioUrl };
+    const existingIndex = tracks.findIndex((t) => t.id === track.id || (resolvedAudioUrl && t.audioUrl === resolvedAudioUrl));
     if (existingIndex >= 0) {
       playTrackAtIndex(existingIndex);
     } else {
-      const updatedQueue = [track, ...tracks];
+      const updatedQueue = [resolvedTrack, ...tracks];
       setTracks(updatedQueue);
       setCurrentTrackIndex(0);
-      setDurationMs(track.durationMs);
+      setDurationMs(resolvedTrack.durationMs);
       setCurrentTimeMs(0);
 
       const engine = audioEngineRef.current;
       if (engine) {
-        engine.loadTrack(track.audioUrl);
         try {
-          await engine.play();
+          if (crossfadeSeconds > 0 && isPlaying) {
+            await engine.crossfadeTo(resolvedAudioUrl, crossfadeSeconds, volume);
+          } else {
+            engine.loadTrack(resolvedAudioUrl);
+            await engine.play();
+          }
         } catch (e) {
           console.warn('Play direct track error:', e);
         }
@@ -978,17 +1192,30 @@ export function RiiqxMusicView() {
             ) : hasSearchQuery ? (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             ) : null}
           </div>
 
+          {/* AI Voice Assistant & Speech Search Button */}
+          <button
+            onClick={toggleVoiceAssistant}
+            className={`p-2 rounded-full border transition-all shrink-0 flex items-center justify-center cursor-pointer ${
+              isVoiceListening
+                ? 'bg-[#FA243C] text-white border-[#FA243C] shadow-lg shadow-[#FA243C]/40 animate-pulse scale-105 ring-4 ring-[#FA243C]/30'
+                : 'bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border-zinc-200 dark:border-white/[0.08]'
+            }`}
+            title={isVoiceListening ? 'Listening to your voice... Speak song name or command' : 'AI Voice Search & Voice Copilot (Click to Speak)'}
+          >
+            {isVoiceListening ? <Mic className="w-4 h-4 animate-bounce" /> : <Mic className="w-4 h-4" />}
+          </button>
+
           {/* Sleep Timer Indicator Button */}
           <button
             onClick={() => setIsSleepTimerModalOpen(true)}
-            className={`p-2 rounded-full border transition-colors shrink-0 flex items-center gap-1 ${
+            className={`p-2 rounded-full border transition-colors shrink-0 flex items-center gap-1 cursor-pointer ${
               sleepTimerRemainingSeconds
                 ? 'bg-amber-500/20 text-amber-500 dark:text-amber-400 border-amber-500/40'
                 : 'bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border-zinc-200 dark:border-white/[0.08]'
@@ -1010,6 +1237,14 @@ export function RiiqxMusicView() {
           </label>
         </div>
       </div>
+
+      {/* Floating Voice Assistant Feedback Banner */}
+      {voiceFeedback && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/95 dark:bg-zinc-800/95 text-white border border-white/20 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-200 text-xs font-semibold">
+          {isVoiceListening && <span className="w-2.5 h-2.5 rounded-full bg-[#FA243C] animate-ping" />}
+          <span>{voiceFeedback.message}</span>
+        </div>
+      )}
 
       {/* Main Workspace Body */}
       <div className="relative flex flex-1 min-h-0 overflow-hidden">
@@ -1120,9 +1355,25 @@ export function RiiqxMusicView() {
                                 <button
                                   onClick={() => handleAddToQueue(track)}
                                   title="Add to Up Next Queue"
-                                  className="p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                                  className="p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
                                 >
                                   <ListPlus className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleToggleSaveOffline(track)}
+                                  disabled={isDownloadingOfflineId === track.id}
+                                  title={offlineTrackIds.has(track.id) ? 'Cached Offline (Click to remove)' : 'Save for Offline Zero-Buffering Playback'}
+                                  className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+                                    offlineTrackIds.has(track.id)
+                                      ? 'text-emerald-500 bg-emerald-500/10'
+                                      : 'hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-500 dark:text-zinc-400 hover:text-emerald-500'
+                                  }`}
+                                >
+                                  {isDownloadingOfflineId === track.id ? (
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-500" />
+                                  ) : (
+                                    <HardDriveDownload className="w-3.5 h-3.5" />
+                                  )}
                                 </button>
                                 <a
                                   href={`/api/music/download?url=${encodeURIComponent(track.audioUrl)}&name=${encodeURIComponent(
@@ -1136,7 +1387,7 @@ export function RiiqxMusicView() {
                                 </a>
                                 <button
                                   onClick={() => playDirectTrack(track)}
-                                  className="w-7 h-7 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white flex items-center justify-center shadow-md transition-transform hover:scale-105"
+                                  className="w-7 h-7 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white flex items-center justify-center shadow-md transition-transform hover:scale-105 cursor-pointer"
                                 >
                                   {isCurrent && isPlaying ? (
                                     <Pause className="w-3 h-3 fill-current" />
@@ -1563,9 +1814,25 @@ export function RiiqxMusicView() {
                                   <button
                                     onClick={() => handleAddToQueue(track)}
                                     title="Add to Up Next Queue"
-                                    className="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                                    className="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
                                   >
                                     <ListPlus className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleToggleSaveOffline(track)}
+                                    disabled={isDownloadingOfflineId === track.id}
+                                    title={offlineTrackIds.has(track.id) ? 'Cached Offline (Click to remove)' : 'Save for Offline Zero-Buffering Playback'}
+                                    className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+                                      offlineTrackIds.has(track.id)
+                                        ? 'text-emerald-500 bg-emerald-500/10'
+                                        : 'hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-500 dark:text-zinc-400 hover:text-emerald-500'
+                                    }`}
+                                  >
+                                    {isDownloadingOfflineId === track.id ? (
+                                      <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-500" />
+                                    ) : (
+                                      <HardDriveDownload className="w-3.5 h-3.5" />
+                                    )}
                                   </button>
                                   <a
                                     href={`/api/music/download?url=${encodeURIComponent(track.audioUrl)}&name=${encodeURIComponent(
@@ -1579,7 +1846,7 @@ export function RiiqxMusicView() {
                                   </a>
                                   <button
                                     onClick={() => toggleFavorite(track.id)}
-                                    className="p-1 text-zinc-400 hover:text-[#FA243C] transition-colors"
+                                    className="p-1 text-zinc-400 hover:text-[#FA243C] transition-colors cursor-pointer"
                                   >
                                     <Heart
                                       className={`w-3.5 h-3.5 ${track.isFavorite ? 'fill-[#FA243C] text-[#FA243C]' : ''}`}
@@ -1593,6 +1860,152 @@ export function RiiqxMusicView() {
                       </tbody>
                     </table>
                   </div>
+                </div>
+              )}
+
+              {/* Downloaded & Offline Tracks Tab View */}
+              {activeTab === 'offline' && (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-2xl bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.08] shadow-sm">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <HardDriveDownload className="w-5 h-5 text-emerald-500" />
+                        <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
+                          Downloaded &amp; Offline Music
+                        </h3>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-bold">
+                          ZERO BUFFERING
+                        </span>
+                      </div>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                        {offlineTracks.length} tracks cached on this device &bull; {offlineStorageInfo.formattedSize} storage used (IndexedDB)
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {offlineTracks.length > 0 && (
+                        <>
+                          <button
+                            onClick={() => {
+                              setTracks([...offlineTracks, ...tracks]);
+                              playTrackAtIndex(0);
+                            }}
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white font-bold text-xs shadow-md shadow-[#FA243C]/20 transition-all cursor-pointer"
+                          >
+                            <Play className="w-3.5 h-3.5 fill-current" />
+                            <span>Play All Offline</span>
+                          </button>
+                          <button
+                            onClick={handleClearAllOffline}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-zinc-100 dark:bg-white/[0.06] hover:bg-rose-500/10 text-zinc-600 dark:text-zinc-400 hover:text-rose-500 text-xs font-semibold border border-zinc-200 dark:border-white/[0.08] transition-all cursor-pointer"
+                            title="Delete all cached offline tracks"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Clear Cache</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {offlineTracks.length === 0 ? (
+                    <div className="text-center py-20 text-zinc-400 dark:text-zinc-500 space-y-3 bg-white dark:bg-white/[0.02] rounded-2xl border border-zinc-200 dark:border-white/[0.08] p-8">
+                      <HardDriveDownload className="w-12 h-12 mx-auto opacity-30 text-emerald-500" />
+                      <h4 className="text-base font-bold text-zinc-800 dark:text-zinc-200">No Offline Tracks Cached Yet</h4>
+                      <p className="text-xs max-w-md mx-auto text-zinc-500">
+                        Click the download/hard-drive icon on any track in Search or Browse to store full 320kbps audio files directly on your device. You can then play them anytime, even without an internet connection!
+                      </p>
+                      <button
+                        onClick={() => setContextActiveTab('browse' as any)}
+                        className="mt-2 px-4 py-2 rounded-full bg-zinc-100 dark:bg-white/[0.08] hover:bg-zinc-200 dark:hover:bg-white/[0.15] text-xs font-semibold text-zinc-800 dark:text-white transition-all cursor-pointer"
+                      >
+                        Explore Music Catalog
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="border border-zinc-200 dark:border-white/[0.08] rounded-2xl overflow-hidden bg-white dark:bg-white/[0.02] shadow-sm">
+                      <table className="w-full text-left border-collapse text-xs">
+                        <thead>
+                          <tr className="border-b border-zinc-200 dark:border-white/[0.08] text-zinc-500 dark:text-zinc-400 font-semibold bg-zinc-50/50 dark:bg-transparent">
+                            <th className="py-3 px-4 w-12 text-center">#</th>
+                            <th className="py-3 px-4">Title &amp; Artist</th>
+                            <th className="py-3 px-4 hidden md:table-cell">Album</th>
+                            <th className="py-3 px-4 hidden sm:table-cell">Status</th>
+                            <th className="py-3 px-4 text-right">Time</th>
+                            <th className="py-3 px-4 w-28 text-center">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {offlineTracks.map((track, idx) => {
+                            const isCurrent = currentTrack.id === track.id;
+                            return (
+                              <tr
+                                key={track.id}
+                                onClick={() => playDirectTrack(track)}
+                                className={`border-b border-zinc-100 dark:border-white/[0.04] hover:bg-zinc-50 dark:hover:bg-white/[0.06] cursor-pointer transition-colors ${
+                                  isCurrent ? 'bg-rose-50/60 dark:bg-white/[0.08] text-zinc-900 dark:text-white font-medium' : 'text-zinc-700 dark:text-zinc-300'
+                                }`}
+                              >
+                                <td className="py-3 px-4 text-center text-zinc-400 dark:text-zinc-500">
+                                  {isCurrent && isPlaying ? (
+                                    <div className="w-3 h-3 mx-auto rounded-full bg-[#FA243C] animate-pulse" />
+                                  ) : (
+                                    idx + 1
+                                  )}
+                                </td>
+                                <td className="py-3 px-4">
+                                  <div className="flex items-center gap-3">
+                                    <img
+                                      src={track.artworkUrl || FALLBACK_ARTWORK}
+                                      alt={track.title}
+                                      onError={(e) => {
+                                        e.currentTarget.src = FALLBACK_ARTWORK;
+                                      }}
+                                      className="w-10 h-10 rounded-lg object-cover bg-zinc-100 dark:bg-zinc-800 shrink-0"
+                                    />
+                                    <div className="min-w-0">
+                                      <div className={`font-semibold truncate ${isCurrent ? 'text-[#FA243C]' : 'text-zinc-900 dark:text-white'}`}>
+                                        {track.title}
+                                      </div>
+                                      <div className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">{track.artist}</div>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="py-3 px-4 text-zinc-500 dark:text-zinc-400 hidden md:table-cell truncate max-w-[200px]">{track.album}</td>
+                                <td className="py-3 px-4 hidden sm:table-cell">
+                                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1 w-max">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    <span>Cached Offline</span>
+                                  </span>
+                                </td>
+                                <td className="py-3 px-4 text-right text-zinc-500 dark:text-zinc-400 font-mono">
+                                  {formatDuration(track.durationMs)}
+                                </td>
+                                <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                                  <div className="flex items-center justify-center gap-2">
+                                    <button
+                                      onClick={() => playDirectTrack(track)}
+                                      className="p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 hover:text-[#FA243C] transition-colors cursor-pointer"
+                                      title="Play Track"
+                                    >
+                                      <Play className="w-4 h-4 fill-current" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleToggleSaveOffline(track)}
+                                      className="p-1.5 rounded-full hover:bg-rose-500/10 text-zinc-400 hover:text-rose-500 transition-colors cursor-pointer"
+                                      title="Remove from Offline Storage"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -2208,6 +2621,27 @@ export function RiiqxMusicView() {
 
         {/* Volume & Toggles */}
         <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 w-1/4 justify-end min-w-[140px] md:min-w-[220px]">
+          {/* 1-Click Save Offline Button */}
+          <button
+            onClick={() => handleToggleSaveOffline(currentTrack)}
+            disabled={isDownloadingOfflineId === currentTrack.id}
+            className={`p-2 rounded-xl transition-colors hidden sm:block cursor-pointer ${
+              offlineTrackIds.has(currentTrack.id)
+                ? 'text-emerald-500 bg-emerald-500/10'
+                : 'text-zinc-500 dark:text-zinc-400 hover:text-emerald-500'
+            }`}
+            title={
+              offlineTrackIds.has(currentTrack.id)
+                ? 'Cached Offline (Click to remove)'
+                : 'Cache Track for Offline Zero-Buffering Playback'
+            }
+          >
+            {isDownloadingOfflineId === currentTrack.id ? (
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+            ) : (
+              <HardDriveDownload className="w-4 h-4" />
+            )}
+          </button>
           <a
             href={`/api/music/download?url=${encodeURIComponent(currentTrack.audioUrl)}&name=${encodeURIComponent(
               `${currentTrack.artist} - ${currentTrack.title}`

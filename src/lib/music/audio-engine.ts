@@ -199,6 +199,45 @@ export class WebAudioEngine {
     this.audio.volume = initialVol;
   }
 
+  /**
+   * Smooth DJ Crossfade transition between tracks
+   */
+  public async crossfadeTo(newUrl: string, durationSec: number = 3, targetVolume: number = 0.85): Promise<void> {
+    if (!this.audio) return;
+    if (durationSec <= 0) {
+      this.loadTrack(newUrl);
+      this.setVolume(targetVolume);
+      await this.play();
+      return;
+    }
+
+    const fadeOutTime = (durationSec * 1000) * 0.45;
+    const initialVol = this.audio.volume || targetVolume;
+    const steps = 15;
+    const stepDuration = fadeOutTime / steps;
+
+    for (let i = 0; i < steps; i++) {
+      await new Promise((r) => setTimeout(r, stepDuration));
+      if (!this.audio) return;
+      this.audio.volume = Math.max(0, this.audio.volume - initialVol / steps);
+    }
+
+    this.loadTrack(newUrl);
+    this.audio.volume = 0;
+    try {
+      await this.play();
+    } catch {}
+
+    const fadeInTime = (durationSec * 1000) * 0.55;
+    const inStepDuration = fadeInTime / steps;
+    for (let i = 0; i < steps; i++) {
+      await new Promise((r) => setTimeout(r, inStepDuration));
+      if (!this.audio) return;
+      this.audio.volume = Math.min(targetVolume, this.audio.volume + targetVolume / steps);
+    }
+    this.audio.volume = targetVolume;
+  }
+
   public getAudioElement(): HTMLAudioElement | null {
     return this.audio;
   }

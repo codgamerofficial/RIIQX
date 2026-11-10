@@ -18,6 +18,7 @@ import {
   Music2,
   ChevronRight,
   Headphones,
+  HardDriveDownload,
 } from 'lucide-react';
 
 export function RiiqxSidebar() {
@@ -27,6 +28,7 @@ export function RiiqxSidebar() {
     { tab: 'music', label: 'Listen Now', icon: Radio },
     { tab: 'browse' as any, label: 'All Tracks', icon: ListMusic },
     { tab: 'ai_dj' as any, label: 'AI Music DJ & Studio', icon: Sparkles },
+    { tab: 'offline' as any, label: 'Downloaded & Offline', icon: HardDriveDownload },
     { tab: 'playlists' as any, label: 'Playlists', icon: Disc3 },
     { tab: 'favorites' as any, label: 'Favorites', icon: Heart },
     { tab: 'equalizer' as any, label: 'Equalizer & DSP', icon: Sliders },
