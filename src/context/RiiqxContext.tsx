@@ -21,6 +21,13 @@ import {
 
 export type RiiqxViewTab =
   | 'home'
+  | 'music'
+  | 'browse'
+  | 'ai_dj'
+  | 'playlists'
+  | 'favorites'
+  | 'equalizer'
+  | 'settings'
   | 'twin'
   | 'decisions'
   | 'opportunities'
@@ -140,8 +147,10 @@ export function RiiqxProvider({ children }: { children: ReactNode }) {
     if (typeof document !== 'undefined') {
       if (newTheme === 'dark') {
         document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = 'dark';
       } else {
         document.documentElement.classList.remove('dark');
+        document.documentElement.style.colorScheme = 'light';
       }
       try {
         localStorage.setItem('riiqx_theme', newTheme);

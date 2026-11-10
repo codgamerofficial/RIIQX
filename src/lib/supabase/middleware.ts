@@ -45,6 +45,8 @@ const PUBLIC_PATHS = [
   '/api/compliance',
   '/api/creator',
   '/api/health',
+  '/api/music',
+  '/music',
   '/api/social',
   '/api/social/oauth',
   '/api/social/accounts',

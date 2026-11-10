@@ -9,7 +9,6 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import { RiiqxHeader } from './RiiqxHeader';
 import { RiiqxSidebar } from './RiiqxSidebar';
-import { RiiqxAssistantDrawer } from './RiiqxAssistantDrawer';
 
 interface RiiqxAppShellProps {
   children: React.ReactNode;
@@ -45,8 +44,6 @@ export function RiiqxAppShell({ children }: RiiqxAppShellProps) {
           {children}
         </main>
       </div>
-      {/* Contextual Floating Assistant Drawer (never squeezes main content) */}
-      <RiiqxAssistantDrawer />
     </div>
   );
 }
