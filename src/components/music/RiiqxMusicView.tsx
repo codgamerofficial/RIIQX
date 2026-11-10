@@ -54,7 +54,7 @@ import {
   MicOff,
 } from 'lucide-react';
 import { Track, Playlist, Lyrics, EqualizerSettings } from '@/types/music';
-import { INITIAL_TRACKS, INITIAL_PLAYLISTS } from '@/lib/music/mock-tracks';
+import { INITIAL_TRACKS, INITIAL_PLAYLISTS, FALLBACK_VINYL_ARTWORK } from '@/lib/music/mock-tracks';
 import { WebAudioEngine, EQUALIZER_PRESETS } from '@/lib/music/audio-engine';
 import { fetchLyrics } from '@/lib/music/lyrics-service';
 import { useRiiqx } from '@/context/RiiqxContext';
@@ -70,8 +70,7 @@ import {
 } from '@/lib/music/offline-storage';
 import { VoiceRecognitionController, ParsedVoiceCommand } from '@/lib/music/voice-assistant';
 
-const FALLBACK_ARTWORK =
-  'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80';
+const FALLBACK_ARTWORK = FALLBACK_VINYL_ARTWORK;
 
 export interface Station {
   id: string;
@@ -339,6 +338,26 @@ export function RiiqxMusicView() {
         audio.pause();
       };
     }
+  }, []);
+
+  // Fetch real trending 320kbps tracks on mount
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/music/trending')
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data.tracks && data.tracks.length > 0) {
+          setTracks((prev) => {
+            const existingIds = new Set(prev.map((t) => t.id));
+            const newTracks = data.tracks.filter((t: Track) => !existingIds.has(t.id));
+            return [...prev, ...newTracks];
+          });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // System Media Session API Integration (Hardware Keys & OS Media Center)
@@ -1293,115 +1312,152 @@ export function RiiqxMusicView() {
                   <span className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Streaming results for "{searchQuery}"...</span>
                 </div>
               ) : searchResults.length > 0 ? (
-                <div className="border border-zinc-200 dark:border-white/[0.08] rounded-2xl overflow-hidden bg-white dark:bg-white/[0.02] shadow-sm">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="border-b border-zinc-200 dark:border-white/[0.08] text-zinc-500 dark:text-zinc-400 font-semibold bg-zinc-50/50 dark:bg-transparent">
-                        <th className="py-3 px-4 w-12 text-center">#</th>
-                        <th className="py-3 px-4">Track Title &amp; Artist</th>
-                        <th className="py-3 px-4 hidden md:table-cell">Album</th>
-                        <th className="py-3 px-4 hidden sm:table-cell">Bitrate</th>
-                        <th className="py-3 px-4 text-right">Time</th>
-                        <th className="py-3 px-4 w-28 text-center">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {searchResults.map((track, idx) => {
-                        const isCurrent = currentTrack.title === track.title && currentTrack.artist === track.artist;
-                        return (
-                          <tr
-                            key={track.id}
-                            onClick={() => playDirectTrack(track)}
-                            className={`border-b border-zinc-100 dark:border-white/[0.04] hover:bg-zinc-50 dark:hover:bg-white/[0.06] cursor-pointer transition-colors ${
-                              isCurrent ? 'bg-zinc-100 dark:bg-white/[0.08] text-zinc-900 dark:text-white font-medium' : 'text-zinc-700 dark:text-zinc-300'
-                            }`}
-                          >
-                            <td className="py-3 px-4 text-center text-zinc-500">
-                              {isCurrent && isPlaying ? (
-                                <div className="w-3 h-3 mx-auto rounded-full bg-[#FA243C] animate-pulse" />
-                              ) : (
-                                idx + 1
-                              )}
-                            </td>
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-3">
-                                <img
-                                  src={track.artworkUrl || FALLBACK_ARTWORK}
-                                  alt={track.title}
-                                  onError={(e) => {
-                                    e.currentTarget.src = FALLBACK_ARTWORK;
-                                  }}
-                                  className="w-10 h-10 rounded-lg object-cover shadow-sm bg-zinc-800 shrink-0"
-                                />
-                                <div className="min-w-0">
-                                  <div className={`font-semibold truncate ${isCurrent ? 'text-[#FA243C]' : 'text-zinc-900 dark:text-white'}`}>
-                                    {track.title}
-                                  </div>
-                                  <div className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">{track.artist}</div>
-                                </div>
+                <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/70 dark:bg-white/[0.02] backdrop-blur-xl p-2 sm:p-3 shadow-sm space-y-1">
+                  {/* Subtle Table Header */}
+                  <div className="hidden sm:flex items-center justify-between px-3 py-2 text-[11px] font-bold tracking-wider text-zinc-400 dark:text-zinc-500 uppercase border-b border-zinc-100 dark:border-white/[0.04]">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <span className="w-7 text-center">#</span>
+                      <span>Track Title &amp; Artist</span>
+                    </div>
+                    <span className="hidden md:block w-44 lg:w-56">Album</span>
+                    <div className="flex items-center gap-3 w-32 justify-end pr-2">
+                      <span>Time</span>
+                      <span className="w-16 text-center">Actions</span>
+                    </div>
+                  </div>
+
+                  {/* Sleek Modern Track Rows */}
+                  {searchResults.map((track, idx) => {
+                    const isCurrent = currentTrack.title === track.title && currentTrack.artist === track.artist;
+                    return (
+                      <div
+                        key={track.id}
+                        onClick={() => playDirectTrack(track)}
+                        className={`group relative flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 cursor-pointer ${
+                          isCurrent
+                            ? 'bg-[#FA243C]/10 text-zinc-900 dark:text-white ring-1 ring-[#FA243C]/30 shadow-sm'
+                            : 'hover:bg-zinc-100 dark:hover:bg-white/[0.05] text-zinc-700 dark:text-zinc-300'
+                        }`}
+                      >
+                        {/* Left: Index / Play Icon + Artwork + Title + Artist */}
+                        <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                          {/* Index or Animated Waves / Play icon on hover */}
+                          <div className="w-7 text-center shrink-0 flex items-center justify-center">
+                            {isCurrent && isPlaying ? (
+                              <div className="flex items-end justify-center gap-0.5 h-3.5 w-3.5">
+                                <span className="w-0.5 bg-[#FA243C] h-3.5 rounded-full animate-pulse" />
+                                <span className="w-0.5 bg-[#FA243C] h-2 rounded-full animate-pulse delay-75" />
+                                <span className="w-0.5 bg-[#FA243C] h-3 rounded-full animate-pulse delay-150" />
                               </div>
-                            </td>
-                            <td className="py-3 px-4 text-zinc-500 dark:text-zinc-400 hidden md:table-cell truncate max-w-[200px]">{track.album}</td>
-                            <td className="py-3 px-4 hidden sm:table-cell">
-                              <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                                {track.format || '320kbps Master'}
+                            ) : (
+                              <>
+                                <span className="text-xs font-mono font-medium text-zinc-400 dark:text-zinc-500 group-hover:hidden">
+                                  {idx + 1}
+                                </span>
+                                <Play className="w-3.5 h-3.5 text-zinc-800 dark:text-white fill-current hidden group-hover:block translate-x-0.5" />
+                              </>
+                            )}
+                          </div>
+
+                          {/* High-res Artwork */}
+                          <div className="relative w-11 h-11 rounded-xl overflow-hidden shadow-sm shrink-0 bg-zinc-800 ring-1 ring-black/5 dark:ring-white/10 group-hover:shadow-md transition-shadow">
+                            <img
+                              src={track.artworkUrl || FALLBACK_ARTWORK}
+                              alt={track.title}
+                              onError={(e) => {
+                                e.currentTarget.src = FALLBACK_ARTWORK;
+                              }}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Play className="w-3.5 h-3.5 text-white fill-current translate-x-0.5" />
+                            </div>
+                          </div>
+
+                          {/* Titles */}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className={`text-sm font-semibold truncate ${
+                                isCurrent ? 'text-[#FA243C]' : 'text-zinc-900 dark:text-white group-hover:text-[#FA243C] transition-colors'
+                              }`}>
+                                {track.title}
                               </span>
-                            </td>
-                            <td className="py-3 px-4 text-right text-zinc-500 dark:text-zinc-400 font-mono">
-                              {formatDuration(track.durationMs)}
-                            </td>
-                            <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
-                              <div className="flex items-center justify-center gap-1.5">
-                                <button
-                                  onClick={() => handleAddToQueue(track)}
-                                  title="Add to Up Next Queue"
-                                  className="p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
-                                >
-                                  <ListPlus className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  onClick={() => handleToggleSaveOffline(track)}
-                                  disabled={isDownloadingOfflineId === track.id}
-                                  title={offlineTrackIds.has(track.id) ? 'Cached Offline (Click to remove)' : 'Save for Offline Zero-Buffering Playback'}
-                                  className={`p-1.5 rounded-full transition-colors cursor-pointer ${
-                                    offlineTrackIds.has(track.id)
-                                      ? 'text-emerald-500 bg-emerald-500/10'
-                                      : 'hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-500 dark:text-zinc-400 hover:text-emerald-500'
-                                  }`}
-                                >
-                                  {isDownloadingOfflineId === track.id ? (
-                                    <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-500" />
-                                  ) : (
-                                    <HardDriveDownload className="w-3.5 h-3.5" />
-                                  )}
-                                </button>
-                                <a
-                                  href={`/api/music/download?url=${encodeURIComponent(track.audioUrl)}&name=${encodeURIComponent(
-                                    `${track.artist} - ${track.title}`
-                                  )}`}
-                                  download
-                                  title="Download 320kbps MP3"
-                                  className="p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-500 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors"
-                                >
-                                  <Download className="w-3.5 h-3.5" />
-                                </a>
-                                <button
-                                  onClick={() => playDirectTrack(track)}
-                                  className="w-7 h-7 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white flex items-center justify-center shadow-md transition-transform hover:scale-105 cursor-pointer"
-                                >
-                                  {isCurrent && isPlaying ? (
-                                    <Pause className="w-3 h-3 fill-current" />
-                                  ) : (
-                                    <Play className="w-3 h-3 fill-current translate-x-0.5" />
-                                  )}
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                              <span className="hidden xs:inline-block px-1.5 py-0.2 rounded text-[9px] font-mono font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                320K
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                              <span className="hover:text-zinc-900 dark:hover:text-zinc-200">{track.artist}</span>
+                              {track.album && (
+                                <>
+                                  <span className="text-zinc-300 dark:text-zinc-600">&bull;</span>
+                                  <span className="truncate hidden sm:inline">{track.album}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Middle: Album Name (Desktop) */}
+                        <div className="hidden md:block w-44 lg:w-56 text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                          {track.album}
+                        </div>
+
+                        {/* Right: Duration + Actions */}
+                        <div className="flex items-center gap-2 sm:gap-3 shrink-0" onClick={(e) => e.stopPropagation()}>
+                          <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500 w-10 text-right">
+                            {formatDuration(track.durationMs)}
+                          </span>
+
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleAddToQueue(track)}
+                              title="Add to Up Next Queue"
+                              className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+                            >
+                              <ListPlus className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleToggleSaveOffline(track)}
+                              disabled={isDownloadingOfflineId === track.id}
+                              title={offlineTrackIds.has(track.id) ? 'Cached Offline' : 'Save for Offline Zero-Buffering Playback'}
+                              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                                offlineTrackIds.has(track.id)
+                                  ? 'text-emerald-500 bg-emerald-500/10'
+                                  : 'hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-400 hover:text-emerald-500'
+                              }`}
+                            >
+                              {isDownloadingOfflineId === track.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+                              ) : (
+                                <HardDriveDownload className="w-4 h-4" />
+                              )}
+                            </button>
+                            <a
+                              href={`/api/music/download?url=${encodeURIComponent(track.audioUrl)}&name=${encodeURIComponent(
+                                `${track.artist} - ${track.title}`
+                              )}`}
+                              download
+                              title="Download 320kbps MP3"
+                              className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors hidden sm:block"
+                            >
+                              <Download className="w-4 h-4" />
+                            </a>
+                            <button
+                              onClick={() => playDirectTrack(track)}
+                              className="w-8 h-8 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white flex items-center justify-center shadow-md shadow-[#FA243C]/20 transition-transform hover:scale-105 cursor-pointer ml-1"
+                            >
+                              {isCurrent && isPlaying ? (
+                                <Pause className="w-3.5 h-3.5 fill-current" />
+                              ) : (
+                                <Play className="w-3.5 h-3.5 fill-current translate-x-0.5" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-20 text-zinc-400 space-y-3">
@@ -1752,113 +1808,148 @@ export function RiiqxMusicView() {
                     <span className="text-xs text-zinc-500 dark:text-zinc-400">{tracks.length} items</span>
                   </div>
 
-                  <div className="border border-zinc-200 dark:border-white/[0.08] rounded-2xl overflow-hidden bg-white dark:bg-white/[0.02] shadow-sm">
-                    <table className="w-full text-left border-collapse text-xs">
-                      <thead>
-                        <tr className="border-b border-zinc-200 dark:border-white/[0.08] text-zinc-500 dark:text-zinc-400 font-semibold bg-zinc-50/50 dark:bg-transparent">
-                          <th className="py-3 px-4 w-12 text-center">#</th>
-                          <th className="py-3 px-4">Title</th>
-                          <th className="py-3 px-4 hidden md:table-cell">Album</th>
-                          <th className="py-3 px-4 hidden sm:table-cell">Format</th>
-                          <th className="py-3 px-4 text-right">Time</th>
-                          <th className="py-3 px-4 w-28 text-center">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {tracks.map((track, idx) => {
-                          const isCurrent = track.id === currentTrack.id;
-                          return (
-                            <tr
-                              key={track.id}
-                              onClick={() => playTrackAtIndex(idx)}
-                              className={`border-b border-zinc-100 dark:border-white/[0.04] hover:bg-zinc-50 dark:hover:bg-white/[0.06] cursor-pointer transition-colors ${
-                                isCurrent ? 'bg-rose-50/60 dark:bg-white/[0.08] text-zinc-900 dark:text-white font-medium' : 'text-zinc-700 dark:text-zinc-300'
-                              }`}
-                            >
-                              <td className="py-3 px-4 text-center text-zinc-400 dark:text-zinc-500">
-                                {isCurrent && isPlaying ? (
-                                  <div className="w-3 h-3 mx-auto rounded-full bg-[#FA243C] animate-pulse" />
-                                ) : (
-                                  idx + 1
-                                )}
-                              </td>
-                              <td className="py-3 px-4">
-                                <div className="flex items-center gap-3">
-                                  <img
-                                    src={track.artworkUrl || FALLBACK_ARTWORK}
-                                    alt={track.title}
-                                    onError={(e) => {
-                                      e.currentTarget.src = FALLBACK_ARTWORK;
-                                    }}
-                                    className="w-9 h-9 rounded-lg object-cover bg-zinc-100 dark:bg-zinc-800 shrink-0"
-                                  />
-                                  <div className="min-w-0">
-                                    <div className={`font-semibold truncate ${isCurrent ? 'text-[#FA243C]' : 'text-zinc-900 dark:text-white'}`}>
-                                      {track.title}
-                                    </div>
-                                    <div className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">{track.artist}</div>
-                                  </div>
+                  <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/70 dark:bg-white/[0.02] backdrop-blur-xl p-2 sm:p-3 shadow-sm space-y-1">
+                    {/* Subtle Table Header */}
+                    <div className="hidden sm:flex items-center justify-between px-3 py-2 text-[11px] font-bold tracking-wider text-zinc-400 dark:text-zinc-500 uppercase border-b border-zinc-100 dark:border-white/[0.04]">
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                        <span className="w-7 text-center">#</span>
+                        <span>Title &amp; Artist</span>
+                      </div>
+                      <span className="hidden md:block w-44 lg:w-56">Album</span>
+                      <div className="flex items-center gap-3 w-32 justify-end pr-2">
+                        <span>Time</span>
+                        <span className="w-16 text-center">Actions</span>
+                      </div>
+                    </div>
+
+                    {/* Sleek Modern Track Rows */}
+                    {tracks.map((track, idx) => {
+                      const isCurrent = track.id === currentTrack.id;
+                      return (
+                        <div
+                          key={track.id}
+                          onClick={() => playTrackAtIndex(idx)}
+                          className={`group relative flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 cursor-pointer ${
+                            isCurrent
+                              ? 'bg-[#FA243C]/10 text-zinc-900 dark:text-white ring-1 ring-[#FA243C]/30 shadow-sm'
+                              : 'hover:bg-zinc-100 dark:hover:bg-white/[0.05] text-zinc-700 dark:text-zinc-300'
+                          }`}
+                        >
+                          {/* Left: Index / Play Icon + Artwork + Title + Artist */}
+                          <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                            <div className="w-7 text-center shrink-0 flex items-center justify-center">
+                              {isCurrent && isPlaying ? (
+                                <div className="flex items-end justify-center gap-0.5 h-3.5 w-3.5">
+                                  <span className="w-0.5 bg-[#FA243C] h-3.5 rounded-full animate-pulse" />
+                                  <span className="w-0.5 bg-[#FA243C] h-2 rounded-full animate-pulse delay-75" />
+                                  <span className="w-0.5 bg-[#FA243C] h-3 rounded-full animate-pulse delay-150" />
                                 </div>
-                              </td>
-                              <td className="py-3 px-4 text-zinc-500 dark:text-zinc-400 hidden md:table-cell truncate max-w-[200px]">{track.album}</td>
-                              <td className="py-3 px-4 hidden sm:table-cell">
-                                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                                  {track.format || '320kbps Master'}
+                              ) : (
+                                <>
+                                  <span className="text-xs font-mono font-medium text-zinc-400 dark:text-zinc-500 group-hover:hidden">
+                                    {idx + 1}
+                                  </span>
+                                  <Play className="w-3.5 h-3.5 text-zinc-800 dark:text-white fill-current hidden group-hover:block translate-x-0.5" />
+                                </>
+                              )}
+                            </div>
+
+                            <div className="relative w-11 h-11 rounded-xl overflow-hidden shadow-sm shrink-0 bg-zinc-800 ring-1 ring-black/5 dark:ring-white/10 group-hover:shadow-md transition-shadow">
+                              <img
+                                src={track.artworkUrl || FALLBACK_ARTWORK}
+                                alt={track.title}
+                                onError={(e) => {
+                                  e.currentTarget.src = FALLBACK_ARTWORK;
+                                }}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                              <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Play className="w-3.5 h-3.5 text-white fill-current translate-x-0.5" />
+                              </div>
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className={`text-sm font-semibold truncate ${
+                                  isCurrent ? 'text-[#FA243C]' : 'text-zinc-900 dark:text-white group-hover:text-[#FA243C] transition-colors'
+                                }`}>
+                                  {track.title}
                                 </span>
-                              </td>
-                              <td className="py-3 px-4 text-right text-zinc-500 dark:text-zinc-400 font-mono">
-                                {formatDuration(track.durationMs)}
-                              </td>
-                              <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
-                                <div className="flex items-center justify-center gap-1.5">
-                                  <button
-                                    onClick={() => handleAddToQueue(track)}
-                                    title="Add to Up Next Queue"
-                                    className="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
-                                  >
-                                    <ListPlus className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleToggleSaveOffline(track)}
-                                    disabled={isDownloadingOfflineId === track.id}
-                                    title={offlineTrackIds.has(track.id) ? 'Cached Offline (Click to remove)' : 'Save for Offline Zero-Buffering Playback'}
-                                    className={`p-1.5 rounded-full transition-colors cursor-pointer ${
-                                      offlineTrackIds.has(track.id)
-                                        ? 'text-emerald-500 bg-emerald-500/10'
-                                        : 'hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-500 dark:text-zinc-400 hover:text-emerald-500'
-                                    }`}
-                                  >
-                                    {isDownloadingOfflineId === track.id ? (
-                                      <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-500" />
-                                    ) : (
-                                      <HardDriveDownload className="w-3.5 h-3.5" />
-                                    )}
-                                  </button>
-                                  <a
-                                    href={`/api/music/download?url=${encodeURIComponent(track.audioUrl)}&name=${encodeURIComponent(
-                                      `${track.artist} - ${track.title}`
-                                    )}`}
-                                    download
-                                    title="Download 320kbps MP3"
-                                    className="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.1] text-zinc-500 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors"
-                                  >
-                                    <Download className="w-3.5 h-3.5" />
-                                  </a>
-                                  <button
-                                    onClick={() => toggleFavorite(track.id)}
-                                    className="p-1 text-zinc-400 hover:text-[#FA243C] transition-colors cursor-pointer"
-                                  >
-                                    <Heart
-                                      className={`w-3.5 h-3.5 ${track.isFavorite ? 'fill-[#FA243C] text-[#FA243C]' : ''}`}
-                                    />
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                                <span className="hidden xs:inline-block px-1.5 py-0.2 rounded text-[9px] font-mono font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                  {track.format || '320K'}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                                <span className="hover:text-zinc-900 dark:hover:text-zinc-200">{track.artist}</span>
+                                {track.album && (
+                                  <>
+                                    <span className="text-zinc-300 dark:text-zinc-600">&bull;</span>
+                                    <span className="truncate hidden sm:inline">{track.album}</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Middle: Album Name */}
+                          <div className="hidden md:block w-44 lg:w-56 text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                            {track.album}
+                          </div>
+
+                          {/* Right: Duration + Actions */}
+                          <div className="flex items-center gap-2 sm:gap-3 shrink-0" onClick={(e) => e.stopPropagation()}>
+                            <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500 w-10 text-right">
+                              {formatDuration(track.durationMs)}
+                            </span>
+
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => handleAddToQueue(track)}
+                                title="Add to Up Next Queue"
+                                className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+                              >
+                                <ListPlus className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleToggleSaveOffline(track)}
+                                disabled={isDownloadingOfflineId === track.id}
+                                title={offlineTrackIds.has(track.id) ? 'Cached Offline (Click to remove)' : 'Save for Offline Zero-Buffering Playback'}
+                                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                                  offlineTrackIds.has(track.id)
+                                    ? 'text-emerald-500 bg-emerald-500/10'
+                                    : 'hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-400 hover:text-emerald-500'
+                                }`}
+                              >
+                                {isDownloadingOfflineId === track.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+                                ) : (
+                                  <HardDriveDownload className="w-4 h-4" />
+                                )}
+                              </button>
+                              <a
+                                href={`/api/music/download?url=${encodeURIComponent(track.audioUrl)}&name=${encodeURIComponent(
+                                  `${track.artist} - ${track.title}`
+                                )}`}
+                                download
+                                title="Download 320kbps MP3"
+                                className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors hidden sm:block"
+                              >
+                                <Download className="w-4 h-4" />
+                              </a>
+                              <button
+                                onClick={() => toggleFavorite(track.id)}
+                                className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-400 hover:text-[#FA243C] transition-colors cursor-pointer"
+                                title={track.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                              >
+                                <Heart
+                                  className={`w-4 h-4 ${track.isFavorite ? 'fill-[#FA243C] text-[#FA243C]' : ''}`}
+                                />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -2519,60 +2610,70 @@ export function RiiqxMusicView() {
       </div>
 
       {/* Persistent Docked Mini-Player */}
-      <div className="h-22 border-t border-zinc-200 dark:border-white/[0.08] bg-white/95 dark:bg-[#0c0c10]/95 backdrop-blur-2xl px-4 md:px-6 py-3 flex items-center justify-between shrink-0 z-30 shadow-lg text-zinc-900 dark:text-white transition-colors">
-        {/* Track Info & Real-Time Spectrum Visualizer */}
-        <div className="flex items-center gap-3 w-1/4 min-w-[160px] md:min-w-[200px]">
-          <img
-            src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
-            alt={currentTrack.title}
-            onError={(e) => {
-              e.currentTarget.src = FALLBACK_ARTWORK;
-            }}
-            className="w-11 h-11 md:w-12 md:h-12 rounded-xl object-cover shadow-md cursor-pointer hover:opacity-80 transition-opacity bg-zinc-100 dark:bg-zinc-900 shrink-0"
+      <div className="h-24 border-t border-zinc-200/90 dark:border-white/[0.08] bg-white/95 dark:bg-[#0c0c10]/95 backdrop-blur-3xl px-4 md:px-8 py-3 flex items-center justify-between shrink-0 z-30 shadow-2xl text-zinc-900 dark:text-white transition-colors">
+        {/* Left: Track Info & Real-Time Spectrum Visualizer */}
+        <div className="flex items-center gap-3.5 w-1/4 min-w-[180px] md:min-w-[240px]">
+          <div
+            className="relative w-13 h-13 md:w-14 md:h-14 rounded-2xl overflow-hidden shadow-lg shrink-0 bg-zinc-800 ring-1 ring-black/5 dark:ring-white/10 group cursor-pointer"
             onClick={() => setIsFullscreenPlayer(true)}
-          />
-          <div className="min-w-0">
+          >
+            <img
+              src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
+              alt={currentTrack.title}
+              onError={(e) => {
+                e.currentTarget.src = FALLBACK_ARTWORK;
+              }}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <Maximize2 className="w-4 h-4 text-white" />
+            </div>
+          </div>
+
+          <div className="min-w-0 flex-1">
             <h4
-              className="text-xs font-bold text-zinc-900 dark:text-white truncate cursor-pointer hover:underline"
+              className="text-sm font-bold text-zinc-900 dark:text-white truncate cursor-pointer hover:text-[#FA243C] transition-colors"
               onClick={() => setIsFullscreenPlayer(true)}
             >
               {currentTrack.title}
             </h4>
-            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">{currentTrack.artist}</p>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="inline-block text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                {currentTrack.format || '320kbps Master'}
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">{currentTrack.artist}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="inline-block text-[9px] font-mono font-semibold px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                {currentTrack.format || '320K Master'}
               </span>
               {/* Mini Spectrum Visualizer */}
               <AudioVisualizer engine={audioEngineRef.current} isPlaying={isPlaying} barCount={8} height={12} className="hidden sm:block" />
             </div>
           </div>
+
           <button
             onClick={() => toggleFavorite(currentTrack.id)}
-            className="ml-2 hidden sm:block text-zinc-400 hover:text-[#FA243C] transition-colors shrink-0 cursor-pointer"
+            className="p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.08] text-zinc-400 hover:text-[#FA243C] transition-colors shrink-0 cursor-pointer hidden sm:block"
+            title={currentTrack.isFavorite ? 'Favorited' : 'Add to Favorites'}
           >
             <Heart className={`w-4 h-4 ${currentTrack.isFavorite ? 'fill-[#FA243C] text-[#FA243C]' : ''}`} />
           </button>
         </div>
 
-        {/* Playback Controls & Scrubber */}
-        <div className="flex flex-col items-center gap-1.5 flex-1 max-w-xl px-2 md:px-4">
-          <div className="flex items-center gap-3 md:gap-4">
+        {/* Center: Playback Controls & Scrubber */}
+        <div className="flex flex-col items-center gap-1.5 flex-1 max-w-xl px-2 md:px-6">
+          <div className="flex items-center gap-3 md:gap-5">
             <button
               onClick={() => setIsShuffle(!isShuffle)}
               className={`p-1.5 rounded-full transition-colors hidden sm:block cursor-pointer ${
-                isShuffle ? 'text-[#FA243C]' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                isShuffle ? 'text-[#FA243C]' : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
               title="Shuffle"
             >
               <Shuffle className="w-4 h-4" />
             </button>
-            <button onClick={handlePrevTrack} className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer" title="Previous">
+            <button onClick={handlePrevTrack} className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer" title="Previous (J)">
               <SkipBack className="w-4 h-4 fill-current" />
             </button>
             <button
               onClick={togglePlayPause}
-              className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 dark:text-black flex items-center justify-center shadow-lg transition-transform hover:scale-105 cursor-pointer"
+              className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#FA243C] to-red-500 hover:from-[#ff3b50] hover:to-red-400 text-white flex items-center justify-center shadow-lg shadow-[#FA243C]/35 hover:scale-105 active:scale-95 transition-all cursor-pointer"
               title="Play/Pause (Space)"
             >
               {isPlaying ? (
@@ -2581,13 +2682,13 @@ export function RiiqxMusicView() {
                 <Play className="w-4 h-4 fill-current translate-x-0.5" />
               )}
             </button>
-            <button onClick={handleNextTrack} className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer" title="Next">
+            <button onClick={handleNextTrack} className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer" title="Next (K)">
               <SkipForward className="w-4 h-4 fill-current" />
             </button>
             <button
               onClick={() => setIsRepeat(!isRepeat)}
               className={`p-1.5 rounded-full transition-colors hidden sm:block cursor-pointer ${
-                isRepeat ? 'text-[#FA243C]' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                isRepeat ? 'text-[#FA243C]' : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
               title="Repeat One"
             >
@@ -2596,7 +2697,7 @@ export function RiiqxMusicView() {
             <button
               onClick={() => setIsAutoplayOn(!isAutoplayOn)}
               className={`p-1.5 rounded-full transition-colors hidden md:block cursor-pointer ${
-                isAutoplayOn ? 'text-emerald-500 dark:text-emerald-400 bg-emerald-500/10' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                isAutoplayOn ? 'text-emerald-500 dark:text-emerald-400 bg-emerald-500/10' : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
               title={isAutoplayOn ? 'Infinite Autoplay Radio: ON' : 'Infinite Autoplay Radio: OFF'}
             >
@@ -2605,103 +2706,65 @@ export function RiiqxMusicView() {
           </div>
 
           {/* Scrubber Slider */}
-          <div className="flex items-center gap-2 md:gap-3 w-full text-[10px] font-mono text-zinc-500 dark:text-zinc-400">
-            <span>{formatDuration(currentTimeMs)}</span>
+          <div className="flex items-center gap-2 md:gap-3 w-full text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
+            <span className="w-10 text-right">{formatDuration(currentTimeMs)}</span>
             <input
               type="range"
               min={0}
               max={durationMs || 1}
               value={currentTimeMs}
               onChange={(e) => handleSeek(Number(e.target.value))}
-              className="flex-1 h-1 bg-zinc-200 dark:bg-white/[0.15] rounded-lg appearance-none cursor-pointer accent-[#FA243C]"
+              className="flex-1 h-1.5 bg-zinc-200 dark:bg-white/[0.12] rounded-lg appearance-none cursor-pointer accent-[#FA243C] hover:h-2 transition-all"
             />
-            <span>{formatDuration(durationMs)}</span>
+            <span className="w-10">{formatDuration(durationMs)}</span>
           </div>
         </div>
 
-        {/* Volume & Toggles */}
-        <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 w-1/4 justify-end min-w-[140px] md:min-w-[220px]">
-          {/* 1-Click Save Offline Button */}
+        {/* Right: Volume & Audio Features */}
+        <div className="flex items-center gap-1.5 sm:gap-2 w-1/4 justify-end min-w-[160px] md:min-w-[240px]">
+          {/* Synced Lyrics Toggle Button */}
           <button
-            onClick={() => handleToggleSaveOffline(currentTrack)}
-            disabled={isDownloadingOfflineId === currentTrack.id}
-            className={`p-2 rounded-xl transition-colors hidden sm:block cursor-pointer ${
-              offlineTrackIds.has(currentTrack.id)
-                ? 'text-emerald-500 bg-emerald-500/10'
-                : 'text-zinc-500 dark:text-zinc-400 hover:text-emerald-500'
+            onClick={() => setRightPanelTab(rightPanelTab === 'lyrics' ? null : 'lyrics')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              rightPanelTab === 'lyrics'
+                ? 'bg-gradient-to-r from-orange-500 to-[#FA243C] text-white shadow-md shadow-orange-500/30'
+                : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white'
             }`}
-            title={
-              offlineTrackIds.has(currentTrack.id)
-                ? 'Cached Offline (Click to remove)'
-                : 'Cache Track for Offline Zero-Buffering Playback'
-            }
+            title="Synced Lyrics (L)"
           >
-            {isDownloadingOfflineId === currentTrack.id ? (
-              <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
-            ) : (
-              <HardDriveDownload className="w-4 h-4" />
-            )}
+            <Sparkles className="w-3.5 h-3.5 text-orange-400" />
+            <span className="hidden xl:inline">Lyrics</span>
           </button>
-          <a
-            href={`/api/music/download?url=${encodeURIComponent(currentTrack.audioUrl)}&name=${encodeURIComponent(
-              `${currentTrack.artist} - ${currentTrack.title}`
-            )}`}
-            download
-            className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 rounded-xl transition-colors hidden sm:block cursor-pointer"
-            title="Download 320kbps MP3"
-          >
-            <Download className="w-4 h-4" />
-          </a>
-          <button
-            onClick={triggerAiDjHostIntro}
-            disabled={isDjSpeaking || isDjLoading}
-            className={`p-2 rounded-xl transition-colors hidden md:block cursor-pointer ${
-              isDjSpeaking
-                ? 'text-orange-500 bg-orange-500/20 animate-pulse'
-                : 'text-zinc-500 dark:text-zinc-400 hover:text-orange-500'
-            }`}
-            title="AI DJ Radio Host Intro"
-          >
-            {isDjLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin text-orange-400" />
-            ) : (
-              <Mic className="w-4 h-4" />
-            )}
-          </button>
-          <button
-            onClick={handleOpenYouTubeVideo}
-            className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-red-500 rounded-xl transition-colors hidden sm:block cursor-pointer"
-            title="Watch Official YouTube Video"
-          >
-            <Video className="w-4 h-4" />
-          </button>
+
+          {/* Up Next Queue Toggle Button */}
           <button
             onClick={() => setRightPanelTab(rightPanelTab === 'queue' ? null : 'queue')}
-            className={`p-2 rounded-xl transition-colors cursor-pointer ${
-              rightPanelTab === 'queue' ? 'text-[#FA243C] bg-[#FA243C]/10 font-bold' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+            className={`relative p-2 rounded-xl transition-colors cursor-pointer ${
+              rightPanelTab === 'queue'
+                ? 'bg-zinc-900 text-white dark:bg-white dark:text-black font-bold'
+                : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white'
             }`}
             title="Toggle Playing Queue (Q)"
           >
             <ListMusic className="w-4 h-4" />
+            {upcomingQueue.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#FA243C] text-[9px] text-white font-bold flex items-center justify-center">
+                {upcomingQueue.length}
+              </span>
+            )}
           </button>
-          <button
-            onClick={() => setRightPanelTab(rightPanelTab === 'lyrics' ? null : 'lyrics')}
-            className={`p-2 rounded-xl transition-colors cursor-pointer ${
-              rightPanelTab === 'lyrics' ? 'text-orange-500 bg-orange-500/10' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-            }`}
-            title="Toggle Synced Lyrics (L)"
-          >
-            <Sparkles className="w-4 h-4" />
-          </button>
+
+          {/* Equalizer & Sound FX */}
           <button
             onClick={() => setIsEqualizerOpen(true)}
-            className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-xl transition-colors hidden sm:block cursor-pointer"
+            className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white rounded-xl transition-colors hidden sm:block cursor-pointer"
             title="Equalizer & Sound FX"
           >
             <Sliders className="w-4 h-4" />
           </button>
 
-          <div className="hidden lg:flex items-center gap-2">
+          {/* Volume Control */}
+          <div className="hidden lg:flex items-center gap-2 pl-1">
             <button onClick={toggleMute} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer" title="Mute (M)">
               {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             </button>
@@ -2716,10 +2779,29 @@ export function RiiqxMusicView() {
             />
           </div>
 
+          {/* 1-Click Save Offline Button */}
+          <button
+            onClick={() => handleToggleSaveOffline(currentTrack)}
+            disabled={isDownloadingOfflineId === currentTrack.id}
+            className={`p-2 rounded-xl transition-colors hidden xl:block cursor-pointer ${
+              offlineTrackIds.has(currentTrack.id)
+                ? 'text-emerald-500 bg-emerald-500/10'
+                : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-emerald-500'
+            }`}
+            title={offlineTrackIds.has(currentTrack.id) ? 'Cached Offline' : 'Cache for Offline Playback'}
+          >
+            {isDownloadingOfflineId === currentTrack.id ? (
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+            ) : (
+              <HardDriveDownload className="w-4 h-4" />
+            )}
+          </button>
+
+          {/* Fullscreen Player Expand */}
           <button
             onClick={() => setIsFullscreenPlayer(true)}
-            className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
-            title="Expand Full Player (F)"
+            className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white rounded-xl transition-colors cursor-pointer"
+            title="Fullscreen Player (F)"
           >
             <Maximize2 className="w-4 h-4" />
           </button>
