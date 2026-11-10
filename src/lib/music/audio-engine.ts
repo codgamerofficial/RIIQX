@@ -38,6 +38,24 @@ export class WebAudioEngine {
       this.audio = new Audio();
       this.audio.crossOrigin = 'anonymous';
       this.audio.preload = 'auto';
+      // Enable continuous background inline playback across mobile & desktop browsers
+      (this.audio as any).playsInline = true;
+      this.audio.setAttribute('webkit-playsinline', 'true');
+      this.audio.setAttribute('playsinline', 'true');
+
+      // Auto-resume audio context when tab or window is minimized/blurred so background playback never drops
+      if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+          if (this.audio && !this.audio.paused) {
+            this.resumeContext();
+          }
+        });
+        window.addEventListener('blur', () => {
+          if (this.audio && !this.audio.paused) {
+            this.resumeContext();
+          }
+        });
+      }
     }
   }
 
@@ -51,6 +69,14 @@ export class WebAudioEngine {
       if (!AudioContextClass) return;
 
       this.audioCtx = new AudioContextClass();
+      
+      // Auto-resume if browser suspends context on tab switch
+      this.audioCtx.onstatechange = () => {
+        if (this.audioCtx?.state === 'suspended' && this.audio && !this.audio.paused) {
+          this.audioCtx.resume().catch(() => {});
+        }
+      };
+
       this.sourceNode = this.audioCtx.createMediaElementSource(this.audio);
 
       // Low Shelf Filter (Bass - 120Hz)

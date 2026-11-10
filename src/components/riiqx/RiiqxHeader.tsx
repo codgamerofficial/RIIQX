@@ -151,30 +151,59 @@ export function RiiqxHeader() {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Drawer Menu & Full Backdrop */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-x-0 top-14 bg-white/98 dark:bg-[#0a0a0c]/98 backdrop-blur-2xl border-b border-zinc-200 dark:border-white/[0.08] p-4 shadow-2xl z-50 space-y-1">
-          {musicNav.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-start">
+          {/* Opaque Dimmed Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+
+          {/* Drawer Content */}
+          <div className="relative z-10 w-full max-w-sm bg-white dark:bg-[#0c0c10] border-b sm:border-r border-zinc-200 dark:border-white/[0.1] p-5 shadow-2xl flex flex-col gap-4 animate-in slide-in-from-top-4 duration-200">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-white/[0.08]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#FA243C] to-orange-500 flex items-center justify-center text-white shadow-md">
+                  <Music2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm text-zinc-900 dark:text-white">RIIQX MUSIC</h3>
+                  <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">320K AUDIOPHILE</p>
+                </div>
+              </div>
               <button
-                key={item.id}
-                onClick={() => {
-                  setActiveTab(item.id as any);
-                  setMobileMenuOpen(false);
-                }}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                  isActive
-                    ? 'bg-[#FA243C] text-white font-bold shadow-lg shadow-[#FA243C]/20'
-                    : 'text-zinc-400 hover:bg-white/[0.04] hover:text-white'
-                }`}
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/[0.08] text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
               >
-                <Icon className="w-4 h-4" />
-                <span>{item.label}</span>
+                <X className="w-5 h-5" />
               </button>
-            );
-          })}
+            </div>
+
+            <nav className="space-y-1">
+              {musicNav.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveTab(item.id as any);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-[#FA243C] text-white font-bold shadow-lg shadow-[#FA243C]/25'
+                        : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.06] hover:text-zinc-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
         </div>
       )}
     </header>

@@ -22,6 +22,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { Audio, AVPlaybackStatus } from 'expo-av';
 import { useRiiqxMobile } from '../../src/context/RiiqxMobileContext';
 import { getApiBaseUrl } from '../../src/services/api';
 
@@ -156,10 +157,34 @@ export default function MobileHomeScreen() {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [activeStation, setActiveStation] = useState<string | null>(null);
 
-  // Audio HTML5 reference for web / simulated ticker for native
+  // Audio References: Native Expo Sound for Android/iOS background & Web Audio fallback
+  const soundRef = useRef<Audio.Sound | null>(null);
   const webAudioRef = useRef<any>(null);
 
   const currentTrack = tracks[currentTrackIndex] || tracks[0];
+
+  // Configure Native Background Audio Mode (Spotify/Apple Music grade background playback)
+  useEffect(() => {
+    if (Platform.OS !== 'web') {
+      Audio.setAudioModeAsync({
+        staysActiveInBackground: true,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      }).catch((err) => {
+        console.warn('Expo Audio background mode configuration error:', err);
+      });
+    }
+
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.unloadAsync().catch(() => {});
+      }
+      if (webAudioRef.current) {
+        webAudioRef.current.pause();
+      }
+    };
+  }, []);
 
   // Load trending tracks from API on mount
   useEffect(() => {
@@ -182,69 +207,96 @@ export default function MobileHomeScreen() {
     fetchTrending();
   }, []);
 
-  // Web audio element initializer
-  useEffect(() => {
-    if (Platform.OS === 'web' && typeof window !== 'undefined') {
-      const audio = new Audio(currentTrack.audioUrl);
-      webAudioRef.current = audio;
-
-      audio.ontimeupdate = () => {
-        setCurrentTimeMs(audio.currentTime * 1000);
-      };
-      audio.onloadedmetadata = () => {
-        if (audio.duration && isFinite(audio.duration)) {
-          setDurationMs(audio.duration * 1000);
-        }
-      };
-      audio.onended = () => {
+  // Playback status listener for Expo AV
+  const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
+    if (status.isLoaded) {
+      setCurrentTimeMs(status.positionMillis);
+      if (status.durationMillis && !isNaN(status.durationMillis) && status.durationMillis > 0) {
+        setDurationMs(status.durationMillis);
+      }
+      setIsPlaying(status.isPlaying);
+      if (status.didJustFinish) {
         handleNextTrack();
-      };
-
-      return () => {
-        audio.pause();
-        audio.src = '';
-      };
-    }
-  }, [currentTrack.audioUrl]);
-
-  // Audio ticker simulation for native testing
-  useEffect(() => {
-    let interval: any = null;
-    if (isPlaying) {
-      if (Platform.OS === 'web' && webAudioRef.current) {
-        webAudioRef.current.play().catch(() => {});
       }
-      interval = setInterval(() => {
-        setCurrentTimeMs((prev) => {
-          if (prev >= durationMs) {
-            handleNextTrack();
-            return 0;
+    }
+  };
+
+  // Central master track player: plays full-length 320k audio with background playback
+  const loadAndPlayTrack = async (track: MobileTrack) => {
+    if (Platform.OS !== 'web') {
+      try {
+        if (soundRef.current) {
+          await soundRef.current.unloadAsync().catch(() => {});
+          soundRef.current = null;
+        }
+        const { sound } = await Audio.Sound.createAsync(
+          { uri: track.audioUrl },
+          { shouldPlay: true, progressUpdateIntervalMillis: 500 },
+          onPlaybackStatusUpdate
+        );
+        soundRef.current = sound;
+        setIsPlaying(true);
+      } catch (err) {
+        console.warn('Native Audio play failed, falling back to simulated timer:', err);
+      }
+    } else if (typeof window !== 'undefined' && (window as any).Audio) {
+      if (!webAudioRef.current) {
+        const audio = new (window as any).Audio();
+        audio.setAttribute('playsinline', 'true');
+        audio.setAttribute('webkit-playsinline', 'true');
+        audio.ontimeupdate = () => setCurrentTimeMs(audio.currentTime * 1000);
+        audio.onloadedmetadata = () => {
+          if (audio.duration && isFinite(audio.duration)) {
+            setDurationMs(audio.duration * 1000);
           }
-          return prev + 1000;
-        });
-      }, 1000);
-    } else {
-      if (Platform.OS === 'web' && webAudioRef.current) {
-        webAudioRef.current.pause();
+        };
+        audio.onended = () => handleNextTrack();
+        webAudioRef.current = audio;
       }
-      clearInterval(interval);
+      webAudioRef.current.src = track.audioUrl;
+      webAudioRef.current.play().catch(() => {});
+      setIsPlaying(true);
     }
-    return () => clearInterval(interval);
-  }, [isPlaying, durationMs]);
+  };
 
-  const togglePlayPause = () => {
+  const togglePlayPause = async () => {
+    if (Platform.OS !== 'web' && soundRef.current) {
+      try {
+        const status = await soundRef.current.getStatusAsync();
+        if (status.isLoaded) {
+          if (status.isPlaying) {
+            await soundRef.current.pauseAsync();
+            setIsPlaying(false);
+          } else {
+            await soundRef.current.playAsync();
+            setIsPlaying(true);
+          }
+          return;
+        }
+      } catch (e) {
+        console.warn('Toggle play error:', e);
+      }
+    }
+    if (Platform.OS === 'web' && webAudioRef.current) {
+      if (isPlaying) {
+        webAudioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        webAudioRef.current.play().catch(() => {});
+        setIsPlaying(true);
+      }
+      return;
+    }
     setIsPlaying(!isPlaying);
   };
 
   const playTrackAtIndex = (index: number) => {
+    const target = tracks[index];
+    if (!target) return;
     setCurrentTrackIndex(index);
     setCurrentTimeMs(0);
-    setDurationMs(tracks[index].durationMs);
-    setIsPlaying(true);
-    if (Platform.OS === 'web' && webAudioRef.current) {
-      webAudioRef.current.src = tracks[index].audioUrl;
-      webAudioRef.current.play().catch(() => {});
-    }
+    setDurationMs(target.durationMs);
+    loadAndPlayTrack(target);
   };
 
   const playDirectTrack = (track: MobileTrack) => {
@@ -256,11 +308,7 @@ export default function MobileHomeScreen() {
       setCurrentTrackIndex(0);
       setCurrentTimeMs(0);
       setDurationMs(track.durationMs);
-      setIsPlaying(true);
-      if (Platform.OS === 'web' && webAudioRef.current) {
-        webAudioRef.current.src = track.audioUrl;
-        webAudioRef.current.play().catch(() => {});
-      }
+      loadAndPlayTrack(track);
     }
   };
 

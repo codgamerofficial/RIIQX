@@ -360,7 +360,7 @@ export function RiiqxMusicView() {
     };
   }, []);
 
-  // System Media Session API Integration (Hardware Keys & OS Media Center)
+  // System Media Session API Integration (Hardware Keys, Lock Screen & Background Playback)
   useEffect(() => {
     if ('mediaSession' in navigator && currentTrack) {
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -368,19 +368,32 @@ export function RiiqxMusicView() {
         artist: currentTrack.artist,
         album: currentTrack.album,
         artwork: [
-          {
-            src: currentTrack.artworkUrl || FALLBACK_ARTWORK,
-            sizes: '512x512',
-            type: 'image/jpeg',
-          },
+          { src: currentTrack.artworkUrl || FALLBACK_ARTWORK, sizes: '96x96', type: 'image/jpeg' },
+          { src: currentTrack.artworkUrl || FALLBACK_ARTWORK, sizes: '128x128', type: 'image/jpeg' },
+          { src: currentTrack.artworkUrl || FALLBACK_ARTWORK, sizes: '192x192', type: 'image/jpeg' },
+          { src: currentTrack.artworkUrl || FALLBACK_ARTWORK, sizes: '256x256', type: 'image/jpeg' },
+          { src: currentTrack.artworkUrl || FALLBACK_ARTWORK, sizes: '384x384', type: 'image/jpeg' },
+          { src: currentTrack.artworkUrl || FALLBACK_ARTWORK, sizes: '512x512', type: 'image/jpeg' },
         ],
       });
 
+      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+
+      if ('setPositionState' in navigator.mediaSession && durationMs > 0) {
+        try {
+          navigator.mediaSession.setPositionState({
+            duration: Math.max(1, durationMs / 1000),
+            playbackRate: 1.0,
+            position: Math.max(0, Math.min(durationMs / 1000, currentTimeMs / 1000)),
+          });
+        } catch {}
+      }
+
       navigator.mediaSession.setActionHandler('play', () => {
-        audioEngineRef.current?.play();
+        togglePlayPause();
       });
       navigator.mediaSession.setActionHandler('pause', () => {
-        audioEngineRef.current?.pause();
+        togglePlayPause();
       });
       navigator.mediaSession.setActionHandler('previoustrack', () => {
         handlePrevTrack();
@@ -393,8 +406,32 @@ export function RiiqxMusicView() {
           handleSeek(details.seekTime * 1000);
         }
       });
+      navigator.mediaSession.setActionHandler('seekforward', (details) => {
+        handleSeek(Math.min(durationMs, currentTimeMs + (details.seekOffset || 10) * 1000));
+      });
+      navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+        handleSeek(Math.max(0, currentTimeMs - (details.seekOffset || 10) * 1000));
+      });
     }
-  }, [currentTrack]);
+  }, [currentTrack, isPlaying, durationMs, currentTimeMs]);
+
+  // Keep screen wake lock active during playback so background audio is protected
+  useEffect(() => {
+    let wakeLockSentinel: any = null;
+    if ('wakeLock' in navigator && isPlaying) {
+      (navigator as any).wakeLock
+        .request('screen')
+        .then((sentinel: any) => {
+          wakeLockSentinel = sentinel;
+        })
+        .catch(() => {});
+    }
+    return () => {
+      if (wakeLockSentinel) {
+        wakeLockSentinel.release().catch(() => {});
+      }
+    };
+  }, [isPlaying]);
 
   // Global Keyboard Shortcuts (Space, Arrows, M, L, F)
   useEffect(() => {
@@ -2609,12 +2646,20 @@ export function RiiqxMusicView() {
         )}
       </div>
 
-      {/* Persistent Docked Mini-Player */}
-      <div className="h-24 border-t border-zinc-200/90 dark:border-white/[0.08] bg-white/95 dark:bg-[#0c0c10]/95 backdrop-blur-3xl px-4 md:px-8 py-3 flex items-center justify-between shrink-0 z-30 shadow-2xl text-zinc-900 dark:text-white transition-colors">
-        {/* Left: Track Info & Real-Time Spectrum Visualizer */}
-        <div className="flex items-center gap-3.5 w-1/4 min-w-[180px] md:min-w-[240px]">
+      {/* Persistent Docked Mini-Player (Fully Responsive: Mobile Streamlined + Desktop Full Cockpit) */}
+      <div className="relative border-t border-zinc-200/90 dark:border-white/[0.08] bg-white/95 dark:bg-[#0c0c10]/95 backdrop-blur-3xl shrink-0 z-30 shadow-2xl text-zinc-900 dark:text-white transition-colors">
+        {/* Subtle Top Linear Progress Bar for Instant Progress Feedback */}
+        <div className="w-full h-1 bg-zinc-200/60 dark:bg-white/[0.08] relative overflow-hidden">
           <div
-            className="relative w-13 h-13 md:w-14 md:h-14 rounded-2xl overflow-hidden shadow-lg shrink-0 bg-zinc-800 ring-1 ring-black/5 dark:ring-white/10 group cursor-pointer"
+            className="h-full bg-gradient-to-r from-orange-500 to-[#FA243C] transition-all duration-300"
+            style={{ width: `${Math.min(100, (currentTimeMs / (durationMs || 1)) * 100)}%` }}
+          />
+        </div>
+
+        {/* MOBILE COMPACT PLAYER (Visible on screens < sm, zero overlap) */}
+        <div className="sm:hidden flex items-center justify-between px-3.5 py-2.5 h-16 gap-3">
+          <div
+            className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
             onClick={() => setIsFullscreenPlayer(true)}
           >
             <img
@@ -2623,58 +2668,30 @@ export function RiiqxMusicView() {
               onError={(e) => {
                 e.currentTarget.src = FALLBACK_ARTWORK;
               }}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-10 h-10 rounded-xl object-cover shadow-sm bg-zinc-800 shrink-0 ring-1 ring-white/10"
             />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Maximize2 className="w-4 h-4 text-white" />
+            <div className="min-w-0 flex-1">
+              <h4 className="text-xs font-bold text-zinc-900 dark:text-white truncate">
+                {currentTrack.title}
+              </h4>
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                {currentTrack.artist} &bull; 320K
+              </p>
             </div>
           </div>
 
-          <div className="min-w-0 flex-1">
-            <h4
-              className="text-sm font-bold text-zinc-900 dark:text-white truncate cursor-pointer hover:text-[#FA243C] transition-colors"
-              onClick={() => setIsFullscreenPlayer(true)}
-            >
-              {currentTrack.title}
-            </h4>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">{currentTrack.artist}</p>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="inline-block text-[9px] font-mono font-semibold px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                {currentTrack.format || '320K Master'}
-              </span>
-              {/* Mini Spectrum Visualizer */}
-              <AudioVisualizer engine={audioEngineRef.current} isPlaying={isPlaying} barCount={8} height={12} className="hidden sm:block" />
-            </div>
-          </div>
-
-          <button
-            onClick={() => toggleFavorite(currentTrack.id)}
-            className="p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.08] text-zinc-400 hover:text-[#FA243C] transition-colors shrink-0 cursor-pointer hidden sm:block"
-            title={currentTrack.isFavorite ? 'Favorited' : 'Add to Favorites'}
-          >
-            <Heart className={`w-4 h-4 ${currentTrack.isFavorite ? 'fill-[#FA243C] text-[#FA243C]' : ''}`} />
-          </button>
-        </div>
-
-        {/* Center: Playback Controls & Scrubber */}
-        <div className="flex flex-col items-center gap-1.5 flex-1 max-w-xl px-2 md:px-6">
-          <div className="flex items-center gap-3 md:gap-5">
+          <div className="flex items-center gap-2 shrink-0">
             <button
-              onClick={() => setIsShuffle(!isShuffle)}
-              className={`p-1.5 rounded-full transition-colors hidden sm:block cursor-pointer ${
-                isShuffle ? 'text-[#FA243C]' : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-              }`}
-              title="Shuffle"
+              onClick={handlePrevTrack}
+              className="p-1.5 text-zinc-400 hover:text-white cursor-pointer"
+              title="Previous"
             >
-              <Shuffle className="w-4 h-4" />
-            </button>
-            <button onClick={handlePrevTrack} className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer" title="Previous (J)">
               <SkipBack className="w-4 h-4 fill-current" />
             </button>
             <button
               onClick={togglePlayPause}
-              className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#FA243C] to-red-500 hover:from-[#ff3b50] hover:to-red-400 text-white flex items-center justify-center shadow-lg shadow-[#FA243C]/35 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-              title="Play/Pause (Space)"
+              className="w-9 h-9 rounded-full bg-[#FA243C] text-white flex items-center justify-center shadow-md shadow-[#FA243C]/40 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              title="Play/Pause"
             >
               {isPlaying ? (
                 <Pause className="w-4 h-4 fill-current" />
@@ -2682,129 +2699,219 @@ export function RiiqxMusicView() {
                 <Play className="w-4 h-4 fill-current translate-x-0.5" />
               )}
             </button>
-            <button onClick={handleNextTrack} className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer" title="Next (K)">
+            <button
+              onClick={handleNextTrack}
+              className="p-1.5 text-zinc-400 hover:text-white cursor-pointer"
+              title="Next"
+            >
               <SkipForward className="w-4 h-4 fill-current" />
             </button>
             <button
-              onClick={() => setIsRepeat(!isRepeat)}
-              className={`p-1.5 rounded-full transition-colors hidden sm:block cursor-pointer ${
-                isRepeat ? 'text-[#FA243C]' : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-              }`}
-              title="Repeat One"
+              onClick={() => setIsFullscreenPlayer(true)}
+              className="p-1.5 text-zinc-400 hover:text-white cursor-pointer"
+              title="Expand"
             >
-              <Repeat className="w-4 h-4" />
+              <Maximize2 className="w-4 h-4" />
             </button>
-            <button
-              onClick={() => setIsAutoplayOn(!isAutoplayOn)}
-              className={`p-1.5 rounded-full transition-colors hidden md:block cursor-pointer ${
-                isAutoplayOn ? 'text-emerald-500 dark:text-emerald-400 bg-emerald-500/10' : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-              }`}
-              title={isAutoplayOn ? 'Infinite Autoplay Radio: ON' : 'Infinite Autoplay Radio: OFF'}
-            >
-              <InfinityIcon className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Scrubber Slider */}
-          <div className="flex items-center gap-2 md:gap-3 w-full text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
-            <span className="w-10 text-right">{formatDuration(currentTimeMs)}</span>
-            <input
-              type="range"
-              min={0}
-              max={durationMs || 1}
-              value={currentTimeMs}
-              onChange={(e) => handleSeek(Number(e.target.value))}
-              className="flex-1 h-1.5 bg-zinc-200 dark:bg-white/[0.12] rounded-lg appearance-none cursor-pointer accent-[#FA243C] hover:h-2 transition-all"
-            />
-            <span className="w-10">{formatDuration(durationMs)}</span>
           </div>
         </div>
 
-        {/* Right: Volume & Audio Features */}
-        <div className="flex items-center gap-1.5 sm:gap-2 w-1/4 justify-end min-w-[160px] md:min-w-[240px]">
-          {/* Synced Lyrics Toggle Button */}
-          <button
-            onClick={() => setRightPanelTab(rightPanelTab === 'lyrics' ? null : 'lyrics')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-              rightPanelTab === 'lyrics'
-                ? 'bg-gradient-to-r from-orange-500 to-[#FA243C] text-white shadow-md shadow-orange-500/30'
-                : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white'
-            }`}
-            title="Synced Lyrics (L)"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-orange-400" />
-            <span className="hidden xl:inline">Lyrics</span>
-          </button>
+        {/* DESKTOP FULL PLAYER (Visible on screens >= sm) */}
+        <div className="hidden sm:flex items-center justify-between px-4 md:px-8 py-3 h-22">
+          {/* Left: Track Info & Real-Time Spectrum Visualizer */}
+          <div className="flex items-center gap-3.5 w-1/4 min-w-[180px] md:min-w-[240px]">
+            <div
+              className="relative w-13 h-13 md:w-14 md:h-14 rounded-2xl overflow-hidden shadow-lg shrink-0 bg-zinc-800 ring-1 ring-black/5 dark:ring-white/10 group cursor-pointer"
+              onClick={() => setIsFullscreenPlayer(true)}
+            >
+              <img
+                src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
+                alt={currentTrack.title}
+                onError={(e) => {
+                  e.currentTarget.src = FALLBACK_ARTWORK;
+                }}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Maximize2 className="w-4 h-4 text-white" />
+              </div>
+            </div>
 
-          {/* Up Next Queue Toggle Button */}
-          <button
-            onClick={() => setRightPanelTab(rightPanelTab === 'queue' ? null : 'queue')}
-            className={`relative p-2 rounded-xl transition-colors cursor-pointer ${
-              rightPanelTab === 'queue'
-                ? 'bg-zinc-900 text-white dark:bg-white dark:text-black font-bold'
-                : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white'
-            }`}
-            title="Toggle Playing Queue (Q)"
-          >
-            <ListMusic className="w-4 h-4" />
-            {upcomingQueue.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#FA243C] text-[9px] text-white font-bold flex items-center justify-center">
-                {upcomingQueue.length}
-              </span>
-            )}
-          </button>
+            <div className="min-w-0 flex-1">
+              <h4
+                className="text-sm font-bold text-zinc-900 dark:text-white truncate cursor-pointer hover:text-[#FA243C] transition-colors"
+                onClick={() => setIsFullscreenPlayer(true)}
+              >
+                {currentTrack.title}
+              </h4>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">{currentTrack.artist}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="inline-block text-[9px] font-mono font-semibold px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  {currentTrack.format || '320K Master'}
+                </span>
+                <AudioVisualizer engine={audioEngineRef.current} isPlaying={isPlaying} barCount={8} height={12} className="hidden sm:block" />
+              </div>
+            </div>
 
-          {/* Equalizer & Sound FX */}
-          <button
-            onClick={() => setIsEqualizerOpen(true)}
-            className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white rounded-xl transition-colors hidden sm:block cursor-pointer"
-            title="Equalizer & Sound FX"
-          >
-            <Sliders className="w-4 h-4" />
-          </button>
-
-          {/* Volume Control */}
-          <div className="hidden lg:flex items-center gap-2 pl-1">
-            <button onClick={toggleMute} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer" title="Mute (M)">
-              {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            <button
+              onClick={() => toggleFavorite(currentTrack.id)}
+              className="p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.08] text-zinc-400 hover:text-[#FA243C] transition-colors shrink-0 cursor-pointer hidden sm:block"
+              title={currentTrack.isFavorite ? 'Favorited' : 'Add to Favorites'}
+            >
+              <Heart className={`w-4 h-4 ${currentTrack.isFavorite ? 'fill-[#FA243C] text-[#FA243C]' : ''}`} />
             </button>
-            <input
-              type="range"
-              min={0}
-              max={1}
-              step={0.01}
-              value={isMuted ? 0 : volume}
-              onChange={(e) => handleVolumeChange(Number(e.target.value))}
-              className="w-16 xl:w-20 h-1 bg-zinc-200 dark:bg-white/[0.15] rounded-lg appearance-none cursor-pointer accent-zinc-800 dark:accent-white"
-            />
           </div>
 
-          {/* 1-Click Save Offline Button */}
-          <button
-            onClick={() => handleToggleSaveOffline(currentTrack)}
-            disabled={isDownloadingOfflineId === currentTrack.id}
-            className={`p-2 rounded-xl transition-colors hidden xl:block cursor-pointer ${
-              offlineTrackIds.has(currentTrack.id)
-                ? 'text-emerald-500 bg-emerald-500/10'
-                : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-emerald-500'
-            }`}
-            title={offlineTrackIds.has(currentTrack.id) ? 'Cached Offline' : 'Cache for Offline Playback'}
-          >
-            {isDownloadingOfflineId === currentTrack.id ? (
-              <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
-            ) : (
-              <HardDriveDownload className="w-4 h-4" />
-            )}
-          </button>
+          {/* Center: Playback Controls & Scrubber */}
+          <div className="flex flex-col items-center gap-1.5 flex-1 max-w-xl px-2 md:px-6">
+            <div className="flex items-center gap-3 md:gap-5">
+              <button
+                onClick={() => setIsShuffle(!isShuffle)}
+                className={`p-1.5 rounded-full transition-colors hidden sm:block cursor-pointer ${
+                  isShuffle ? 'text-[#FA243C]' : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                }`}
+                title="Shuffle"
+              >
+                <Shuffle className="w-4 h-4" />
+              </button>
+              <button onClick={handlePrevTrack} className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer" title="Previous (J)">
+                <SkipBack className="w-4 h-4 fill-current" />
+              </button>
+              <button
+                onClick={togglePlayPause}
+                className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#FA243C] to-red-500 hover:from-[#ff3b50] hover:to-red-400 text-white flex items-center justify-center shadow-lg shadow-[#FA243C]/35 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                title="Play/Pause (Space)"
+              >
+                {isPlaying ? (
+                  <Pause className="w-4 h-4 fill-current" />
+                ) : (
+                  <Play className="w-4 h-4 fill-current translate-x-0.5" />
+                )}
+              </button>
+              <button onClick={handleNextTrack} className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer" title="Next (K)">
+                <SkipForward className="w-4 h-4 fill-current" />
+              </button>
+              <button
+                onClick={() => setIsRepeat(!isRepeat)}
+                className={`p-1.5 rounded-full transition-colors hidden sm:block cursor-pointer ${
+                  isRepeat ? 'text-[#FA243C]' : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                }`}
+                title="Repeat One"
+              >
+                <Repeat className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setIsAutoplayOn(!isAutoplayOn)}
+                className={`p-1.5 rounded-full transition-colors hidden md:block cursor-pointer ${
+                  isAutoplayOn ? 'text-emerald-500 dark:text-emerald-400 bg-emerald-500/10' : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                }`}
+                title={isAutoplayOn ? 'Infinite Autoplay Radio: ON' : 'Infinite Autoplay Radio: OFF'}
+              >
+                <InfinityIcon className="w-4 h-4" />
+              </button>
+            </div>
 
-          {/* Fullscreen Player Expand */}
-          <button
-            onClick={() => setIsFullscreenPlayer(true)}
-            className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white rounded-xl transition-colors cursor-pointer"
-            title="Fullscreen Player (F)"
-          >
-            <Maximize2 className="w-4 h-4" />
-          </button>
+            {/* Scrubber Slider */}
+            <div className="flex items-center gap-2 md:gap-3 w-full text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
+              <span className="w-10 text-right">{formatDuration(currentTimeMs)}</span>
+              <input
+                type="range"
+                min={0}
+                max={durationMs || 1}
+                value={currentTimeMs}
+                onChange={(e) => handleSeek(Number(e.target.value))}
+                className="flex-1 h-1.5 bg-zinc-200 dark:bg-white/[0.12] rounded-lg appearance-none cursor-pointer accent-[#FA243C] hover:h-2 transition-all"
+              />
+              <span className="w-10">{formatDuration(durationMs)}</span>
+            </div>
+          </div>
+
+          {/* Right: Volume & Audio Features */}
+          <div className="flex items-center gap-1.5 sm:gap-2 w-1/4 justify-end min-w-[160px] md:min-w-[240px]">
+            {/* Synced Lyrics Toggle Button */}
+            <button
+              onClick={() => setRightPanelTab(rightPanelTab === 'lyrics' ? null : 'lyrics')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                rightPanelTab === 'lyrics'
+                  ? 'bg-gradient-to-r from-orange-500 to-[#FA243C] text-white shadow-md shadow-orange-500/30'
+                  : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white'
+              }`}
+              title="Synced Lyrics (L)"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-orange-400" />
+              <span className="hidden xl:inline">Lyrics</span>
+            </button>
+
+            {/* Up Next Queue Toggle Button */}
+            <button
+              onClick={() => setRightPanelTab(rightPanelTab === 'queue' ? null : 'queue')}
+              className={`relative p-2 rounded-xl transition-colors cursor-pointer ${
+                rightPanelTab === 'queue'
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-black font-bold'
+                  : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white'
+              }`}
+              title="Toggle Playing Queue (Q)"
+            >
+              <ListMusic className="w-4 h-4" />
+              {upcomingQueue.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#FA243C] text-[9px] text-white font-bold flex items-center justify-center">
+                  {upcomingQueue.length}
+                </span>
+              )}
+            </button>
+
+            {/* Equalizer & Sound FX */}
+            <button
+              onClick={() => setIsEqualizerOpen(true)}
+              className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white rounded-xl transition-colors hidden sm:block cursor-pointer"
+              title="Equalizer & Sound FX"
+            >
+              <Sliders className="w-4 h-4" />
+            </button>
+
+            {/* Volume Control */}
+            <div className="hidden lg:flex items-center gap-2 pl-1">
+              <button onClick={toggleMute} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer" title="Mute (M)">
+                {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={isMuted ? 0 : volume}
+                onChange={(e) => handleVolumeChange(Number(e.target.value))}
+                className="w-16 xl:w-20 h-1 bg-zinc-200 dark:bg-white/[0.15] rounded-lg appearance-none cursor-pointer accent-zinc-800 dark:accent-white"
+              />
+            </div>
+
+            {/* 1-Click Save Offline Button */}
+            <button
+              onClick={() => handleToggleSaveOffline(currentTrack)}
+              disabled={isDownloadingOfflineId === currentTrack.id}
+              className={`p-2 rounded-xl transition-colors hidden xl:block cursor-pointer ${
+                offlineTrackIds.has(currentTrack.id)
+                  ? 'text-emerald-500 bg-emerald-500/10'
+                  : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-emerald-500'
+              }`}
+              title={offlineTrackIds.has(currentTrack.id) ? 'Cached Offline' : 'Cache for Offline Playback'}
+            >
+              {isDownloadingOfflineId === currentTrack.id ? (
+                <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+              ) : (
+                <HardDriveDownload className="w-4 h-4" />
+              )}
+            </button>
+
+            {/* Fullscreen Player Expand */}
+            <button
+              onClick={() => setIsFullscreenPlayer(true)}
+              className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white rounded-xl transition-colors cursor-pointer"
+              title="Fullscreen Player (F)"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -2952,9 +3059,9 @@ export function RiiqxMusicView() {
         </div>
       )}
 
-      {/* Floating Mini Video Player (Picture-in-Picture) */}
+      {/* Floating Mini Video Player (Picture-in-Picture - Desktop only, never blocks mobile) */}
       {isVideoFloating && youtubeVideoId && (
-        <div className="fixed bottom-24 right-4 sm:right-6 z-40 w-72 sm:w-88 rounded-2xl overflow-hidden shadow-2xl border border-zinc-300 dark:border-white/20 bg-white/95 dark:bg-black/95 backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="hidden md:block fixed bottom-28 right-6 z-40 w-80 rounded-2xl overflow-hidden shadow-2xl border border-zinc-300 dark:border-white/20 bg-white/95 dark:bg-black/95 backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4 duration-300">
           <div className="flex items-center justify-between px-3 py-2 bg-zinc-100 dark:bg-zinc-900/90 border-b border-zinc-200 dark:border-white/10">
             <div className="flex items-center gap-2 min-w-0">
               <Video className="w-3.5 h-3.5 text-red-500 shrink-0" />
