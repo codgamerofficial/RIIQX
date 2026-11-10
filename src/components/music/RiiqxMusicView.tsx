@@ -59,6 +59,7 @@ import { WebAudioEngine, EQUALIZER_PRESETS } from '@/lib/music/audio-engine';
 import { fetchLyrics } from '@/lib/music/lyrics-service';
 import { useRiiqx } from '@/context/RiiqxContext';
 import { AudioVisualizer } from './AudioVisualizer';
+import { AIThinkingOrb } from '@/components/riiqx/ai/AIThinkingOrb';
 import {
   saveTrackOffline,
   isTrackSavedOffline,
@@ -1260,12 +1261,12 @@ export function RiiqxMusicView() {
             onClick={toggleVoiceAssistant}
             className={`p-2 rounded-full border transition-all shrink-0 flex items-center justify-center cursor-pointer ${
               isVoiceListening
-                ? 'bg-[#FA243C] text-white border-[#FA243C] shadow-lg shadow-[#FA243C]/40 animate-pulse scale-105 ring-4 ring-[#FA243C]/30'
+                ? 'bg-rose-500/20 text-[#FA243C] border-[#FA243C] shadow-lg shadow-[#FA243C]/40 ring-4 ring-[#FA243C]/20'
                 : 'bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border-zinc-200 dark:border-white/[0.08]'
             }`}
             title={isVoiceListening ? 'Listening to your voice... Speak song name or command' : 'AI Voice Search & Voice Copilot (Click to Speak)'}
           >
-            {isVoiceListening ? <Mic className="w-4 h-4 animate-bounce" /> : <Mic className="w-4 h-4" />}
+            {isVoiceListening ? <AIThinkingOrb state="listening" size={18} neuralActivity={false} /> : <Mic className="w-4 h-4" />}
           </button>
 
           {/* Sleep Timer Indicator Button */}
@@ -1512,8 +1513,8 @@ export function RiiqxMusicView() {
                   {/* AI DJ Hero Banner */}
                   <div className="relative rounded-3xl overflow-hidden border border-zinc-200 dark:border-white/[0.1] bg-gradient-to-r from-amber-50 via-rose-50 to-white dark:from-orange-950/40 dark:via-red-950/30 dark:to-zinc-900/80 p-6 md:p-8 shadow-md dark:shadow-2xl space-y-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-[#FA243C] flex items-center justify-center text-white shadow-xl shadow-orange-500/20">
-                        <Bot className="w-6 h-6" />
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500/20 to-[#FA243C]/20 border border-orange-500/30 flex items-center justify-center shadow-xl shadow-orange-500/20 shrink-0 overflow-hidden">
+                        <AIThinkingOrb state={isAiLoading ? 'generating' : 'idle'} size={38} />
                       </div>
                       <div>
                         <h2 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
@@ -1680,13 +1681,15 @@ export function RiiqxMusicView() {
                           disabled={isDjSpeaking || isDjLoading}
                           className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all cursor-pointer ${
                             isDjSpeaking
-                              ? 'bg-orange-500 text-white border-orange-400 shadow-lg shadow-orange-500/30 animate-pulse'
+                              ? 'bg-orange-500/20 text-orange-400 border-orange-500/50 shadow-lg shadow-orange-500/20'
                               : 'bg-white dark:bg-white/[0.1] hover:bg-zinc-100 dark:hover:bg-white/[0.15] border-zinc-200 dark:border-white/[0.1] text-zinc-800 dark:text-white shadow-sm'
                           }`}
                           title="AI DJ Radio Host Voice Intro"
                         >
                           {isDjLoading ? (
                             <Loader2 className="w-4 h-4 animate-spin text-orange-400" />
+                          ) : isDjSpeaking ? (
+                            <AIThinkingOrb state="generating" size={16} neuralActivity={false} />
                           ) : (
                             <Mic className="w-4 h-4 text-orange-400" />
                           )}
