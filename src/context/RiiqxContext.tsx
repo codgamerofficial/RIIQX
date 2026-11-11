@@ -9,6 +9,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import { RiiqxConversation, RiiqxMessage, RiiqxProject, RiiqxTaskPlan, RiiqxDocument, RiiqxSearchCitation } from '@/lib/riiqx/types';
 import { RIIQX_MODELS, RiiqxModel, ProviderHealth } from '@/lib/riiqx/models';
 import { RiiqxUser, getDefaultUser } from '@/lib/riiqx/user';
+import { Track } from '@/types/music';
 import { supabase } from '@/lib/supabase/client';
 import {
   loadConversationsFromStorage,
@@ -24,6 +25,7 @@ export type RiiqxViewTab =
   | 'music'
   | 'browse'
   | 'ai_dj'
+  | 'video_studio'
   | 'offline'
   | 'playlists'
   | 'favorites'
@@ -54,6 +56,11 @@ interface RiiqxContextType {
   // Navigation & View
   activeTab: RiiqxViewTab;
   setActiveTab: (tab: RiiqxViewTab) => void;
+
+  // AI Video Studio (Pro)
+  videoStudioTrack: Track | null;
+  setVideoStudioTrack: (track: Track | null) => void;
+  openVideoStudioForTrack: (track: Track) => void;
 
   // Visual Theme (Light/Dark)
   theme: 'light' | 'dark';
@@ -134,6 +141,11 @@ export function RiiqxProvider({ children }: { children: ReactNode }) {
   const [activeTab, setActiveTabState] = useState<RiiqxViewTab>('home');
   const setActiveTab = useCallback((tab: RiiqxViewTab) => {
     setActiveTabState(tab);
+  }, []);
+  const [videoStudioTrack, setVideoStudioTrack] = useState<Track | null>(null);
+  const openVideoStudioForTrack = useCallback((track: Track) => {
+    setVideoStudioTrack(track);
+    setActiveTabState('video_studio');
   }, []);
   const [theme, setThemeState] = useState<'light' | 'dark'>('dark');
   const [globalPrompt, setGlobalPrompt] = useState<string>('');
@@ -708,6 +720,9 @@ export function RiiqxProvider({ children }: { children: ReactNode }) {
       value={{
         activeTab,
         setActiveTab,
+        videoStudioTrack,
+        setVideoStudioTrack,
+        openVideoStudioForTrack,
         theme,
         toggleTheme,
         setTheme,

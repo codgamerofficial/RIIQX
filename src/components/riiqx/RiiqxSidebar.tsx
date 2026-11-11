@@ -20,15 +20,17 @@ import {
   Headphones,
   HardDriveDownload,
   Scale,
+  Video,
 } from 'lucide-react';
 
 export function RiiqxSidebar() {
   const { activeTab, setActiveTab, user } = useRiiqx();
 
-  const navItems: { tab: RiiqxViewTab; label: string; icon: React.ElementType }[] = [
+  const navItems: { tab: RiiqxViewTab; label: string; icon: React.ElementType; badge?: string }[] = [
     { tab: 'music', label: 'Listen Now', icon: Radio },
     { tab: 'browse' as any, label: 'All Tracks', icon: ListMusic },
     { tab: 'ai_dj' as any, label: 'AI Music DJ & Studio', icon: Sparkles },
+    { tab: 'video_studio', label: 'AI Video Studio (Pro)', icon: Video, badge: 'PRO' },
     { tab: 'offline' as any, label: 'Downloaded & Offline', icon: HardDriveDownload },
     { tab: 'playlists' as any, label: 'Playlists', icon: Disc3 },
     { tab: 'favorites' as any, label: 'Favorites', icon: Heart },
@@ -92,9 +94,16 @@ export function RiiqxSidebar() {
                   />
                   <span className="truncate">{item.label}</span>
                 </div>
-                {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_#ffffff] shrink-0" />
-                )}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {item.badge && !isActive && (
+                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-gradient-to-r from-red-500/20 to-orange-500/20 text-[#FA243C] dark:text-orange-400 border border-[#FA243C]/40 shadow-xs">
+                      {item.badge}
+                    </span>
+                  )}
+                  {isActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_#ffffff] shrink-0" />
+                  )}
+                </div>
               </button>
             );
           })}

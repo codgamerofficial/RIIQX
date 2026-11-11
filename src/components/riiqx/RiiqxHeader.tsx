@@ -23,6 +23,7 @@ import {
   User,
   HardDriveDownload,
   Scale,
+  Video,
 } from 'lucide-react';
 
 export function RiiqxHeader() {
@@ -45,6 +46,7 @@ export function RiiqxHeader() {
     { id: 'music', label: 'Listen Now', icon: Radio },
     { id: 'browse', label: 'All Tracks & Search', icon: ListMusic },
     { id: 'ai_dj', label: 'AI Music DJ & Studio', icon: Sparkles },
+    { id: 'video_studio', label: 'AI Video Studio (Pro)', icon: Video, badge: 'PRO' },
     { id: 'offline', label: 'Downloaded & Offline', icon: HardDriveDownload },
     { id: 'playlists', label: 'Playlists', icon: Disc3 },
     { id: 'favorites', label: 'Favorites', icon: Heart },
@@ -83,14 +85,27 @@ export function RiiqxHeader() {
         <span>RIIQX Audiophile Lossless Engine &bull; LRCLIB Synced &bull; AI DJ</span>
       </div>
 
-      {/* Right Controls: AI DJ quick launch, Theme, Profile */}
+      {/* Right Controls: AI Video Studio, AI DJ, Theme, Profile */}
       <div className="flex items-center gap-2 md:gap-3">
+        {/* Quick Launch AI Video Studio (Pro) */}
+        <button
+          onClick={() => setActiveTab('video_studio')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-purple-600 via-[#FA243C] to-orange-500 text-white shadow-md shadow-[#FA243C]/20 hover:scale-105 transition-all cursor-pointer"
+          title="Create Animated 9:16 / 16:9 Lyric Videos"
+        >
+          <Video className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">AI Video Studio</span>
+          <span className="text-[9px] font-black uppercase px-1 py-0.2 rounded bg-white/20 text-white border border-white/30">
+            PRO
+          </span>
+        </button>
+
         {/* Quick Launch AI DJ */}
         <button
           onClick={() => setActiveTab('ai_dj' as any)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-[#FA243C] to-orange-500 text-white shadow-md shadow-[#FA243C]/20 hover:scale-105 transition-all cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-white/[0.08] hover:bg-zinc-200 dark:hover:bg-white/[0.15] text-zinc-800 dark:text-white border border-zinc-200 dark:border-white/[0.1] shadow-xs hover:scale-105 transition-all cursor-pointer"
         >
-          <Sparkles className="w-3.5 h-3.5" />
+          <Sparkles className="w-3.5 h-3.5 text-orange-500" />
           <span className="hidden sm:inline">AI Music DJ</span>
         </button>
 
@@ -197,8 +212,15 @@ export function RiiqxHeader() {
                         : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.06] hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
+                    <div className="flex items-center gap-3">
+                      <Icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </div>
+                    {item.badge && !isActive && (
+                      <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-gradient-to-r from-red-500/20 to-orange-500/20 text-[#FA243C] border border-[#FA243C]/40">
+                        {item.badge}
+                      </span>
+                    )}
                   </button>
                 );
               })}

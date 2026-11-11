@@ -1,0 +1,3 @@
+*.mp4
+*.ass
+!test-render.mp4

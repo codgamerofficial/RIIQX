@@ -61,6 +61,7 @@ import { fetchLyrics } from '@/lib/music/lyrics-service';
 import { useRiiqx } from '@/context/RiiqxContext';
 import { AudioVisualizer } from './AudioVisualizer';
 import { AIThinkingOrb } from '@/components/riiqx/ai/AIThinkingOrb';
+import { AIVideoStudioView } from '@/components/video/AIVideoStudioView';
 import {
   saveTrackOffline,
   isTrackSavedOffline,
@@ -176,7 +177,12 @@ const AI_VIBE_PROMPTS = [
 ];
 
 export function RiiqxMusicView() {
-  const { activeTab: contextActiveTab, setActiveTab: setContextActiveTab } = useRiiqx();
+  const {
+    activeTab: contextActiveTab,
+    setActiveTab: setContextActiveTab,
+    openVideoStudioForTrack,
+    videoStudioTrack,
+  } = useRiiqx();
 
   const [tracks, setTracks] = useState<Track[]>(INITIAL_TRACKS);
   const [playlists, setPlaylists] = useState<Playlist[]>(() => {
@@ -204,6 +210,7 @@ export function RiiqxMusicView() {
   // Tab routing
   const activeTab = useMemo(() => {
     if (contextActiveTab === 'ai_dj') return 'ai_dj';
+    if (contextActiveTab === 'video_studio') return 'video_studio';
     if (contextActiveTab === 'browse') return 'browse';
     if (contextActiveTab === 'offline') return 'offline';
     if (contextActiveTab === 'playlists') return 'playlists';
@@ -1486,6 +1493,13 @@ export function RiiqxMusicView() {
 
                           <div className="flex items-center gap-1">
                             <button
+                              onClick={() => openVideoStudioForTrack(track)}
+                              title="Make Animated Lyric Video (Pro)"
+                              className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-400 hover:text-purple-500 transition-colors cursor-pointer"
+                            >
+                              <Video className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={() => handleAddToQueue(track)}
                               title="Add to Up Next Queue"
                               className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
@@ -1658,6 +1672,11 @@ export function RiiqxMusicView() {
                 </div>
               )}
 
+              {/* AI VIDEO STUDIO (PRO) TAB */}
+              {activeTab === 'video_studio' && (
+                <AIVideoStudioView currentPlayingTrack={currentTrack} />
+              )}
+
               {/* DEFAULT VIEW: LISTEN NOW */}
               {activeTab === 'listen_now' && (
                 <div className="space-y-6">
@@ -1745,6 +1764,17 @@ export function RiiqxMusicView() {
                         >
                           <ListMusic className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
                           <span>Queue ({upcomingQueue.length})</span>
+                        </button>
+                        <button
+                          onClick={() => openVideoStudioForTrack(currentTrack)}
+                          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-purple-600 via-[#FA243C] to-orange-500 hover:opacity-95 text-white font-bold text-sm shadow-md shadow-red-500/25 transition-all cursor-pointer hover:scale-105"
+                          title="Generate 9:16 / 16:9 Animated Lyric Video (Pro)"
+                        >
+                          <Video className="w-4 h-4 text-white" />
+                          <span>Make Lyric Video</span>
+                          <span className="text-[9px] font-black uppercase px-1 py-0.2 rounded bg-white/20 text-white border border-white/30">
+                            PRO
+                          </span>
                         </button>
                         <button
                           onClick={handleOpenYouTubeVideo}
@@ -1980,6 +2010,13 @@ export function RiiqxMusicView() {
                             </span>
 
                             <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => openVideoStudioForTrack(track)}
+                                title="Make Animated Lyric Video (Pro)"
+                                className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-400 hover:text-purple-500 transition-colors cursor-pointer"
+                              >
+                                <Video className="w-4 h-4" />
+                              </button>
                               <button
                                 onClick={() => handleAddToQueue(track)}
                                 title="Add to Up Next Queue"
@@ -2875,6 +2912,15 @@ export function RiiqxMusicView() {
 
           {/* Right: Volume & Audio Features */}
           <div className="flex items-center gap-1.5 sm:gap-2 w-1/4 justify-end min-w-[160px] md:min-w-[240px]">
+            {/* Quick Launch Lyric Video Studio */}
+            <button
+              onClick={() => openVideoStudioForTrack(currentTrack)}
+              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-purple-500 dark:hover:text-purple-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
+              title="Create 9:16 / 16:9 Lyric Video (Pro)"
+            >
+              <Video className="w-4 h-4" />
+            </button>
+
             {/* Synced Lyrics Toggle Button */}
             <button
               onClick={() => setRightPanelTab(rightPanelTab === 'lyrics' ? null : 'lyrics')}
