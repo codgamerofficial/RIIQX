@@ -48,6 +48,7 @@ import {
 import { Track } from '@/types/music';
 import { INITIAL_TRACKS, FALLBACK_VINYL_ARTWORK } from '@/lib/music/mock-tracks';
 import { fetchLyrics } from '@/lib/music/lyrics-service';
+import { RiiqxLogo } from '@/components/ui/RiiqxLogo';
 import { useRiiqx } from '@/context/RiiqxContext';
 
 interface WordToken {
@@ -737,9 +738,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
       <div className="relative overflow-hidden rounded-3xl border border-zinc-200 dark:border-white/[0.1] bg-gradient-to-r from-purple-950/40 via-red-950/30 to-zinc-900/80 p-6 md:p-8 shadow-2xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FA243C] via-purple-600 to-orange-500 flex items-center justify-center shadow-lg shadow-[#FA243C]/30 shrink-0">
-              <Video className="w-6 h-6 text-white" />
-            </div>
+            <RiiqxLogo size="md" variant="icon" animated={true} />
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white font-heading">

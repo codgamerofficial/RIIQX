@@ -60,6 +60,7 @@ import { WebAudioEngine, EQUALIZER_PRESETS } from '@/lib/music/audio-engine';
 import { fetchLyrics } from '@/lib/music/lyrics-service';
 import { useRiiqx } from '@/context/RiiqxContext';
 import { AudioVisualizer } from './AudioVisualizer';
+import { RiiqxLogo } from '@/components/ui/RiiqxLogo';
 import { AIThinkingOrb } from '@/components/riiqx/ai/AIThinkingOrb';
 import { AIVideoStudioView } from '@/components/video/AIVideoStudioView';
 import {
@@ -307,6 +308,9 @@ export function RiiqxMusicView() {
     bassBoostLevel: 30,
     playbackSpeed: 1.0,
   });
+
+  // 3D Spatial Audio Virtual Soundstage
+  const [spatialAudioMode, setSpatialAudioMode] = useState<'stereo' | 'stage3d' | 'binaural'>('stage3d');
 
   const audioEngineRef = useRef<WebAudioEngine | null>(null);
   const lyricsContainerRef = useRef<HTMLDivElement | null>(null);
@@ -1261,20 +1265,7 @@ export function RiiqxMusicView() {
       {/* Top Header Bar with Live Search Input */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 md:px-6 py-3 border-b border-zinc-200 dark:border-white/[0.08] bg-white/80 dark:bg-[#0a0a0c]/80 backdrop-blur-xl shrink-0 z-10 gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#FA243C] to-orange-500 flex items-center justify-center shadow-lg shadow-[#FA243C]/20 shrink-0">
-            <Music2 className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="font-bold text-lg tracking-tight text-zinc-900 dark:text-white font-heading">
-                RIIQX Music
-              </h1>
-              <span className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#FA243C]/20 text-[#FA243C] border border-[#FA243C]/30">
-                PRO 320K
-              </span>
-            </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Stream Millions of Full-Length 320kbps Master Tracks</p>
-          </div>
+          <RiiqxLogo size="sm" variant="full" animated={true} subtitle="STREAM 320K MASTER AUDIO" />
         </div>
 
         {/* Global Live Music Search Input & Quick Actions */}
@@ -2723,41 +2714,61 @@ export function RiiqxMusicView() {
         )}
       </div>
 
-      {/* Persistent Docked Mini-Player (Fully Responsive: Mobile Streamlined + Desktop Full Cockpit) */}
-      <div className="relative border-t border-zinc-200/90 dark:border-white/[0.08] bg-white/95 dark:bg-[#0c0c10]/95 backdrop-blur-3xl shrink-0 z-30 shadow-2xl text-zinc-900 dark:text-white transition-colors">
-        {/* Subtle Top Linear Progress Bar for Instant Progress Feedback */}
-        <div className="w-full h-1 bg-zinc-200/60 dark:bg-white/[0.08] relative overflow-hidden">
+      {/* Persistent End-to-End Audiophile Player Bar (100% Full Width Edge-to-Edge) */}
+      <div className="fixed bottom-0 inset-x-0 w-full z-40 border-t border-zinc-200/90 dark:border-white/[0.08] bg-white/95 dark:bg-[#07080e]/95 backdrop-blur-3xl shadow-[0_-12px_40px_rgba(0,0,0,0.6)] text-zinc-900 dark:text-white transition-all select-none">
+        {/* Ambient Subtle Sound Aura Glow */}
+        <div className="absolute left-1/4 -top-8 w-96 h-12 bg-gradient-to-r from-[#FA243C]/15 via-purple-600/10 to-transparent blur-2xl pointer-events-none" />
+
+        {/* Top Full-Width Hairline Scrubber for Instant Feedback */}
+        <div
+          className="w-full h-1 bg-zinc-200/60 dark:bg-white/[0.08] relative overflow-hidden cursor-pointer group hover:h-1.5 transition-all"
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            handleSeek(ratio * durationMs);
+          }}
+          title="Click anywhere to jump"
+        >
           <div
-            className="h-full bg-gradient-to-r from-orange-500 to-[#FA243C] transition-all duration-300"
+            className="h-full bg-gradient-to-r from-amber-500 via-[#FA243C] to-red-500 transition-all duration-150 relative"
             style={{ width: `${Math.min(100, (currentTimeMs / (durationMs || 1)) * 100)}%` }}
-          />
+          >
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#ffffff] opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
         </div>
 
-        {/* MOBILE COMPACT PLAYER (Visible on screens < sm, zero overlap) */}
-        <div className="sm:hidden flex items-center justify-between px-3.5 py-2.5 h-16 gap-3">
+        {/* MOBILE COMPACT PLAYER (Screens < sm) */}
+        <div className="sm:hidden flex items-center justify-between px-3.5 py-2 h-16 gap-3 w-full">
           <div
-            className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
+            className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer"
             onClick={() => setIsFullscreenPlayer(true)}
           >
-            <img
-              src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
-              alt={currentTrack.title}
-              onError={(e) => {
-                e.currentTarget.src = FALLBACK_ARTWORK;
-              }}
-              className="w-10 h-10 rounded-xl object-cover shadow-sm bg-zinc-800 shrink-0 ring-1 ring-white/10"
-            />
+            <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-sm bg-zinc-800 shrink-0 ring-1 ring-white/10">
+              <img
+                src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
+                alt={currentTrack.title}
+                onError={(e) => {
+                  e.currentTarget.src = FALLBACK_ARTWORK;
+                }}
+                className="w-full h-full object-cover"
+              />
+            </div>
             <div className="min-w-0 flex-1">
               <h4 className="text-xs font-bold text-zinc-900 dark:text-white truncate">
                 {currentTrack.title}
               </h4>
-              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
-                {currentTrack.artist} &bull; 320K
-              </p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">
+                  {currentTrack.artist}
+                </span>
+                <span className="text-[8px] font-mono font-bold text-emerald-500 px-1 rounded bg-emerald-500/10">
+                  320K
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={handlePrevTrack}
               className="p-1.5 text-zinc-400 hover:text-white cursor-pointer"
@@ -2767,7 +2778,7 @@ export function RiiqxMusicView() {
             </button>
             <button
               onClick={togglePlayPause}
-              className="w-9 h-9 rounded-full bg-[#FA243C] text-white flex items-center justify-center shadow-md shadow-[#FA243C]/40 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#FA243C] to-orange-500 text-white flex items-center justify-center shadow-lg shadow-[#FA243C]/40 hover:scale-105 active:scale-95 transition-all cursor-pointer"
               title="Play/Pause"
             >
               {isPlaying ? (
@@ -2800,12 +2811,12 @@ export function RiiqxMusicView() {
           </div>
         </div>
 
-        {/* DESKTOP FULL PLAYER (Visible on screens >= sm) */}
-        <div className="hidden sm:flex items-center justify-between px-4 md:px-8 py-3 h-22">
-          {/* Left: Track Info & Real-Time Spectrum Visualizer */}
-          <div className="flex items-center gap-3.5 w-1/4 min-w-[180px] md:min-w-[240px]">
+        {/* DESKTOP FULL-WIDTH END-TO-END COCKPIT (Screens >= sm) */}
+        <div className="hidden sm:flex items-center justify-between px-4 lg:px-8 py-2.5 h-22 w-full gap-4">
+          {/* Left: Track Details, Artwork & Spectrum Visualizer */}
+          <div className="flex items-center gap-3.5 w-1/4 min-w-[200px] lg:min-w-[280px]">
             <div
-              className="relative w-13 h-13 md:w-14 md:h-14 rounded-2xl overflow-hidden shadow-lg shrink-0 bg-zinc-800 ring-1 ring-black/5 dark:ring-white/10 group cursor-pointer"
+              className="relative w-13 h-13 lg:w-14 lg:h-14 rounded-2xl overflow-hidden shadow-lg shrink-0 bg-zinc-800 ring-1 ring-black/5 dark:ring-white/10 group cursor-pointer"
               onClick={() => setIsFullscreenPlayer(true)}
             >
               <img
@@ -2825,30 +2836,32 @@ export function RiiqxMusicView() {
               <h4
                 className="text-sm font-bold text-zinc-900 dark:text-white truncate cursor-pointer hover:text-[#FA243C] transition-colors"
                 onClick={() => setIsFullscreenPlayer(true)}
+                title={currentTrack.title}
               >
                 {currentTrack.title}
               </h4>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">{currentTrack.artist}</p>
               <div className="flex items-center gap-2 mt-1">
-                <span className="inline-block text-[9px] font-mono font-semibold px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <span className="inline-flex items-center gap-1 text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   {currentTrack.format || '320K Master'}
                 </span>
-                <AudioVisualizer engine={audioEngineRef.current} isPlaying={isPlaying} barCount={8} height={12} className="hidden sm:block" />
+                <AudioVisualizer engine={audioEngineRef.current} isPlaying={isPlaying} barCount={8} height={12} className="hidden lg:block" />
               </div>
             </div>
 
             <button
               onClick={() => toggleFavorite(currentTrack.id)}
-              className="p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-white/[0.08] text-zinc-400 hover:text-[#FA243C] transition-colors shrink-0 cursor-pointer hidden sm:block"
+              className="p-2 rounded-2xl hover:bg-zinc-100 dark:hover:bg-white/[0.08] text-zinc-400 hover:text-[#FA243C] transition-colors shrink-0 cursor-pointer hidden md:block"
               title={currentTrack.isFavorite ? 'Favorited' : 'Add to Favorites'}
             >
               <Heart className={`w-4 h-4 ${currentTrack.isFavorite ? 'fill-[#FA243C] text-[#FA243C]' : ''}`} />
             </button>
           </div>
 
-          {/* Center: Playback Controls & Scrubber */}
-          <div className="flex flex-col items-center gap-1.5 flex-1 max-w-xl px-2 md:px-6">
-            <div className="flex items-center gap-3 md:gap-5">
+          {/* Center: Playback Controls & Precision Scrubber */}
+          <div className="flex flex-col items-center gap-1.5 flex-1 max-w-xl px-2 lg:px-6">
+            <div className="flex items-center gap-3.5 lg:gap-5">
               <button
                 onClick={() => setIsShuffle(!isShuffle)}
                 className={`p-1.5 rounded-full transition-colors hidden sm:block cursor-pointer ${
@@ -2858,21 +2871,29 @@ export function RiiqxMusicView() {
               >
                 <Shuffle className="w-4 h-4" />
               </button>
-              <button onClick={handlePrevTrack} className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer" title="Previous (J)">
+              <button
+                onClick={handlePrevTrack}
+                className="p-2 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+                title="Previous Track (J)"
+              >
                 <SkipBack className="w-4 h-4 fill-current" />
               </button>
               <button
                 onClick={togglePlayPause}
-                className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#FA243C] to-red-500 hover:from-[#ff3b50] hover:to-red-400 text-white flex items-center justify-center shadow-lg shadow-[#FA243C]/35 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                title="Play/Pause (Space)"
+                className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#FA243C] via-red-500 to-orange-500 hover:scale-105 active:scale-95 text-white flex items-center justify-center shadow-xl shadow-[#FA243C]/40 hover:shadow-[#FA243C]/60 transition-all cursor-pointer shrink-0"
+                title="Play / Pause (Space)"
               >
                 {isPlaying ? (
-                  <Pause className="w-4 h-4 fill-current" />
+                  <Pause className="w-5 h-5 fill-current" />
                 ) : (
-                  <Play className="w-4 h-4 fill-current translate-x-0.5" />
+                  <Play className="w-5 h-5 fill-current translate-x-0.5" />
                 )}
               </button>
-              <button onClick={handleNextTrack} className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer" title="Next (K)">
+              <button
+                onClick={handleNextTrack}
+                className="p-2 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+                title="Next Track (K)"
+              >
                 <SkipForward className="w-4 h-4 fill-current" />
               </button>
               <button
@@ -2887,7 +2908,9 @@ export function RiiqxMusicView() {
               <button
                 onClick={() => setIsAutoplayOn(!isAutoplayOn)}
                 className={`p-1.5 rounded-full transition-colors hidden md:block cursor-pointer ${
-                  isAutoplayOn ? 'text-emerald-500 dark:text-emerald-400 bg-emerald-500/10' : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                  isAutoplayOn
+                    ? 'text-emerald-500 dark:text-emerald-400 bg-emerald-500/10'
+                    : 'text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
                 title={isAutoplayOn ? 'Infinite Autoplay Radio: ON' : 'Infinite Autoplay Radio: OFF'}
               >
@@ -2895,8 +2918,8 @@ export function RiiqxMusicView() {
               </button>
             </div>
 
-            {/* Scrubber Slider */}
-            <div className="flex items-center gap-2 md:gap-3 w-full text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
+            {/* Scrubber Slider with Hover Preview */}
+            <div className="flex items-center gap-2.5 lg:gap-3 w-full text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
               <span className="w-10 text-right">{formatDuration(currentTimeMs)}</span>
               <input
                 type="range"
@@ -2910,15 +2933,41 @@ export function RiiqxMusicView() {
             </div>
           </div>
 
-          {/* Right: Volume & Audio Features */}
-          <div className="flex items-center gap-1.5 sm:gap-2 w-1/4 justify-end min-w-[160px] md:min-w-[240px]">
-            {/* Quick Launch Lyric Video Studio */}
+          {/* Right: Audiophile Controls, 3D Spatial Audio, Lyrics, Queue, Volume */}
+          <div className="flex items-center gap-1.5 lg:gap-2 w-1/4 justify-end min-w-[220px] lg:min-w-[320px]">
+            {/* Quick Launch Lyric Video Studio (Pro) */}
             <button
               onClick={() => openVideoStudioForTrack(currentTrack)}
-              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-purple-500 dark:hover:text-purple-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
+              className="p-2 rounded-2xl text-zinc-500 dark:text-zinc-400 hover:text-purple-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
               title="Create 9:16 / 16:9 Lyric Video (Pro)"
             >
               <Video className="w-4 h-4" />
+            </button>
+
+            {/* 3D Spatial Audio Stage Toggle (NEW Unique Audiophile Feature) */}
+            <button
+              onClick={() => {
+                const nextMode =
+                  spatialAudioMode === 'stereo'
+                    ? 'stage3d'
+                    : spatialAudioMode === 'stage3d'
+                    ? 'binaural'
+                    : 'stereo';
+                setSpatialAudioMode(nextMode);
+              }}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase transition-all cursor-pointer ${
+                spatialAudioMode === 'stage3d'
+                  ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 shadow-xs'
+                  : spatialAudioMode === 'binaural'
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/40 shadow-xs'
+                  : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08]'
+              }`}
+              title={`Spatial Audio Mode: ${spatialAudioMode.toUpperCase()} (Click to toggle)`}
+            >
+              <Headphones className="w-3.5 h-3.5" />
+              <span className="hidden xl:inline">
+                {spatialAudioMode === 'stage3d' ? '3D Stage' : spatialAudioMode === 'binaural' ? 'Binaural' : 'Stereo'}
+              </span>
             </button>
 
             {/* Synced Lyrics Toggle Button */}
@@ -2938,7 +2987,7 @@ export function RiiqxMusicView() {
             {/* Up Next Queue Toggle Button */}
             <button
               onClick={() => setRightPanelTab(rightPanelTab === 'queue' ? null : 'queue')}
-              className={`relative p-2 rounded-xl transition-colors cursor-pointer ${
+              className={`relative p-2 rounded-2xl transition-colors cursor-pointer ${
                 rightPanelTab === 'queue'
                   ? 'bg-zinc-900 text-white dark:bg-white dark:text-black font-bold'
                   : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white'
@@ -2956,7 +3005,7 @@ export function RiiqxMusicView() {
             {/* Equalizer & Sound FX */}
             <button
               onClick={() => setIsEqualizerOpen(true)}
-              className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white rounded-xl transition-colors hidden sm:block cursor-pointer"
+              className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white rounded-2xl transition-colors hidden sm:block cursor-pointer"
               title="Equalizer & Sound FX"
             >
               <Sliders className="w-4 h-4" />
@@ -2982,7 +3031,7 @@ export function RiiqxMusicView() {
             <button
               onClick={() => handleToggleSaveOffline(currentTrack)}
               disabled={isDownloadingOfflineId === currentTrack.id}
-              className={`p-2 rounded-xl transition-colors hidden xl:block cursor-pointer ${
+              className={`p-2 rounded-2xl transition-colors hidden xl:block cursor-pointer ${
                 offlineTrackIds.has(currentTrack.id)
                   ? 'text-emerald-500 bg-emerald-500/10'
                   : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-emerald-500'
@@ -2999,7 +3048,7 @@ export function RiiqxMusicView() {
             {/* Car Mode */}
             <button
               onClick={() => setIsCarModeOpen(true)}
-              className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-amber-500 dark:hover:text-amber-400 rounded-xl transition-colors cursor-pointer"
+              className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-amber-500 dark:hover:text-amber-400 rounded-2xl transition-colors cursor-pointer"
               title="Car Mode (Driving Interface)"
             >
               <Car className="w-4 h-4" />
@@ -3008,7 +3057,7 @@ export function RiiqxMusicView() {
             {/* Fullscreen Player Expand */}
             <button
               onClick={() => setIsFullscreenPlayer(true)}
-              className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white rounded-xl transition-colors cursor-pointer"
+              className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white rounded-2xl transition-colors cursor-pointer"
               title="Fullscreen Player (F)"
             >
               <Maximize2 className="w-4 h-4" />
@@ -3437,13 +3486,11 @@ export function RiiqxMusicView() {
           {/* Top HUD Bar */}
           <div className="relative z-10 h-14 shrink-0 flex items-center justify-between border-b border-white/[0.08] pb-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
-                <Car className="w-5 h-5 animate-pulse" />
-              </div>
+              <RiiqxLogo size="sm" variant="icon" animated={true} />
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-base sm:text-lg font-black tracking-tight text-white font-heading">
-                    CAR & DRIVER MODE
+                    RIIQX CAR COCKPIT
                   </h2>
                   <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                     SAFE TOUCH
@@ -3471,26 +3518,26 @@ export function RiiqxMusicView() {
           </div>
 
           {/* Center Stage: Hero Track & Giant Tactile Transport */}
-          <div className="relative z-10 flex-1 flex flex-col justify-center items-center py-2 sm:py-6 w-full max-w-5xl mx-auto overflow-y-auto no-scrollbar">
-            <div className="flex flex-col lg:flex-row items-center justify-center gap-6 sm:gap-8 lg:gap-14 w-full my-auto">
+          <div className="relative z-10 flex-1 flex flex-col justify-center items-center py-4 w-full max-w-4xl mx-auto min-h-0 overflow-y-auto no-scrollbar">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6 sm:gap-8 md:gap-12 w-full">
               {/* Artwork & Spectrum Visualizer */}
               <div className="flex flex-col items-center shrink-0">
                 <div className="relative group">
-                  <div className="w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 rounded-3xl overflow-hidden shadow-2xl shadow-rose-950/60 border-2 border-white/[0.15] ring-4 sm:ring-8 ring-white/[0.04]">
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-3xl overflow-hidden shadow-2xl shadow-rose-950/60 border-2 border-white/[0.15] ring-4 ring-white/[0.04]">
                     <img
                       src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
                       alt={currentTrack.title}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-amber-500 text-black font-black text-[10px] sm:text-xs shadow-lg uppercase tracking-wider">
-                    320K MASTER
+                  <div className="absolute -bottom-2 -right-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-[#FA243C] text-white font-black text-[10px] shadow-lg uppercase tracking-wider">
+                    320K LOSSLESS
                   </div>
                 </div>
 
-                {/* Subdued Real-Time Spectrum Visualizer below art */}
-                <div className="mt-4 flex items-center justify-center">
-                  <AudioVisualizer engine={audioEngineRef.current} isPlaying={isPlaying} barCount={18} height={16} />
+                {/* Real-Time Spectrum Visualizer */}
+                <div className="mt-3 flex items-center justify-center">
+                  <AudioVisualizer engine={audioEngineRef.current} isPlaying={isPlaying} barCount={16} height={16} />
                 </div>
               </div>
 
