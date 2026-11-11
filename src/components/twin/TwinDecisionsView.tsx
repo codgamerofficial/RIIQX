@@ -1110,8 +1110,8 @@ export function TwinDecisionsView() {
           <div className="rounded-3xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-zinc-900/60 backdrop-blur-xl p-6 sm:p-8 shadow-xl dark:shadow-2xl space-y-6 relative overflow-hidden transition-colors">
             <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
-              <div className="flex items-start gap-5">
+            <div className="flex flex-col gap-6 relative z-10">
+              <div className="flex flex-col sm:flex-row items-start gap-5">
                 <div className="h-24 w-24 shrink-0">
                   <VerifiedProductImage
                     src={result.bestPick.imageUrl}
@@ -1122,7 +1122,7 @@ export function TwinDecisionsView() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wide">
                       Verdict: {result.verdict.replace(/_/g, ' ')}
@@ -1148,7 +1148,7 @@ export function TwinDecisionsView() {
                     {result.subtext}
                   </p>
 
-                  <div className="pt-1 flex flex-wrap items-center gap-2.5">
+                  <div className="pt-2 flex flex-wrap items-center gap-2.5">
                     <button
                       onClick={() =>
                         handleFetchHyperlocal(
@@ -1184,7 +1184,7 @@ export function TwinDecisionsView() {
               </div>
 
               {/* 3-Tier Lowest Final Price Truth Highlights (Section 6 Requirements) */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full pt-4 border-t border-zinc-200 dark:border-white/[0.08]">
                 {/* Card 1: Cheapest Market Price */}
                 <div
                   onClick={() => setActiveRankingTab('standard')}
@@ -1288,13 +1288,13 @@ export function TwinDecisionsView() {
 
           {/* B. 3-Way Price Ranking Dimension Selector */}
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200 dark:border-white/[0.08] pb-4">
-            <div className="flex items-center gap-2 bg-zinc-950/80 p-1.5 rounded-2xl border border-white/[0.08] shadow-inner">
+            <div className="flex items-center gap-2 bg-zinc-100 dark:bg-zinc-950/80 p-1.5 rounded-2xl border border-zinc-200 dark:border-white/[0.08] shadow-inner">
               <button
                 onClick={() => setActiveRankingTab('eligible')}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                   activeRankingTab === 'eligible'
                     ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/20'
-                    : 'text-zinc-400 hover:text-white'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 <CheckCircle2 className="h-3.5 w-3.5" />
@@ -1305,8 +1305,8 @@ export function TwinDecisionsView() {
                 onClick={() => setActiveRankingTab('standard')}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                   activeRankingTab === 'standard'
-                    ? 'bg-zinc-800 text-white shadow-md border border-white/[0.1]'
-                    : 'text-zinc-400 hover:text-white'
+                    ? 'bg-zinc-900 text-white dark:bg-zinc-800 dark:text-white shadow-md border border-zinc-300 dark:border-white/[0.1]'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 <DollarSign className="h-3.5 w-3.5" />
@@ -1318,7 +1318,7 @@ export function TwinDecisionsView() {
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                   activeRankingTab === 'conditional'
                     ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-500/25'
-                    : 'text-zinc-400 hover:text-white'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
                 <Tag className="h-3.5 w-3.5" />
@@ -1326,8 +1326,8 @@ export function TwinDecisionsView() {
               </button>
             </div>
 
-            <div className="text-xs text-zinc-400 font-mono">
-              Showing <span className="text-white font-bold">{activeOffers.length}</span> Verified Stores (Ascending Order)
+            <div className="text-xs text-zinc-600 dark:text-zinc-400 font-mono">
+              Showing <span className="text-zinc-900 dark:text-white font-bold">{activeOffers.length}</span> Verified Stores (Ascending Order)
             </div>
           </div>
 
@@ -1519,7 +1519,7 @@ export function TwinDecisionsView() {
                     </div>
 
                     {/* BUY FROM STORE Primary CTA */}
-                    <div className="pt-3 border-t border-white/[0.08] space-y-2">
+                    <div className="pt-3 border-t border-zinc-200 dark:border-white/[0.08] space-y-2">
                       {offer.directLinkVerified ? (
                         <a
                           href={offer.purchaseUrl || offer.productUrl}
@@ -1533,7 +1533,7 @@ export function TwinDecisionsView() {
                         </a>
                       ) : (
                         <div className="space-y-1.5">
-                          <span className="block text-[10px] text-amber-400 font-bold text-center flex items-center justify-center gap-1">
+                          <span className="block text-[10px] text-amber-600 dark:text-amber-400 font-bold text-center flex items-center justify-center gap-1">
                             <AlertTriangle className="h-3 w-3" />
                             <span>Direct purchase link not verified.</span>
                           </span>
@@ -1542,7 +1542,7 @@ export function TwinDecisionsView() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={() => handleBuyFromStoreClick(offer)}
-                            className="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-2xl bg-zinc-800/80 hover:bg-zinc-700 border border-white/[0.08] hover:border-white/[0.16] text-[11px] font-bold text-zinc-300 hover:text-white text-center transition-all"
+                            className="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-white/[0.08] text-[11px] font-bold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white text-center transition-all"
                           >
                             <span>Search Store Catalog</span>
                             <ExternalLink className="h-3 w-3" />
@@ -1553,13 +1553,13 @@ export function TwinDecisionsView() {
                       <button
                         type="button"
                         onClick={() => handleOpenSniper(offer)}
-                        className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-zinc-950/70 hover:bg-zinc-800 border border-white/[0.08] hover:border-orange-500/40 text-[11px] font-bold text-zinc-300 hover:text-orange-400 transition-all cursor-pointer"
+                        className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950/70 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-white/[0.08] hover:border-orange-500/40 text-[11px] font-bold text-zinc-700 dark:text-zinc-300 hover:text-orange-500 dark:hover:text-orange-400 transition-all cursor-pointer"
                       >
-                        <Bell className="h-3 w-3 text-orange-400" />
+                        <Bell className="h-3 w-3 text-orange-500 dark:text-orange-400" />
                         <span>Track Price Drop</span>
                       </button>
 
-                      <div className="text-[10px] text-zinc-400 text-center truncate font-mono">
+                      <div className="text-[10px] text-zinc-500 dark:text-zinc-400 text-center truncate font-mono">
                         {offer.verificationMethod}
                       </div>
                     </div>
@@ -1571,42 +1571,42 @@ export function TwinDecisionsView() {
 
           {/* D. Discount Explorer (Bank Offers, Coupons, Gift Cards, Cashback) */}
           {result.report?.availablePromotionalOffers && result.report.availablePromotionalOffers.length > 0 && (
-            <div className="rounded-3xl border border-white/[0.08] bg-zinc-900/60 backdrop-blur-xl p-6 sm:p-8 space-y-6 shadow-2xl">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
+            <div className="rounded-3xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-zinc-900/60 backdrop-blur-xl p-6 sm:p-8 space-y-6 shadow-xl dark:shadow-2xl transition-colors">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-zinc-200 dark:border-white/[0.08] pb-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <Tag className="h-4 w-4 text-orange-400" />
-                    <span className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                    <Tag className="h-4 w-4 text-orange-500 dark:text-orange-400" />
+                    <span className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                       Promotion &amp; Discount Explorer
                     </span>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-black text-white font-heading mt-1">
+                  <h3 className="text-lg sm:text-xl font-black text-zinc-900 dark:text-white font-heading mt-1">
                     Verified Merchant &amp; Bank Offers
                   </h3>
                 </div>
 
                 {/* Sub-Tabs: Bank Offers, Coupons, Cashback */}
-                <div className="flex items-center gap-1.5 bg-zinc-950/80 p-1 rounded-2xl border border-white/[0.08]">
+                <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-950/80 p-1 rounded-2xl border border-zinc-200 dark:border-white/[0.08]">
                   <button
                     onClick={() => setActiveDiscountTab('bank')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      activeDiscountTab === 'bank' ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs' : 'text-zinc-400 hover:text-white'
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeDiscountTab === 'bank' ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
                     Bank Offers
                   </button>
                   <button
                     onClick={() => setActiveDiscountTab('coupon')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      activeDiscountTab === 'coupon' ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs' : 'text-zinc-400 hover:text-white'
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeDiscountTab === 'coupon' ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
                     Store Coupons
                   </button>
                   <button
                     onClick={() => setActiveDiscountTab('cashback')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      activeDiscountTab === 'cashback' ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs' : 'text-zinc-400 hover:text-white'
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeDiscountTab === 'cashback' ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
                     Cashback
@@ -1628,24 +1628,24 @@ export function TwinDecisionsView() {
                     return (
                       <div
                         key={promo.id}
-                        className="p-5 rounded-2xl bg-zinc-950/70 border border-white/[0.08] flex flex-col justify-between space-y-3 hover:border-white/[0.18] transition-all"
+                        className="p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-950/70 border border-zinc-200 dark:border-white/[0.08] flex flex-col justify-between space-y-3 hover:border-zinc-300 dark:hover:border-white/[0.18] transition-all"
                       >
                         <div className="space-y-2">
-                          <div className="flex items-center justify-between text-[10px] font-black uppercase text-orange-400">
+                          <div className="flex items-center justify-between text-[10px] font-black uppercase text-orange-500 dark:text-orange-400">
                             <span>{promo.retailerName}</span>
                             <span className={`px-2 py-0.5 rounded-full border ${badge.color}`}>{badge.label}</span>
                           </div>
 
-                          <h4 className="text-xs font-bold text-white leading-snug">
+                          <h4 className="text-xs font-bold text-zinc-900 dark:text-white leading-snug">
                             {promo.offerName}
                           </h4>
 
-                          <p className="text-[11px] text-zinc-400 leading-relaxed">
+                          <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
                             {promo.eligibilityDescription}
                           </p>
                         </div>
 
-                        <div className="pt-2 border-t border-white/[0.06] text-[10px] text-zinc-500 font-mono flex items-center justify-between">
+                        <div className="pt-2 border-t border-zinc-200 dark:border-white/[0.06] text-[10px] text-zinc-500 dark:text-zinc-400 font-mono flex items-center justify-between">
                           <span>Min Spend: ₹{promo.minTransaction.toLocaleString('en-IN')}</span>
                           {promo.maxDiscountCap && <span>Max Cap: ₹{promo.maxDiscountCap.toLocaleString('en-IN')}</span>}
                         </div>
@@ -1660,45 +1660,45 @@ export function TwinDecisionsView() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="rounded-3xl border border-amber-500/20 bg-amber-500/5 p-6 sm:p-7 space-y-4 shadow-xl">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-amber-400" />
-                <h3 className="text-base font-bold text-white font-heading">
+                <AlertTriangle className="h-4 w-4 text-amber-500 dark:text-amber-400" />
+                <h3 className="text-base font-bold text-zinc-900 dark:text-white font-heading">
                   What Marketplaces Hide
                 </h3>
               </div>
 
-              <ul className="space-y-2.5 text-xs text-zinc-300">
+              <ul className="space-y-2.5 text-xs text-zinc-700 dark:text-zinc-300">
                 {result.whatPlatformsHide.map((h, i) => (
                   <li key={i} className="flex items-start gap-2.5">
-                    <span className="text-amber-400 font-black text-sm shrink-0">&times;</span>
+                    <span className="text-amber-500 dark:text-amber-400 font-black text-sm shrink-0">&times;</span>
                     <span className="leading-relaxed">{h}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="rounded-3xl border border-white/[0.08] bg-zinc-900/60 backdrop-blur-xl p-6 sm:p-7 space-y-4 shadow-xl">
+            <div className="rounded-3xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-zinc-900/60 backdrop-blur-xl p-6 sm:p-7 space-y-4 shadow-xl">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                <h3 className="text-base font-bold text-white font-heading">
+                <ShieldCheck className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
+                <h3 className="text-base font-bold text-zinc-900 dark:text-white font-heading">
                   Price Truth &amp; Verification Methodology
                 </h3>
               </div>
 
-              <ul className="space-y-2.5 text-xs text-zinc-400">
+              <ul className="space-y-2.5 text-xs text-zinc-600 dark:text-zinc-400">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400 shrink-0" />
                   <span>Exact Product Matching separates variants, refurbished, and bundles.</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400 shrink-0" />
                   <span>Direct buying links audited against canonical merchant product detail pages (PDP).</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400 shrink-0" />
                   <span>Cashback is never disguised as an immediate cash price reduction.</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400 shrink-0" />
                   <span>Stored gift cards reduce out-of-pocket cash, not market price.</span>
                 </li>
               </ul>
@@ -1862,19 +1862,19 @@ export function TwinDecisionsView() {
             ) : (
               <div className="space-y-5 text-xs">
                 {/* Product & Store Summary */}
-                <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/[0.08] space-y-2">
+                <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950/70 border border-zinc-200 dark:border-white/[0.08] space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <RetailerLogoBadge name={sniperItem.retailerName} />
-                    <span className="text-[10px] text-zinc-400 font-mono">
-                      Current Price: <strong className="text-white font-mono text-xs">₹{sniperItem.currentPrice.toLocaleString('en-IN')}</strong>
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
+                      Current Price: <strong className="text-zinc-900 dark:text-white font-mono text-xs">₹{sniperItem.currentPrice.toLocaleString('en-IN')}</strong>
                     </span>
                   </div>
-                  <h4 className="text-xs font-bold text-white line-clamp-2">
+                  <h4 className="text-xs font-bold text-zinc-900 dark:text-white line-clamp-2">
                     {sniperItem.productTitle}
                   </h4>
                   {sniperItem.sellerName && (
-                    <div className="text-[10px] text-zinc-400">
-                      Seller: <span className="text-zinc-200">{sniperItem.sellerName}</span>
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                      Seller: <span className="text-zinc-800 dark:text-zinc-200">{sniperItem.sellerName}</span>
                     </div>
                   )}
                 </div>
@@ -1882,8 +1882,8 @@ export function TwinDecisionsView() {
                 {/* Target Price Configuration */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-white">Target Trigger Price (₹):</span>
-                    <span className="text-[11px] text-emerald-400 font-mono font-bold">
+                    <span className="font-bold text-zinc-900 dark:text-white">Target Trigger Price (₹):</span>
+                    <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono font-bold">
                       {sniperItem.targetPrice > 0 && sniperItem.currentPrice > sniperItem.targetPrice ? (
                         <>Save ₹{(sniperItem.currentPrice - sniperItem.targetPrice).toLocaleString('en-IN')} ({Math.round(((sniperItem.currentPrice - sniperItem.targetPrice) / sniperItem.currentPrice) * 100)}% drop)</>
                       ) : null}
@@ -1891,7 +1891,7 @@ export function TwinDecisionsView() {
                   </div>
 
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-bold">₹</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-400 font-bold">₹</span>
                     <input
                       type="number"
                       value={sniperItem.targetPrice || ''}
@@ -1899,7 +1899,7 @@ export function TwinDecisionsView() {
                         const val = Number(e.target.value);
                         setSniperItem((prev) => (prev ? { ...prev, targetPrice: val } : null));
                       }}
-                      className="w-full pl-9 pr-4 py-3 rounded-2xl bg-zinc-950/80 border border-white/[0.1] text-white font-mono font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                      className="w-full pl-9 pr-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-200 dark:border-white/[0.1] text-zinc-900 dark:text-white font-mono font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                     />
                   </div>
 
@@ -1917,7 +1917,7 @@ export function TwinDecisionsView() {
                           className={`px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold transition-all ${
                             isSelected
                               ? 'bg-orange-500 text-white shadow-xs'
-                              : 'bg-zinc-950/70 text-zinc-300 hover:text-white border border-white/[0.08]'
+                              : 'bg-zinc-100 dark:bg-zinc-950/70 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/[0.08]'
                           }`}
                         >
                           -{pct}% (₹{computed.toLocaleString('en-IN')})
@@ -1928,9 +1928,9 @@ export function TwinDecisionsView() {
                 </div>
 
                 {/* Privacy & Methodology Guarantee */}
-                <div className="p-3.5 rounded-2xl bg-zinc-950/70 border border-white/[0.06] text-[11px] text-zinc-400 space-y-1">
-                  <span className="font-bold text-white flex items-center gap-1.5">
-                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-950/70 border border-zinc-200 dark:border-white/[0.06] text-[11px] text-zinc-600 dark:text-zinc-400 space-y-1">
+                  <span className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400" />
                     Supabase-Backed Persistence &amp; RLS:
                   </span>
                   <p>
@@ -1939,14 +1939,14 @@ export function TwinDecisionsView() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/[0.08]">
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-200 dark:border-white/[0.08]">
                   <button
                     type="button"
                     onClick={() => {
                       setIsSniperModalOpen(false);
                       setSniperSuccessMsg(null);
                     }}
-                    className="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-400 hover:text-white transition-colors"
+                    className="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                   >
                     Cancel
                   </button>

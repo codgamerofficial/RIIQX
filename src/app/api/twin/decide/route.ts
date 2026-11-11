@@ -80,13 +80,7 @@ export interface TwinDecisionResponse {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = await resolveAuthUserId(req);
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Authentication required.' },
-        { status: 401 }
-      );
-    }
+    const userId = (await resolveAuthUserId(req)) || 'guest_shopper';
     const body: TwinDecisionRequest = await req.json();
 
     const prompt = (body.prompt || body.query || '').trim();
