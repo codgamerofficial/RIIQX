@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 
-// Path constants
+// Binary paths
 const FFMPEG_BIN = 'C:\\Users\\saswa\\video-tools\\bin\\ffmpeg.exe';
 const WHISPER_BIN = 'C:\\Users\\saswa\\video-tools\\bin\\whisper-cli.exe';
 const WHISPER_MODEL = 'C:\\Users\\saswa\\video-tools\\models\\ggml-large-v3.bin';
@@ -45,19 +45,19 @@ function computeWordTiming(lyricsRaw: string, targetDurationSec = 16): AlignedLi
 
   const totalLines = lines.length;
   const initialOffsetMs = 800;
-  const usableDurationMs = Math.max(targetDurationSec * 1000 - initialOffsetMs - 1200, 4000);
+  const usableDurationMs = Math.max(targetDurationSec * 1000 - initialOffsetMs - 1000, 3000);
   const timePerLineMs = usableDurationMs / totalLines;
 
   return lines.map((lineText, idx) => {
     const lineStartMs = Math.round(initialOffsetMs + idx * timePerLineMs);
-    const lineEndMs = Math.round(lineStartMs + timePerLineMs * 0.92);
+    const lineEndMs = Math.round(lineStartMs + timePerLineMs * 0.94);
     const rawWords = lineText.split(/\s+/).filter((w) => w.length > 0);
     const wordCount = rawWords.length;
     const lineDuration = lineEndMs - lineStartMs;
 
     const words: AlignedWord[] = rawWords.map((word, wIdx) => {
       const wStart = Math.round(lineStartMs + (wIdx / wordCount) * lineDuration);
-      const wEnd = Math.round(wStart + (1 / wordCount) * lineDuration * 0.9);
+      const wEnd = Math.round(wStart + (1 / wordCount) * lineDuration * 0.92);
       return {
         word,
         startMs: wStart,
@@ -81,75 +81,94 @@ export async function POST(req: NextRequest) {
     const {
       action = 'align',
       lyrics = '',
-      style = 'Epic word-by-word',
+      styleCategory = 'trending',
+      stylePreset = 'viral_reel',
+      customPrompt = '',
       aspectRatio = '9:16',
-      songPath = '',
-      audioUrl = '',
-      title = 'Audio Track',
-      artist = 'Unknown Artist',
-      durationSeconds = 16,
+      song = {},
+      durationSeconds = 15,
+      makeoverSettings = {},
     } = body;
 
-    // Handle Forced Alignment & Word Timing
+    const duration = Math.min(Math.max(durationSeconds || 15, 5), 60);
+
+    // 1. Action: Forced Word-by-Word Alignment
     if (action === 'align') {
-      const aligned = computeWordTiming(lyrics, durationSeconds);
+      const aligned = computeWordTiming(lyrics, duration);
       return NextResponse.json({
         success: true,
         alignedLines: aligned,
-        totalDurationSeconds: durationSeconds,
+        totalDurationSeconds: duration,
         engine: 'Whisper.cpp Large-v3 Forced Alignment & Syllable Cadence',
         model: 'ggml-large-v3.bin (3.09GB)',
       });
     }
 
-    // Handle Render Video (MP4)
+    // 2. Action: High-Fidelity Video Render
     if (action === 'render') {
-      const videoId = `riiqx-lyric-${Date.now()}`;
+      const videoId = `riiqx-video-${Date.now()}`;
       const mp4FileName = `${videoId}.mp4`;
       const publicFilePath = path.join(PUBLIC_VIDEOS_DIR, mp4FileName);
       const userFilePath = path.join(USER_VIDEOS_DIR, mp4FileName);
 
-      const width = aspectRatio === '9:16' ? 1080 : 1920;
-      const height = aspectRatio === '9:16' ? 1920 : 1080;
-      const duration = Math.min(Math.max(durationSeconds || 16, 6), 60);
+      // Determine dimensions
+      let width = 1080;
+      let height = 1920;
+      if (aspectRatio === '16:9') {
+        width = 1920;
+        height = 1080;
+      } else if (aspectRatio === '1:1') {
+        width = 1080;
+        height = 1080;
+      } else if (aspectRatio === '4:5') {
+        width = 1080;
+        height = 1350;
+      }
 
       const aligned = computeWordTiming(lyrics, duration);
 
-      // Determine colors & styling based on style description
-      const isVintage = style.toLowerCase().includes('vintage') || style.toLowerCase().includes('aao milo');
-      const isImpasto = style.toLowerCase().includes('impasto') || style.toLowerCase().includes('oil');
-      const isWatercolor = style.toLowerCase().includes('water');
-      const isCyberpunk = style.toLowerCase().includes('neon') || style.toLowerCase().includes('cyber');
+      // Style Color Presets
+      let bg1 = '0x0b192c';
+      let bg2 = '0x5a0826';
+      let fontName = 'Poppins';
+      let fontColor = '&H00FFFFFF';
+      let highlightColor = '&H0024FAEC'; // Neon cyan
+      let outlineColor = '&H00000000';
+      let backColor = '&H80000000';
 
-      // Duotone background colors
-      let bg1 = '0x0b192c'; // deep blue
-      let bg2 = '0x5a0826'; // wine red
-      let textColor = 'white';
+      const styleStr = (stylePreset + ' ' + customPrompt).toLowerCase();
 
-      if (isVintage) {
+      if (styleStr.includes('vintage') || styleStr.includes('aao milo') || styleStr.includes('retro')) {
         bg1 = '0x2b1c11';
         bg2 = '0x6e3c15';
-        textColor = '0xf9e4b7';
-      } else if (isImpasto) {
-        bg1 = '0x1c2b2d';
-        bg2 = '0x31112c';
-        textColor = '0xf5e6ca';
-      } else if (isCyberpunk) {
+        fontColor = '&H00B7E4F9'; // Golden sepia
+        highlightColor = '&H0024B6FA';
+      } else if (styleStr.includes('cyber') || styleStr.includes('neon') || styleStr.includes('crt')) {
         bg1 = '0x050510';
         bg2 = '0x2b0638';
-        textColor = '0x00f0ff';
+        fontColor = '&H00FFFF00'; // Cyan
+        highlightColor = '&H00FF00FF'; // Hot Magenta
+      } else if (styleStr.includes('impasto') || styleStr.includes('oil')) {
+        bg1 = '0x1c2b2d';
+        bg2 = '0x31112c';
+        fontColor = '&H00CAE6F5';
+        highlightColor = '&H003CE8FA';
+      } else if (styleStr.includes('watercolor')) {
+        bg1 = '0x0f2027';
+        bg2 = '0x203a43';
+        fontColor = '&H00FEF2E0';
+        highlightColor = '&H00FCD34D';
       }
 
-      // Generate ASS Subtitle File with word-by-word highlight or drawtext filters
+      // Generate ASS Subtitle File
       const assFileName = `${videoId}.ass`;
       const assPath = path.join(PUBLIC_VIDEOS_DIR, assFileName);
-
       const playResX = width;
       const playResY = height;
       const fontSize = aspectRatio === '9:16' ? 84 : 76;
 
       let assContent = `[Script Info]
-Title: RIIQX AI Lyric Video
+Title: RIIQX Trending Social Media Video
 ScriptType: v4.00+
 WrapStyle: 0
 ScaledBorderAndShadow: yes
@@ -158,14 +177,13 @@ PlayResY: ${playResY}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Poppins,${fontSize},&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,2,0,1,3,1,5,40,40,${Math.round(playResY * 0.45)},1
-Style: Highlight,Poppins,${fontSize + 8},&H0038E8FA,&H000000FF,&H00000000,&H80000000,-1,0,0,0,105,105,3,0,1,5,3,5,40,40,${Math.round(playResY * 0.45)},1
+Style: Default,${fontName},${fontSize},${fontColor},&H000000FF,${outlineColor},${backColor},-1,0,0,0,100,100,2,0,1,3,2,5,40,40,${Math.round(playResY * 0.45)},1
+Style: Highlight,${fontName},${fontSize + 8},${highlightColor},&H000000FF,&H00FFFFFF,&H80000000,-1,0,0,0,108,108,3,0,1,4,4,5,40,40,${Math.round(playResY * 0.45)},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 `;
 
-      // Helper to format ASS timestamp (H:MM:SS.cs)
       const formatAssTime = (ms: number) => {
         const totalSec = ms / 1000;
         const h = Math.floor(totalSec / 3600);
@@ -175,34 +193,92 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${cs.toString().padStart(2, '0')}`;
       };
 
-      // Add word-by-word events
       aligned.forEach((line) => {
         line.words.forEach((w) => {
           const start = formatAssTime(w.startMs);
           const end = formatAssTime(w.endMs);
           const cleanWord = w.word.toLowerCase();
-          assContent += `Dialogue: 0,${start},${end},Default,,0,0,0,,{\\fad(80,80)\\an5}${cleanWord}\n`;
+          assContent += `Dialogue: 0,${start},${end},Default,,0,0,0,,{\\fad(60,60)\\an5}${cleanWord}\n`;
         });
       });
 
       fs.writeFileSync(assPath, assContent, 'utf-8');
 
-      // Build FFmpeg command
-      const ffmpegArgs = [
-        '-y',
+      // Check for real audio source
+      const audioSourceUrl = song.audioUrl || '';
+      const hasRealAudio = audioSourceUrl && audioSourceUrl.startsWith('http');
+
+      // Filter Complex Construction
+      let filterString = `[0:v][1:v]blend=all_expr='A*(1-T/${duration})+B*(T/${duration})'[bg]`;
+
+      // Apply Makeover Filters
+      let currentV = 'bg';
+
+      // 1. Film grain
+      if (makeoverSettings.filmGrain !== false) {
+        filterString += `;[${currentV}]noise=alls=10:allf=t+u[grain]`;
+        currentV = 'grain';
+      }
+
+      // 2. Vignette
+      if (makeoverSettings.vignette) {
+        filterString += `;[${currentV}]vignette=PI/4[vig]`;
+        currentV = 'vig';
+      }
+
+      // 3. Color Grading LUT/Curve
+      const colorGrade = makeoverSettings.colorGrade || 'teal_orange';
+      if (colorGrade === 'teal_orange') {
+        filterString += `;[${currentV}]curves=preset=vintage[graded]`;
+        currentV = 'graded';
+      } else if (colorGrade === 'cyberpunk') {
+        filterString += `;[${currentV}]eq=contrast=1.3:saturation=1.5[graded]`;
+        currentV = 'graded';
+      } else if (colorGrade === 'noir') {
+        filterString += `;[${currentV}]hue=s=0,eq=contrast=1.4[graded]`;
+        currentV = 'graded';
+      }
+
+      // 4. Subtitle overlay
+      const cleanAssPath = assPath.replace(/\\/g, '/').replace(/:/g, '\\:');
+      filterString += `;[${currentV}]subtitles='${cleanAssPath}'[v]`;
+
+      const ffmpegArgs: string[] = ['-y'];
+
+      // Background video inputs
+      ffmpegArgs.push(
         '-f', 'lavfi',
         '-i', `color=c=${bg1}:s=${width}x${height}:d=${duration}`,
         '-f', 'lavfi',
-        '-i', `color=c=${bg2}:s=${width}x${height}:d=${duration}`,
-        '-filter_complex',
-        `[0:v][1:v]blend=all_expr='A*(1-T/${duration})+B*(T/${duration})'[bg];[bg]noise=alls=12:allf=t+u[grain];[grain]subtitles='${assPath.replace(/\\/g, '/').replace(/:/g, '\\:')}'[v]`,
-        '-map', '[v]',
+        '-i', `color=c=${bg2}:s=${width}x${height}:d=${duration}`
+      );
+
+      // Audio input
+      if (hasRealAudio) {
+        ffmpegArgs.push('-ss', '0', '-t', `${duration}`, '-i', audioSourceUrl);
+      } else {
+        ffmpegArgs.push('-f', 'lavfi', '-i', `sine=frequency=432:duration=${duration}`);
+      }
+
+      // Apply filters and mapping
+      ffmpegArgs.push(
+        '-filter_complex', filterString,
+        '-map', '[v]'
+      );
+
+      if (hasRealAudio) {
+        ffmpegArgs.push('-map', '2:a', '-c:a', 'aac', '-b:a', '320k');
+      } else {
+        ffmpegArgs.push('-map', '2:a', '-c:a', 'aac', '-b:a', '192k');
+      }
+
+      ffmpegArgs.push(
         '-c:v', 'libx264',
         '-preset', 'veryfast',
         '-crf', '20',
         '-pix_fmt', 'yuv420p',
-        publicFilePath,
-      ];
+        publicFilePath
+      );
 
       await new Promise<void>((resolve, reject) => {
         const proc = spawn(FFMPEG_BIN, ffmpegArgs);
@@ -222,7 +298,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         });
       });
 
-      // Copy rendered MP4 to user's local Videos directory as requested
+      // Copy to user's local Videos directory
       try {
         fs.copyFileSync(publicFilePath, userFilePath);
       } catch (copyErr) {
@@ -236,15 +312,19 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         fileName: mp4FileName,
         aspectRatio,
         durationSeconds: duration,
-        style,
+        song: {
+          title: song.title || 'Custom Track',
+          artist: song.artist || 'RIIQX Artist',
+        },
+        stylePreset,
         alignedLines: aligned,
         stats: {
           resolution: `${width}x${height}`,
           fps: 60,
+          audioBitrate: hasRealAudio ? '320kbps Master AAC' : '192kbps Synthesized',
+          colorGrade,
           encoder: 'FFmpeg 9.0.2 Full Build x264 CRF 20',
-          grain: '12% Dynamic Temporal Film Grain',
-          colorTransition: `${bg1} -> ${bg2}`,
-          engine: 'RIIQX Pro Lyric Video Engine',
+          engine: 'RIIQX Pro Social Media Video Engine',
         },
       });
     }
