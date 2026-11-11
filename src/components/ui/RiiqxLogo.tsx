@@ -1,5 +1,11 @@
 'use client';
 
+// =============================================================================
+// RIIQX — Primary Brand Mark & Identity (Classy • Clean • Minimalist • Luxury)
+// Inspired by Apple Music & Spotify • Precision Acoustic Ribbon • Pure Vector
+// Smooth Breathing Audio Wave Animation • Zero Neon / Zero Cyberpunk
+// =============================================================================
+
 import React from 'react';
 
 export interface RiiqxLogoProps {
@@ -15,156 +21,119 @@ export function RiiqxLogo({
   variant = 'full',
   animated = true,
   className = '',
-  subtitle = 'PRO AUDIO &bull; 320K',
+  subtitle = 'Music & Audio Intelligence',
 }: RiiqxLogoProps) {
   const sizeMap = {
-    xs: { box: 22, iconSize: 22, text: 'text-sm', subText: 'text-[7px]', badgeText: 'text-[6px]' },
-    sm: { box: 30, iconSize: 30, text: 'text-base', subText: 'text-[9px]', badgeText: 'text-[7px]' },
-    md: { box: 38, iconSize: 38, text: 'text-xl', subText: 'text-[10px]', badgeText: 'text-[8px]' },
-    lg: { box: 48, iconSize: 48, text: 'text-2xl', subText: 'text-xs', badgeText: 'text-[9px]' },
-    xl: { box: 64, iconSize: 64, text: 'text-3xl', subText: 'text-sm', badgeText: 'text-[10px]' },
-    hero: { box: 88, iconSize: 88, text: 'text-5xl', subText: 'text-base', badgeText: 'text-xs' },
+    xs: { box: 22, text: 'text-xs', sub: 'text-[7px]', gap: 'gap-2' },
+    sm: { box: 28, text: 'text-sm', sub: 'text-[9px]', gap: 'gap-2.5' },
+    md: { box: 36, text: 'text-base font-bold', sub: 'text-[10px]', gap: 'gap-3' },
+    lg: { box: 44, text: 'text-xl font-extrabold', sub: 'text-xs', gap: 'gap-3.5' },
+    xl: { box: 56, text: 'text-2xl font-black', sub: 'text-xs', gap: 'gap-4' },
+    hero: { box: 80, text: 'text-4xl font-black', sub: 'text-sm', gap: 'gap-5' },
   };
 
   const currentSize = sizeMap[size];
 
   return (
-    <div className={`inline-flex items-center gap-3 select-none ${className}`}>
-      {/* Iconic Quantum Sonic Prism Mark */}
+    <div className={`inline-flex items-center ${currentSize.gap} select-none cursor-pointer group ${className}`}>
+      {/* Luxury Minimalist Acoustic Mark */}
       <div
-        className="relative shrink-0 flex items-center justify-center transition-transform duration-300 hover:scale-105"
+        className="relative shrink-0 flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
         style={{ width: currentSize.box, height: currentSize.box }}
       >
-        {/* Ambient Neon Back-Glow */}
-        <div
-          className={`absolute -inset-1 rounded-2xl bg-gradient-to-tr from-[#FA243C] via-[#9333EA] to-[#06B6D4] opacity-50 blur-md pointer-events-none ${
-            animated ? 'animate-pulse' : ''
-          }`}
-          style={{ animationDuration: '3s' }}
-        />
-
-        {/* SVG Icon Masterpiece */}
         <svg
           viewBox="0 0 100 100"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="relative w-full h-full drop-shadow-xl"
+          className="w-full h-full drop-shadow-sm"
         >
           <defs>
-            {/* Holographic Primary Gradient */}
-            <linearGradient id="riiqx-grad-primary" x1="0%" y1="0%" x2="100%" y2="100%">
+            {/* Apple Music Signature Deep Crimson to Ruby Red Gradient */}
+            <linearGradient id="riiqx-classy-red" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#FA243C" />
-              <stop offset="45%" stopColor="#FF4655" />
-              <stop offset="75%" stopColor="#8B5CF6" />
-              <stop offset="100%" stopColor="#06B6D4" />
+              <stop offset="100%" stopColor="#C8102E" />
             </linearGradient>
 
-            {/* Inner Sonic Core Glow */}
-            <radialGradient id="riiqx-core-glow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.9" />
-              <stop offset="40%" stopColor="#FA243C" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#1E112A" stopOpacity="0" />
-            </radialGradient>
-
-            {/* Facet Reflection Accent */}
-            <linearGradient id="riiqx-facet-shine" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.0" />
+            {/* Subtle Brushed Titanium Sheen */}
+            <linearGradient id="riiqx-brushed-dark" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#222228" />
+              <stop offset="100%" stopColor="#121216" />
             </linearGradient>
 
-            {/* Outer Squircle Border Gradient */}
-            <linearGradient id="riiqx-border-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.4" />
-              <stop offset="50%" stopColor="#FA243C" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#06B6D4" stopOpacity="0.6" />
+            {/* Precision 1px Border Highlight */}
+            <linearGradient id="riiqx-border-classy" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.05" />
             </linearGradient>
           </defs>
 
-          {/* Squircle Chassis with Dark Obsidian Glass */}
+          {/* Squircle Chassis: Premium Matte Obsidian */}
           <rect
-            x="4"
-            y="4"
-            width="92"
-            height="92"
-            rx="26"
-            fill="#090A10"
-            stroke="url(#riiqx-border-grad)"
-            strokeWidth="2.5"
+            x="3"
+            y="3"
+            width="94"
+            height="94"
+            rx="24"
+            fill="url(#riiqx-brushed-dark)"
+            stroke="url(#riiqx-border-classy)"
+            strokeWidth="1.5"
           />
 
-          {/* Inner Geometric Sound Chamber Wave */}
-          <circle cx="50" cy="50" r="32" stroke="url(#riiqx-grad-primary)" strokeWidth="1.2" strokeOpacity="0.3" strokeDasharray="3 3" />
-
-          {/* Central R-Q-X Convergent Sound Vortex */}
-          {/* Stem of R and left acoustic blade */}
+          {/* Fluid Modern "R" Acoustic Monogram */}
+          {/* Main Stem */}
           <path
-            d="M26 24C26 20.6863 28.6863 18 32 18H46C56 18 64 24 64 33C64 40 58.5 45.5 50.5 47C59.5 52 68 66 74 82H58C53 70 46 56 40 50H36V82H26V24Z"
-            fill="url(#riiqx-grad-primary)"
+            d="M30 25C30 22.2386 32.2386 20 35 20H52C63.0457 20 72 28.9543 72 40C72 48.6183 66.5744 55.9702 59 58.7466L72.2 78.4C73.4 80.2 72.1 82.5 69.9 82.5H60.5C59.3 82.5 58.2 81.9 57.5 80.9L46.5 62H39V79C39 80.6569 37.6569 82 36 82H33C31.3431 82 30 80.6569 30 79V25Z"
+            fill="url(#riiqx-classy-red)"
           />
 
-          {/* Upper Loop Inner Chamber Cutout */}
-          <path
-            d="M36 28V42H45C49.5 42 53 39 53 35C53 31 49.5 28 45 28H36Z"
-            fill="#090A10"
+          {/* Counter Hole (Precision Circle) */}
+          <rect
+            x="39"
+            y="29"
+            width="14"
+            height="18"
+            rx="7"
+            fill="#121216"
           />
 
-          {/* Futuristic Sonic Crossbar & Frequency Beam (Crossing into X and resonant Q ring) */}
-          <path
-            d="M48 42L72 20C73.5 18.5 76 19.5 76 21.5V31L56 50L48 42Z"
-            fill="#06B6D4"
-            fillOpacity="0.85"
-          />
-
-          {/* Dynamic Frequency Equalizer Pulsar Bars (Upper Right) */}
-          <rect x="74" y="38" width="3.5" height="18" rx="1.75" fill="#FA243C">
+          {/* Classy Kinetic Equalizer Soundwave Bars (Subtle & Fluid) */}
+          <rect x="74" y="32" width="3" height="14" rx="1.5" fill="#FA243C" opacity="0.85">
             {animated && (
-              <animate attributeName="height" values="18;8;24;14;18" dur="1.4s" repeatCount="indefinite" />
+              <animate attributeName="height" values="14;6;18;10;14" dur="2s" repeatCount="indefinite" />
             )}
           </rect>
-          <rect x="80" y="32" width="3.5" height="26" rx="1.75" fill="#06B6D4">
+          <rect x="80" y="26" width="3" height="26" rx="1.5" fill="#FA243C">
             {animated && (
-              <animate attributeName="height" values="26;14;30;10;26" dur="1.1s" repeatCount="indefinite" />
+              <animate attributeName="height" values="26;12;28;16;26" dur="1.7s" repeatCount="indefinite" />
             )}
           </rect>
-          <rect x="86" y="44" width="3.5" height="12" rx="1.75" fill="#F43F5E">
+          <rect x="86" y="38" width="3" height="10" rx="1.5" fill="#FA243C" opacity="0.7">
             {animated && (
-              <animate attributeName="height" values="12;20;6;16;12" dur="1.7s" repeatCount="indefinite" />
+              <animate attributeName="height" values="10;18;8;14;10" dur="2.3s" repeatCount="indefinite" />
             )}
           </rect>
-
-          {/* Central Glowing Sonic Sparkle (Energy Nexus) */}
-          <circle cx="50" cy="50" r="14" fill="url(#riiqx-core-glow)" />
-          <circle cx="50" cy="50" r="3.5" fill="#FFFFFF" />
-
-          {/* Diagonal Glass Sheen Highlight */}
-          <path
-            d="M10 26C10 17.1634 17.1634 10 26 10H74C82.8366 10 90 17.1634 90 26V32L10 68V26Z"
-            fill="url(#riiqx-facet-shine)"
-          />
         </svg>
       </div>
 
-      {/* Typography & Subtitle (Full Variant) */}
+      {/* Classy Typography Header */}
       {variant !== 'icon' && (
-        <div className="flex flex-col min-w-0">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col min-w-0 justify-center leading-tight">
+          <div className="flex items-center gap-1.5">
             <span
-              className={`font-black tracking-tight leading-none text-zinc-900 dark:text-white font-heading ${currentSize.text}`}
+              className={`font-black tracking-tight text-white font-heading ${currentSize.text}`}
+              style={{ letterSpacing: '-0.02em' }}
             >
               RIIQX
             </span>
-            <span
-              className={`font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-gradient-to-r from-[#FA243C] to-orange-500 text-white shadow-xs shadow-[#FA243C]/40 ${currentSize.badgeText}`}
-            >
-              PRO
+            <span className="text-[9px] font-bold text-white/50 tracking-widest uppercase">
+              MUSIC
             </span>
           </div>
 
           {variant === 'full' && (
-            <span
-              className={`font-semibold tracking-wider text-zinc-500 dark:text-zinc-400 mt-1 uppercase ${currentSize.subText}`}
-              dangerouslySetInnerHTML={{ __html: subtitle }}
-            />
+            <span className={`font-medium tracking-wide text-zinc-400 -mt-0.5 ${currentSize.sub}`}>
+              {subtitle}
+            </span>
           )}
         </div>
       )}

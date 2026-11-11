@@ -20,7 +20,11 @@ export const metadata: Metadata = {
   authors: [{ name: 'RIIQX Engineering Core' }],
   creator: 'RIIQX Platform Team',
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/brand/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' },
+    ],
+    apple: [{ url: '/brand/icon.svg' }],
   },
   appleWebApp: {
     capable: true,
@@ -36,8 +40,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#FFD43B',
-  colorScheme: 'light dark',
+  themeColor: '#07070A',
+  colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,

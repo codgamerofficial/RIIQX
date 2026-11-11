@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181D" />
+      <stop offset="100%" stop-color="#0A0A0D" />
+    </linearGradient>
+    <linearGradient id="brandRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FA243C" />
+      <stop offset="100%" stop-color="#C8102E" />
+    </linearGradient>
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.04" />
+    </linearGradient>
+  </defs>
+
+  <!-- Premium Matte Chassis -->
+  <rect x="16" y="16" width="480" height="480" rx="120" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="8" />
+
+  <!-- Fluid Classy "R" Acoustic Monogram -->
+  <path
+    d="M150 120C150 106 161 95 175 95H270C330 95 380 145 380 205C380 252 350 292 308 307L378 408C384 417 377 429 366 429H315C309 429 303 426 299 420L236 325H195V415C195 423 188 429 180 429H165C157 429 150 423 150 415V120Z"
+    fill="url(#brandRed)"
+  />
+
+  <!-- Counter Hole -->
+  <rect x="195" y="145" width="75" height="96" rx="36" fill="#0A0A0D" />
+
+  <!-- Acoustic Dynamic Equalizer Soundwaves -->
+  <rect x="390" y="170" width="16" height="70" rx="8" fill="#FA243C" opacity="0.85" />
+  <rect x="420" y="135" width="16" height="140" rx="8" fill="#FA243C" />
+  <rect x="450" y="200" width="16" height="50" rx="8" fill="#FA243C" opacity="0.65" />
+</svg>

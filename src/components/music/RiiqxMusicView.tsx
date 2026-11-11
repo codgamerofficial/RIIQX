@@ -1262,10 +1262,52 @@ export function RiiqxMusicView() {
         />
       )}
 
-      {/* Top Header Bar with Live Search Input */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 md:px-6 py-3 border-b border-zinc-200 dark:border-white/[0.08] bg-white/80 dark:bg-[#0a0a0c]/80 backdrop-blur-xl shrink-0 z-10 gap-3">
-        <div className="flex items-center gap-3">
-          <RiiqxLogo size="sm" variant="full" animated={true} subtitle="STREAM 320K MASTER AUDIO" />
+      {/* Top Navigation Filter Pills & Unified Search */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 md:px-6 py-2.5 border-b border-zinc-200/80 dark:border-white/[0.06] bg-white/70 dark:bg-[#07070a]/80 backdrop-blur-xl shrink-0 z-10 gap-3">
+        {/* Apple Music & Spotify Style Clean Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+          <button
+            onClick={() => setContextActiveTab('music')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === 'listen_now'
+                ? 'bg-white text-black font-bold shadow-xs'
+                : 'bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] hover:text-white'
+            }`}
+          >
+            All Music
+          </button>
+          <button
+            onClick={() => setContextActiveTab('browse')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === 'browse'
+                ? 'bg-white text-black font-bold shadow-xs'
+                : 'bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] hover:text-white'
+            }`}
+          >
+            Browse
+          </button>
+          <button
+            onClick={() => setContextActiveTab('ai_dj')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'ai_dj'
+                ? 'bg-white text-black font-bold shadow-xs'
+                : 'bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] hover:text-white'
+            }`}
+          >
+            <Sparkles className="w-3 h-3 text-[#FA243C]" />
+            <span>AI DJ</span>
+          </button>
+          <button
+            onClick={() => setContextActiveTab('video_studio')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'video_studio'
+                ? 'bg-white text-black font-bold shadow-xs'
+                : 'bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] hover:text-white'
+            }`}
+          >
+            <Video className="w-3 h-3 text-[#FA243C]" />
+            <span>Lyric Studio</span>
+          </button>
         </div>
 
         {/* Global Live Music Search Input & Quick Actions */}
@@ -1552,20 +1594,20 @@ export function RiiqxMusicView() {
               {/* AI MUSIC DJ & STUDIO TAB */}
               {activeTab === 'ai_dj' && (
                 <div className="space-y-6">
-                  {/* AI DJ Hero Banner */}
-                  <div className="relative rounded-3xl overflow-hidden border border-zinc-200 dark:border-white/[0.1] bg-gradient-to-r from-amber-50 via-rose-50 to-white dark:from-orange-950/40 dark:via-red-950/30 dark:to-zinc-900/80 p-6 md:p-8 shadow-md dark:shadow-2xl space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500/20 to-[#FA243C]/20 border border-orange-500/30 flex items-center justify-center shadow-xl shadow-orange-500/20 shrink-0 overflow-hidden">
+                  {/* AI DJ Hero Banner (Apple Music + Spotify Minimalist Aesthetic) */}
+                  <div className="relative rounded-3xl overflow-hidden border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] backdrop-blur-2xl p-6 md:p-8 shadow-sm space-y-4">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-white/[0.06] border border-zinc-200 dark:border-white/[0.1] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
                         <AIThinkingOrb state={isAiLoading ? 'generating' : 'idle'} size={38} />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                           <span>RIIQX AI Music DJ</span>
-                          <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-500/30">
+                          <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/15">
                             LLM CURATED
                           </span>
                         </h2>
-                        <p className="text-xs text-zinc-600 dark:text-zinc-300">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
                           Powered by high-speed neural models to generate instant mood playlists and acoustic deep dives.
                         </p>
                       </div>
@@ -1579,12 +1621,12 @@ export function RiiqxMusicView() {
                         onChange={(e) => setAiPrompt(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleGenerateAiPlaylist()}
                         placeholder="Tell the AI DJ what vibe or mood you want (e.g. 'Punjabi party like High Rated Gabru', 'sad acoustic hindi', 'coding lofi')..."
-                        className="flex-1 bg-white dark:bg-white/[0.06] border border-zinc-300 dark:border-white/[0.12] rounded-2xl py-3 px-4 text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-orange-500 transition-all shadow-sm"
+                        className="flex-1 bg-zinc-50 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.1] rounded-2xl py-3 px-4 text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-[#FA243C] transition-all shadow-inner"
                       />
                       <button
                         onClick={() => handleGenerateAiPlaylist()}
                         disabled={isAiLoading || !aiPrompt.trim()}
-                        className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-[#FA243C] hover:opacity-95 text-white font-bold text-xs shadow-lg shadow-orange-500/30 transition-all disabled:opacity-50 cursor-pointer"
+                        className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#FA243C] hover:bg-[#ff3b50] text-white font-semibold text-xs shadow-md shadow-[#FA243C]/20 transition-all disabled:opacity-50 cursor-pointer"
                       >
                         {isAiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                         <span>Spin Mix</span>
@@ -1600,7 +1642,7 @@ export function RiiqxMusicView() {
                             setAiPrompt(promptText);
                             handleGenerateAiPlaylist(promptText);
                           }}
-                          className="px-3 py-1.5 rounded-xl bg-white dark:bg-white/[0.05] hover:bg-zinc-100 dark:hover:bg-white/[0.1] border border-zinc-200 dark:border-white/[0.08] text-xs text-zinc-700 dark:text-zinc-300 transition-colors shadow-sm cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-full bg-zinc-100 dark:bg-white/[0.04] hover:bg-zinc-200 dark:hover:bg-white/[0.08] border border-zinc-200 dark:border-white/[0.08] text-xs text-zinc-700 dark:text-zinc-300 transition-colors shadow-xs cursor-pointer"
                         >
                           {promptText}
                         </button>
@@ -1614,7 +1656,7 @@ export function RiiqxMusicView() {
                       <div className="flex items-center justify-between">
                         <div>
                           <h3 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-orange-400" />
+                            <Sparkles className="w-4 h-4 text-[#FA243C]" />
                             <span>AI Curated Mix</span>
                           </h3>
                           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{aiGeneratedPlaylist.commentary}</p>
@@ -1715,64 +1757,60 @@ export function RiiqxMusicView() {
                         {currentTrack.artist} &bull; <span className="text-zinc-500 dark:text-zinc-400">{currentTrack.album}</span>
                       </p>
 
-                      <div className="flex items-center gap-3 justify-center md:justify-start pt-2 flex-wrap">
+                      <div className="flex items-center gap-2.5 justify-center md:justify-start pt-2 flex-wrap">
                         <button
                           onClick={togglePlayPause}
-                          className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white font-bold text-sm shadow-xl shadow-[#FA243C]/30 transition-all hover:scale-105 cursor-pointer"
+                          className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white font-bold text-sm shadow-md shadow-[#FA243C]/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
                         >
                           {isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
                           <span>{isPlaying ? 'Pause' : 'Play Now'}</span>
                         </button>
                         <button
-                          onClick={triggerAiDjHostIntro}
-                          disabled={isDjSpeaking || isDjLoading}
-                          className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-semibold transition-all cursor-pointer ${
-                            isDjSpeaking
-                              ? 'bg-orange-500/20 text-orange-400 border-orange-500/50 shadow-lg shadow-orange-500/20'
-                              : 'bg-white dark:bg-white/[0.1] hover:bg-zinc-100 dark:hover:bg-white/[0.15] border-zinc-200 dark:border-white/[0.1] text-zinc-800 dark:text-white shadow-sm'
-                          }`}
-                          title="AI DJ Radio Host Voice Intro"
-                        >
-                          {isDjLoading ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-orange-400" />
-                          ) : isDjSpeaking ? (
-                            <AIThinkingOrb state="generating" size={16} neuralActivity={false} />
-                          ) : (
-                            <Mic className="w-4 h-4 text-orange-400" />
-                          )}
-                          <span>{isDjSpeaking ? 'DJ Speaking...' : 'DJ Host Intro'}</span>
-                        </button>
-                        <button
                           onClick={() => setRightPanelTab(rightPanelTab === 'lyrics' ? null : 'lyrics')}
-                          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-white/[0.1] hover:bg-zinc-100 dark:hover:bg-white/[0.15] border border-zinc-200 dark:border-white/[0.1] text-zinc-800 dark:text-white font-semibold text-sm transition-all shadow-sm cursor-pointer"
+                          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] text-white font-semibold text-xs transition-all cursor-pointer"
                         >
-                          <Sparkles className="w-4 h-4 text-orange-400" />
+                          <Sparkles className="w-3.5 h-3.5 text-[#FA243C]" />
                           <span>Lyrics</span>
                         </button>
                         <button
                           onClick={() => setRightPanelTab(rightPanelTab === 'queue' ? null : 'queue')}
-                          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-white/[0.1] hover:bg-zinc-100 dark:hover:bg-white/[0.15] border border-zinc-200 dark:border-white/[0.1] text-zinc-800 dark:text-white font-semibold text-sm transition-all shadow-sm cursor-pointer"
+                          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] text-white font-semibold text-xs transition-all cursor-pointer"
                         >
-                          <ListMusic className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+                          <ListMusic className="w-3.5 h-3.5 text-zinc-300" />
                           <span>Queue ({upcomingQueue.length})</span>
                         </button>
                         <button
                           onClick={() => openVideoStudioForTrack(currentTrack)}
-                          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-purple-600 via-[#FA243C] to-orange-500 hover:opacity-95 text-white font-bold text-sm shadow-md shadow-red-500/25 transition-all cursor-pointer hover:scale-105"
+                          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] text-white font-semibold text-xs transition-all cursor-pointer"
                           title="Generate 9:16 / 16:9 Animated Lyric Video (Pro)"
                         >
-                          <Video className="w-4 h-4 text-white" />
-                          <span>Make Lyric Video</span>
-                          <span className="text-[9px] font-black uppercase px-1 py-0.2 rounded bg-white/20 text-white border border-white/30">
+                          <Video className="w-3.5 h-3.5 text-[#FA243C]" />
+                          <span>Lyric Studio</span>
+                          <span className="text-[8px] font-black uppercase px-1 py-0.2 rounded bg-white/20 text-white">
                             PRO
                           </span>
                         </button>
                         <button
-                          onClick={handleOpenYouTubeVideo}
-                          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white dark:bg-white/[0.1] hover:bg-zinc-100 dark:hover:bg-white/[0.15] border border-zinc-200 dark:border-white/[0.1] text-zinc-800 dark:text-white font-semibold text-sm transition-all shadow-sm cursor-pointer"
+                          onClick={triggerAiDjHostIntro}
+                          disabled={isDjSpeaking || isDjLoading}
+                          className="flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] text-zinc-300 hover:text-white text-xs font-medium transition-all cursor-pointer"
+                          title="AI DJ Radio Host Voice Intro"
                         >
-                          <Video className="w-4 h-4 text-red-500" />
-                          <span>Official Video</span>
+                          {isDjLoading ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-[#FA243C]" />
+                          ) : isDjSpeaking ? (
+                            <AIThinkingOrb state="generating" size={14} neuralActivity={false} />
+                          ) : (
+                            <Mic className="w-3.5 h-3.5 text-zinc-400" />
+                          )}
+                          <span>{isDjSpeaking ? 'Speaking...' : 'DJ Intro'}</span>
+                        </button>
+                        <button
+                          onClick={handleOpenYouTubeVideo}
+                          className="p-2.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] text-zinc-300 hover:text-white transition-all cursor-pointer"
+                          title="Watch Official Video"
+                        >
+                          <Video className="w-3.5 h-3.5 text-red-500" />
                         </button>
                         <a
                           href={`/api/music/download?url=${encodeURIComponent(currentTrack.audioUrl)}&name=${encodeURIComponent(
@@ -1780,16 +1818,16 @@ export function RiiqxMusicView() {
                           )}`}
                           download
                           title="Download 320kbps MP3"
-                          className="p-2.5 rounded-full bg-white dark:bg-white/[0.1] hover:bg-zinc-100 dark:hover:bg-white/[0.15] border border-zinc-200 dark:border-white/[0.1] text-zinc-800 dark:text-white transition-all shadow-sm cursor-pointer"
+                          className="p-2.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] text-zinc-300 hover:text-white transition-all cursor-pointer"
                         >
-                          <Download className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+                          <Download className="w-3.5 h-3.5" />
                         </a>
                         <button
                           onClick={() => setIsFullscreenPlayer(true)}
-                          className="p-2.5 rounded-full bg-white dark:bg-white/[0.1] hover:bg-zinc-100 dark:hover:bg-white/[0.15] border border-zinc-200 dark:border-white/[0.1] text-zinc-800 dark:text-white transition-all shadow-sm cursor-pointer"
-                          title="Fullscreen Player"
+                          className="p-2.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] text-zinc-300 hover:text-white transition-all cursor-pointer"
+                          title="Fullscreen Immersion"
                         >
-                          <Maximize2 className="w-4 h-4" />
+                          <Maximize2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
@@ -2880,7 +2918,7 @@ export function RiiqxMusicView() {
               </button>
               <button
                 onClick={togglePlayPause}
-                className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#FA243C] via-red-500 to-orange-500 hover:scale-105 active:scale-95 text-white flex items-center justify-center shadow-xl shadow-[#FA243C]/40 hover:shadow-[#FA243C]/60 transition-all cursor-pointer shrink-0"
+                className="w-12 h-12 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] hover:scale-105 active:scale-95 text-white flex items-center justify-center shadow-lg shadow-[#FA243C]/25 transition-all cursor-pointer shrink-0"
                 title="Play / Pause (Space)"
               >
                 {isPlaying ? (
@@ -2938,13 +2976,13 @@ export function RiiqxMusicView() {
             {/* Quick Launch Lyric Video Studio (Pro) */}
             <button
               onClick={() => openVideoStudioForTrack(currentTrack)}
-              className="p-2 rounded-2xl text-zinc-500 dark:text-zinc-400 hover:text-purple-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
+              className="p-2 rounded-2xl text-zinc-500 dark:text-zinc-400 hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
               title="Create 9:16 / 16:9 Lyric Video (Pro)"
             >
               <Video className="w-4 h-4" />
             </button>
 
-            {/* 3D Spatial Audio Stage Toggle (NEW Unique Audiophile Feature) */}
+            {/* 3D Spatial Audio Stage Toggle (Clean Apple Monochromatic Glass) */}
             <button
               onClick={() => {
                 const nextMode =
@@ -2957,9 +2995,9 @@ export function RiiqxMusicView() {
               }}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase transition-all cursor-pointer ${
                 spatialAudioMode === 'stage3d'
-                  ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 shadow-xs'
+                  ? 'bg-white/10 text-white border border-white/20 shadow-xs'
                   : spatialAudioMode === 'binaural'
-                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/40 shadow-xs'
+                  ? 'bg-white/10 text-[#FA243C] border border-[#FA243C]/30 shadow-xs'
                   : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08]'
               }`}
               title={`Spatial Audio Mode: ${spatialAudioMode.toUpperCase()} (Click to toggle)`}
@@ -2970,17 +3008,17 @@ export function RiiqxMusicView() {
               </span>
             </button>
 
-            {/* Synced Lyrics Toggle Button */}
+            {/* Synced Lyrics Toggle Button (Clean Apple Crimson State) */}
             <button
               onClick={() => setRightPanelTab(rightPanelTab === 'lyrics' ? null : 'lyrics')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 rightPanelTab === 'lyrics'
-                  ? 'bg-gradient-to-r from-orange-500 to-[#FA243C] text-white shadow-md shadow-orange-500/30'
+                  ? 'bg-[#FA243C] text-white shadow-md shadow-[#FA243C]/25'
                   : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.08] hover:text-zinc-900 dark:hover:text-white'
               }`}
               title="Synced Lyrics (L)"
             >
-              <Sparkles className="w-3.5 h-3.5 text-orange-400" />
+              <Sparkles className="w-3.5 h-3.5 text-white" />
               <span className="hidden xl:inline">Lyrics</span>
             </button>
 
@@ -3469,19 +3507,19 @@ export function RiiqxMusicView() {
         </div>
       )}
 
-      {/* Car Mode / Distraction-Free Driver Cockpit Modal */}
+      {/* Car Mode / Distraction-Free Driver Cockpit Modal (Apple CarPlay & Spotify Hybrid) */}
       {isCarModeOpen && (
-        <div className="fixed inset-0 z-50 bg-[#09090d] flex flex-col justify-between overflow-hidden p-4 sm:p-6 md:p-8 text-white select-none animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-50 bg-[#050508]/98 backdrop-blur-3xl flex flex-col justify-between overflow-hidden p-4 sm:p-6 md:p-8 text-white select-none animate-in fade-in duration-200">
           {/* Dynamic Ambient Blur Glow from Album Art */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-25 filter blur-3xl scale-125 transition-all duration-700"
+            className="absolute inset-0 pointer-events-none opacity-20 filter blur-3xl scale-125 transition-all duration-700"
             style={{
               backgroundImage: `url(${currentTrack.artworkUrl || FALLBACK_ARTWORK})`,
               backgroundPosition: 'center',
               backgroundSize: 'cover',
             }}
           />
-          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#09090d]/80 via-[#09090d]/95 to-[#09090d]" />
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#050508]/70 via-[#050508]/90 to-[#050508]" />
 
           {/* Top HUD Bar */}
           <div className="relative z-10 h-14 shrink-0 flex items-center justify-between border-b border-white/[0.08] pb-3">
@@ -3489,28 +3527,28 @@ export function RiiqxMusicView() {
               <RiiqxLogo size="sm" variant="icon" animated={true} />
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-base sm:text-lg font-black tracking-tight text-white font-heading">
-                    RIIQX CAR COCKPIT
+                  <h2 className="text-base sm:text-lg font-bold tracking-tight text-white font-heading">
+                    CAR MODE
                   </h2>
-                  <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                    SAFE TOUCH
+                  <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-white/10 text-zinc-300 border border-white/15">
+                    320K LOSSLESS
                   </span>
                 </div>
                 <p className="text-[11px] text-zinc-400 hidden sm:block">
-                  CarPlay & Android Auto HUD &bull; 320k Lossless Audio
+                  Driver Cockpit HUD &bull; Audiophile DSP Engine
                 </p>
               </div>
             </div>
 
             {/* Center Live Cockpit Clock */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.1] text-xs font-mono font-bold text-amber-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.1] text-xs font-mono font-bold text-zinc-200">
+              <span className="w-2 h-2 rounded-full bg-[#FA243C] animate-pulse" />
               <span>{carClockTime}</span>
             </div>
 
             <button
               onClick={() => setIsCarModeOpen(false)}
-              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-white/[0.1] hover:bg-white/[0.2] active:scale-95 border border-white/[0.15] text-xs sm:text-sm font-bold text-white transition-all cursor-pointer shadow-lg"
+              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2 rounded-full bg-white/[0.1] hover:bg-white/[0.18] active:scale-95 border border-white/[0.15] text-xs sm:text-sm font-semibold text-white transition-all cursor-pointer shadow-sm"
             >
               <X className="w-4 h-4" />
               <span>Exit Car Mode</span>
@@ -3523,15 +3561,15 @@ export function RiiqxMusicView() {
               {/* Artwork & Spectrum Visualizer */}
               <div className="flex flex-col items-center shrink-0">
                 <div className="relative group">
-                  <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-3xl overflow-hidden shadow-2xl shadow-rose-950/60 border-2 border-white/[0.15] ring-4 ring-white/[0.04]">
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-3xl overflow-hidden shadow-2xl border border-white/15">
                     <img
                       src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
                       alt={currentTrack.title}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="absolute -bottom-2 -right-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-[#FA243C] text-white font-black text-[10px] shadow-lg uppercase tracking-wider">
-                    320K LOSSLESS
+                  <div className="absolute -bottom-2 -right-2 px-3 py-1 rounded-full bg-[#FA243C] text-white font-bold text-[10px] shadow-lg uppercase tracking-wider">
+                    MASTER AUDIO
                   </div>
                 </div>
 
@@ -3542,15 +3580,15 @@ export function RiiqxMusicView() {
               </div>
 
               {/* Track Metadata, Scrubber & Giant Controls */}
-              <div className="flex-1 text-center lg:text-left space-y-4 sm:space-y-6 w-full max-w-lg lg:max-w-none">
+              <div className="flex-1 text-center md:text-left space-y-4 sm:space-y-6 w-full max-w-lg md:max-w-none">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-white font-heading truncate">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white font-heading truncate">
                     {currentTrack.title}
                   </h1>
-                  <p className="text-lg sm:text-xl lg:text-2xl text-amber-400 font-bold mt-1 truncate">
+                  <p className="text-base sm:text-lg lg:text-xl text-zinc-300 font-semibold mt-1 truncate">
                     {currentTrack.artist}
                   </p>
-                  <p className="text-xs sm:text-sm text-zinc-400 mt-0.5 truncate">
+                  <p className="text-xs sm:text-sm text-zinc-500 mt-0.5 truncate">
                     {currentTrack.album}
                   </p>
                 </div>
@@ -3558,7 +3596,7 @@ export function RiiqxMusicView() {
                 {/* Safe Scrub Line */}
                 <div className="space-y-1.5">
                   <div
-                    className="w-full h-3 sm:h-4 bg-white/[0.1] rounded-full overflow-hidden cursor-pointer relative"
+                    className="w-full h-3 sm:h-3.5 bg-white/[0.1] rounded-full overflow-hidden cursor-pointer relative"
                     onClick={(e) => {
                       const rect = e.currentTarget.getBoundingClientRect();
                       const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
@@ -3566,22 +3604,22 @@ export function RiiqxMusicView() {
                     }}
                   >
                     <div
-                      className="h-full bg-gradient-to-r from-amber-500 to-[#FA243C] rounded-full transition-all duration-150"
+                      className="h-full bg-[#FA243C] rounded-full transition-all duration-150"
                       style={{ width: `${(currentTimeMs / (durationMs || 1)) * 100}%` }}
                     />
                   </div>
-                  <div className="flex items-center justify-between text-xs sm:text-sm font-mono font-bold text-zinc-400 px-1">
+                  <div className="flex items-center justify-between text-xs font-mono font-semibold text-zinc-400 px-1">
                     <span>{formatDuration(currentTimeMs)}</span>
                     <span>{formatDuration(durationMs)}</span>
                   </div>
                 </div>
 
                 {/* Giant Safe-Touch Primary Controls */}
-                <div className="flex items-center justify-center lg:justify-start gap-2.5 sm:gap-4 lg:gap-5 pt-1">
+                <div className="flex items-center justify-center md:justify-start gap-2.5 sm:gap-4 lg:gap-5 pt-1">
                   {/* -10s */}
                   <button
                     onClick={() => handleSeek(Math.max(0, currentTimeMs - 10000))}
-                    className="w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center text-white text-[11px] sm:text-xs font-black transition-all cursor-pointer"
+                    className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center text-white text-[11px] sm:text-xs font-bold transition-all cursor-pointer"
                     title="Rewind 10s"
                   >
                     -10s
@@ -3590,7 +3628,7 @@ export function RiiqxMusicView() {
                   {/* Prev */}
                   <button
                     onClick={handlePrevTrack}
-                    className="w-13 h-13 sm:w-15 sm:h-15 lg:w-16 lg:h-16 rounded-2xl bg-white/[0.1] hover:bg-white/[0.2] active:scale-95 border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer"
+                    className="w-13 h-13 sm:w-15 sm:h-15 rounded-2xl bg-white/[0.1] hover:bg-white/[0.18] active:scale-95 border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer"
                     title="Previous Track"
                   >
                     <SkipBack className="w-6 h-6 sm:w-7 sm:h-7 fill-current" />
@@ -3599,20 +3637,20 @@ export function RiiqxMusicView() {
                   {/* Massive Play/Pause Circle */}
                   <button
                     onClick={togglePlayPause}
-                    className="w-18 h-18 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-tr from-amber-500 to-[#FA243C] hover:scale-105 active:scale-95 flex items-center justify-center text-white shadow-2xl shadow-rose-600/50 transition-all cursor-pointer shrink-0"
+                    className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] hover:scale-105 active:scale-95 flex items-center justify-center text-white shadow-xl shadow-[#FA243C]/30 transition-all cursor-pointer shrink-0"
                     title={isPlaying ? 'Pause' : 'Play'}
                   >
                     {isPlaying ? (
-                      <Pause className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 fill-current" />
+                      <Pause className="w-8 h-8 sm:w-10 sm:h-10 fill-current" />
                     ) : (
-                      <Play className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 fill-current ml-1" />
+                      <Play className="w-8 h-8 sm:w-10 sm:h-10 fill-current ml-1" />
                     )}
                   </button>
 
                   {/* Next */}
                   <button
                     onClick={handleNextTrack}
-                    className="w-13 h-13 sm:w-15 sm:h-15 lg:w-16 lg:h-16 rounded-2xl bg-white/[0.1] hover:bg-white/[0.2] active:scale-95 border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer"
+                    className="w-13 h-13 sm:w-15 sm:h-15 rounded-2xl bg-white/[0.1] hover:bg-white/[0.18] active:scale-95 border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer"
                     title="Next Track"
                   >
                     <SkipForward className="w-6 h-6 sm:w-7 sm:h-7 fill-current" />
@@ -3621,7 +3659,7 @@ export function RiiqxMusicView() {
                   {/* +10s */}
                   <button
                     onClick={() => handleSeek(Math.min(durationMs, currentTimeMs + 10000))}
-                    className="w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center text-white text-[11px] sm:text-xs font-black transition-all cursor-pointer"
+                    className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center text-white text-[11px] sm:text-xs font-bold transition-all cursor-pointer"
                     title="Forward 10s"
                   >
                     +10s
@@ -3630,7 +3668,7 @@ export function RiiqxMusicView() {
                   {/* Heart Favorite */}
                   <button
                     onClick={() => toggleFavorite(currentTrack.id)}
-                    className="w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center transition-all cursor-pointer"
+                    className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center transition-all cursor-pointer"
                     title="Favorite"
                   >
                     <Heart
@@ -3643,9 +3681,9 @@ export function RiiqxMusicView() {
                   {/* AI Voice Copilot */}
                   <button
                     onClick={toggleVoiceAssistant}
-                    className={`w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-2xl border flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
+                    className={`w-11 h-11 sm:w-13 sm:h-13 rounded-2xl border flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
                       isVoiceListening
-                        ? 'bg-rose-500/30 text-rose-400 border-rose-500 ring-4 ring-rose-500/20'
+                        ? 'bg-[#FA243C]/20 text-[#FA243C] border-[#FA243C] ring-4 ring-[#FA243C]/20'
                         : 'bg-white/[0.08] hover:bg-white/[0.15] border-white/[0.1] text-zinc-300'
                     }`}
                     title="Voice Copilot"
@@ -3664,10 +3702,10 @@ export function RiiqxMusicView() {
           {/* Bottom Vehicle Preset Stations Bar */}
           <div className="relative z-10 shrink-0 border-t border-white/[0.08] pt-3 pb-1 w-full max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-2 px-1">
-              <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">
-                VEHICLE PRESET STATIONS (P1 - P5)
+              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                PRESET STATIONS (P1 - P5)
               </span>
-              <span className="text-[10px] text-amber-400/80 font-mono font-bold">1-TAP SWITCH</span>
+              <span className="text-[10px] text-zinc-400 font-mono font-medium">1-TAP SWITCH</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3">
               {STATIONS.map((station, idx) => {
@@ -3676,13 +3714,13 @@ export function RiiqxMusicView() {
                   <button
                     key={station.id}
                     onClick={() => handleSelectStation(station)}
-                    className={`h-11 sm:h-12 px-3 rounded-2xl text-xs font-black flex items-center gap-2 transition-all cursor-pointer active:scale-95 ${
+                    className={`h-11 sm:h-12 px-3 rounded-2xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer active:scale-95 ${
                       isCurrent
-                        ? 'bg-gradient-to-r from-amber-500 to-[#FA243C] text-white shadow-lg shadow-rose-600/30 ring-2 ring-white/20'
-                        : 'bg-white/[0.07] hover:bg-white/[0.12] text-zinc-200 border border-white/[0.08]'
+                        ? 'bg-[#FA243C] text-white shadow-md shadow-[#FA243C]/20 border border-[#FA243C]'
+                        : 'bg-white/[0.06] hover:bg-white/[0.1] text-zinc-200 border border-white/[0.08]'
                     }`}
                   >
-                    <span className="w-5 h-5 rounded-md bg-black/40 flex items-center justify-center text-[10px] font-mono text-amber-400 shrink-0">
+                    <span className="w-5 h-5 rounded-md bg-black/40 flex items-center justify-center text-[10px] font-mono text-zinc-300 shrink-0">
                       P{idx + 1}
                     </span>
                     <span className="truncate">{station.emoji} {station.name}</span>

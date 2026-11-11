@@ -87,20 +87,20 @@ export const riiqxBrand: RiiqxBrandConfig = {
       textMuted: '#737373',
     },
     accents: {
-      primary: '#FFD43B', // Primary Yellow
-      secondary: '#FFC928', // Secondary Yellow
-      red: '#FF4D4F', // Primary Red
-      coral: '#FF6B5E', // Coral Accent
-      accent: '#FF6B5E', // Coral Accent
-      success: '#16865D', // Success
-      warning: '#D97706', // Warning
-      error: '#D92D36', // Error
-      amber: '#D97706',
-      rose: '#FF4D4F',
-      yellow: '#FFD43B',
-      gradient: 'linear-gradient(135deg, #FFD43B 0%, #FF6B5E 100%)',
-      gradientYellow: 'linear-gradient(135deg, #FFD43B 0%, #FFC928 100%)',
-      gradientRed: 'linear-gradient(135deg, #FF6B5E 0%, #FF4D4F 100%)',
+      primary: '#FA243C', // Apple Crimson
+      secondary: '#C8102E', // Deep Crimson
+      red: '#FA243C',
+      coral: '#FF3B50',
+      accent: '#FA243C',
+      success: '#10B981',
+      warning: '#F59E0B',
+      error: '#EF4444',
+      amber: '#F59E0B',
+      rose: '#FA243C',
+      yellow: '#FA243C',
+      gradient: 'linear-gradient(135deg, #FA243C 0%, #C8102E 100%)',
+      gradientYellow: 'linear-gradient(135deg, #FA243C 0%, #FF3B50 100%)',
+      gradientRed: 'linear-gradient(135deg, #FA243C 0%, #C8102E 100%)',
     },
   },
 

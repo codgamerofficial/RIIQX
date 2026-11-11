@@ -28,6 +28,10 @@ public/uploads/videos/
 public/uploads/rendered/
 public/uploads/keyframes/
 public/uploads/recordings/
+public/videos/*.png
+public/videos/*.jpg
+public/videos/*.mp4
+public/videos/*.wav
 tests/*.jpg
 tests/*.mp4
 

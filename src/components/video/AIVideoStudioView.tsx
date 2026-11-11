@@ -734,21 +734,21 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-24 text-zinc-900 dark:text-white select-none">
-      {/* Top Banner & Toolchain Health */}
-      <div className="relative overflow-hidden rounded-3xl border border-zinc-200 dark:border-white/[0.1] bg-gradient-to-r from-purple-950/40 via-red-950/30 to-zinc-900/80 p-6 md:p-8 shadow-2xl space-y-4">
+      {/* Top Banner & Toolchain Health (Apple Music + Spotify Minimalist Aesthetic) */}
+      <div className="relative overflow-hidden rounded-3xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] backdrop-blur-2xl p-6 md:p-8 shadow-sm space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <RiiqxLogo size="md" variant="icon" animated={true} />
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white font-heading">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white font-heading">
                   RIIQX AI Video & Motion Studio
                 </h1>
-                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-[#FA243C] text-white border border-white/20 shadow-sm animate-pulse">
+                <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/15">
                   PRO 4K/60FPS
                 </span>
               </div>
-              <p className="text-xs md:text-sm text-zinc-300">
+              <p className="text-xs md:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
                 Turn any song or artist into viral social media content — Lyrical Kinetic, 3D Mesh Animation, Motion Graphics & Hypermotion VFX.
               </p>
             </div>
@@ -757,29 +757,29 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
           {/* Quick Action: Sync Current Playing Track */}
           <button
             onClick={handleSyncCurrentTrack}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs shadow-md transition-all cursor-pointer shrink-0 hover:scale-105"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white font-semibold text-xs shadow-md shadow-[#FA243C]/20 transition-all cursor-pointer shrink-0"
           >
-            <Music2 className="w-4 h-4 text-emerald-400" />
+            <Music2 className="w-4 h-4 text-white" />
             <span>Sync Current Song</span>
           </button>
         </div>
 
         {/* Engine Tech Chips */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/[0.08] text-[11px] font-mono text-zinc-400">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-200 dark:border-white/[0.06] text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.08]">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
             <span>Whisper.cpp Large-v3 Syllables</span>
           </div>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.08]">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
             <span>Nirmala UI + HarfBuzz Indic Shaper</span>
           </div>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.08]">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
             <span>FFmpeg 9.0.2 1080p60 Muxer</span>
           </div>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-white/[0.04] border border-zinc-200 dark:border-white/[0.08]">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
             <span>320kbps Master Lossless Audio</span>
           </div>
         </div>
@@ -1235,7 +1235,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
             <button
               onClick={handleRenderVideo}
               disabled={isRendering}
-              className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-[#FA243C] to-orange-500 hover:opacity-95 text-white font-black text-sm shadow-2xl shadow-red-500/30 transition-all cursor-pointer hover:scale-[1.01]"
+              className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-[#FA243C] hover:bg-[#ff3b50] hover:scale-[1.005] active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-[#FA243C]/20 transition-all cursor-pointer disabled:opacity-50"
             >
               {isRendering ? (
                 <>
@@ -1259,7 +1259,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
                 </div>
                 <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-purple-500 via-[#FA243C] to-orange-500 transition-all duration-300"
+                    className="h-full bg-[#FA243C] transition-all duration-300"
                     style={{ width: `${renderProgress}%` }}
                   />
                 </div>
@@ -1454,7 +1454,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
                   <a
                     href={renderedResult.videoUrl}
                     download={renderedResult.fileName}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-black font-bold text-xs shadow-lg transition-all cursor-pointer"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-xs shadow-md transition-all cursor-pointer"
                   >
                     <Download className="w-4 h-4" />
                     <span>Download 1080p MP4</span>
