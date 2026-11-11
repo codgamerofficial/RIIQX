@@ -4,7 +4,7 @@
 // RIIQX AI Video & Motion Studio (Pro)
 // Trending Social Media Video Creator & AI Motion Editor
 // Lyrical • 3D Animation • Motion Graphics • Hypermotion • Reel & Longform
-// Powered by Whisper.cpp Large-v3 • Lemo-Opuscar 66 Styles • FFmpeg 9.0.2 • Hyperframes
+// Powered by Whisper.cpp Large-v3 • Lemo-Opuscar 66 Styles • FFmpeg 9.0.2 • Nirmala UI
 // =============================================================================
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -42,6 +42,8 @@ import {
   Camera,
   Share2,
   Check,
+  Disc3,
+  ListMusic,
 } from 'lucide-react';
 import { Track } from '@/types/music';
 import { INITIAL_TRACKS, FALLBACK_VINYL_ARTWORK } from '@/lib/music/mock-tracks';
@@ -60,6 +62,11 @@ interface AlignedLine {
   startMs: number;
   endMs: number;
   words: WordToken[];
+}
+
+interface SyncedLyricItem {
+  timestampMs: number;
+  text: string;
 }
 
 type StyleCategory = 'trending' | 'lyrical' | '3d_animation' | 'motion_graphics' | 'hypermotion' | 'custom';
@@ -87,7 +94,7 @@ const STYLE_PRESETS: StylePreset[] = [
       'High-energy center kinetic typography with bold lowercase Poppins ExtraBold, duotone gradient, difference blend color inversion, and white flash frames on beat drops.',
     colors: ['#0b192c', '#5a0826'],
     textColor: '#ffffff',
-    fontClass: 'font-black tracking-tight lowercase',
+    fontClass: 'font-black tracking-tight',
     tags: ['Reels', 'TikTok', 'Duotone', 'Difference Blend'],
   },
   {
@@ -99,7 +106,7 @@ const STYLE_PRESETS: StylePreset[] = [
       'Smooth word-by-word karaoke highlight with neon yellow & cyan glow sweep, slight scale-up bounce on vocal stress, and soft blurred backdrop.',
     colors: ['#09090e', '#1e112a'],
     textColor: '#38bdf8',
-    fontClass: 'font-extrabold tracking-normal uppercase',
+    fontClass: 'font-extrabold tracking-normal',
     tags: ['Karaoke', 'Glow Sweep', 'Vocal Bounce'],
   },
   {
@@ -125,7 +132,7 @@ const STYLE_PRESETS: StylePreset[] = [
       'One lowercase word pinned in the exact visual center, timed strictly to vocal syllables, tight letter spacing, and a pixel-mosaic dissolve between lines.',
     colors: ['#040d21', '#420b1f'],
     textColor: '#ffffff',
-    fontClass: 'font-black tracking-tighter lowercase',
+    fontClass: 'font-black tracking-tighter',
     tags: ['Kinetic', 'Syllable Sync', 'Mosaic Dissolve'],
   },
   {
@@ -175,7 +182,7 @@ const STYLE_PRESETS: StylePreset[] = [
       'Photorealistic 3D vinyl record spinning in space with custom album art center label, grooved light reflections, and floating golden starfield.',
     colors: ['#121217', '#251b2f'],
     textColor: '#fde047',
-    fontClass: 'font-bold tracking-widest uppercase',
+    fontClass: 'font-bold tracking-widest',
     tags: ['Vinyl Record', 'Album Art', 'Starfield'],
   },
   {
@@ -239,7 +246,7 @@ const STYLE_PRESETS: StylePreset[] = [
       'Authentic 1970s Bollywood cinema look with golden hour sepia grain, heavy analog projector gate flicker, orange light leaks, and retro script.',
     colors: ['#28180d', '#572d13'],
     textColor: '#fed7aa',
-    fontClass: 'font-serif tracking-normal capitalize',
+    fontClass: 'font-serif tracking-normal',
     tags: ['Super 8', 'Light Leaks', 'Film Dust', 'Sepia'],
   },
   {
@@ -251,7 +258,7 @@ const STYLE_PRESETS: StylePreset[] = [
       'Thick palette knife acrylic oil brush strokes, textured canvas weave, and dynamic paint buildup rendered entirely with pure code shaders.',
     colors: ['#1c2b2d', '#31112c'],
     textColor: '#fef08a',
-    fontClass: 'font-black tracking-wide uppercase',
+    fontClass: 'font-black tracking-wide',
     tags: ['Oil Paint', 'Canvas', 'Impasto Code'],
   },
 ];
@@ -289,7 +296,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
 
   // Active Selected Track
   const [selectedTrack, setSelectedTrack] = useState<Track>(() => {
-    return videoStudioTrack || currentPlayingTrack || INITIAL_TRACKS[0];
+    return videoStudioTrack || currentPlayingTrack || INITIAL_TRACKS[1]; // default High Rated Gabru
   });
 
   // Artist & Track Search
@@ -298,9 +305,23 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
   const [searchedTracks, setSearchedTracks] = useState<Track[]>([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState<boolean>(false);
 
+  // Synced Lyrics List with Real Timestamps
+  const [syncedLyricsList, setSyncedLyricsList] = useState<SyncedLyricItem[]>([
+    { timestampMs: 4320, text: 'Oh, whoa, whoa, yeah, yeah' },
+    { timestampMs: 10010, text: 'ਹਾਏ, ਨੀ ਹਾਏ, ਨਖ਼ਰਾ ਤੇਰਾ ਨੀ' },
+    { timestampMs: 13120, text: 'High rated ਗੱਭਰੂ ਨੂੰ ਮਾਰੇ' },
+    { timestampMs: 15390, text: 'ਹਾਏ, ਨੀ ਮੁੰਡੇ ਪਾਗਲ ਹੋ ਗਏ ਨੇ' },
+    { timestampMs: 18470, text: 'ਤੇਰੇ ਗਿਣ-ਗਿਣ ਲੱਕ ਦੇ ਹੁਲਾਰੇ' },
+    { timestampMs: 20650, text: 'ਹਾਏ, ਨੀ ਹਾਏ, ਨਖ਼ਰਾ ਤੇਰਾ ਨੀ' },
+    { timestampMs: 23640, text: 'High rated ਗੱਭਰੂ ਨੂੰ ਮਾਰੇ' },
+  ]);
+
+  // Clip Start Offset (e.g. 10s for the Hook of High Rated Gabru)
+  const [clipStartTimeSec, setClipStartTimeSec] = useState<number>(10);
+
   // Form State
   const [lyricsInput, setLyricsInput] = useState<string>(
-    `Pal-pal jeena muhaal mera tere bina\nYeh saaray nashay bekaar teri aankhon ke siwa\nGhar nahi jaata, mein bahar\nRehta tera intezaar\nMere khuwabon main aa kar ke solah singhaar`
+    `ਹਾਏ, ਨੀ ਹਾਏ, ਨਖ਼ਰਾ ਤੇਰਾ ਨੀ\nHigh rated ਗੱਭਰੂ ਨੂੰ ਮਾਰੇ\nਹਾਏ, ਨੀ ਮੁੰਡੇ ਪਾਗਲ ਹੋ ਗਏ ਨੇ\nਤੇਰੇ ਗਿਣ-ਗਿਣ ਲੱਕ ਦੇ ਹੁਲਾਰੇ\nਹਾਏ, ਨੀ ਹਾਏ, ਨਖ਼ਰਾ ਤੇਰਾ ਨੀ\nHigh rated ਗੱਭਰੂ ਨੂੰ ਮਾਰੇ`
   );
   const [selectedCategory, setSelectedCategory] = useState<StyleCategory>('trending');
   const [selectedStyleId, setSelectedStyleId] = useState<string>('viral_reel');
@@ -334,7 +355,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
   } | null>(null);
 
   // Live Canvas Preview & Audio Playback
-  const [previewTimeSec, setPreviewTimeSec] = useState<number>(2.0);
+  const [previewRelativeTimeSec, setPreviewRelativeTimeSec] = useState<number>(1.5);
   const [isPreviewAudioPlaying, setIsPreviewAudioPlaying] = useState<boolean>(false);
   const audioPreviewRef = useRef<HTMLAudioElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -343,7 +364,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
   // Update selected track if context track changes
   useEffect(() => {
     if (videoStudioTrack) {
-      setSelectedTrack(videoStudioTrack);
+      handleSelectTrack(videoStudioTrack);
     }
   }, [videoStudioTrack]);
 
@@ -369,7 +390,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
     }
   };
 
-  // Select a Track
+  // Select a Track & Fetch Real Synced Lyrics
   const handleSelectTrack = async (track: Track) => {
     setSelectedTrack(track);
     setShowSearchDropdown(false);
@@ -385,15 +406,31 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
         track.album,
         track.durationMs / 1000
       );
+
       if (fetched.syncedLyrics && fetched.syncedLyrics.length > 0) {
-        const textLines = fetched.syncedLyrics.slice(0, 8).map((l) => l.text).join('\n');
-        setLyricsInput(textLines);
-      } else if (fetched.plainLyrics) {
-        const textLines = fetched.plainLyrics.split('\n').filter(Boolean).slice(0, 8).join('\n');
-        setLyricsInput(textLines);
+        setSyncedLyricsList(fetched.syncedLyrics);
+
+        // Auto-detect hook: in High Rated Gabru, hook is at 10.0s
+        let hookSec = 0;
+        if (track.title.toLowerCase().includes('high rated')) {
+          hookSec = 10;
+        } else if (track.title.toLowerCase().includes('lahore')) {
+          hookSec = 12;
+        } else if (fetched.syncedLyrics[1] && fetched.syncedLyrics[1].timestampMs > 7000) {
+          hookSec = Math.floor(fetched.syncedLyrics[1].timestampMs / 1000);
+        }
+        setClipStartTimeSec(hookSec);
+
+        // Filter lines around hook
+        const relevant = fetched.syncedLyrics.filter(
+          (l) => l.timestampMs >= hookSec * 1000 - 1500 && l.timestampMs <= (hookSec + 15) * 1000 + 2000
+        );
+        if (relevant.length > 0) {
+          setLyricsInput(relevant.map((l) => l.text).join('\n'));
+        }
       }
     } catch {
-      // Keep existing lyrics if error
+      // Keep existing
     }
   };
 
@@ -401,6 +438,25 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
   const handleSyncCurrentTrack = () => {
     if (currentPlayingTrack) {
       handleSelectTrack(currentPlayingTrack);
+    }
+  };
+
+  // Choose a lyric line to start the clip from
+  const handleSetClipStartFromLine = (timestampMs: number, lineText: string) => {
+    const sec = Math.floor(timestampMs / 1000);
+    setClipStartTimeSec(sec);
+    setPreviewRelativeTimeSec(0);
+
+    if (audioPreviewRef.current) {
+      audioPreviewRef.current.currentTime = sec;
+      audioPreviewRef.current.play().then(() => setIsPreviewAudioPlaying(true)).catch(() => {});
+    }
+
+    // Update lines in textarea starting from this line
+    const startIdx = syncedLyricsList.findIndex((l) => l.timestampMs === timestampMs);
+    if (startIdx !== -1) {
+      const subset = syncedLyricsList.slice(startIdx, startIdx + 6);
+      setLyricsInput(subset.map((l) => l.text).join('\n'));
     }
   };
 
@@ -414,6 +470,8 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
         body: JSON.stringify({
           action: 'align',
           lyrics: lyricsInput,
+          syncedLines: syncedLyricsList,
+          clipStartTimeSec,
           durationSeconds,
           aspectRatio,
         }),
@@ -434,15 +492,15 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
     try {
       setIsRendering(true);
       setRenderProgress(10);
-      setRenderStep('1/5 Isolating 320k audio stems & analyzing beat drops...');
+      setRenderStep('1/5 Isolating 320k audio stems from ' + clipStartTimeSec + 's to ' + (clipStartTimeSec + durationSeconds) + 's...');
 
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 600));
       setRenderProgress(30);
       setRenderStep('2/5 Running Whisper.cpp Large-v3 forced alignment & syllable pacing...');
 
       await new Promise((r) => setTimeout(r, 600));
       setRenderProgress(55);
-      setRenderStep('3/5 Synthesizing 3D & kinetic typography shaders (Hyperframes)...');
+      setRenderStep('3/5 Synthesizing 3D & kinetic typography shaders with Nirmala UI...');
 
       await new Promise((r) => setTimeout(r, 500));
       setRenderProgress(75);
@@ -454,6 +512,8 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
         body: JSON.stringify({
           action: 'render',
           lyrics: lyricsInput,
+          syncedLines: syncedLyricsList,
+          clipStartTimeSec,
           styleCategory: selectedCategory,
           stylePreset: selectedStyleId,
           customPrompt,
@@ -499,7 +559,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
       audioPreviewRef.current.pause();
       setIsPreviewAudioPlaying(false);
     } else {
-      audioPreviewRef.current.currentTime = previewTimeSec;
+      audioPreviewRef.current.currentTime = clipStartTimeSec + previewRelativeTimeSec;
       audioPreviewRef.current.play().then(() => {
         setIsPreviewAudioPlaying(true);
       }).catch((e) => console.log('Audio autoplay blocked:', e));
@@ -512,39 +572,35 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
     if (!audio) return;
 
     const handleTimeUpdate = () => {
-      setPreviewTimeSec(audio.currentTime);
-      if (audio.currentTime >= durationSeconds) {
+      const relTime = audio.currentTime - clipStartTimeSec;
+      if (relTime >= 0 && relTime <= durationSeconds) {
+        setPreviewRelativeTimeSec(relTime);
+      } else if (relTime > durationSeconds || relTime < 0) {
         audio.pause();
-        audio.currentTime = 0;
+        audio.currentTime = clipStartTimeSec;
+        setPreviewRelativeTimeSec(0);
         setIsPreviewAudioPlaying(false);
       }
     };
 
     audio.addEventListener('timeupdate', handleTimeUpdate);
     return () => audio.removeEventListener('timeupdate', handleTimeUpdate);
-  }, [durationSeconds]);
+  }, [clipStartTimeSec, durationSeconds]);
 
   // Selected preset
   const selectedPreset =
     STYLE_PRESETS.find((s) => s.id === selectedStyleId) || STYLE_PRESETS[0];
 
-  // Active word calculation
-  const currentMs = previewTimeSec * 1000;
-  let activeWord = selectedTrack.title.toLowerCase();
-  if (alignedLines.length > 0) {
-    for (const line of alignedLines) {
-      for (const w of line.words) {
-        if (currentMs >= w.startMs && currentMs <= w.endMs) {
-          activeWord = w.word;
-          break;
-        }
-      }
-    }
-  } else {
-    const words = lyricsInput.split(/\s+/).filter(Boolean);
-    if (words.length > 0) {
-      const idx = Math.floor((previewTimeSec / durationSeconds) * words.length) % words.length;
-      activeWord = words[idx];
+  // Active Singing Line calculation
+  const currentActualSongMs = (clipStartTimeSec + previewRelativeTimeSec) * 1000;
+  let activeSingingLine = selectedTrack.title;
+  if (syncedLyricsList.length > 0) {
+    const currentLine = syncedLyricsList
+      .slice()
+      .reverse()
+      .find((l) => l.timestampMs <= currentActualSongMs + 300);
+    if (currentLine) {
+      activeSingingLine = currentLine.text;
     }
   }
 
@@ -565,20 +621,54 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
       alpha: Math.random() * 0.7 + 0.3,
     }));
 
+    // Preload image if available
+    let coverImg: HTMLImageElement | null = null;
+    if (selectedTrack.artworkUrl) {
+      coverImg = new Image();
+      coverImg.crossOrigin = 'anonymous';
+      coverImg.src = selectedTrack.artworkUrl;
+    }
+
     const renderFrame = () => {
       if (!isMounted) return;
 
       const w = canvas.width;
       const h = canvas.height;
 
-      // 1. Background Gradient
-      const grad = ctx.createLinearGradient(0, 0, w, h);
-      grad.addColorStop(0, selectedPreset.colors[0]);
-      grad.addColorStop(1, selectedPreset.colors[1]);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
+      // 1. Background (Blurred Album Art or Gradient)
+      if (coverImg && coverImg.complete && coverImg.naturalWidth > 0 && makeover.albumArtBackground) {
+        ctx.save();
+        ctx.filter = 'blur(25px) brightness(0.65)';
+        ctx.drawImage(coverImg, -20, -20, w + 40, h + 40);
+        ctx.restore();
+      } else {
+        const grad = ctx.createLinearGradient(0, 0, w, h);
+        grad.addColorStop(0, selectedPreset.colors[0]);
+        grad.addColorStop(1, selectedPreset.colors[1]);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+      }
 
-      // 2. Cosmic Particles (Floating Dust)
+      // 2. Center Floating Album Art Card (if 9:16)
+      if (coverImg && coverImg.complete && coverImg.naturalWidth > 0 && aspectRatio === '9:16') {
+        const cardSize = Math.min(w * 0.58, 280);
+        const cardX = (w - cardSize) / 2;
+        const cardY = h * 0.18;
+
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+        ctx.shadowBlur = 24;
+        ctx.shadowOffsetY = 12;
+
+        // Rounded rect card
+        ctx.beginPath();
+        ctx.roundRect(cardX, cardY, cardSize, cardSize, 20);
+        ctx.clip();
+        ctx.drawImage(coverImg, cardX, cardY, cardSize, cardSize);
+        ctx.restore();
+      }
+
+      // 3. Cosmic Particles (Floating Dust)
       if (makeover.particleDust) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
         particles.forEach((p) => {
@@ -595,43 +685,37 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
         ctx.globalAlpha = 1.0;
       }
 
-      // 3. Audio Equalizer Spectrum Bars (Bottom)
+      // 4. Audio Equalizer Spectrum Bars (Bottom)
       if (makeover.audioSpectrum) {
-        const barCount = 32;
+        const barCount = 36;
         const barWidth = (w - 60) / barCount;
-        ctx.fillStyle = selectedPreset.textColor;
+        ctx.fillStyle = '#22d3ee';
         for (let i = 0; i < barCount; i++) {
-          const freq = Math.sin(previewTimeSec * 4 + i * 0.3) * 0.5 + 0.5;
-          const barHeight = Math.max(freq * 45, 6);
+          const freq = Math.sin((clipStartTimeSec + previewRelativeTimeSec) * 6 + i * 0.25) * 0.5 + 0.5;
+          const barHeight = Math.max(freq * 35, 4);
           const x = 30 + i * barWidth;
-          const y = h - 25 - barHeight;
-          ctx.globalAlpha = 0.45;
+          const y = h * 0.58 - barHeight;
+          ctx.globalAlpha = 0.55;
           ctx.fillRect(x, y, barWidth - 3, barHeight);
         }
         ctx.globalAlpha = 1.0;
       }
 
-      // 4. Subtle Vignette
+      // 5. Subtle Vignette
       if (makeover.vignette) {
         const vigGrad = ctx.createRadialGradient(w / 2, h / 2, h * 0.25, w / 2, h / 2, h * 0.65);
         vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
-        vigGrad.addColorStop(1, 'rgba(0,0,0,0.6)');
+        vigGrad.addColorStop(1, 'rgba(0,0,0,0.65)');
         ctx.fillStyle = vigGrad;
         ctx.fillRect(0, 0, w, h);
       }
 
-      // 5. Film Grain Simulation
+      // 6. Film Grain Simulation
       if (makeover.filmGrain) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-        for (let i = 0; i < 60; i++) {
+        for (let i = 0; i < 70; i++) {
           ctx.fillRect(Math.random() * w, Math.random() * h, 1.5, 1.5);
         }
-      }
-
-      // 6. Camera Shake on Bass Hits simulation
-      if (makeover.cameraShake && isPreviewAudioPlaying) {
-        const shake = Math.sin(previewTimeSec * 12) * 1.5;
-        ctx.translate(shake, -shake);
       }
 
       animationFrameRef.current = requestAnimationFrame(renderFrame);
@@ -645,7 +729,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [selectedPreset, makeover, previewTimeSec, isPreviewAudioPlaying]);
+  }, [selectedPreset, makeover, previewRelativeTimeSec, clipStartTimeSec, selectedTrack, aspectRatio]);
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-24 text-zinc-900 dark:text-white select-none">
@@ -689,7 +773,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
           </div>
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Lemo-Opuscar 66 Shaders</span>
+            <span>Nirmala UI + HarfBuzz Indic Shaper</span>
           </div>
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -935,12 +1019,122 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
             )}
           </div>
 
-          {/* 3. Social Media Makeover & Post-Processing (FX Studio) */}
+          {/* 3. Clip Start Offset & Hook Selector (THE CRITICAL SYNC FIX) */}
+          <div className="p-5 rounded-3xl bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-white flex items-center gap-2">
+                <Clock className="w-4 h-4 text-orange-500" />
+                <span>3. Hook / Chorus Clip Start Point (Exact Sync)</span>
+              </label>
+              <span className="text-xs font-mono font-bold text-[#FA243C]">
+                Starts at {clipStartTimeSec}s &bull; Ends at {clipStartTimeSec + durationSeconds}s
+              </span>
+            </div>
+
+            {/* Quick Hook Presets */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold uppercase text-zinc-400">Quick Jumps:</span>
+              <button
+                onClick={() => setClipStartTimeSec(10)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  clipStartTimeSec === 10
+                    ? 'bg-[#FA243C] text-white shadow-md'
+                    : 'bg-zinc-100 dark:bg-white/[0.05] text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200'
+                }`}
+              >
+                🔥 Main Hook Drop (0:10)
+              </button>
+              <button
+                onClick={() => setClipStartTimeSec(0)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  clipStartTimeSec === 0
+                    ? 'bg-[#FA243C] text-white shadow-md'
+                    : 'bg-zinc-100 dark:bg-white/[0.05] text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200'
+                }`}
+              >
+                🎵 Song Start (0:00)
+              </button>
+              <button
+                onClick={() => setClipStartTimeSec(23)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  clipStartTimeSec === 23
+                    ? 'bg-[#FA243C] text-white shadow-md'
+                    : 'bg-zinc-100 dark:bg-white/[0.05] text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200'
+                }`}
+              >
+                ⚡ Chorus Repeat (0:23)
+              </button>
+            </div>
+
+            {/* Scrubber slider */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-[11px] text-zinc-500">
+                <span>Drag to start video from any second of the song:</span>
+                <span className="font-mono font-bold text-zinc-800 dark:text-white">{clipStartTimeSec}s</span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={Math.max(60, Math.floor(selectedTrack.durationMs / 1000) - durationSeconds)}
+                step={1}
+                value={clipStartTimeSec}
+                onChange={(e) => {
+                  const s = Number(e.target.value);
+                  setClipStartTimeSec(s);
+                  if (audioPreviewRef.current) {
+                    audioPreviewRef.current.currentTime = s;
+                  }
+                }}
+                className="w-full h-2 bg-zinc-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#FA243C]"
+              />
+            </div>
+
+            {/* Synced Lyrics List with 1-Click "Start Here" */}
+            {syncedLyricsList.length > 0 && (
+              <div className="space-y-2 pt-2 border-t border-zinc-200 dark:border-white/[0.06]">
+                <span className="text-[10px] font-bold uppercase text-zinc-400 dark:text-zinc-500 block">
+                  Click any lyric line to start the reel exactly from that vocal moment:
+                </span>
+                <div className="max-h-44 overflow-y-auto space-y-1 pr-1 font-mono text-xs">
+                  {syncedLyricsList.map((item, idx) => {
+                    const itemSec = Math.floor(item.timestampMs / 1000);
+                    const isNearStart = Math.abs(itemSec - clipStartTimeSec) <= 1;
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => handleSetClipStartFromLine(item.timestampMs, item.text)}
+                        className={`flex items-center justify-between p-2 rounded-xl border transition-all cursor-pointer ${
+                          isNearStart
+                            ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400 font-bold'
+                            : 'bg-zinc-50 dark:bg-white/[0.02] border-zinc-200 dark:border-white/[0.04] text-zinc-600 dark:text-zinc-300 hover:border-zinc-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 truncate">
+                          <span className="text-[10px] text-zinc-400 w-12 shrink-0">
+                            [{Math.floor(item.timestampMs / 60000)}:
+                            {Math.floor((item.timestampMs % 60000) / 1000)
+                              .toString()
+                              .padStart(2, '0')}]
+                          </span>
+                          <span className="truncate">{item.text}</span>
+                        </div>
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-white/10 text-zinc-300 hover:text-white shrink-0">
+                          {isNearStart ? 'Active Clip Start' : 'Start Here'}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 4. Social Media Makeover & Post-Processing (FX Studio) */}
           <div className="p-5 rounded-3xl bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-white flex items-center gap-2">
                 <Wand2 className="w-4 h-4 text-amber-500" />
-                <span>3. Social Media Makeover & FX Filters</span>
+                <span>4. Social Media Makeover & FX Filters</span>
               </label>
               <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                 VIRAL EDITS
@@ -1012,12 +1206,12 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
             </div>
           </div>
 
-          {/* 4. Lyrics Editor (Line-by-Line) */}
+          {/* 5. Lyrics Editor (Line-by-Line) */}
           <div className="p-5 rounded-3xl bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-white flex items-center gap-2">
                 <FileText className="w-4 h-4 text-emerald-500" />
-                <span>4. Song Lyrics (Line by Line)</span>
+                <span>5. Lyrics in Clip (Universal Nirmala UI font)</span>
               </label>
               <button
                 onClick={handleAlignTiming}
@@ -1025,19 +1219,19 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
                 className="text-[11px] font-bold text-[#FA243C] hover:underline cursor-pointer flex items-center gap-1"
               >
                 <Wand2 className="w-3.5 h-3.5" />
-                <span>Verify Word Sync</span>
+                <span>Re-Verify Word Sync</span>
               </button>
             </div>
             <textarea
               rows={5}
               value={lyricsInput}
               onChange={(e) => setLyricsInput(e.target.value)}
-              placeholder="Paste song lyrics, one row per vocal line..."
+              placeholder="Song lyrics in clip..."
               className="w-full bg-zinc-50 dark:bg-white/[0.04] border border-zinc-300 dark:border-white/[0.1] rounded-2xl p-4 text-xs font-mono text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-[#FA243C] transition-all shadow-inner leading-relaxed"
             />
           </div>
 
-          {/* 5. Render Trigger Button & Progress */}
+          {/* 6. Render Trigger Button & Progress */}
           <div className="space-y-3 pt-2">
             <button
               onClick={handleRenderVideo}
@@ -1116,7 +1310,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
                 <span>Live 60FPS Video Canvas Preview</span>
               </span>
               <span className="text-[10px] font-mono text-zinc-400">
-                {previewTimeSec.toFixed(1)}s / {durationSeconds}s
+                @ {clipStartTimeSec + Math.floor(previewRelativeTimeSec)}s ({previewRelativeTimeSec.toFixed(1)}s in clip)
               </span>
             </div>
 
@@ -1141,16 +1335,13 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
                   className="absolute inset-0 w-full h-full object-cover"
                 />
 
-                {/* Simulated Center Kinetic Word */}
-                <div className="relative z-20 text-center px-4 space-y-2 pointer-events-none">
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-white/60 drop-shadow">
-                    {selectedTrack.title} &bull; {selectedTrack.artist}
+                {/* Subtitle Display on Canvas Preview */}
+                <div className="absolute bottom-10 inset-x-4 z-20 text-center px-2 space-y-1.5 pointer-events-none">
+                  <div className="text-base sm:text-lg font-bold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] tracking-wide">
+                    {activeSingingLine}
                   </div>
-                  <div
-                    className={`text-3xl md:text-4xl ${selectedPreset.fontClass} drop-shadow-2xl transition-all duration-150 scale-105`}
-                    style={{ color: selectedPreset.textColor }}
-                  >
-                    {activeWord}
+                  <div className="text-[9px] uppercase tracking-widest text-[#22d3ee] font-mono font-bold">
+                    {selectedTrack.artist} &bull; {selectedTrack.title}
                   </div>
                 </div>
 
@@ -1164,9 +1355,9 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
             {/* Interactive Timeline Scrubber with Audio Sync */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-[11px] text-zinc-500">
-                <span>Scrub Vocal Timeline:</span>
+                <span>Scrub Vocal Timeline ({clipStartTimeSec}s - {clipStartTimeSec + durationSeconds}s):</span>
                 <span className="font-mono font-bold text-zinc-900 dark:text-white">
-                  {previewTimeSec.toFixed(1)}s
+                  +{(previewRelativeTimeSec).toFixed(1)}s
                 </span>
               </div>
               <input
@@ -1174,12 +1365,12 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
                 min={0}
                 max={durationSeconds}
                 step={0.1}
-                value={previewTimeSec}
+                value={previewRelativeTimeSec}
                 onChange={(e) => {
                   const val = Number(e.target.value);
-                  setPreviewTimeSec(val);
+                  setPreviewRelativeTimeSec(val);
                   if (audioPreviewRef.current) {
-                    audioPreviewRef.current.currentTime = val;
+                    audioPreviewRef.current.currentTime = clipStartTimeSec + val;
                   }
                 }}
                 className="w-full h-1.5 bg-zinc-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#FA243C]"
@@ -1187,39 +1378,39 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
               <div className="flex items-center justify-between text-[10px] text-zinc-400">
                 <button
                   onClick={() => {
-                    setPreviewTimeSec(2.0);
-                    if (audioPreviewRef.current) audioPreviewRef.current.currentTime = 2.0;
+                    setPreviewRelativeTimeSec(1.0);
+                    if (audioPreviewRef.current) audioPreviewRef.current.currentTime = clipStartTimeSec + 1.0;
                   }}
                   className="hover:text-[#FA243C] cursor-pointer"
                 >
-                  0:02
+                  +1s
                 </button>
                 <button
                   onClick={() => {
-                    setPreviewTimeSec(5.0);
-                    if (audioPreviewRef.current) audioPreviewRef.current.currentTime = 5.0;
+                    setPreviewRelativeTimeSec(4.0);
+                    if (audioPreviewRef.current) audioPreviewRef.current.currentTime = clipStartTimeSec + 4.0;
                   }}
                   className="hover:text-[#FA243C] cursor-pointer"
                 >
-                  0:05
+                  +4s
                 </button>
                 <button
                   onClick={() => {
-                    setPreviewTimeSec(10.0);
-                    if (audioPreviewRef.current) audioPreviewRef.current.currentTime = 10.0;
+                    setPreviewRelativeTimeSec(8.0);
+                    if (audioPreviewRef.current) audioPreviewRef.current.currentTime = clipStartTimeSec + 8.0;
                   }}
                   className="hover:text-[#FA243C] cursor-pointer"
                 >
-                  0:10
+                  +8s
                 </button>
                 <button
                   onClick={() => {
-                    setPreviewTimeSec(14.0);
-                    if (audioPreviewRef.current) audioPreviewRef.current.currentTime = 14.0;
+                    setPreviewRelativeTimeSec(12.0);
+                    if (audioPreviewRef.current) audioPreviewRef.current.currentTime = clipStartTimeSec + 12.0;
                   }}
                   className="hover:text-[#FA243C] cursor-pointer"
                 >
-                  0:14
+                  +12s
                 </button>
               </div>
             </div>
