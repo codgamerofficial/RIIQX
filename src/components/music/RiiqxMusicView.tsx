@@ -1745,10 +1745,8 @@ export function RiiqxMusicView() {
                           NOW STREAMING
                         </span>
                         <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                          {currentTrack.format || '320KBPS FULL TRACK'}
+                          {currentTrack.format || '320KBPS MASTER'}
                         </span>
-                        {/* Hero Spectrum Visualizer */}
-                        <AudioVisualizer engine={audioEngineRef.current} isPlaying={isPlaying} barCount={16} height={20} className="hidden sm:inline-block ml-2" />
                       </div>
 
                       <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white font-heading">
@@ -2764,14 +2762,14 @@ export function RiiqxMusicView() {
             className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
             onClick={() => setIsFullscreenPlayer(true)}
           >
-            <div className="relative w-11 h-11 rounded-xl overflow-hidden shadow-sm bg-zinc-800 shrink-0 ring-1 ring-white/10">
+            <div className="relative w-11 h-11 min-w-[44px] min-h-[44px] max-w-[44px] max-h-[44px] rounded-xl overflow-hidden shadow-sm bg-zinc-800 shrink-0 ring-1 ring-white/10">
               <img
                 src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
                 alt={currentTrack.title}
                 onError={(e) => {
                   e.currentTarget.src = FALLBACK_ARTWORK;
                 }}
-                className="w-full h-full object-cover"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] max-w-[44px] max-h-[44px] object-cover rounded-xl"
               />
             </div>
             <div className="min-w-0 flex-1">
@@ -2828,9 +2826,9 @@ export function RiiqxMusicView() {
         {/* DESKTOP FULL-WIDTH END-TO-END COCKPIT (Screens >= sm) */}
         <div className="hidden sm:flex items-center justify-between px-5 lg:px-8 py-2 h-20 w-full gap-4">
           {/* Left: Track Details & Artwork */}
-          <div className="flex items-center gap-3.5 w-1/4 min-w-[200px] lg:min-w-[260px]">
+          <div className="flex items-center gap-3.5 w-[260px] max-w-[280px] shrink-0 min-w-0">
             <div
-              className="relative w-13 h-13 rounded-xl overflow-hidden shadow-md shadow-black/40 shrink-0 bg-zinc-800 ring-1 ring-white/10 group cursor-pointer"
+              className="relative w-14 h-14 min-w-[56px] min-h-[56px] max-w-[56px] max-h-[56px] rounded-xl overflow-hidden shadow-md shadow-black/40 shrink-0 bg-zinc-800 ring-1 ring-white/10 group cursor-pointer"
               onClick={() => setIsFullscreenPlayer(true)}
             >
               <img
@@ -2839,14 +2837,14 @@ export function RiiqxMusicView() {
                 onError={(e) => {
                   e.currentTarget.src = FALLBACK_ARTWORK;
                 }}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-14 h-14 min-w-[56px] min-h-[56px] max-w-[56px] max-h-[56px] object-cover group-hover:scale-105 transition-transform duration-300 rounded-xl"
               />
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <Maximize2 className="w-4 h-4 text-white" />
               </div>
             </div>
 
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 overflow-hidden">
               <h4
                 className="text-sm font-semibold text-zinc-900 dark:text-white truncate cursor-pointer hover:text-[#FA243C] transition-colors leading-tight"
                 onClick={() => setIsFullscreenPlayer(true)}
@@ -2856,12 +2854,12 @@ export function RiiqxMusicView() {
               </h4>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">{currentTrack.artist}</p>
               <div className="flex items-center gap-2 mt-1">
-                <span className="inline-flex items-center gap-1 text-[9px] font-mono font-medium px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1 text-[9px] font-mono font-medium px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 uppercase tracking-wider">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#FA243C]" />
                   {currentTrack.format || 'LOSSLESS • 320K'}
                 </span>
                 {spatialAudioMode !== 'stereo' && (
-                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#FA243C]/15 text-[#FA243C] border border-[#FA243C]/20 uppercase">
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#FA243C]/15 text-[#FA243C] border border-[#FA243C]/20 uppercase">
                     {spatialAudioMode === 'stage3d' ? '3D Stage' : 'Binaural'}
                   </span>
                 )}
@@ -2878,7 +2876,7 @@ export function RiiqxMusicView() {
           </div>
 
           {/* Center: Playback Controls & Precision Scrubber */}
-          <div className="flex flex-col items-center justify-center gap-1.5 flex-1 max-w-xl lg:max-w-2xl px-2">
+          <div className="flex flex-col items-center justify-center gap-1.5 flex-1 min-w-[320px] max-w-xl lg:max-w-2xl px-2">
             {/* Playback Action Buttons */}
             <div className="flex items-center gap-4 lg:gap-6">
               <button
@@ -2968,7 +2966,7 @@ export function RiiqxMusicView() {
           </div>
 
           {/* Right: Audio Utilities, Spatial, Lyrics, Queue, Volume */}
-          <div className="flex items-center gap-1.5 lg:gap-2 w-1/4 justify-end min-w-[200px] lg:min-w-[280px]">
+          <div className="flex items-center gap-1.5 lg:gap-2 shrink-0 justify-end">
             {/* 3D Spatial Audio Stage Toggle */}
             <button
               onClick={() => {
@@ -3031,7 +3029,7 @@ export function RiiqxMusicView() {
             </button>
 
             {/* Volume Control with Custom Smooth Bar */}
-            <div className="hidden lg:flex items-center gap-2 group/volume pl-1">
+            <div className="hidden md:flex items-center gap-1.5 group/volume pl-1">
               <button
                 onClick={toggleMute}
                 className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer p-1"
@@ -3046,7 +3044,7 @@ export function RiiqxMusicView() {
                 )}
               </button>
               <div
-                className="relative w-18 xl:w-22 h-1 group-hover/volume:h-1.5 bg-zinc-200 dark:bg-white/10 rounded-full cursor-pointer transition-all duration-150 py-2 -my-2 flex items-center"
+                className="relative w-16 xl:w-20 h-1 group-hover/volume:h-1.5 bg-zinc-200 dark:bg-white/10 rounded-full cursor-pointer transition-all duration-150 py-2 -my-2 flex items-center"
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   const val = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
@@ -3065,7 +3063,7 @@ export function RiiqxMusicView() {
             {/* Quick Launch Lyric Video Studio (Pro) */}
             <button
               onClick={() => openVideoStudioForTrack(currentTrack)}
-              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors hidden xl:block cursor-pointer"
+              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors hidden 2xl:block cursor-pointer"
               title="Create 9:16 / 16:9 Lyric Video (Pro)"
             >
               <Video className="w-4 h-4" />
@@ -3075,7 +3073,7 @@ export function RiiqxMusicView() {
             <button
               onClick={() => handleToggleSaveOffline(currentTrack)}
               disabled={isDownloadingOfflineId === currentTrack.id}
-              className={`p-2 rounded-xl transition-colors hidden xl:block cursor-pointer ${
+              className={`p-2 rounded-xl transition-colors hidden 2xl:block cursor-pointer ${
                 offlineTrackIds.has(currentTrack.id)
                   ? 'text-emerald-500 bg-emerald-500/10'
                   : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.06] hover:text-emerald-500'
@@ -3092,7 +3090,7 @@ export function RiiqxMusicView() {
             {/* Car Mode */}
             <button
               onClick={() => setIsCarModeOpen(true)}
-              className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.06] hover:text-amber-500 dark:hover:text-amber-400 rounded-xl transition-colors hidden xl:block cursor-pointer"
+              className="p-2 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/[0.06] hover:text-amber-500 dark:hover:text-amber-400 rounded-xl transition-colors hidden 2xl:block cursor-pointer"
               title="Car Mode (Driving Interface)"
             >
               <Car className="w-4 h-4" />
