@@ -7,7 +7,7 @@
 // Powered by Whisper.cpp Large-v3 • Lemo-Opuscar 66 Styles • FFmpeg 9.0.2 • Nirmala UI
 // =============================================================================
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Video,
   Sparkles,
@@ -44,6 +44,7 @@ import {
   Check,
   Disc3,
   ListMusic,
+  ArrowLeft,
 } from 'lucide-react';
 import { Track } from '@/types/music';
 import { INITIAL_TRACKS, FALLBACK_VINYL_ARTWORK } from '@/lib/music/mock-tracks';
@@ -293,7 +294,7 @@ interface AIVideoStudioViewProps {
 }
 
 export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProps) {
-  const { videoStudioTrack } = useRiiqx();
+  const { videoStudioTrack, setActiveTab } = useRiiqx();
 
   // Active Selected Track
   const [selectedTrack, setSelectedTrack] = useState<Track>(() => {
@@ -362,12 +363,28 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
-  // Update selected track if context track changes
+  // Update selected track if context track or current playing track changes
   useEffect(() => {
-    if (videoStudioTrack) {
-      handleSelectTrack(videoStudioTrack);
+    const target = videoStudioTrack || currentPlayingTrack;
+    if (target && target.id !== selectedTrack.id) {
+      handleSelectTrack(target);
     }
-  }, [videoStudioTrack]);
+  }, [videoStudioTrack, currentPlayingTrack]);
+
+  // Responsive Canvas Dimensions based on Aspect Ratio
+  const canvasDimensions = useMemo(() => {
+    switch (aspectRatio) {
+      case '16:9':
+        return { width: 960, height: 540 };
+      case '1:1':
+        return { width: 720, height: 720 };
+      case '4:5':
+        return { width: 576, height: 720 };
+      case '9:16':
+      default:
+        return { width: 540, height: 960 };
+    }
+  }, [aspectRatio]);
 
   // Handle Search Artist / Track
   const handleSearchArtist = async (query: string) => {
@@ -968,14 +985,24 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
             </div>
           </div>
 
-          {/* Quick Action: Sync Current Playing Track */}
-          <button
-            onClick={handleSyncCurrentTrack}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white font-semibold text-xs shadow-md shadow-[#FA243C]/20 transition-all cursor-pointer shrink-0"
-          >
-            <Music2 className="w-4 h-4 text-white" />
-            <span>Sync Current Song</span>
-          </button>
+          {/* Quick Actions */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setActiveTab('music')}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.06] dark:hover:bg-white/[0.12] text-zinc-700 dark:text-zinc-200 font-semibold text-xs border border-zinc-200 dark:border-white/10 transition-all cursor-pointer"
+              title="Return to Music Player"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Music</span>
+            </button>
+            <button
+              onClick={handleSyncCurrentTrack}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white font-semibold text-xs shadow-md shadow-[#FA243C]/20 transition-all cursor-pointer"
+            >
+              <Music2 className="w-4 h-4 text-white" />
+              <span>Sync Current Song</span>
+            </button>
+          </div>
         </div>
 
         {/* Engine Tech Chips */}
@@ -1101,7 +1128,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
                   <h4 className="text-sm font-bold text-zinc-900 dark:text-white truncate">
                     {selectedTrack.title}
                   </h4>
-                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-[#FA243C]/20 text-[#FA243C] border border-[#FA243C]/30">
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#FA243C]/20 text-[#FA243C] border border-[#FA243C]/30">
                     MASTER 320K
                   </span>
                 </div>
@@ -1543,8 +1570,8 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
                 {/* Real-time HTML5 60FPS Canvas */}
                 <canvas
                   ref={canvasRef}
-                  width={aspectRatio === '9:16' ? 540 : 960}
-                  height={aspectRatio === '9:16' ? 960 : 540}
+                  width={canvasDimensions.width}
+                  height={canvasDimensions.height}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
 

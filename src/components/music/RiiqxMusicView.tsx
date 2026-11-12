@@ -1498,7 +1498,7 @@ export function RiiqxMusicView() {
                               }`}>
                                 {track.title}
                               </span>
-                              <span className="hidden xs:inline-block px-1.5 py-0.2 rounded text-[9px] font-mono font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              <span className="hidden xs:inline-block px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                                 320K
                               </span>
                             </div>
@@ -1691,7 +1691,7 @@ export function RiiqxMusicView() {
                             <div className="flex-1 min-w-0">
                               <h4 className="text-xs font-bold text-zinc-900 dark:text-white truncate">{track.title}</h4>
                               <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">{track.artist}</p>
-                              <span className="inline-block mt-1 text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              <span className="inline-block mt-1 text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                                 {track.format || '320kbps Master'}
                               </span>
                             </div>
@@ -1708,7 +1708,7 @@ export function RiiqxMusicView() {
 
               {/* AI VIDEO STUDIO (PRO) TAB */}
               {activeTab === 'video_studio' && (
-                <AIVideoStudioView currentPlayingTrack={currentTrack} />
+                <AIVideoStudioView currentPlayingTrack={videoStudioTrack || currentTrack} />
               )}
 
               {/* DEFAULT VIEW: LISTEN NOW */}
@@ -1785,7 +1785,7 @@ export function RiiqxMusicView() {
                         >
                           <Video className="w-3.5 h-3.5 text-[#FA243C]" />
                           <span>Lyric Studio</span>
-                          <span className="text-[8px] font-black uppercase px-1 py-0.2 rounded bg-white/20 text-white">
+                          <span className="text-[8px] font-black uppercase px-1 py-0.5 rounded bg-white/20 text-white">
                             PRO
                           </span>
                         </button>
@@ -2010,7 +2010,7 @@ export function RiiqxMusicView() {
                                 }`}>
                                   {track.title}
                                 </span>
-                                <span className="hidden xs:inline-block px-1.5 py-0.2 rounded text-[9px] font-mono font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                <span className="hidden xs:inline-block px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                                   {track.format || '320K'}
                                 </span>
                               </div>
@@ -2588,7 +2588,7 @@ export function RiiqxMusicView() {
                       <h4 className="text-xs font-bold text-zinc-900 dark:text-white truncate">{currentTrack.title}</h4>
                       <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">{currentTrack.artist}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                           {currentTrack.format || '320kbps Master'}
                         </span>
                         <AudioVisualizer engine={audioEngineRef.current} isPlaying={isPlaying} barCount={6} height={10} />
@@ -2780,7 +2780,7 @@ export function RiiqxMusicView() {
                 <span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
                   {currentTrack.artist}
                 </span>
-                <span className="text-[8px] font-mono font-bold text-zinc-400 px-1 py-0.2 rounded bg-white/5 border border-white/10">
+                <span className="text-[8px] font-mono font-bold text-zinc-400 px-1 py-0.5 rounded bg-white/5 border border-white/10">
                   LOSSLESS
                 </span>
               </div>
@@ -3623,7 +3623,7 @@ export function RiiqxMusicView() {
                   {/* -10s */}
                   <button
                     onClick={() => handleSeek(Math.max(0, currentTimeMs - 10000))}
-                    className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center text-white text-[11px] sm:text-xs font-bold transition-all cursor-pointer"
+                    className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center text-white text-[11px] sm:text-xs font-bold transition-all cursor-pointer"
                     title="Rewind 10s"
                   >
                     -10s
@@ -3632,7 +3632,7 @@ export function RiiqxMusicView() {
                   {/* Prev */}
                   <button
                     onClick={handlePrevTrack}
-                    className="w-13 h-13 sm:w-15 sm:h-15 rounded-2xl bg-white/[0.1] hover:bg-white/[0.18] active:scale-95 border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer"
+                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/[0.1] hover:bg-white/[0.18] active:scale-95 border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer"
                     title="Previous Track"
                   >
                     <SkipBack className="w-6 h-6 sm:w-7 sm:h-7 fill-current" />
@@ -3641,7 +3641,7 @@ export function RiiqxMusicView() {
                   {/* Massive Play/Pause Circle */}
                   <button
                     onClick={togglePlayPause}
-                    className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] hover:scale-105 active:scale-95 flex items-center justify-center text-white shadow-xl shadow-[#FA243C]/30 transition-all cursor-pointer shrink-0"
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] hover:scale-105 active:scale-95 flex items-center justify-center text-white shadow-xl shadow-[#FA243C]/30 transition-all cursor-pointer shrink-0"
                     title={isPlaying ? 'Pause' : 'Play'}
                   >
                     {isPlaying ? (
@@ -3654,7 +3654,7 @@ export function RiiqxMusicView() {
                   {/* Next */}
                   <button
                     onClick={handleNextTrack}
-                    className="w-13 h-13 sm:w-15 sm:h-15 rounded-2xl bg-white/[0.1] hover:bg-white/[0.18] active:scale-95 border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer"
+                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/[0.1] hover:bg-white/[0.18] active:scale-95 border border-white/[0.15] flex items-center justify-center text-white transition-all cursor-pointer"
                     title="Next Track"
                   >
                     <SkipForward className="w-6 h-6 sm:w-7 sm:h-7 fill-current" />
@@ -3663,7 +3663,7 @@ export function RiiqxMusicView() {
                   {/* +10s */}
                   <button
                     onClick={() => handleSeek(Math.min(durationMs, currentTimeMs + 10000))}
-                    className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center text-white text-[11px] sm:text-xs font-bold transition-all cursor-pointer"
+                    className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center text-white text-[11px] sm:text-xs font-bold transition-all cursor-pointer"
                     title="Forward 10s"
                   >
                     +10s
@@ -3672,7 +3672,7 @@ export function RiiqxMusicView() {
                   {/* Heart Favorite */}
                   <button
                     onClick={() => toggleFavorite(currentTrack.id)}
-                    className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center transition-all cursor-pointer"
+                    className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] active:scale-95 border border-white/[0.1] flex items-center justify-center transition-all cursor-pointer"
                     title="Favorite"
                   >
                     <Heart
@@ -3685,7 +3685,7 @@ export function RiiqxMusicView() {
                   {/* AI Voice Copilot */}
                   <button
                     onClick={toggleVoiceAssistant}
-                    className={`w-11 h-11 sm:w-13 sm:h-13 rounded-2xl border flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
+                    className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl border flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
                       isVoiceListening
                         ? 'bg-[#FA243C]/20 text-[#FA243C] border-[#FA243C] ring-4 ring-[#FA243C]/20'
                         : 'bg-white/[0.08] hover:bg-white/[0.15] border-white/[0.1] text-zinc-300'
