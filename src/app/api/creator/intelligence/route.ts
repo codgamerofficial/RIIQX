@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'node:path';
 import fs from 'node:fs';
+import os from 'node:os';
 import {
   VideoIntelligenceEngine,
   EditingStyle,
@@ -39,8 +40,9 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Save uploaded video file to disk
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+      // Save uploaded video file to disk (supports /tmp on Vercel/serverless)
+      const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+      const uploadsDir = isVercel ? path.join(os.tmpdir(), 'riiqx-uploads') : path.join(process.cwd(), 'public', 'uploads');
       if (!fs.existsSync(uploadsDir)) {
         fs.mkdirSync(uploadsDir, { recursive: true });
       }

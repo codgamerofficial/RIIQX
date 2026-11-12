@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 
 // =============================================================================
 // RIIQX MUSIC — Cloud Playlist & Favorites Sync Engine
@@ -19,8 +20,9 @@ interface SyncPayload {
   updatedAt?: number;
 }
 
-// Local cache file path for dev/guest sessions
-const DATA_DIR = path.join(process.cwd(), '.data');
+// Local cache file path for dev/guest sessions (uses /tmp on Vercel/serverless)
+const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const DATA_DIR = isVercel ? path.join(os.tmpdir(), 'riiqx-data') : path.join(process.cwd(), '.data');
 const SYNC_FILE = path.join(DATA_DIR, 'user-music-sync.json');
 
 function ensureDataFile(): Record<string, SyncPayload> {

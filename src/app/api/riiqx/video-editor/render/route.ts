@@ -7,6 +7,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { FFmpegService } from '@/lib/video/ffmpeg-service';
 import { getSafeTempFilePath } from '@/lib/riiqx/temp-storage';
 import { AssetService } from '@/services/assets/asset-service';
@@ -90,14 +91,23 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Prepare Output Directories
-    const exportVideosDir = path.join(process.cwd(), 'AI Video Editor', 'export', 'final-videos');
-    const exportReportsDir = path.join(process.cwd(), 'AI Video Editor', 'export', 'render-reports');
-    const exportThumbsDir = path.join(process.cwd(), 'AI Video Editor', 'export', 'thumbnails');
-    const publicRenderDir = path.join(process.cwd(), 'public', 'uploads', 'rendered');
+    // 2. Prepare Output Directories (Resilient to Vercel/Serverless read-only environments)
+    const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+    const baseExportDir = isVercel
+      ? path.join(os.tmpdir(), 'riiqx-video-editor')
+      : path.join(process.cwd(), 'AI Video Editor');
+
+    const exportVideosDir = path.join(baseExportDir, 'export', 'final-videos');
+    const exportReportsDir = path.join(baseExportDir, 'export', 'render-reports');
+    const exportThumbsDir = path.join(baseExportDir, 'export', 'thumbnails');
+    const publicRenderDir = isVercel
+      ? path.join(os.tmpdir(), 'riiqx-rendered')
+      : path.join(process.cwd(), 'public', 'uploads', 'rendered');
 
     [exportVideosDir, exportReportsDir, exportThumbsDir, publicRenderDir].forEach((dir) => {
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      try {
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      } catch {}
     });
 
     // 3. Resolve Input Source Video
@@ -162,13 +172,19 @@ export async function POST(req: Request) {
 
     // 6. HyperFrames Deterministic Motion Graphics & Subtitle Compositing
     // Physical copy to final export path, public uploads, and AI Video Editor/Exports
-    fs.copyFileSync(concatMasterTempPath, finalVideoPath);
-    fs.copyFileSync(concatMasterTempPath, publicVideoPath);
+    try {
+      fs.copyFileSync(concatMasterTempPath, finalVideoPath);
+      fs.copyFileSync(concatMasterTempPath, publicVideoPath);
 
-    const directExportsDir = path.join(process.cwd(), 'AI Video Editor', 'Exports');
-    if (!fs.existsSync(directExportsDir)) fs.mkdirSync(directExportsDir, { recursive: true });
-    const directExportsPath = path.join(directExportsDir, outputFileName);
-    fs.copyFileSync(concatMasterTempPath, directExportsPath);
+      const directExportsDir = isVercel
+        ? path.join(os.tmpdir(), 'riiqx-exports')
+        : path.join(process.cwd(), 'AI Video Editor', 'Exports');
+      if (!fs.existsSync(directExportsDir)) fs.mkdirSync(directExportsDir, { recursive: true });
+      const directExportsPath = path.join(directExportsDir, outputFileName);
+      fs.copyFileSync(concatMasterTempPath, directExportsPath);
+    } catch (exportErr) {
+      console.warn('Export file copy skipped in read-only environment:', exportErr);
+    }
 
     if (targetRawNotesPath && fs.existsSync(targetRawNotesPath)) {
       try {

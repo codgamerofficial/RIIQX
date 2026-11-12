@@ -4,19 +4,38 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 
-// Binary paths
+// Detect Vercel / AWS Lambda serverless environment
+const isVercel = Boolean(
+  process.env.VERCEL ||
+  process.env.AWS_LAMBDA_FUNCTION_NAME ||
+  process.env.NEXT_RUNTIME === 'edge'
+);
+
+// Binary paths (Desktop Windows)
 const FFMPEG_BIN = 'C:\\Users\\saswa\\video-tools\\bin\\ffmpeg.exe';
 const WHISPER_BIN = 'C:\\Users\\saswa\\video-tools\\bin\\whisper-cli.exe';
 const WHISPER_MODEL = 'C:\\Users\\saswa\\video-tools\\models\\ggml-large-v3.bin';
+
 const USER_VIDEOS_DIR = path.join(os.homedir(), 'Videos', 'riiqx-lyric-videos');
 const PUBLIC_VIDEOS_DIR = path.join(process.cwd(), 'public', 'videos');
+const TMP_VIDEOS_DIR = path.join(os.tmpdir(), 'riiqx-videos');
 
-// Ensure output directories exist
+// Dynamic output directory based on environment (Vercel uses /tmp)
+const OUTPUT_VIDEOS_DIR = isVercel ? TMP_VIDEOS_DIR : PUBLIC_VIDEOS_DIR;
+
+// Check if local binaries are available
+const hasLocalFfmpeg = !isVercel && fs.existsSync(FFMPEG_BIN);
+
+// Safely ensure output directories exist
 try {
-  if (!fs.existsSync(USER_VIDEOS_DIR)) fs.mkdirSync(USER_VIDEOS_DIR, { recursive: true });
-  if (!fs.existsSync(PUBLIC_VIDEOS_DIR)) fs.mkdirSync(PUBLIC_VIDEOS_DIR, { recursive: true });
-} catch (e) {
-  console.error('Error creating video directories:', e);
+  if (!isVercel) {
+    if (!fs.existsSync(USER_VIDEOS_DIR)) fs.mkdirSync(USER_VIDEOS_DIR, { recursive: true });
+    if (!fs.existsSync(PUBLIC_VIDEOS_DIR)) fs.mkdirSync(PUBLIC_VIDEOS_DIR, { recursive: true });
+  } else {
+    if (!fs.existsSync(TMP_VIDEOS_DIR)) fs.mkdirSync(TMP_VIDEOS_DIR, { recursive: true });
+  }
+} catch {
+  // Silent fallback for read-only serverless environments
 }
 
 export interface AlignedWord {
@@ -174,10 +193,24 @@ export async function POST(req: NextRequest) {
 
     // 2. Action: High-Fidelity Video Render
     if (action === 'render') {
+      // In serverless cloud environments (like Vercel) or when native FFmpeg binary is absent,
+      // seamlessly delegate to high-speed 60FPS browser canvas recorder
+      if (isVercel || !hasLocalFfmpeg) {
+        return NextResponse.json({
+          success: false,
+          fallbackToClient: true,
+          message: 'Cloud serverless environment active. Delegating to 60FPS client-side video renderer.',
+          alignedLines: aligned,
+          clipStartTimeSec,
+          durationSeconds: duration,
+          aspectRatio,
+        });
+      }
+
       const videoId = `riiqx-video-${Date.now()}`;
       const mp4FileName = `${videoId}.mp4`;
-      const publicFilePath = path.join(PUBLIC_VIDEOS_DIR, mp4FileName);
-      const userFilePath = path.join(USER_VIDEOS_DIR, mp4FileName);
+      const publicFilePath = path.join(OUTPUT_VIDEOS_DIR, mp4FileName);
+      const userFilePath = isVercel ? publicFilePath : path.join(USER_VIDEOS_DIR, mp4FileName);
 
       let width = 1080;
       let height = 1920;
@@ -196,7 +229,7 @@ export async function POST(req: NextRequest) {
       let localCoverPath: string | null = null;
       if (song.artworkUrl && song.artworkUrl.startsWith('http')) {
         try {
-          const coverFile = path.join(PUBLIC_VIDEOS_DIR, `${videoId}-cover.jpg`);
+          const coverFile = path.join(OUTPUT_VIDEOS_DIR, `${videoId}-cover.jpg`);
           const imgRes = await fetch(song.artworkUrl);
           if (imgRes.ok) {
             const buffer = Buffer.from(await imgRes.arrayBuffer());
@@ -210,7 +243,7 @@ export async function POST(req: NextRequest) {
 
       // ASS Subtitle generation with Universal Indic/Gurmukhi font support
       const assFileName = `${videoId}.ass`;
-      const assPath = path.join(PUBLIC_VIDEOS_DIR, assFileName);
+      const assPath = path.join(OUTPUT_VIDEOS_DIR, assFileName);
       const playResX = width;
       const playResY = height;
       const fontSize = aspectRatio === '9:16' ? 94 : 84;
@@ -371,9 +404,11 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
   } catch (err: any) {
     console.error('Video Studio API Error:', err);
-    return NextResponse.json(
-      { success: false, error: err.message || 'Internal error in Video Studio' },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      success: false,
+      fallbackToClient: true,
+      error: err.message || 'Video studio server execution error',
+      message: 'Server video rendering unavailable. Delegating to 60FPS client-side video engine.',
+    });
   }
 }
