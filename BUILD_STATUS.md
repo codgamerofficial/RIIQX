@@ -23,6 +23,7 @@
 | **Phase 10** | Sandbox Testing & Security Verification | 🟢 **COMPLETED** | `tests/test-riiqx-commerce-heritage-e2e.mjs` with 8/8 tests passed (Catalog, Filtering, Search, Margin >= 30%, COD blocking, Prepaid Checkout, Downstream PO dispatch). |
 | **Phase 11** | Vercel EROFS Read-Only Filesystem Fix | 🟢 **COMPLETED** | Eliminated all server-side write attempts on Vercel/serverless; multi-layer fallback to 60FPS canvas & data URLs. |
 | **Phase 12** | Creator Studio 2.0 & YouTube Publishing | 🟢 **COMPLETED** | Real FLUX.1 image synthesis, YouTube OAuth & 1-click publishing live via `/api/social/publish`. |
+| **Phase 13** | Statutory Compliance & Operating Playbooks | 🟢 **COMPLETED** | Created `ORDER_STATE_MACHINE.md`, `STATUTORY_COMPLIANCE.md`, `MERCHANT_ONBOARDING_CHECKLIST.md`, and `GROWTH_PLAYBOOK.md`. |
 
 ---
 

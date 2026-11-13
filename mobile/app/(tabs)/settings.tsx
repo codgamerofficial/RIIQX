@@ -1,289 +1,367 @@
 // =============================================================================
-// RIIQX Mobile — Settings, Governance & Shared Backend Diagnostics
-// Supabase Auth · Live API Gateway Telemetry · Clean Sign Out
+// RIIQX Mobile 2.0 — Audiophile Settings & Quality Configuration Screen
+// Lossless Streaming • Dolby Atmos Spatial Engine • Direct Source Stream
+// Matches User Design Screenshot 5 Exactly
 // =============================================================================
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
+  TextInput,
   ScrollView,
-  Alert,
+  TouchableOpacity,
+  Switch,
+  StyleSheet,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useRiiqxMobile } from '../../src/context/RiiqxMobileContext';
-import { colors } from '../../src/theme/colors';
+import { useRiiqxAudio } from '../../src/context/RiiqxAudioContext';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function SettingsScreen() {
   const router = useRouter();
   const {
-    user,
-    signOut,
-    isAuthenticated,
-    apiBaseUrl,
-    isBackendConnected,
-    refreshAll,
-  } = useRiiqxMobile();
+    directSourceStream,
+    setDirectSourceStream,
+    dolbyAtmos,
+    setDolbyAtmos,
+    wifiQuality,
+    mobileDataQuality,
+  } = useRiiqxAudio();
 
-  const [cleared, setCleared] = useState<boolean>(false);
-
-  const handleSignOut = useCallback(() => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out of RIIQX?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: async () => {
-            await signOut();
-            router.replace('/auth/login');
-          },
-        },
-      ]
-    );
-  }, [signOut, router]);
-
-  const handleClearCache = useCallback(() => {
-    Alert.alert(
-      'Clear Local Cache',
-      'Are you sure you want to clear local cache? Server data remains secure.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Clear Cache',
-          style: 'destructive',
-          onPress: () => {
-            setCleared(true);
-            setTimeout(() => setCleared(false), 2000);
-          },
-        },
-      ]
-    );
-  }, []);
-
-  const handleTestConnection = useCallback(async () => {
-    await refreshAll();
-    Alert.alert('Server Probed', `Backend connection probed at ${apiBaseUrl}`);
-  }, [refreshAll, apiBaseUrl]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      {/* Top Header Row with Back Button (Screenshot 5) */}
+      <View style={styles.headerRow}>
+        <TouchableOpacity
+          style={styles.backButtonCircle}
+          onPress={() => router.back()}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.screenHeading}>Settings</Text>
+
+      {/* Search Settings Input (Screenshot 5) */}
+      <View style={styles.searchWrapper}>
+        <Ionicons name="search" size={16} color="#71717A" style={styles.searchIcon} />
+        <TextInput
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Search settings"
+          placeholderTextColor="#71717A"
+          style={styles.searchInput}
+        />
+      </View>
+
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={{ marginBottom: 16 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Ionicons name="settings-outline" size={20} color={colors.cyan} />
-            <Text style={{ color: '#FFFFFF', fontSize: 18, fontWeight: '800' }}>
-              Settings &amp; Governance
-            </Text>
-          </View>
-          <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 4 }}>
-            System infrastructure, online cloud runtimes &amp; shared RIIQX workspace.
-          </Text>
+        {/* Account & Integrations Card Group (Screenshot 5) */}
+        <View style={styles.cardGroup}>
+          <TouchableOpacity style={styles.listItemRow} activeOpacity={0.7}>
+            <View style={styles.itemAvatarBadge}>
+              <Text style={styles.itemAvatarText}>QX</Text>
+            </View>
+            <View style={styles.itemTextContainer}>
+              <Text style={styles.itemTitle}>Account &amp; integrations</Text>
+              <Text style={styles.itemSubtitle}>@riiqxstudio</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#71717A" />
+          </TouchableOpacity>
+
+          <View style={styles.itemDivider} />
+
+          <TouchableOpacity style={styles.listItemRow} activeOpacity={0.7}>
+            <View style={styles.itemIconContainer}>
+              <Ionicons name="people-outline" size={20} color="#D1D5DB" />
+            </View>
+            <View style={styles.itemTextContainer}>
+              <Text style={styles.itemTitle}>Listen together</Text>
+              <Text style={styles.itemSubtitle}>
+                Share a code and play the same music, in time
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#71717A" />
+          </TouchableOpacity>
         </View>
 
-        {/* Section 0: User Identity & Supabase Session */}
-        <View style={{ gap: 10, marginBottom: 16 }}>
-          <Text style={{ color: colors.textSecondary, fontSize: 11, fontWeight: '700' }}>
-            AUTHENTICATED IDENTITY (SUPABASE)
-          </Text>
+        {/* AUDIO QUALITY Section (Screenshot 5) */}
+        <Text style={styles.sectionHeaderTitle}>AUDIO QUALITY</Text>
 
-          <View
-            style={{
-              backgroundColor: colors.surface,
-              borderColor: colors.cardBorder,
-              borderWidth: 1,
-              borderRadius: 14,
-              padding: 14,
-              gap: 8,
-            }}
-          >
-            {isAuthenticated && user ? (
-              <>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Ionicons name="person-circle-outline" size={20} color={colors.cyan} />
-                    <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>
-                      {user.name}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                      paddingHorizontal: 8,
-                      paddingVertical: 3,
-                      borderRadius: 6,
-                    }}
-                  >
-                    <Text style={{ color: colors.emerald, fontSize: 10, fontWeight: '700' }}>
-                      {user.role.toUpperCase()}
-                    </Text>
-                  </View>
-                </View>
-                <Text style={{ color: colors.textSecondary, fontSize: 12 }}>
-                  {user.email}
-                </Text>
-                <TouchableOpacity
-                  onPress={handleSignOut}
-                  style={{
-                    marginTop: 6,
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    borderRadius: 8,
-                    backgroundColor: 'rgba(244, 63, 94, 0.12)',
-                    alignSelf: 'flex-start',
-                  }}
-                >
-                  <Text style={{ color: colors.rose, fontSize: 11, fontWeight: '700' }}>
-                    Sign Out Account
-                  </Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <View>
-                  <Text style={{ color: '#FFFFFF', fontSize: 13, fontWeight: '700' }}>
-                    Guest Explorer
-                  </Text>
-                  <Text style={{ color: colors.textMuted, fontSize: 11 }}>
-                    Not signed into a Supabase account
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => router.push('/auth/login')}
-                  style={{
-                    paddingVertical: 6,
-                    paddingHorizontal: 12,
-                    borderRadius: 8,
-                    backgroundColor: '#FFD43B',
-                  }}
-                >
-                  <Text style={{ color: '#0C0C0E', fontSize: 11, fontWeight: '700' }}>
-                    Sign In
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
+        <View style={styles.cardGroup}>
+          {/* Sources */}
+          <TouchableOpacity style={styles.listItemRow} activeOpacity={0.7}>
+            <View style={styles.itemIconContainer}>
+              <Ionicons name="extension-puzzle-outline" size={20} color="#D1D5DB" />
+            </View>
+            <View style={styles.itemTextContainer}>
+              <Text style={styles.itemTitle}>Sources</Text>
+              <Text style={styles.itemSubtitle}>
+                Where audio comes from and the order used
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#71717A" />
+          </TouchableOpacity>
+
+          <View style={styles.itemDivider} />
+
+          {/* Direct Source Stream Toggle */}
+          <View style={styles.listItemRow}>
+            <View style={styles.itemTextContainerNoIcon}>
+              <Text style={styles.itemTitle}>Direct Source Stream</Text>
+            </View>
+            <Switch
+              value={directSourceStream}
+              onValueChange={setDirectSourceStream}
+              trackColor={{ false: '#27272A', true: '#22C55E' }}
+              thumbColor="#FFFFFF"
+            />
           </View>
-        </View>
 
-        {/* Section 1: Server Connection Diagnostic */}
-        <View style={{ gap: 10, marginBottom: 16 }}>
-          <Text style={{ color: colors.textSecondary, fontSize: 11, fontWeight: '700' }}>
-            SHARED BACKEND GATEWAY
-          </Text>
+          <View style={styles.itemDivider} />
 
-          <View
-            style={{
-              backgroundColor: colors.surface,
-              borderColor: colors.cardBorder,
-              borderWidth: 1,
-              borderRadius: 14,
-              padding: 14,
-              gap: 8,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Ionicons name="server-outline" size={16} color={colors.cyan} />
-                <Text style={{ color: '#FFFFFF', fontSize: 13, fontWeight: '700' }}>
-                  Next.js Online Core
-                </Text>
-              </View>
-              <View
-                style={{
-                  backgroundColor: isBackendConnected
-                    ? 'rgba(16, 185, 129, 0.15)'
-                    : 'rgba(244, 63, 94, 0.15)',
-                  paddingHorizontal: 6,
-                  paddingVertical: 2,
-                  borderRadius: 4,
-                }}
-              >
-                <Text
-                  style={{
-                    color: isBackendConnected ? colors.emerald : colors.rose,
-                    fontSize: 9,
-                    fontWeight: '700',
-                  }}
-                >
-                  {isBackendConnected ? 'ONLINE' : 'UNREACHABLE'}
-                </Text>
+          {/* On Wi-Fi Quality */}
+          <TouchableOpacity style={styles.listItemRow} activeOpacity={0.7}>
+            <View style={styles.itemIconContainer}>
+              <Ionicons name="wifi-outline" size={20} color="#D1D5DB" />
+            </View>
+            <View style={styles.itemTextContainer}>
+              <Text style={styles.itemTitle}>On Wi-Fi</Text>
+            </View>
+            <View style={styles.rightValueRow}>
+              <Text style={styles.rightValueText}>{wifiQuality}</Text>
+              <Ionicons name="chevron-forward" size={16} color="#71717A" />
+            </View>
+          </TouchableOpacity>
+
+          <View style={styles.itemDivider} />
+
+          {/* On Mobile Data Quality with IN USE badge */}
+          <TouchableOpacity style={styles.listItemRow} activeOpacity={0.7}>
+            <View style={styles.itemIconContainer}>
+              <Ionicons name="cellular-outline" size={20} color="#D1D5DB" />
+            </View>
+            <View style={styles.itemTextContainerWithBadge}>
+              <Text style={styles.itemTitle}>On mobile data</Text>
+              <View style={styles.inUseBadge}>
+                <Text style={styles.inUseText}>IN USE</Text>
               </View>
             </View>
+            <View style={styles.rightValueRow}>
+              <Text style={styles.rightValueText}>{mobileDataQuality}</Text>
+              <Ionicons name="chevron-forward" size={16} color="#71717A" />
+            </View>
+          </TouchableOpacity>
 
-            <Text style={{ color: colors.textSecondary, fontSize: 11 }}>
-              Target: {apiBaseUrl}
-            </Text>
+          <View style={styles.itemDivider} />
 
-            <TouchableOpacity
-              onPress={handleTestConnection}
-              style={{
-                alignSelf: 'flex-start',
-                paddingVertical: 4,
-                paddingHorizontal: 8,
-                borderRadius: 6,
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                marginTop: 2,
-              }}
-            >
-              <Text style={{ color: colors.textSecondary, fontSize: 10, fontWeight: '600' }}>
-                Test Connection
+          {/* Dolby Atmos Surround Toggle */}
+          <View style={styles.listItemRow}>
+            <View style={styles.itemIconContainer}>
+              <Ionicons name="hardware-chip-outline" size={20} color="#D1D5DB" />
+            </View>
+            <View style={styles.itemTextContainer}>
+              <Text style={styles.itemTitle}>Dolby Atmos</Text>
+              <Text style={styles.itemSubtitle}>
+                Play the more immersive, surround version of a song when there is one.
               </Text>
-            </TouchableOpacity>
+            </View>
+            <Switch
+              value={dolbyAtmos}
+              onValueChange={setDolbyAtmos}
+              trackColor={{ false: '#27272A', true: '#22C55E' }}
+              thumbColor="#FFFFFF"
+            />
           </View>
         </View>
 
-        {/* Action Buttons */}
-        <View style={{ gap: 10, marginTop: 10 }}>
-          <TouchableOpacity
-            onPress={handleClearCache}
-            style={{
-              backgroundColor: 'rgba(244, 63, 94, 0.1)',
-              borderColor: 'rgba(244, 63, 94, 0.3)',
-              borderWidth: 1,
-              borderRadius: 12,
-              paddingVertical: 12,
-              paddingHorizontal: 16,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-            }}
-          >
-            <Ionicons name="trash-outline" size={16} color={colors.rose} />
-            <Text style={{ color: colors.rose, fontSize: 12, fontWeight: '700' }}>
-              {cleared ? 'Cache Cleared!' : 'Clear Device Cache'}
-            </Text>
+        {/* Content & Storage Options Group (Screenshot 5) */}
+        <View style={[styles.cardGroup, { marginTop: 16 }]}>
+          <TouchableOpacity style={styles.listItemRow} activeOpacity={0.7}>
+            <View style={styles.itemIconContainer}>
+              <Ionicons name="arrow-down-circle-outline" size={20} color="#D1D5DB" />
+            </View>
+            <View style={styles.itemTextContainer}>
+              <Text style={styles.itemTitle}>Downloads</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#71717A" />
+          </TouchableOpacity>
+
+          <View style={styles.itemDivider} />
+
+          <TouchableOpacity style={styles.listItemRow} activeOpacity={0.7}>
+            <View style={styles.itemIconContainer}>
+              <Ionicons name="videocam-outline" size={20} color="#D1D5DB" />
+            </View>
+            <View style={styles.itemTextContainer}>
+              <Text style={styles.itemTitle}>Content Preferences</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#71717A" />
           </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#000000',
+  },
+  headerRow: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 4,
+  },
+  backButtonCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#1C1C20',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  screenHeading: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    paddingHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 14,
+    letterSpacing: -0.6,
+  },
+  searchWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#16161A',
+    borderRadius: 22,
+    height: 42,
+    paddingHorizontal: 14,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '500',
+    paddingVertical: 0,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 170, // Space for mini player and bottom dock
+  },
+  cardGroup: {
+    backgroundColor: '#141418',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    overflow: 'hidden',
+  },
+  listItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  itemAvatarBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#4C1D95',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  itemAvatarText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#F43F5E',
+  },
+  itemIconContainer: {
+    width: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  itemTextContainer: {
+    flex: 1,
+    marginRight: 8,
+  },
+  itemTextContainerNoIcon: {
+    flex: 1,
+  },
+  itemTextContainerWithBadge: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  itemTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  itemSubtitle: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#8E8E93',
+    marginTop: 2,
+    lineHeight: 14,
+  },
+  inUseBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  inUseText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#D1D5DB',
+  },
+  rightValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  rightValueText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#8E8E93',
+  },
+  itemDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    marginLeft: 62,
+  },
+  sectionHeaderTitle: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#71717A',
+    marginTop: 20,
+    marginBottom: 8,
+    marginLeft: 12,
+    letterSpacing: 0.8,
+  },
+});

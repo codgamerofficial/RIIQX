@@ -747,14 +747,14 @@ export default function MobileShoppingScreen() {
                 placeholder="Full Name"
                 placeholderTextColor="#78716C"
                 value={checkoutAddress.name}
-                onChangeText={(t) => setCheckoutAddress((p) => ({ ...p, name: t }))}
+                onChangeText={(t: string) => setCheckoutAddress((p) => ({ ...p, name: t }))}
               />
               <TextInput
                 style={{ backgroundColor: '#1C1917', borderWidth: 1, borderColor: '#292524', borderRadius: 8, padding: 10, color: '#FBF9F5', fontSize: 12 }}
                 placeholder="Mobile (+91)"
                 placeholderTextColor="#78716C"
                 value={checkoutAddress.phone}
-                onChangeText={(t) => setCheckoutAddress((p) => ({ ...p, phone: t }))}
+                onChangeText={(t: string) => setCheckoutAddress((p) => ({ ...p, phone: t }))}
                 keyboardType="phone-pad"
               />
               <TextInput
@@ -762,7 +762,7 @@ export default function MobileShoppingScreen() {
                 placeholder="Delivery Address"
                 placeholderTextColor="#78716C"
                 value={checkoutAddress.address}
-                onChangeText={(t) => setCheckoutAddress((p) => ({ ...p, address: t }))}
+                onChangeText={(t: string) => setCheckoutAddress((p) => ({ ...p, address: t }))}
               />
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 <TextInput
@@ -770,14 +770,14 @@ export default function MobileShoppingScreen() {
                   placeholder="City"
                   placeholderTextColor="#78716C"
                   value={checkoutAddress.city}
-                  onChangeText={(t) => setCheckoutAddress((p) => ({ ...p, city: t }))}
+                  onChangeText={(t: string) => setCheckoutAddress((p) => ({ ...p, city: t }))}
                 />
                 <TextInput
                   style={{ flex: 1, backgroundColor: '#1C1917', borderWidth: 1, borderColor: '#292524', borderRadius: 8, padding: 10, color: '#FBF9F5', fontSize: 12 }}
                   placeholder="Pincode"
                   placeholderTextColor="#78716C"
                   value={checkoutAddress.pincode}
-                  onChangeText={(t) => setCheckoutAddress((p) => ({ ...p, pincode: t }))}
+                  onChangeText={(t: string) => setCheckoutAddress((p) => ({ ...p, pincode: t }))}
                   keyboardType="number-pad"
                 />
               </View>

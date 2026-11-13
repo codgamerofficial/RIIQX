@@ -257,6 +257,17 @@ export interface RiiqxApiClient {
   purchaseGiftCard(params: { platform: string; faceValue: number; paymentMethod?: string; autoCreditToShoppingWallet?: boolean }): Promise<any>;
   trackDropshippingOrder(orderId: string): Promise<any>;
   getMarketplaceProducts(params?: { category?: string; query?: string; sortBy?: string }): Promise<any>;
+  getHeritageCommerceProducts(params?: { collection?: string; query?: string }): Promise<any>;
+  initiateCommerceCheckout(params: {
+    items: Array<{ productId: string; quantity: number }>;
+    shippingAddress: any;
+    paymentMethod: 'upi' | 'card' | 'netbanking';
+  }): Promise<any>;
+  verifyCommerceCheckout(params: {
+    orderId: string;
+    paymentId: string;
+    gatewayName?: string;
+  }): Promise<any>;
 }
 
 export const api: RiiqxApiClient = {
