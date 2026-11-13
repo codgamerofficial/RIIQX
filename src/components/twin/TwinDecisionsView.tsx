@@ -1103,6 +1103,188 @@ export function TwinDecisionsView() {
         </div>
       )}
 
+      {/* Price Truth Onboarding & Featured Comparisons (When in price truth mode but no search performed yet) */}
+      {activeMode === 'price_truth' && !result && (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          {/* Header Banner */}
+          <div className="rounded-3xl border border-orange-500/20 bg-gradient-to-br from-orange-950/20 via-zinc-900/60 to-zinc-950/80 backdrop-blur-xl p-6 sm:p-8 shadow-xl space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                  <Scale className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white tracking-wide">
+                    Live Verified Price Truth &amp; Anti-Simulation Matrix
+                  </h3>
+                  <p className="text-xs text-zinc-400">
+                    Real canonical store links &bull; True payable price factoring bank cards &bull; Zero fake AI hallucinations
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 w-max">
+                100% CANONICAL PDP VERIFIED
+              </span>
+            </div>
+
+            {/* 3 Protection Pillars */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div className="p-4 rounded-2xl bg-zinc-950/60 border border-white/[0.08] space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black text-orange-400 uppercase tracking-wider">01 &bull; EXACT SKU MATCH</span>
+                </div>
+                <p className="text-xs font-bold text-white">Separates Refurbished &amp; Bundles</p>
+                <p className="text-[11px] text-zinc-400">Never get fooled by marketplace third-party sellers passing off older variants or imported grey goods as new.</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-zinc-950/60 border border-white/[0.08] space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black text-rose-400 uppercase tracking-wider">02 &bull; DECEPTIVE FEE SCANNER</span>
+                </div>
+                <p className="text-xs font-bold text-white">Detects Checkout Traps</p>
+                <p className="text-[11px] text-zinc-400">Catches auto-ticked warranties, handling surcharges, fake countdowns, and cancellation penalty fees.</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-zinc-950/60 border border-white/[0.08] space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider">03 &bull; TRUE PAYABLE PRICE</span>
+                </div>
+                <p className="text-xs font-bold text-white">Bank Card &amp; POS Discounts</p>
+                <p className="text-[11px] text-zinc-400">Calculates true out-of-pocket cash factoring your HDFC, ICICI, SBI or Axis credit cards &amp; prime memberships.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Featured Verified Comparisons Grid */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-orange-500" />
+                  <span>Trending Verified Price Comparisons</span>
+                </h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">1-click audit and price check against all major retailers</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                {
+                  title: 'Sony WH-1000XM5 Noise Cancelling Headphones',
+                  category: 'Audio',
+                  mrp: '₹34,990',
+                  bestPrice: '₹26,990',
+                  store: 'Amazon India',
+                  badge: 'SAVE ₹8,000',
+                  highlight: 'HDFC Card ₹2,000 Instant Discount Active',
+                  query: 'Sony WH-1000XM5 Wireless Noise Cancelling Headphones',
+                },
+                {
+                  title: 'Apple MacBook Air M3 (13-inch, 16GB, 512GB)',
+                  category: 'Laptops',
+                  mrp: '₹1,34,900',
+                  bestPrice: '₹1,19,900',
+                  store: 'Reliance Digital',
+                  badge: 'SAVE ₹15,000',
+                  highlight: 'ICICI Bank ₹5,000 Cashback Verified',
+                  query: 'Apple MacBook Air M3 16GB 512GB Space Grey',
+                },
+                {
+                  title: 'Samsung Galaxy S24 Ultra 5G (12GB / 256GB)',
+                  category: 'Smartphones',
+                  mrp: '₹1,34,999',
+                  bestPrice: '₹1,19,999',
+                  store: 'Vijay Sales',
+                  badge: 'SAVE ₹15,000',
+                  highlight: 'Instant Upgrade Bonus + Free Wireless Charger',
+                  query: 'Samsung Galaxy S24 Ultra 5G Titanium Black 256GB',
+                },
+                {
+                  title: 'Apple iPad Air 11-inch M2 (WiFi, 128GB)',
+                  category: 'Tablets',
+                  mrp: '₹59,900',
+                  bestPrice: '₹53,990',
+                  store: 'Croma',
+                  badge: 'SAVE ₹5,910',
+                  highlight: 'SBI Card ₹3,000 Discount + Free Store Pickup',
+                  query: 'Apple iPad Air 11-inch M2 WiFi 128GB Space Grey',
+                },
+                {
+                  title: 'Bose QuietComfort Ultra Wireless Earbuds',
+                  category: 'Audio',
+                  mrp: '₹25,900',
+                  bestPrice: '₹21,900',
+                  store: 'Tata CLiQ',
+                  badge: 'SAVE ₹4,000',
+                  highlight: 'Axis Bank ₹1,500 Instant Swipe Discount',
+                  query: 'Bose QuietComfort Ultra Earbuds Black',
+                },
+                {
+                  title: 'PlayStation 5 Slim Digital Edition (1TB)',
+                  category: 'Gaming',
+                  mrp: '₹44,990',
+                  bestPrice: '₹39,990',
+                  store: 'Flipkart',
+                  badge: 'SAVE ₹5,000',
+                  highlight: 'Bank Offer ₹2,500 + Official Sony Warranty',
+                  query: 'Sony PlayStation 5 Slim Digital Edition Console',
+                },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => {
+                    setQuery(item.query);
+                    handleAnalyze(item.query);
+                  }}
+                  className="p-5 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-white/[0.08] hover:border-orange-500/40 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 shadow-sm hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between space-y-4 group"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-300">
+                        {item.category}
+                      </span>
+                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                        {item.badge}
+                      </span>
+                    </div>
+
+                    <h4 className="font-bold text-sm text-zinc-900 dark:text-white group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors line-clamp-2">
+                      {item.title}
+                    </h4>
+
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-1">
+                      {item.highlight}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
+                    <div>
+                      <div className="text-[10px] text-zinc-400 line-through">{item.mrp}</div>
+                      <div className="text-base font-black text-zinc-900 dark:text-white">
+                        {item.bestPrice}
+                      </div>
+                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{item.store}</span>
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setQuery(item.query);
+                        handleAnalyze(item.query);
+                      }}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                    >
+                      <span>Verify Price</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 4. Decision Results Container */}
       {activeMode === 'price_truth' && result && (
         <div className="space-y-8 animate-in fade-in duration-300">

@@ -8,6 +8,7 @@
 
 import React, { useState } from 'react';
 import { useRiiqx, RiiqxViewTab } from '@/context/RiiqxContext';
+import { RiiqxProfileAvatarPill } from '@/components/ui/RiiqxWaveMark';
 import {
   Radio,
   Disc3,
@@ -152,16 +153,18 @@ export function RiiqxSidebar() {
       <div className="shrink-0 pt-2 w-full border-t border-white/[0.06]">
         {isCollapsed ? (
           <div
-            className="w-9 h-9 rounded-full bg-[#18181d] border border-white/10 flex items-center justify-center text-white font-bold text-xs shrink-0 mx-auto cursor-pointer"
+            className="w-9 h-9 flex items-center justify-center shrink-0 mx-auto cursor-pointer"
             title={`${resolvedDisplayName} • Lossless Audio`}
+            onClick={() => setActiveTab('settings')}
           >
-            <span>{userInitial}</span>
+            <RiiqxProfileAvatarPill size={32} />
           </div>
         ) : (
-          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer">
-            <div className="w-8 h-8 rounded-full bg-[#1c1c22] border border-white/10 flex items-center justify-center text-white font-bold text-xs shrink-0">
-              <span>{userInitial}</span>
-            </div>
+          <div
+            onClick={() => setActiveTab('settings')}
+            className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer"
+          >
+            <RiiqxProfileAvatarPill size={34} />
 
             <div className="flex flex-col flex-1 min-w-0">
               <span className="text-xs font-semibold text-white truncate">

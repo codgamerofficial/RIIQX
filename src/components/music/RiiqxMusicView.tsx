@@ -72,6 +72,7 @@ import { RiiqxLogo } from '@/components/ui/RiiqxLogo';
 import { RiiqxWaveMark, RiiqxProfileAvatarPill } from '@/components/ui/RiiqxWaveMark';
 import { AIThinkingOrb } from '@/components/riiqx/ai/AIThinkingOrb';
 import { AIVideoStudioView } from '@/components/video/AIVideoStudioView';
+import { TwinDecisionsView } from '@/components/twin/TwinDecisionsView';
 import {
   saveTrackOffline,
   isTrackSavedOffline,
@@ -231,11 +232,15 @@ export function RiiqxMusicView() {
   const [isShuffle, setIsShuffle] = useState<boolean>(false);
   const [isRepeat, setIsRepeat] = useState<boolean>(false);
   const [isAutoplayOn, setIsAutoplayOn] = useState<boolean>(true);
+  const [showAllHeavyRotation, setShowAllHeavyRotation] = useState<boolean>(false);
+  const [djCrossfader, setDjCrossfader] = useState<number>(50);
+  const [djDeckBpm, setDjDeckBpm] = useState<number>(128);
 
   // Tab routing
   const activeTab = useMemo(() => {
     if (contextActiveTab === 'ai_dj') return 'ai_dj';
     if (contextActiveTab === 'video_studio') return 'video_studio';
+    if (contextActiveTab === 'decisions') return 'decisions';
     if (contextActiveTab === 'browse') return 'browse';
     if (contextActiveTab === 'offline') return 'offline';
     if (contextActiveTab === 'playlists') return 'playlists';
@@ -1628,19 +1633,178 @@ export function RiiqxMusicView() {
               {/* AI MUSIC DJ & STUDIO TAB */}
               {activeTab === 'ai_dj' && (
                 <div className="space-y-6">
-                  {/* AI DJ Hero Banner (Apple Music + Spotify Minimalist Aesthetic) */}
+                  {/* Interactive Dual-Deck DJ Console Visualizer */}
+                  <div className="p-6 md:p-8 rounded-3xl bg-gradient-to-b from-[#18181D] via-[#101014] to-[#0A0A0D] border border-white/[0.08] shadow-2xl space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-[#FA243C]/10 border border-[#FA243C]/20 flex items-center justify-center text-[#FA243C]">
+                          <Sparkles className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                            <span>RIIQX AI DJ Studio &bull; Pro Dual Deck</span>
+                            <span className="text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                              320K LOSSLESS
+                            </span>
+                          </h2>
+                          <p className="text-xs text-zinc-400">
+                            Neural seamless beatmatching &bull; Automated harmonics &bull; AI Voice commentary
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={triggerAiDjHostIntro}
+                          disabled={isDjSpeaking || isDjLoading}
+                          className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white font-bold text-xs shadow-md shadow-[#FA243C]/20 transition-all cursor-pointer"
+                        >
+                          {isDjLoading ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : isDjSpeaking ? (
+                            <AIThinkingOrb state="generating" size={14} neuralActivity={false} />
+                          ) : (
+                            <Mic className="w-3.5 h-3.5" />
+                          )}
+                          <span>{isDjSpeaking ? 'DJ Speaking...' : 'DJ Voice Intro'}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Dual Decks + Center Mixer Cockpit */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                      {/* Deck A (Left - On Air) */}
+                      <div className="lg:col-span-4 p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] flex flex-col items-center text-center space-y-3 relative overflow-hidden">
+                        <div className="flex items-center justify-between w-full text-[10px] font-mono text-zinc-400">
+                          <span className="font-bold text-[#FA243C]">DECK A &bull; ON AIR</span>
+                          <span className="px-2 py-0.5 rounded bg-white/10 text-white font-bold">{djDeckBpm} BPM</span>
+                        </div>
+
+                        {/* Spinning Vinyl Turntable */}
+                        <div className="relative w-36 h-36 rounded-full bg-gradient-to-tr from-zinc-950 via-zinc-800 to-zinc-900 border-4 border-zinc-700 shadow-2xl flex items-center justify-center p-3">
+                          <div
+                            className={`w-full h-full rounded-full overflow-hidden border border-white/20 shadow-inner ${
+                              isPlaying ? 'animate-spin' : ''
+                            }`}
+                            style={{ animationDuration: '4s' }}
+                          >
+                            <img
+                              src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
+                              alt={currentTrack.title}
+                              className="w-full h-full object-cover rounded-full"
+                            />
+                          </div>
+                          <div className="absolute w-6 h-6 rounded-full bg-black border-2 border-white/40 flex items-center justify-center pointer-events-none">
+                            <div className="w-2 h-2 rounded-full bg-white" />
+                          </div>
+                        </div>
+
+                        <div className="w-full">
+                          <h4 className="text-sm font-bold text-white truncate">{currentTrack.title}</h4>
+                          <p className="text-xs text-zinc-400 truncate">{currentTrack.artist}</p>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-[10px] font-mono text-emerald-400">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                          <span>PITCH 0.0% &bull; MASTER TEMPO</span>
+                        </div>
+                      </div>
+
+                      {/* Center Mixer Console */}
+                      <div className="lg:col-span-4 p-5 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex flex-col items-center justify-between space-y-4">
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">
+                          CROSSFADER &bull; DUAL TRANSITION
+                        </span>
+
+                        {/* Waveform visualizer */}
+                        <div className="w-full h-12 flex items-center justify-center px-2">
+                          <AudioVisualizer engine={audioEngineRef.current} isPlaying={isPlaying} barCount={24} height={40} />
+                        </div>
+
+                        {/* Crossfader slider */}
+                        <div className="w-full space-y-1.5">
+                          <div className="flex justify-between text-[10px] font-mono text-zinc-400 px-1">
+                            <span className={djCrossfader < 40 ? 'text-[#FA243C] font-bold' : ''}>DECK A</span>
+                            <span className="text-white font-bold">{djCrossfader}%</span>
+                            <span className={djCrossfader > 60 ? 'text-cyan-400 font-bold' : ''}>DECK B</span>
+                          </div>
+                          <input
+                            type="range"
+                            min={0}
+                            max={100}
+                            value={djCrossfader}
+                            onChange={(e) => setDjCrossfader(Number(e.target.value))}
+                            className="w-full h-3 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-[#FA243C]"
+                          />
+                        </div>
+
+                        <button
+                          onClick={togglePlayPause}
+                          className="w-12 h-12 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white flex items-center justify-center shadow-lg shadow-[#FA243C]/30 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                        >
+                          {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current translate-x-0.5" />}
+                        </button>
+                      </div>
+
+                      {/* Deck B (Right - Cue / Next) */}
+                      {(() => {
+                        const nextTrack = upcomingQueue[0] || tracks[(currentTrackIndex + 1) % tracks.length] || currentTrack;
+                        return (
+                          <div className="lg:col-span-4 p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] flex flex-col items-center text-center space-y-3 relative overflow-hidden">
+                            <div className="flex items-center justify-between w-full text-[10px] font-mono text-zinc-400">
+                              <span className="font-bold text-cyan-400">DECK B &bull; NEXT CUE</span>
+                              <span className="px-2 py-0.5 rounded bg-white/10 text-white font-bold">{djDeckBpm + 2} BPM</span>
+                            </div>
+
+                            {/* Spinning Vinyl Turntable (Deck B) */}
+                            <div className="relative w-36 h-36 rounded-full bg-gradient-to-tr from-zinc-950 via-zinc-800 to-zinc-900 border-4 border-zinc-700 shadow-2xl flex items-center justify-center p-3">
+                              <div
+                                className={`w-full h-full rounded-full overflow-hidden border border-white/20 shadow-inner ${
+                                  isPlaying ? 'animate-spin' : ''
+                                }`}
+                                style={{ animationDuration: '4.2s' }}
+                              >
+                                <img
+                                  src={nextTrack.artworkUrl || FALLBACK_ARTWORK}
+                                  alt={nextTrack.title}
+                                  className="w-full h-full object-cover rounded-full"
+                                />
+                              </div>
+                              <div className="absolute w-6 h-6 rounded-full bg-black border-2 border-white/40 flex items-center justify-center pointer-events-none">
+                                <div className="w-2 h-2 rounded-full bg-cyan-400" />
+                              </div>
+                            </div>
+
+                            <div className="w-full">
+                              <h4 className="text-sm font-bold text-white truncate">{nextTrack.title}</h4>
+                              <p className="text-xs text-zinc-400 truncate">{nextTrack.artist}</p>
+                            </div>
+
+                            <button
+                              onClick={() => playDirectTrack(nextTrack)}
+                              className="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold hover:bg-cyan-500/30 transition-all cursor-pointer"
+                            >
+                              Transition to Deck B
+                            </button>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* AI Prompt Input Bar (Apple Music + Spotify Minimalist Aesthetic) */}
                   <div className="relative rounded-3xl overflow-hidden border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] backdrop-blur-2xl p-6 md:p-8 shadow-sm space-y-4">
                     <div className="flex items-center gap-3.5">
                       <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-white/[0.06] border border-zinc-200 dark:border-white/[0.1] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
                         <AIThinkingOrb state={isAiLoading ? 'generating' : 'idle'} size={38} />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
-                          <span>RIIQX AI Music DJ</span>
+                        <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
+                          <span>Ask RIIQX AI DJ for Any Vibe</span>
                           <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/15">
                             LLM CURATED
                           </span>
-                        </h2>
+                        </h3>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
                           Powered by high-speed neural models to generate instant mood playlists and acoustic deep dives.
                         </p>
@@ -1742,6 +1906,11 @@ export function RiiqxMusicView() {
               {/* AI VIDEO STUDIO (PRO) TAB */}
               {activeTab === 'video_studio' && (
                 <AIVideoStudioView currentPlayingTrack={videoStudioTrack || currentTrack} />
+              )}
+
+              {/* DECISIONS LAB & DEALS TAB */}
+              {activeTab === 'decisions' && (
+                <TwinDecisionsView />
               )}
 
               {/* DEFAULT VIEW: LISTEN NOW */}
@@ -2002,15 +2171,24 @@ export function RiiqxMusicView() {
                   {/* Heavy Rotation Carousel */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
-                        <Flame className="w-4 h-4 text-orange-500" />
-                        <span>Heavy Rotation &amp; Trending Hits</span>
-                      </h3>
-                      <span className="text-xs text-zinc-500 dark:text-zinc-400">Guru Randhawa, Chainsmokers, Arijit</span>
+                      <div>
+                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
+                          <Flame className="w-4 h-4 text-orange-500" />
+                          <span>Heavy Rotation &amp; Trending Hits</span>
+                        </h3>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">Guru Randhawa, Chainsmokers, Arijit, Karan Aujla</p>
+                      </div>
+
+                      <button
+                        onClick={() => setShowAllHeavyRotation(!showAllHeavyRotation)}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-white/[0.06] hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer"
+                      >
+                        {showAllHeavyRotation ? 'Show Less' : `Show All (${tracks.length})`}
+                      </button>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                      {tracks.map((track, idx) => {
+                      {(showAllHeavyRotation ? tracks : tracks.slice(0, 10)).map((track, idx) => {
                         const isCurrent = idx === currentTrackIndex;
                         return (
                           <div
@@ -2572,6 +2750,64 @@ export function RiiqxMusicView() {
                     </div>
                   </div>
 
+                  {/* 10-Band Graphic Equalizer Faders */}
+                  <div className="p-6 rounded-3xl bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.08] shadow-sm space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                          <span>10-Band Graphic EQ Spectrum</span>
+                          <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+                            &plusmn;12 dB Dynamic Range
+                          </span>
+                        </h4>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                          Hardware-accelerated parametric biquad filters across the human audible spectrum (32Hz - 16kHz)
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setEqSettings((prev) => ({ ...prev, preset: 'Balanced' as any, bassBoostLevel: 0 }))}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-white/[0.06] hover:bg-zinc-200 dark:hover:bg-white/[0.1] text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer"
+                      >
+                        Reset Flat
+                      </button>
+                    </div>
+
+                    {/* 10 Vertical Sliders */}
+                    <div className="grid grid-cols-10 gap-2 sm:gap-4 pt-3 pb-2 items-end justify-items-center">
+                      {[
+                        { freq: '32Hz', band: 'Sub-Bass', gain: Math.round((eqSettings.bassBoostLevel / 100) * 8) },
+                        { freq: '64Hz', band: 'Bass', gain: Math.round((eqSettings.bassBoostLevel / 100) * 6) },
+                        { freq: '125Hz', band: 'Warmth', gain: Math.round((eqSettings.bassBoostLevel / 100) * 4) },
+                        { freq: '250Hz', band: 'Low-Mid', gain: 1 },
+                        { freq: '500Hz', band: 'Body', gain: 0 },
+                        { freq: '1kHz', band: 'Vocal', gain: eqSettings.preset.includes('Vocal') ? 4 : 0 },
+                        { freq: '2kHz', band: 'Presence', gain: eqSettings.preset.includes('Vocal') ? 3 : 1 },
+                        { freq: '4kHz', band: 'Clarity', gain: 2 },
+                        { freq: '8kHz', band: 'Brilliance', gain: 3 },
+                        { freq: '16kHz', band: 'Air', gain: 4 },
+                      ].map((item, idx) => (
+                        <div key={idx} className="flex flex-col items-center gap-2 group w-full">
+                          <span className="text-[10px] font-mono font-bold text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
+                            {item.gain >= 0 ? `+${item.gain}` : item.gain}
+                          </span>
+                          <div className="h-28 sm:h-36 w-2 bg-zinc-200 dark:bg-white/[0.08] rounded-full relative flex items-center justify-center">
+                            <div
+                              className="w-full bg-[#FA243C] rounded-full transition-all duration-150 absolute bottom-0"
+                              style={{ height: `${Math.min(100, Math.max(10, 50 + item.gain * 4))}%` }}
+                            />
+                            <div
+                              className="w-4 h-4 rounded-full bg-white shadow-md border border-zinc-300 dark:border-white/20 absolute -translate-x-1/2 left-1/2 cursor-grab transition-all"
+                              style={{ bottom: `calc(${Math.min(95, Math.max(5, 50 + item.gain * 4))}% - 8px)` }}
+                            />
+                          </div>
+                          <span className="text-[10px] font-mono font-bold text-zinc-700 dark:text-zinc-300 mt-1">
+                            {item.freq}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Presets Grid */}
                   <div className="space-y-3">
                     <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -2738,10 +2974,10 @@ export function RiiqxMusicView() {
                         <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">Direct Source Stream</h4>
                         <p className="text-xs text-zinc-500">Direct bitstream pass-through</p>
                       </div>
-                      <input
-                        type="checkbox"
-                        className="w-5 h-5 accent-[#34C759] rounded cursor-pointer"
-                      />
+                      <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                        <input type="checkbox" className="sr-only peer" />
+                        <div className="w-11 h-6 bg-zinc-300 dark:bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#34C759]"></div>
+                      </label>
                     </div>
 
                     <div className="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer">
@@ -2774,11 +3010,10 @@ export function RiiqxMusicView() {
                           Play the more immersive, surround version of a song when there is one.
                         </p>
                       </div>
-                      <input
-                        type="checkbox"
-                        defaultChecked
-                        className="w-5 h-5 accent-[#34C759] rounded cursor-pointer"
-                      />
+                      <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                        <input type="checkbox" defaultChecked className="sr-only peer" />
+                        <div className="w-11 h-6 bg-zinc-300 dark:bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#34C759]"></div>
+                      </label>
                     </div>
                   </div>
 
@@ -3389,19 +3624,23 @@ export function RiiqxMusicView() {
                 )}
               </button>
               <div
-                className="relative w-16 xl:w-20 h-1 group-hover/volume:h-1.5 bg-zinc-200 dark:bg-white/10 rounded-full cursor-pointer transition-all duration-150 py-2 -my-2 flex items-center"
+                className="relative w-20 xl:w-24 h-1 group-hover/volume:h-1.5 bg-zinc-200 dark:bg-white/15 rounded-full cursor-pointer transition-all duration-150 py-2 -my-2 flex items-center"
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   const val = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
                   handleVolumeChange(val);
                 }}
               >
-                <div className="w-full h-full bg-zinc-200 dark:bg-white/10 rounded-full overflow-hidden pointer-events-none">
+                <div className="w-full h-full bg-zinc-200 dark:bg-white/15 rounded-full overflow-hidden pointer-events-none">
                   <div
                     className="h-full bg-zinc-800 dark:bg-white group-hover/volume:bg-[#FA243C] rounded-full transition-all duration-75"
                     style={{ width: `${(isMuted ? 0 : volume) * 100}%` }}
                   />
                 </div>
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-md opacity-0 group-hover/volume:opacity-100 transition-opacity pointer-events-none"
+                  style={{ left: `calc(${Math.min(100, Math.max(0, (isMuted ? 0 : volume) * 100))}% - 6px)` }}
+                />
               </div>
             </div>
 
@@ -3743,7 +3982,7 @@ export function RiiqxMusicView() {
 
       {/* Fullscreen Player Modal (Apple Music + RiMusic Hybrid - Screenshot 4) */}
       {isFullscreenPlayer && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-gradient-to-b from-[#6B1A1E] via-[#280B0F] to-[#0A0507] p-4 sm:p-6 md:p-8 overflow-hidden select-none">
+        <div className="fixed inset-0 z-50 flex flex-col bg-gradient-to-b from-[#6B1A1E] via-[#280B0F] to-[#0A0507] p-4 sm:p-6 md:p-8 max-h-screen overflow-y-auto no-scrollbar select-none justify-between">
           {/* Dynamic Ambient blurred glow */}
           {currentTrack.artworkUrl && (
             <div
@@ -3778,9 +4017,9 @@ export function RiiqxMusicView() {
           </div>
 
           {/* Center Stage: Artwork / Synced Lyrics Drawer */}
-          <div className="flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full my-auto space-y-4">
+          <div className="flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full my-auto space-y-3 sm:space-y-4 py-2">
             {/* Large Rounded-3xl Artwork (Screenshot 4) */}
-            <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-92 md:h-92 rounded-3xl overflow-hidden shadow-2xl border border-white/10 group bg-zinc-900 shrink-0">
+            <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 max-h-[32vh] aspect-square rounded-3xl overflow-hidden shadow-2xl border border-white/10 group bg-zinc-900 shrink-0 mx-auto">
               <img
                 src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
                 alt={currentTrack.title}
@@ -3794,12 +4033,12 @@ export function RiiqxMusicView() {
             </div>
 
             {/* Song Title, Artist & Actions (Favorite Star, 3-dots) (Screenshot 4) */}
-            <div className="flex items-center justify-between w-full pt-2">
+            <div className="flex items-center justify-between w-full pt-1">
               <div className="flex-1 min-w-0 pr-3">
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight truncate">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight truncate">
                   {currentTrack.title}
                 </h2>
-                <p className="text-sm sm:text-base text-white/70 font-medium truncate mt-0.5">
+                <p className="text-xs sm:text-sm md:text-base text-white/70 font-medium truncate mt-0.5">
                   {currentTrack.artist}
                 </p>
               </div>
@@ -3807,15 +4046,15 @@ export function RiiqxMusicView() {
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => toggleFavorite(currentTrack.id)}
-                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
                 >
-                  <Star className={`w-5 h-5 ${currentTrack.isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-white'}`} />
+                  <Star className={`w-4 h-4 sm:w-5 sm:h-5 ${currentTrack.isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-white'}`} />
                 </button>
                 <button
                   onClick={() => setIsEqualizerOpen(true)}
-                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
                 >
-                  <MoreVertical className="w-5 h-5 text-white" />
+                  <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </button>
               </div>
             </div>
@@ -3823,14 +4062,14 @@ export function RiiqxMusicView() {
             {/* Synced Lyric Sneak-Peek Line (Screenshot 4) */}
             <div
               onClick={() => setRightPanelTab(rightPanelTab === 'lyrics' ? null : 'lyrics')}
-              className="flex items-center justify-between w-full py-1 text-white/85 hover:text-white cursor-pointer transition-colors"
+              className="flex items-center justify-between w-full py-0.5 text-white/85 hover:text-white cursor-pointer transition-colors"
             >
-              <p className="text-sm sm:text-base font-semibold truncate flex-1 pr-2">
+              <p className="text-xs sm:text-sm font-semibold truncate flex-1 pr-2">
                 {activeLyricIndex >= 0 && lyricsData?.syncedLyrics?.[activeLyricIndex]?.text
                   ? lyricsData.syncedLyrics[activeLyricIndex].text
                   : 'Lyrics synchronized via LRCLIB Master'}
               </p>
-              <span className="text-white/60 text-sm font-bold">&gt;</span>
+              <span className="text-white/60 text-xs sm:text-sm font-bold">&gt;</span>
             </div>
 
             {/* Scrubber Progress Slider */}
@@ -3845,7 +4084,7 @@ export function RiiqxMusicView() {
               />
               <div className="flex justify-between items-center text-xs font-medium text-white/70 pt-0.5">
                 <span>{formatDuration(currentTimeMs)}</span>
-                <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-white font-mono text-[10px] font-semibold flex items-center gap-1">
+                <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-white font-mono text-[9px] font-semibold flex items-center gap-1">
                   <span>🎧</span>
                   <span>High quality</span>
                 </span>
@@ -3854,48 +4093,58 @@ export function RiiqxMusicView() {
             </div>
 
             {/* Big Transport Controls: Previous, Play/Pause, Next (Screenshot 4) */}
-            <div className="flex items-center justify-center gap-8 py-1">
+            <div className="flex items-center justify-center gap-6 sm:gap-8 py-1">
               <button
                 onClick={handlePrevTrack}
                 className="text-white/90 hover:text-white hover:scale-110 transition-all cursor-pointer"
               >
-                <SkipBack className="w-8 h-8 fill-current" />
+                <SkipBack className="w-7 h-7 sm:w-8 sm:h-8 fill-current" />
               </button>
               <button
                 onClick={togglePlayPause}
-                className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white text-black flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
               >
                 {isPlaying ? (
-                  <Pause className="w-7 h-7 fill-current" />
+                  <Pause className="w-6 h-6 sm:w-7 sm:h-7 fill-current" />
                 ) : (
-                  <Play className="w-7 h-7 fill-current translate-x-0.5" />
+                  <Play className="w-6 h-6 sm:w-7 sm:h-7 fill-current translate-x-0.5" />
                 )}
               </button>
               <button
                 onClick={handleNextTrack}
                 className="text-white/90 hover:text-white hover:scale-110 transition-all cursor-pointer"
               >
-                <SkipForward className="w-8 h-8 fill-current" />
+                <SkipForward className="w-7 h-7 sm:w-8 sm:h-8 fill-current" />
               </button>
             </div>
 
             {/* Volume Slider Bar with Speaker Low & High Icons (Screenshot 4) */}
-            <div className="flex items-center gap-3 w-full px-2">
+            <div className="flex items-center gap-3 w-full px-2 max-w-md mx-auto">
               <Volume1 className="w-4 h-4 text-white/60 shrink-0" />
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.01}
-                value={isMuted ? 0 : volume}
-                onChange={(e) => handleVolumeChange(Number(e.target.value))}
-                className="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
-              />
+              <div
+                className="relative flex-1 h-1.5 bg-white/20 rounded-full cursor-pointer py-2 -my-2 flex items-center group/fullvol"
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const val = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                  handleVolumeChange(val);
+                }}
+              >
+                <div className="w-full h-full bg-white/20 rounded-full overflow-hidden pointer-events-none">
+                  <div
+                    className="h-full bg-white rounded-full transition-all duration-75"
+                    style={{ width: `${(isMuted ? 0 : volume) * 100}%` }}
+                  />
+                </div>
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-lg pointer-events-none"
+                  style={{ left: `calc(${Math.min(100, Math.max(0, (isMuted ? 0 : volume) * 100))}% - 7px)` }}
+                />
+              </div>
               <Volume2 className="w-4 h-4 text-white/60 shrink-0" />
             </div>
 
             {/* Bottom Actions Bar: Lyrics, Cast, Queue (Screenshot 4) */}
-            <div className="flex items-center justify-around w-full pt-2">
+            <div className="flex items-center justify-around w-full pt-1">
               <button
                 onClick={() => setRightPanelTab(rightPanelTab === 'lyrics' ? null : 'lyrics')}
                 className="p-2 text-white/80 hover:text-white transition-colors cursor-pointer"
