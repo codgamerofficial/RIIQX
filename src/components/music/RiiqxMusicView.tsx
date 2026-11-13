@@ -54,6 +54,13 @@ import {
   HardDriveDownload,
   MicOff,
   Car,
+  Star,
+  MoreVertical,
+  Cast,
+  MessageSquare,
+  Folder,
+  Compass,
+  History,
 } from 'lucide-react';
 import { Track, Playlist, Lyrics, EqualizerSettings } from '@/types/music';
 import { INITIAL_TRACKS, INITIAL_PLAYLISTS, FALLBACK_VINYL_ARTWORK } from '@/lib/music/mock-tracks';
@@ -62,6 +69,7 @@ import { fetchLyrics } from '@/lib/music/lyrics-service';
 import { useRiiqx } from '@/context/RiiqxContext';
 import { AudioVisualizer } from './AudioVisualizer';
 import { RiiqxLogo } from '@/components/ui/RiiqxLogo';
+import { RiiqxWaveMark, RiiqxProfileAvatarPill } from '@/components/ui/RiiqxWaveMark';
 import { AIThinkingOrb } from '@/components/riiqx/ai/AIThinkingOrb';
 import { AIVideoStudioView } from '@/components/video/AIVideoStudioView';
 import {
@@ -151,6 +159,21 @@ export const STATIONS: Station[] = [
     badge: 'NIGHT DRIVE',
     gradient: 'from-cyan-600/30 to-blue-600/30',
   },
+];
+
+export const EXPLORE_CATEGORIES = [
+  { title: 'Chill', subtitle: 'Coffee Shop Blend', gradient: 'from-[#456B82] to-[#2B4758]', query: 'lofi chill coffee beats' },
+  { title: 'Commute', subtitle: 'Feel-Good Hip Hop', gradient: 'from-[#B88214] to-[#785408]', query: 'drake hip hop upbeat drive' },
+  { title: 'Diwali', subtitle: 'Bollywood Party', gradient: 'from-[#5E5953] to-[#3A3632]', query: 'bollywood party dance hits' },
+  { title: 'Energize', subtitle: 'Pump-up Pop', gradient: 'from-[#948028] to-[#605214]', query: 'workout pop high energy' },
+  { title: 'Feel good', subtitle: 'Sunshine Indie', gradient: 'from-[#3B6846] to-[#214029]', query: 'feel good acoustic sunshine indie' },
+  { title: 'Focus', subtitle: 'Lofi Loft', gradient: 'from-[#484E56] to-[#2C3138]', query: 'study focus ambient vinyl' },
+  { title: 'Gaming', subtitle: 'Gaming Hits', gradient: 'from-[#343D49] to-[#1E242C]', query: 'electronic gaming hits' },
+  { title: 'Party', subtitle: 'Bollywood Dance', gradient: 'from-[#6A3B9B] to-[#432168]', query: 'bhangra party dance punjabi' },
+  { title: 'Romance', subtitle: 'Bollywood Romance', gradient: 'from-[#8C1D24] to-[#590E13]', query: 'romantic soulful arijit love' },
+  { title: 'Sad', subtitle: 'Bollywood Melancholy', gradient: 'from-[#2F3238] to-[#1B1D20]', query: 'sad acoustic piano melancholy' },
+  { title: 'African', subtitle: 'Afrobeats & Heat', gradient: 'from-[#5A442E] to-[#38281A]', query: 'afrobeats dancehall' },
+  { title: 'Arabic', subtitle: 'Khaleeji & Levantine', gradient: 'from-[#6B5824] to-[#453610]', query: 'arabic modern pop' },
 ];
 
 function formatDuration(ms: number): string {
@@ -1285,7 +1308,17 @@ export function RiiqxMusicView() {
                 : 'bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] hover:text-white'
             }`}
           >
-            Browse
+            Explore
+          </button>
+          <button
+            onClick={() => setContextActiveTab('playlists')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === 'playlists'
+                ? 'bg-white text-black font-bold shadow-xs'
+                : 'bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] hover:text-white'
+            }`}
+          >
+            Library
           </button>
           <button
             onClick={() => setContextActiveTab('ai_dj')}
@@ -1311,13 +1344,13 @@ export function RiiqxMusicView() {
           </button>
         </div>
 
-        {/* Global Live Music Search Input & Quick Actions */}
+        {/* Global Live Music Search Input & Filter Chips (Screenshot 3) */}
         <div className="flex items-center gap-2 md:gap-3 flex-1 sm:max-w-md">
           <div className="relative w-full">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
             <input
               type="text"
-              placeholder="Search Guru Randhawa, Paris, Arijit, any song..."
+              placeholder="Artists, Songs, Lyrics and More"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-zinc-100 dark:bg-white/[0.06] border border-zinc-200 dark:border-white/[0.12] rounded-full py-2 pl-10 pr-9 text-xs text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:border-[#FA243C] focus:bg-white dark:focus:bg-white/[0.1] transition-all shadow-inner"
@@ -1832,6 +1865,91 @@ export function RiiqxMusicView() {
                     </div>
                   </div>
 
+                  {/* Top Picks for You (Screenshot 1) */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <span>Top Picks for You</span>
+                      </h3>
+                      <span className="text-xs text-zinc-500 dark:text-zinc-400">Curated daily for you</span>
+                    </div>
+
+                    <div className="flex items-center gap-4 overflow-x-auto no-scrollbar pb-2">
+                      {/* Card 1: Featuring Arijit Singh & Similar Artists */}
+                      <div
+                        onClick={() => playTrackAtIndex(0)}
+                        className="relative w-64 h-80 rounded-3xl p-5 bg-[#DC5E12] text-white shrink-0 cursor-pointer overflow-hidden shadow-xl hover:scale-[1.02] transition-transform flex flex-col justify-between"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-white/20 text-white">
+                            ARTIST MIX
+                          </span>
+                          <RiiqxWaveMark size={24} color="#FFFFFF" className="opacity-90" />
+                        </div>
+
+                        {/* Circular Artist Cutouts */}
+                        <div className="flex flex-col items-center my-auto">
+                          <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/40 shadow-lg mb-2">
+                            <img
+                              src={tracks[0]?.artworkUrl || FALLBACK_ARTWORK}
+                              alt="Arijit Singh"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-14 h-14 rounded-full overflow-hidden border border-white/30 shadow-md">
+                              <img
+                                src={tracks[1]?.artworkUrl || FALLBACK_ARTWORK}
+                                alt="Artist"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="w-14 h-14 rounded-full overflow-hidden border border-white/30 shadow-md">
+                              <img
+                                src={tracks[2]?.artworkUrl || FALLBACK_ARTWORK}
+                                alt="Artist"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-white/80 font-medium">Featuring Arijit Singh</p>
+                          <h4 className="text-base font-bold text-white tracking-tight line-clamp-1">
+                            Arijit Singh & Similar Artists
+                          </h4>
+                        </div>
+                      </div>
+
+                      {/* Card 2: New Release Mix */}
+                      <div
+                        onClick={() => playTrackAtIndex(1)}
+                        className="relative w-64 h-80 rounded-3xl p-5 bg-gradient-to-br from-[#2C1E3A] via-[#4A1942] to-[#1E1026] text-white shrink-0 cursor-pointer overflow-hidden shadow-xl hover:scale-[1.02] transition-transform flex flex-col justify-between"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-white/20 text-white">
+                            NEW MIX
+                          </span>
+                          <RiiqxWaveMark size={24} color="#FFFFFF" className="opacity-90" />
+                        </div>
+
+                        <div className="my-auto">
+                          <h3 className="text-3xl font-black leading-tight tracking-tight text-white">
+                            New<br />Release<br />Mix
+                          </h3>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-white/80 font-medium">Made for you</p>
+                          <h4 className="text-sm font-semibold text-white tracking-tight line-clamp-1">
+                            Guru Randhawa, Karan Aujla, Arijit
+                          </h4>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Curated Stations & Music Vibes */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -1933,12 +2051,37 @@ export function RiiqxMusicView() {
                 </div>
               )}
 
-              {/* All Tracks Table View */}
+              {/* Explore Grid & All Tracks View (Screenshot 2) */}
               {(activeTab === 'browse' || activeTab === 'favorites') && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+                <div className="space-y-6">
+                  {activeTab === 'browse' && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                          Explore
+                        </h2>
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">12 Curated Moods &amp; Categories</span>
+                      </div>
+
+                      {/* 2-Column (Mobile) / 4-Column (Desktop) Colored Tiles (Screenshot 2) */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                        {EXPLORE_CATEGORIES.map((cat) => (
+                          <div
+                            key={cat.title}
+                            onClick={() => setSearchQuery(cat.query)}
+                            className={`h-28 rounded-2xl p-4 bg-gradient-to-br ${cat.gradient} text-white cursor-pointer hover:scale-[1.02] active:scale-98 transition-all shadow-md flex flex-col justify-between overflow-hidden relative group`}
+                          >
+                            <h4 className="text-base font-bold tracking-tight">{cat.title}</h4>
+                            <p className="text-xs text-white/80 font-medium truncate">{cat.subtitle}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between pt-2">
                     <h3 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
-                      {activeTab === 'favorites' ? 'Favorite Songs' : 'All Tracks'}
+                      {activeTab === 'favorites' ? 'Favorite Songs' : 'All Tracks & Library'}
                     </h3>
                     <span className="text-xs text-zinc-500 dark:text-zinc-400">{tracks.length} items</span>
                   </div>
@@ -2242,18 +2385,132 @@ export function RiiqxMusicView() {
                 </div>
               )}
 
-              {/* Curated Playlists Tab */}
+              {/* Library & Playlists Tab (Screenshot 6) */}
               {activeTab === 'playlists' && (
-                <div className="space-y-4">
+                <div className="space-y-6">
+                  {/* Top Header */}
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Your Playlists</h3>
-                    <button
-                      onClick={() => setIsCreatePlaylistModalOpen(true)}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                    <div>
+                      <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
+                        Library
+                      </h2>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Your personal music collection &amp; analytics</p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setIsCreatePlaylistModalOpen(true)}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#FA243C] hover:bg-[#ff3b50] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>New Playlist</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Horizontal Stats Cards: "YOUR LISTENING EXPERIENCE" (Screenshot 6) */}
+                  <div className="flex items-center gap-4 overflow-x-auto no-scrollbar pb-2">
+                    {/* Card 1: Listening Experience Stats */}
+                    <div className="w-72 h-44 rounded-3xl p-5 bg-gradient-to-b from-[#2C2F36] to-[#1B1D22] text-white shrink-0 shadow-xl flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">
+                          YOUR LISTENING EXPERIENCE
+                        </span>
+                        <RiiqxWaveMark size={22} color="#FFFFFF" className="opacity-80" />
+                      </div>
+
+                      <div>
+                        <h3 className="text-3xl font-black text-white tracking-tight">3,196</h3>
+                        <p className="text-[11px] font-semibold text-zinc-400">MINUTES LISTENED</p>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs pt-1 border-t border-white/10">
+                        <div>
+                          <p className="font-bold text-white text-[11px]">RIIQX STUDIO</p>
+                          <p className="text-[9px] text-zinc-400">1,143 plays &bull; 2026</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] text-zinc-400 font-semibold uppercase">MEMBER SINCE</p>
+                          <p className="font-bold text-white text-xs">09/26</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card 2: Top Song */}
+                    <div className="w-72 h-44 rounded-3xl p-5 bg-gradient-to-b from-[#382A3A] to-[#1E1722] text-white shrink-0 shadow-xl flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">
+                          YOUR LISTENING STATS
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30">
+                          TOP SONG
+                        </span>
+                      </div>
+
+                      <div>
+                        <h3 className="text-xl font-black text-white leading-tight">Barbaad Saiyaan</h3>
+                        <p className="text-[11px] text-zinc-400">Jubin Nautiyal, Tulsi Kumar</p>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs pt-1 border-t border-white/10">
+                        <p className="font-bold text-white text-[11px]">RIIQX STUDIO</p>
+                        <p className="text-[10px] text-pink-400 font-semibold">Lossless FLAC</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Fast Action Rows: Downloads, Local Music, Spotify (Screenshot 6) */}
+                  <div className="rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] p-2 space-y-1">
+                    <div
+                      onClick={() => setContextActiveTab('offline')}
+                      className="flex items-center justify-between p-3 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors cursor-pointer"
                     >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>New Playlist</span>
-                    </button>
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                          <Download className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">Downloads &amp; Offline</h4>
+                          <p className="text-xs text-zinc-500">Zero-buffering local caching</p>
+                        </div>
+                      </div>
+                      <span className="text-zinc-400 text-sm font-bold">&gt;</span>
+                    </div>
+
+                    <label className="flex items-center justify-between p-3 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors cursor-pointer">
+                      <input type="file" accept="audio/*" onChange={handleFileUpload} className="hidden" />
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                          <Folder className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">Local Music Files</h4>
+                          <p className="text-xs text-zinc-500">Import FLAC, WAV, MP3 from device</p>
+                        </div>
+                      </div>
+                      <span className="text-zinc-400 text-sm font-bold">&gt;</span>
+                    </label>
+
+                    <div
+                      onClick={() => setSearchQuery('Spotify Top 50 Hits')}
+                      className="flex items-center justify-between p-3 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                          <Disc3 className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">Spotify Integration</h4>
+                          <p className="text-xs text-zinc-500">Sync playlists &amp; favorites</p>
+                        </div>
+                      </div>
+                      <span className="text-zinc-400 text-sm font-bold">&gt;</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2">
+                    <h3 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Your Playlists</h3>
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400">{playlists.length} playlists</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -2424,17 +2681,105 @@ export function RiiqxMusicView() {
                 </div>
               )}
 
-              {/* Audio & Streaming Settings Tab */}
+              {/* Audio & Streaming Settings Tab (Screenshot 5) */}
               {activeTab === 'settings' && (
-                <div className="space-y-6 max-w-3xl mx-auto">
+                <div className="space-y-6 max-w-2xl mx-auto">
                   <div className="border-b border-zinc-200 dark:border-white/[0.08] pb-4">
-                    <h2 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-2.5">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2.5">
                       <Settings className="w-6 h-6 text-[#FA243C]" />
-                      <span>Audio &amp; Streaming Preferences</span>
+                      <span>Settings</span>
                     </h2>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                      Configure bitrates, audio caching, hardware integrations and shortcuts
+                      Account, lossless audio quality, Dolby Atmos &amp; system integrations
                     </p>
+                  </div>
+
+                  {/* Group 1: Account & Listen Together (Screenshot 5) */}
+                  <div className="rounded-3xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-[#161619] overflow-hidden divide-y divide-zinc-100 dark:divide-white/[0.06] shadow-sm">
+                    <div className="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <RiiqxProfileAvatarPill size={34} />
+                        <div>
+                          <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">Account &amp; integrations</h4>
+                          <p className="text-xs text-zinc-500">@riiqxstudio</p>
+                        </div>
+                      </div>
+                      <span className="text-zinc-400 text-sm font-bold">&gt;</span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer">
+                      <div>
+                        <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">Listen together</h4>
+                        <p className="text-xs text-zinc-500">Share a code and play the same music, in time</p>
+                      </div>
+                      <span className="text-zinc-400 text-sm font-bold">&gt;</span>
+                    </div>
+                  </div>
+
+                  {/* Section Title: AUDIO QUALITY (Screenshot 5) */}
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 px-1">
+                      AUDIO QUALITY
+                    </span>
+                  </div>
+
+                  {/* Group 2: Audio Quality Controls (Screenshot 5) */}
+                  <div className="rounded-3xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-[#161619] overflow-hidden divide-y divide-zinc-100 dark:divide-white/[0.06] shadow-sm">
+                    <div className="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer">
+                      <div>
+                        <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">Sources</h4>
+                        <p className="text-xs text-zinc-500">Where audio comes from and the order used</p>
+                      </div>
+                      <span className="text-zinc-400 text-sm font-bold">&gt;</span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4">
+                      <div>
+                        <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">Direct Source Stream</h4>
+                        <p className="text-xs text-zinc-500">Direct bitstream pass-through</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        className="w-5 h-5 accent-[#34C759] rounded cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer">
+                      <div>
+                        <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">On Wi-Fi</h4>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-zinc-400">
+                        <span className="text-xs font-semibold">Lossless</span>
+                        <span className="text-sm font-bold">&gt;</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">On mobile data</h4>
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-zinc-200 dark:bg-white/10 text-zinc-700 dark:text-zinc-300">
+                          IN USE
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-zinc-400">
+                        <span className="text-xs font-semibold">Lossless</span>
+                        <span className="text-sm font-bold">&gt;</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4">
+                      <div className="pr-4">
+                        <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">Dolby Atmos</h4>
+                        <p className="text-xs text-zinc-500">
+                          Play the more immersive, surround version of a song when there is one.
+                        </p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="w-5 h-5 accent-[#34C759] rounded cursor-pointer"
+                      />
+                    </div>
                   </div>
 
                   {/* Streaming Bitrate Quality */}
@@ -3396,13 +3741,13 @@ export function RiiqxMusicView() {
         </div>
       )}
 
-      {/* Fullscreen Player Modal with Real-time Spectrum Visualizer */}
+      {/* Fullscreen Player Modal (Apple Music + RiMusic Hybrid - Screenshot 4) */}
       {isFullscreenPlayer && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-[#070709] p-6 md:p-8 overflow-hidden select-none">
-          {/* Ambient blurred glow */}
+        <div className="fixed inset-0 z-50 flex flex-col bg-gradient-to-b from-[#6B1A1E] via-[#280B0F] to-[#0A0507] p-4 sm:p-6 md:p-8 overflow-hidden select-none">
+          {/* Dynamic Ambient blurred glow */}
           {currentTrack.artworkUrl && (
             <div
-              className="absolute inset-0 pointer-events-none opacity-30 filter blur-[140px] scale-150 -z-10"
+              className="absolute inset-0 pointer-events-none opacity-40 filter blur-[140px] scale-150 -z-10"
               style={{
                 backgroundImage: `url(${currentTrack.artworkUrl})`,
                 backgroundPosition: 'center',
@@ -3411,26 +3756,31 @@ export function RiiqxMusicView() {
             />
           )}
 
-          {/* Top Bar */}
-          <div className="flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                RIIQX Ultra Audio
-              </span>
-              <AudioVisualizer engine={audioEngineRef.current} isPlaying={isPlaying} barCount={20} height={16} />
-            </div>
+          {/* Top Bar: Center Label & Subtitle, Right Minimize (Screenshot 4) */}
+          <div className="relative flex items-center justify-between shrink-0">
             <button
               onClick={() => setIsFullscreenPlayer(false)}
-              className="p-2 rounded-full bg-white/[0.1] hover:bg-white/[0.2] text-white transition-colors"
+              className="p-2 rounded-full bg-white/[0.1] hover:bg-white/[0.2] text-white transition-colors cursor-pointer"
             >
               <Minimize2 className="w-5 h-5" />
             </button>
+
+            <div className="flex flex-col items-center text-center">
+              <span className="text-[11px] font-black uppercase tracking-widest text-white/90">
+                {currentTrack.album || 'BEATOP RECORDS'}
+              </span>
+              <span className="text-[11px] text-white/60 font-medium">
+                Playing from Search
+              </span>
+            </div>
+
+            <div className="w-9" /> {/* Spacer */}
           </div>
 
-          {/* Center Stage */}
-          <div className="flex-1 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 max-w-5xl mx-auto w-full my-auto">
-            {/* Spinning Artwork Vinyl */}
-            <div className="relative w-64 h-64 md:w-96 md:h-96 rounded-3xl overflow-hidden shadow-2xl border border-white/[0.1] group bg-zinc-900 shrink-0">
+          {/* Center Stage: Artwork / Synced Lyrics Drawer */}
+          <div className="flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full my-auto space-y-4">
+            {/* Large Rounded-3xl Artwork (Screenshot 4) */}
+            <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-92 md:h-92 rounded-3xl overflow-hidden shadow-2xl border border-white/10 group bg-zinc-900 shrink-0">
               <img
                 src={currentTrack.artworkUrl || FALLBACK_ARTWORK}
                 alt={currentTrack.title}
@@ -3443,70 +3793,136 @@ export function RiiqxMusicView() {
               />
             </div>
 
-            {/* Lyrics or Track Details */}
-            <div className="flex-1 max-w-md w-full space-y-5 md:space-y-6 text-center md:text-left">
-              <div>
-                <span className="text-xs font-bold text-[#FA243C] uppercase tracking-wider">
-                  {currentTrack.album}
-                </span>
-                <h2 className="text-2xl md:text-4xl font-extrabold text-white mt-1 truncate">
+            {/* Song Title, Artist & Actions (Favorite Star, 3-dots) (Screenshot 4) */}
+            <div className="flex items-center justify-between w-full pt-2">
+              <div className="flex-1 min-w-0 pr-3">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight truncate">
                   {currentTrack.title}
                 </h2>
-                <p className="text-base md:text-lg text-zinc-400 font-medium mt-1 truncate">{currentTrack.artist}</p>
+                <p className="text-sm sm:text-base text-white/70 font-medium truncate mt-0.5">
+                  {currentTrack.artist}
+                </p>
               </div>
 
-              {/* Scrubber */}
-              <div className="space-y-1">
-                <input
-                  type="range"
-                  min={0}
-                  max={durationMs || 1}
-                  value={currentTimeMs}
-                  onChange={(e) => handleSeek(Number(e.target.value))}
-                  className="w-full h-1.5 bg-white/[0.15] rounded-lg appearance-none cursor-pointer accent-[#FA243C]"
-                />
-                <div className="flex justify-between text-xs font-mono text-zinc-400">
-                  <span>{formatDuration(currentTimeMs)}</span>
-                  <span>{formatDuration(durationMs)}</span>
-                </div>
-              </div>
-
-              {/* Controls */}
-              <div className="flex items-center justify-center md:justify-start gap-6">
+              <div className="flex items-center gap-2 shrink-0">
                 <button
-                  onClick={() => setIsShuffle(!isShuffle)}
-                  className={`p-2 transition-colors ${
-                    isShuffle ? 'text-[#FA243C]' : 'text-zinc-400 hover:text-white'
-                  }`}
+                  onClick={() => toggleFavorite(currentTrack.id)}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
                 >
-                  <Shuffle className="w-5 h-5" />
-                </button>
-                <button onClick={handlePrevTrack} className="text-white hover:text-zinc-300">
-                  <SkipBack className="w-7 h-7 fill-current" />
+                  <Star className={`w-5 h-5 ${currentTrack.isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-white'}`} />
                 </button>
                 <button
-                  onClick={togglePlayPause}
-                  className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow-xl hover:scale-105 transition-transform"
+                  onClick={() => setIsEqualizerOpen(true)}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
                 >
-                  {isPlaying ? (
-                    <Pause className="w-6 h-6 fill-current" />
-                  ) : (
-                    <Play className="w-6 h-6 fill-current translate-x-0.5" />
-                  )}
-                </button>
-                <button onClick={handleNextTrack} className="text-white hover:text-zinc-300">
-                  <SkipForward className="w-7 h-7 fill-current" />
-                </button>
-                <button
-                  onClick={() => setIsRepeat(!isRepeat)}
-                  className={`p-2 transition-colors ${
-                    isRepeat ? 'text-[#FA243C]' : 'text-zinc-400 hover:text-white'
-                  }`}
-                >
-                  <Repeat className="w-5 h-5" />
+                  <MoreVertical className="w-5 h-5 text-white" />
                 </button>
               </div>
             </div>
+
+            {/* Synced Lyric Sneak-Peek Line (Screenshot 4) */}
+            <div
+              onClick={() => setRightPanelTab(rightPanelTab === 'lyrics' ? null : 'lyrics')}
+              className="flex items-center justify-between w-full py-1 text-white/85 hover:text-white cursor-pointer transition-colors"
+            >
+              <p className="text-sm sm:text-base font-semibold truncate flex-1 pr-2">
+                {activeLyricIndex >= 0 && lyricsData?.syncedLyrics?.[activeLyricIndex]?.text
+                  ? lyricsData.syncedLyrics[activeLyricIndex].text
+                  : 'Lyrics synchronized via LRCLIB Master'}
+              </p>
+              <span className="text-white/60 text-sm font-bold">&gt;</span>
+            </div>
+
+            {/* Scrubber Progress Slider */}
+            <div className="w-full space-y-1">
+              <input
+                type="range"
+                min={0}
+                max={durationMs || 1}
+                value={currentTimeMs}
+                onChange={(e) => handleSeek(Number(e.target.value))}
+                className="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
+              />
+              <div className="flex justify-between items-center text-xs font-medium text-white/70 pt-0.5">
+                <span>{formatDuration(currentTimeMs)}</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-white font-mono text-[10px] font-semibold flex items-center gap-1">
+                  <span>🎧</span>
+                  <span>High quality</span>
+                </span>
+                <span>-{formatDuration(Math.max(0, durationMs - currentTimeMs))}</span>
+              </div>
+            </div>
+
+            {/* Big Transport Controls: Previous, Play/Pause, Next (Screenshot 4) */}
+            <div className="flex items-center justify-center gap-8 py-1">
+              <button
+                onClick={handlePrevTrack}
+                className="text-white/90 hover:text-white hover:scale-110 transition-all cursor-pointer"
+              >
+                <SkipBack className="w-8 h-8 fill-current" />
+              </button>
+              <button
+                onClick={togglePlayPause}
+                className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              >
+                {isPlaying ? (
+                  <Pause className="w-7 h-7 fill-current" />
+                ) : (
+                  <Play className="w-7 h-7 fill-current translate-x-0.5" />
+                )}
+              </button>
+              <button
+                onClick={handleNextTrack}
+                className="text-white/90 hover:text-white hover:scale-110 transition-all cursor-pointer"
+              >
+                <SkipForward className="w-8 h-8 fill-current" />
+              </button>
+            </div>
+
+            {/* Volume Slider Bar with Speaker Low & High Icons (Screenshot 4) */}
+            <div className="flex items-center gap-3 w-full px-2">
+              <Volume1 className="w-4 h-4 text-white/60 shrink-0" />
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={isMuted ? 0 : volume}
+                onChange={(e) => handleVolumeChange(Number(e.target.value))}
+                className="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
+              />
+              <Volume2 className="w-4 h-4 text-white/60 shrink-0" />
+            </div>
+
+            {/* Bottom Actions Bar: Lyrics, Cast, Queue (Screenshot 4) */}
+            <div className="flex items-center justify-around w-full pt-2">
+              <button
+                onClick={() => setRightPanelTab(rightPanelTab === 'lyrics' ? null : 'lyrics')}
+                className="p-2 text-white/80 hover:text-white transition-colors cursor-pointer"
+                title="Synchronized Lyrics"
+              >
+                <MessageSquare className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => {}}
+                className="p-2 text-white/80 hover:text-white transition-colors cursor-pointer"
+                title="AirPlay / Cast Device"
+              >
+                <Cast className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setRightPanelTab(rightPanelTab === 'queue' ? null : 'queue')}
+                className="p-2 text-white/80 hover:text-white transition-colors cursor-pointer"
+                title="Playback Queue"
+              >
+                <ListMusic className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Bottom Device Indicator Label: "RIIQX's Phone" (Screenshot 4) */}
+            <p className="text-[11px] text-white/50 font-medium text-center">
+              RIIQX&apos;s Phone
+            </p>
           </div>
         </div>
       )}

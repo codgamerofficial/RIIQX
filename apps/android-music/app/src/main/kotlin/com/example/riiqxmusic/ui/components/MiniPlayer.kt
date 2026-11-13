@@ -25,19 +25,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.riiqxmusic.model.Track
-import com.example.riiqxmusic.ui.theme.AppleMusicRed
-import com.example.riiqxmusic.ui.theme.DarkSurface
-import com.example.riiqxmusic.ui.theme.GlassBorder
+import com.example.riiqxmusic.ui.theme.DarkCardBorder
 import com.example.riiqxmusic.ui.theme.TextPrimary
 import com.example.riiqxmusic.ui.theme.TextSecondary
 
+/**
+ * Floating Capsule MiniPlayer (Matches the floating pill player above dock in screenshots 1-6)
+ */
 @Composable
 fun MiniPlayer(
     track: Track,
@@ -54,36 +54,39 @@ fun MiniPlayer(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-            .shadow(12.dp, RoundedCornerShape(16.dp))
-            .clip(RoundedCornerShape(16.dp))
-            .background(DarkSurface.copy(alpha = 0.95f))
-            .border(1.dp, GlassBorder, RoundedCornerShape(16.dp))
+            .padding(horizontal = 14.dp, vertical = 4.dp)
+            .clip(RoundedCornerShape(22.dp))
+            .background(Color(0xF018181C))
+            .border(1.dp, Color(0x2AFFFFFF), RoundedCornerShape(22.dp))
             .clickable { onClick() }
     ) {
         Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                    .padding(horizontal = 10.dp, vertical = 7.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Album Art
+                // Rounded Album Art
                 ArtworkCard(
                     artworkUri = track.artworkUriString,
-                    modifier = Modifier.size(46.dp),
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(RoundedCornerShape(10.dp)),
                     cornerRadius = 10.dp
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                // Title and Artist
-                Column(modifier = Modifier.weight(1f)) {
+                // Track Title and Artist
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
                         text = track.title,
                         color = TextPrimary,
                         fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -97,36 +100,43 @@ fun MiniPlayer(
                 }
 
                 // Play / Pause Button
-                IconButton(onClick = onTogglePlayPause) {
+                IconButton(
+                    onClick = onTogglePlayPause,
+                    modifier = Modifier.size(38.dp)
+                ) {
                     Icon(
                         imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                         contentDescription = if (isPlaying) "Pause" else "Play",
-                        tint = TextPrimary,
-                        modifier = Modifier.size(28.dp)
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
-                // Next Button
-                IconButton(onClick = onNext) {
+                // Skip Next Button
+                IconButton(
+                    onClick = onNext,
+                    modifier = Modifier.size(38.dp)
+                ) {
                     Icon(
                         imageVector = Icons.Default.SkipNext,
-                        contentDescription = "Next Track",
-                        tint = TextSecondary,
-                        modifier = Modifier.size(26.dp)
+                        contentDescription = "Next",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
 
-            // Slim Bottom Progress Bar
-            LinearProgressIndicator(
-                progress = { progress },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(2.5.dp),
-                color = AppleMusicRed,
-                trackColor = Color.White.copy(alpha = 0.1f)
-            )
+            // Subtle Progress Line at bottom of pill
+            if (durationMs > 0) {
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp),
+                    color = Color.White,
+                    trackColor = Color(0x22FFFFFF)
+                )
+            }
         }
     }
 }
-

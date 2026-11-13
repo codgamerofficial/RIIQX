@@ -9,6 +9,7 @@
 import React, { useState } from 'react';
 import { useRiiqx } from '@/context/RiiqxContext';
 import { RiiqxLogo } from '@/components/ui/RiiqxLogo';
+import { RiiqxWaveMark, RiiqxProfileAvatarPill } from '@/components/ui/RiiqxWaveMark';
 import {
   Menu,
   X,
@@ -68,10 +69,19 @@ export function RiiqxHeader() {
         </button>
 
         <div
-          className="cursor-pointer transition-transform duration-150 hover:opacity-95"
+          className="cursor-pointer transition-transform duration-150 hover:opacity-95 flex items-center gap-2.5"
           onClick={() => setActiveTab('music')}
         >
-          <RiiqxLogo size="sm" variant="full" animated={true} subtitle="Music & Intelligence" />
+          <div className="w-8 h-8 rounded-xl bg-white/[0.07] border border-white/10 flex items-center justify-center text-white">
+            <RiiqxWaveMark size={22} color="#FFFFFF" />
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-black tracking-tight text-white">RIIQX</span>
+              <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-[#FA243C]/20 text-[#FA243C] border border-[#FA243C]/30">PRO</span>
+            </div>
+            <span className="text-[9px] text-zinc-400 font-medium tracking-wider uppercase">Lossless Studio</span>
+          </div>
         </div>
       </div>
 
@@ -119,16 +129,12 @@ export function RiiqxHeader() {
           {theme === 'dark' ? <Sun className="w-4 h-4 text-zinc-300" /> : <Moon className="w-4 h-4 text-zinc-300" />}
         </button>
 
-        {/* User Profile Avatar */}
+        {/* User Profile Avatar with QX Badge */}
         <div className="relative pl-1 border-l border-white/[0.08]">
-          <button
+          <RiiqxProfileAvatarPill
+            size={34}
             onClick={() => setUserMenuOpen(!userMenuOpen)}
-            className="flex items-center gap-2 cursor-pointer focus:outline-none"
-          >
-            <div className="w-8 h-8 rounded-full bg-[#1c1c22] border border-white/10 flex items-center justify-center text-white font-bold text-xs hover:border-white/25 transition-all">
-              <span>{userInitial}</span>
-            </div>
-          </button>
+          />
 
           {/* User Popover Menu */}
           {userMenuOpen && (

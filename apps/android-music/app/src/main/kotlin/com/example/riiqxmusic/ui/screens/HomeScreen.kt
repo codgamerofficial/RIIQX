@@ -17,15 +17,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,9 +37,12 @@ import androidx.compose.ui.unit.sp
 import com.example.riiqxmusic.model.Playlist
 import com.example.riiqxmusic.model.Track
 import com.example.riiqxmusic.ui.components.ArtworkCard
-import com.example.riiqxmusic.ui.theme.AppleMusicRed
+import com.example.riiqxmusic.ui.components.RiiqxProfileAvatar
+import com.example.riiqxmusic.ui.components.RiiqxWaveLogo
 import com.example.riiqxmusic.ui.theme.DarkBackground
-import com.example.riiqxmusic.ui.theme.DarkSurface
+import com.example.riiqxmusic.ui.theme.FeaturedOrange
+import com.example.riiqxmusic.ui.theme.FeaturedOrangeLight
+import com.example.riiqxmusic.ui.theme.FeaturedPurple
 import com.example.riiqxmusic.ui.theme.TextMuted
 import com.example.riiqxmusic.ui.theme.TextPrimary
 import com.example.riiqxmusic.ui.theme.TextSecondary
@@ -46,105 +52,95 @@ fun HomeScreen(
     tracks: List<Track>,
     playlists: List<Playlist>,
     onTrackSelected: (Track) -> Unit,
+    onOpenSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .background(DarkBackground),
-        contentPadding = PaddingValues(bottom = 120.dp)
+        contentPadding = PaddingValues(bottom = 140.dp)
     ) {
-        // App Header
+        // Top App Bar with 3-Wave Logo & QX Avatar (Screenshot 1)
         item {
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
+                    .padding(horizontal = 20.dp, vertical = 14.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "RIIQX MUSIC",
-                        color = AppleMusicRed,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 1.5.sp
-                    )
-                    Text(
-                        text = "PRO AUDIO",
-                        color = TextMuted,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Listen Now",
-                    color = TextPrimary,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
+                RiiqxWaveLogo(
+                    modifier = Modifier.size(36.dp),
+                    tint = Color.White
+                )
+
+                RiiqxProfileAvatar(
+                    modifier = Modifier.size(36.dp),
+                    onClick = onOpenSettings
                 )
             }
         }
 
-        // Featured Horizontal Carousel
+        // Section Title: "Top Picks for You"
         item {
             Text(
-                text = "Recently Added",
+                text = "Top Picks for You",
                 color = TextPrimary,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
             )
+        }
 
+        // Horizontal Carousel: Featured Orange Artist Mix + New Release Mix
+        item {
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(tracks) { track ->
-                    FeaturedTrackCard(track = track, onClick = { onTrackSelected(track) })
+                // Card 1: Featuring Arijit Singh & Similar Artists
+                item {
+                    FeaturedArtistCard(
+                        title = "Arijit Singh & Similar Artists",
+                        subtitle = "Featuring Arijit Singh",
+                        backgroundColor = FeaturedOrange,
+                        artistUris = tracks.take(3).map { it.artworkUriString },
+                        onClick = {
+                            if (tracks.isNotEmpty()) onTrackSelected(tracks.first())
+                        }
+                    )
+                }
+
+                // Card 2: New Release Mix
+                item {
+                    NewReleaseMixCard(
+                        title = "New Release Mix",
+                        subtitle = "Made for you",
+                        artists = "Guru Randhawa, Karan Aujla, Arijit",
+                        onClick = {
+                            if (tracks.size > 1) onTrackSelected(tracks[1])
+                        }
+                    )
                 }
             }
         }
 
-        // Curated Playlists Section
+        // Section Title: "Recents"
         item {
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "Curated Playlists",
+                text = "Recents",
                 color = TextPrimary,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
             )
-
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(playlists) { playlist ->
-                    PlaylistCard(playlist = playlist)
-                }
-            }
         }
 
-        // Quick Picks List
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(
-                text = "Quick Picks",
-                color = TextPrimary,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
-            )
-        }
-
+        // Vertical List: Recent Tracks with 3-dots Menu
         items(tracks) { track ->
-            TrackListItem(
+            RecentTrackRow(
                 track = track,
                 onClick = { onTrackSelected(track) }
             )
@@ -152,81 +148,184 @@ fun HomeScreen(
     }
 }
 
+/**
+ * Featured Artist Mix Card with 3 circular artist portraits (Screenshot 1)
+ */
 @Composable
-fun FeaturedTrackCard(track: Track, onClick: () -> Unit) {
-    Column(
+fun FeaturedArtistCard(
+    title: String,
+    subtitle: String,
+    backgroundColor: Color,
+    artistUris: List<String?>,
+    onClick: () -> Unit
+) {
+    Box(
         modifier = Modifier
-            .width(160.dp)
+            .width(260.dp)
+            .height(340.dp)
+            .clip(RoundedCornerShape(26.dp))
+            .background(backgroundColor)
             .clickable { onClick() }
+            .padding(20.dp)
     ) {
-        ArtworkCard(
-            artworkUri = track.artworkUriString,
+        // Small 3-wave logo in top right
+        RiiqxWaveLogo(
             modifier = Modifier
-                .size(160.dp)
-                .clip(RoundedCornerShape(14.dp)),
-            cornerRadius = 14.dp,
-            elevation = 6.dp
+                .size(24.dp)
+                .align(Alignment.TopEnd),
+            tint = Color.White.copy(alpha = 0.85f)
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = track.title,
-            color = TextPrimary,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-        Text(
-            text = track.artist,
-            color = TextSecondary,
-            fontSize = 12.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+
+        // Center: 3 overlapping artist circle cuts
+        Column(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(bottom = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Main Top Circle
+            ArtworkCard(
+                artworkUri = artistUris.getOrNull(0),
+                modifier = Modifier
+                    .size(110.dp)
+                    .clip(CircleShape),
+                cornerRadius = 55.dp
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Two bottom circles side-by-side
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ArtworkCard(
+                    artworkUri = artistUris.getOrNull(1),
+                    modifier = Modifier
+                        .size(65.dp)
+                        .clip(CircleShape),
+                    cornerRadius = 32.dp
+                )
+                ArtworkCard(
+                    artworkUri = artistUris.getOrNull(2),
+                    modifier = Modifier
+                        .size(65.dp)
+                        .clip(CircleShape),
+                    cornerRadius = 32.dp
+                )
+            }
+        }
+
+        // Bottom text: Subtitle and Title
+        Column(
+            modifier = Modifier.align(Alignment.BottomStart)
+        ) {
+            Text(
+                text = subtitle,
+                color = Color.White.copy(alpha = 0.8f),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = title,
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 
+/**
+ * Secondary Featured Mix Card (Screenshot 1)
+ */
 @Composable
-fun PlaylistCard(playlist: Playlist) {
-    Column(
-        modifier = Modifier.width(140.dp)
+fun NewReleaseMixCard(
+    title: String,
+    subtitle: String,
+    artists: String,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .width(260.dp)
+            .height(340.dp)
+            .clip(RoundedCornerShape(26.dp))
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xFF2C1E3A),
+                        Color(0xFF4A1942),
+                        Color(0xFF1E1026)
+                    )
+                )
+            )
+            .clickable { onClick() }
+            .padding(20.dp)
     ) {
-        ArtworkCard(
-            artworkUri = playlist.coverUriString,
+        RiiqxWaveLogo(
             modifier = Modifier
-                .size(140.dp)
-                .clip(RoundedCornerShape(12.dp)),
-            cornerRadius = 12.dp
+                .size(24.dp)
+                .align(Alignment.TopEnd),
+            tint = Color.White.copy(alpha = 0.85f)
         )
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = playlist.title,
-            color = TextPrimary,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-        Text(
-            text = "${playlist.tracks.size} tracks",
-            color = TextMuted,
-            fontSize = 11.sp
-        )
+
+        Column(
+            modifier = Modifier.align(Alignment.CenterStart)
+        ) {
+            Text(
+                text = "New\nRelease\nMix",
+                color = Color.White,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Black,
+                lineHeight = 36.sp
+            )
+        }
+
+        Column(
+            modifier = Modifier.align(Alignment.BottomStart)
+        ) {
+            Text(
+                text = subtitle,
+                color = Color.White.copy(alpha = 0.8f),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = artists,
+                color = Color.White,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 
+/**
+ * Recent Track Row with rounded artwork, title, artist, and 3-dots icon
+ */
 @Composable
-fun TrackListItem(track: Track, onClick: () -> Unit) {
+fun RecentTrackRow(
+    track: Track,
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(horizontal = 20.dp, vertical = 8.dp),
+            .padding(horizontal = 20.dp, vertical = 7.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         ArtworkCard(
             artworkUri = track.artworkUriString,
-            modifier = Modifier.size(50.dp),
+            modifier = Modifier
+                .size(52.dp)
+                .clip(RoundedCornerShape(10.dp)),
             cornerRadius = 10.dp
         )
 
@@ -241,20 +340,26 @@ fun TrackListItem(track: Track, onClick: () -> Unit) {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = "${track.artist} • ${track.album}",
+                text = track.artist,
                 color = TextSecondary,
-                fontSize = 12.sp,
+                fontSize = 13.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
 
-        Text(
-            text = track.formattedDuration,
-            color = TextMuted,
-            fontSize = 12.sp
-        )
+        IconButton(
+            onClick = { /* Track Options Menu */ },
+            modifier = Modifier.size(36.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "Options",
+                tint = TextSecondary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }
-

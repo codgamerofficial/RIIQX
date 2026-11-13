@@ -10,20 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LibraryMusic
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,29 +24,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.riiqxmusic.data.MusicRepository
 import com.example.riiqxmusic.model.Lyrics
 import com.example.riiqxmusic.playback.MusicPlayerController
 import com.example.riiqxmusic.ui.components.MiniPlayer
+import com.example.riiqxmusic.ui.components.RiiqxBottomBar
 import com.example.riiqxmusic.ui.screens.AudioSettingsScreen
+import com.example.riiqxmusic.ui.screens.ExploreScreen
 import com.example.riiqxmusic.ui.screens.HomeScreen
 import com.example.riiqxmusic.ui.screens.LibraryScreen
 import com.example.riiqxmusic.ui.screens.NowPlayingScreen
 import com.example.riiqxmusic.ui.screens.SearchScreen
-import com.example.riiqxmusic.ui.theme.AppleMusicRed
 import com.example.riiqxmusic.ui.theme.DarkBackground
-import com.example.riiqxmusic.ui.theme.DarkSurface
-import com.example.riiqxmusic.ui.theme.TextMuted
-import com.example.riiqxmusic.ui.theme.TextSecondary
-import kotlinx.coroutines.launch
 
+/**
+ * RIIQX Mobile Master Application (RiMusic / Apple Music Hybrid Architecture)
+ * Matches Screenshots 1, 2, 3, 4, 5, 6.
+ */
 @Composable
 fun MainApp(
     repository: MusicRepository,
     playerController: MusicPlayerController
 ) {
-    var selectedNavTab by remember { mutableStateOf(0) }
+    var selectedNavTab by remember { mutableIntStateOf(0) }
     var isNowPlayingExpanded by remember { mutableStateOf(false) }
     var isAudioSettingsOpen by remember { mutableStateOf(false) }
 
@@ -74,7 +66,7 @@ fun MainApp(
     var activeLyrics by remember { mutableStateOf<Lyrics?>(null) }
     val scope = rememberCoroutineScope()
 
-    // Load local tracks on launch
+    // Load library on start
     LaunchedEffect(Unit) {
         repository.loadLibrary()
     }
@@ -86,15 +78,16 @@ fun MainApp(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(DarkBackground)) {
         Scaffold(
+            containerColor = DarkBackground,
             bottomBar = {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(DarkBackground)
+                        .navigationBarsPadding()
                 ) {
-                    // Floating Mini-Player
+                    // Floating Mini-Player (Right above the dock)
                     currentTrack?.let { track ->
                         MiniPlayer(
                             track = track,
@@ -107,52 +100,11 @@ fun MainApp(
                         )
                     }
 
-                    // Glassmorphic Bottom Navigation Bar
-                    NavigationBar(
-                        containerColor = DarkSurface.copy(alpha = 0.95f),
-                        contentColor = AppleMusicRed,
-                        modifier = Modifier.navigationBarsPadding()
-                    ) {
-                        NavigationBarItem(
-                            selected = selectedNavTab == 0,
-                            onClick = { selectedNavTab = 0 },
-                            icon = { Icon(Icons.Default.Home, contentDescription = "Listen Now") },
-                            label = { Text("Listen Now", fontSize = 11.sp) },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = AppleMusicRed,
-                                selectedTextColor = AppleMusicRed,
-                                unselectedIconColor = TextMuted,
-                                unselectedTextColor = TextMuted,
-                                indicatorColor = Color.Transparent
-                            )
-                        )
-                        NavigationBarItem(
-                            selected = selectedNavTab == 1,
-                            onClick = { selectedNavTab = 1 },
-                            icon = { Icon(Icons.Default.LibraryMusic, contentDescription = "Library") },
-                            label = { Text("Library", fontSize = 11.sp) },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = AppleMusicRed,
-                                selectedTextColor = AppleMusicRed,
-                                unselectedIconColor = TextMuted,
-                                unselectedTextColor = TextMuted,
-                                indicatorColor = Color.Transparent
-                            )
-                        )
-                        NavigationBarItem(
-                            selected = selectedNavTab == 2,
-                            onClick = { selectedNavTab = 2 },
-                            icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                            label = { Text("Search", fontSize = 11.sp) },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = AppleMusicRed,
-                                selectedTextColor = AppleMusicRed,
-                                unselectedIconColor = TextMuted,
-                                unselectedTextColor = TextMuted,
-                                indicatorColor = Color.Transparent
-                            )
-                        )
-                    }
+                    // 4-Tab Floating Capsule Navigation Dock (Home, Explore, Library, Search)
+                    RiiqxBottomBar(
+                        selectedTab = selectedNavTab,
+                        onTabSelected = { selectedNavTab = it }
+                    )
                 }
             }
         ) { paddingValues ->
@@ -167,28 +119,38 @@ fun MainApp(
                         playlists = playlists,
                         onTrackSelected = { track ->
                             playerController.playTrack(track, tracks)
-                        }
+                        },
+                        onOpenSettings = { isAudioSettingsOpen = true }
                     )
-                    1 -> LibraryScreen(
+                    1 -> ExploreScreen(
+                        tracks = tracks,
+                        onTrackSelected = { track ->
+                            playerController.playTrack(track, tracks)
+                        },
+                        onOpenSettings = { isAudioSettingsOpen = true }
+                    )
+                    2 -> LibraryScreen(
                         tracks = tracks,
                         albums = albums,
                         artists = artists,
                         playlists = playlists,
                         onTrackSelected = { track ->
                             playerController.playTrack(track, tracks)
-                        }
+                        },
+                        onOpenSettings = { isAudioSettingsOpen = true }
                     )
-                    2 -> SearchScreen(
+                    3 -> SearchScreen(
                         tracks = tracks,
                         onTrackSelected = { track ->
                             playerController.playTrack(track, tracks)
-                        }
+                        },
+                        onOpenSettings = { isAudioSettingsOpen = true }
                     )
                 }
             }
         }
 
-        // Full-Screen Now Playing View Overlay
+        // Full-Screen Now Playing View Overlay (Screenshot 4)
         AnimatedVisibility(
             visible = isNowPlayingExpanded && currentTrack != null,
             enter = slideInVertically(initialOffsetY = { it }),
@@ -216,7 +178,7 @@ fun MainApp(
             }
         }
 
-        // Audio Settings & Equalizer Bottom Modal Overlay
+        // Settings & Audio Quality Bottom Modal Overlay (Screenshot 5)
         AnimatedVisibility(
             visible = isAudioSettingsOpen,
             enter = slideInVertically(initialOffsetY = { it }),
@@ -232,4 +194,3 @@ fun MainApp(
         }
     }
 }
-
