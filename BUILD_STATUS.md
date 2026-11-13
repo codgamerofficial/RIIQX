@@ -14,11 +14,11 @@
 | **Phase 1** | Market Research & Category Scorecard | 🟢 **COMPLETED** | `MARKET_RESEARCH.md`, `PRODUCT_CATEGORY_SCORECARD.md` (Desk & Living selected with 8.80/10). |
 | **Phase 2** | Brand Identity & Earthy Luxury Design System | 🟢 **COMPLETED** | Added `heritage` color tokens to `tailwind.config.ts`, `src/lib/riiqx/brand.ts`, and vector `RiiqxHeritageLogo.tsx`. |
 | **Phase 3** | Target Architecture & Migration Plan | 🟢 **COMPLETED** | `ARCHITECTURE.md`, `MIGRATION_PLAN.md` (Non-destructive modular monolith, zero downtime). |
-| **Phase 4** | Commerce OS Foundation & Supabase Schema | 🟢 **COMPLETED** | `DATABASE_SCHEMA.md`, normalized PostgreSQL tables & RLS policies designed and documented. |
+| **Phase 4** | Commerce OS Foundation & Supabase Schema | 🟢 **COMPLETED** | `DATABASE_SCHEMA.md` & additive migration `supabase/migrations/20261114000000_riiqx_commerce_os_heritage.sql` created with RLS. |
 | **Phase 5** | Supplier Integration Hub (`SupplierAdapter`) | 🟢 **COMPLETED** | Universal `SupplierAdapter` contract in `src/lib/riiqx/commerce/supplier-adapter.ts` with Qikink & Sandbox. |
 | **Phase 6** | Pricing Engine, Cart & Checkout | 🟢 **COMPLETED** | `pricing-engine.ts`, `catalog-engine.ts`, `order-engine.ts`, `/api/commerce/checkout/initiate`, `/api/commerce/checkout/verify`. |
 | **Phase 7** | World-Class D2C Storefront (Next.js) | 🟢 **COMPLETED** | Modern Indian Heritage storefront at `/shop`, responsive bag drawer, prepaid-only checkout. |
-| **Phase 8** | Standalone Native Mobile App Parity | 🟡 **IN PROGRESS** | Expo tab navigator in `mobile/app/(tabs)/` styled to match desktop dark obsidian & heritage aesthetic. |
+| **Phase 8** | Standalone Native Mobile App Parity | 🟢 **COMPLETED** | Native React Native screen `mobile/app/(tabs)/shopping.tsx` with Heritage Store segment, collections filter, and 1-click prepaid checkout modal. |
 | **Phase 9** | Private Admin & Operations Hub | 🟢 **COMPLETED** | Operations control center at `/admin` (GMV, order routing, catalog manager, supplier health monitor). |
 | **Phase 10** | Vercel EROFS Read-Only Filesystem Fix | 🟢 **COMPLETED** | Eliminated all server-side write attempts on Vercel/serverless; multi-layer fallback to 60FPS canvas & data URLs. |
 | **Phase 11** | Creator Studio 2.0 & YouTube Publishing | 🟢 **COMPLETED** | Real FLUX.1 image synthesis, YouTube OAuth & 1-click publishing live via `/api/social/publish`. |
