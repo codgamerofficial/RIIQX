@@ -6,11 +6,21 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { customer, cartItems, paymentMethod } = body;
+    const customer = body.customer || {
+      fullName: body.shippingAddress?.fullName || body.shippingAddress?.name,
+      email: body.shippingAddress?.email || body.email || 'customer@riiqx.com',
+      phone: body.shippingAddress?.phone || body.phone,
+      addressLine1: body.shippingAddress?.addressLine1 || body.shippingAddress?.address,
+      city: body.shippingAddress?.city,
+      state: body.shippingAddress?.state || 'West Bengal',
+      pincode: body.shippingAddress?.pincode,
+    };
+    const cartItems = body.cartItems || body.items;
+    const paymentMethod = body.paymentMethod;
 
-    if (!customer || !customer.fullName || !customer.email || !customer.phone || !customer.pincode) {
+    if (!customer || !customer.fullName || !customer.phone || !customer.pincode) {
       return NextResponse.json(
-        { success: false, error: 'Full customer name, email, phone, and pincode are required.' },
+        { success: false, error: 'Full customer name, phone, and pincode are required.' },
         { status: 400 }
       );
     }
@@ -30,7 +40,7 @@ export async function POST(req: NextRequest) {
           error:
             'Cash on Delivery is currently disabled. 100% prepaid checkout (UPI, Card, Netbanking) is required for guaranteed fulfillment.',
         },
-        { status: 403 }
+        { status: 400 }
       );
     }
 
@@ -42,6 +52,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      order,
       orderId: order.id,
       totalAmount: order.totalAmount,
       currency: order.currency,

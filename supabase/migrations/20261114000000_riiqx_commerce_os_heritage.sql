@@ -242,3 +242,4 @@ VALUES
     ('col_carry', 'RIIQX Carry', 'carry', 'Travel and everyday carry handcrafted from full-grain leather', 'Vegetable-tanned leather folios, brass key hooks, and ballistic canvas organizers designed to last a lifetime.', 3),
     ('col_everyday', 'RIIQX Everyday', 'everyday', 'Original RIIQX heritage essentials', 'Organic cotton everyday essentials, notebooks, and architectural desk accessories.', 4)
 ON CONFLICT (id) DO NOTHING;
+
