@@ -655,6 +655,50 @@ export const api: RiiqxApiClient = {
     if (!res.ok) throw new Error(`Failed to fetch marketplace products: HTTP ${res.status}`);
     return await res.json();
   },
+
+  // 20. RIIQX 2.0 Modern Indian Heritage Commerce Products
+  async getHeritageCommerceProducts(params?: { collection?: string; query?: string }): Promise<any> {
+    const qs = new URLSearchParams(params as any).toString();
+    const res = await fetch(`${getApiBaseUrl()}/commerce/products${qs ? `?${qs}` : ''}`);
+    if (!res.ok) throw new Error(`Failed to fetch RIIQX Heritage products: HTTP ${res.status}`);
+    return await res.json();
+  },
+
+  // 21. RIIQX 2.0 Initiate Prepaid Checkout
+  async initiateCommerceCheckout(params: {
+    items: Array<{ productId: string; quantity: number }>;
+    shippingAddress: any;
+    paymentMethod: 'upi' | 'card' | 'netbanking';
+  }): Promise<any> {
+    const res = await fetch(`${getApiBaseUrl()}/commerce/checkout/initiate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Checkout failed: HTTP ${res.status}`);
+    }
+    return await res.json();
+  },
+
+  // 22. RIIQX 2.0 Verify Prepaid Checkout & Route to Supplier
+  async verifyCommerceCheckout(params: {
+    orderId: string;
+    paymentId: string;
+    gatewayName?: string;
+  }): Promise<any> {
+    const res = await fetch(`${getApiBaseUrl()}/commerce/checkout/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Verification failed: HTTP ${res.status}`);
+    }
+    return await res.json();
+  },
 };
 
 export async function executeResearch(query: string): Promise<ResearchResult> {

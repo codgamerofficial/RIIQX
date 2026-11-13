@@ -379,3 +379,4 @@ export function getHeritageProducts(collection?: string): HeritageProduct[] {
 export function getHeritageProductById(id: string): HeritageProduct | undefined {
   return INITIAL_HERITAGE_CATALOG.find((p) => p.id === id || p.sku === id);
 }
+

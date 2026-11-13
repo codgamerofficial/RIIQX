@@ -91,3 +91,4 @@ export function formatCurrencyINR(amount: number): string {
     maximumFractionDigits: 0,
   }).format(amount);
 }
+

@@ -174,3 +174,4 @@ export function RiiqxPackagingBadge({ className = '' }: { className?: string }) 
     </div>
   );
 }
+
