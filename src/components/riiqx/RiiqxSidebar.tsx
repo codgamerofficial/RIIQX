@@ -23,6 +23,7 @@ import {
   Video,
   Compass,
   Headphones,
+  Clapperboard,
 } from 'lucide-react';
 
 export function RiiqxSidebar() {
@@ -43,6 +44,7 @@ export function RiiqxSidebar() {
     {
       category: 'STUDIO & AI',
       items: [
+        { tab: 'creator', label: 'Creator Studio 2.0', icon: Clapperboard, badge: 'PRO' },
         { tab: 'ai_dj' as any, label: 'AI Music DJ & Studio', icon: Sparkles, badge: 'AI' },
         { tab: 'video_studio', label: 'Lyric Video Studio', icon: Video, badge: 'PRO' },
         { tab: 'decisions', label: 'Decisions Lab & Deals', icon: Scale },

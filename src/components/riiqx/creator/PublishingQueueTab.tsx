@@ -155,7 +155,7 @@ export function PublishingQueueTab({
     handleScheduleChange(newDate.toISOString());
   };
 
-  const handleLivePublish = async () => {
+  const handleLivePublish = async (isTestMode = false) => {
     if (!selectedAccount) {
       alert('Please connect a YouTube, Facebook, or Instagram account before publishing.');
       return;
@@ -163,7 +163,11 @@ export function PublishingQueueTab({
 
     setIsDispatching(true);
     setPublishError(null);
-    setDispatchLogs(['Initiating automated container dispatch with idempotency verification...']);
+    setDispatchLogs([
+      isTestMode
+        ? 'Initiating verified 1-click test publish pipeline with idempotency verification...'
+        : 'Initiating automated container dispatch with idempotency verification...',
+    ]);
 
     setJob((prev) => ({ ...prev, status: 'uploading', errorMessage: undefined }));
     await new Promise((r) => setTimeout(r, 400));
@@ -186,6 +190,7 @@ export function PublishingQueueTab({
           caption: project.storyboard?.caption || `${project.name} #Shorts #Reels`,
           mediaUrl: resolvedMediaUrl,
           idempotencyKey: `idemp_${project.id}_${Date.now()}`,
+          testMode: isTestMode,
         }),
       });
 
@@ -299,24 +304,35 @@ export function PublishingQueueTab({
               <ExternalLink className="h-3.5 w-3.5" />
             </button>
           ) : (
-            <button
-              onClick={handleLivePublish}
-              disabled={isDispatching || connectedAccounts.length === 0}
-              className="flex items-center gap-1.5 rounded-xl bg-[#FFD43B] hover:bg-[#FFC928] text-black px-4 py-2 text-xs font-bold transition shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer"
-            >
-              {job.status === 'failed' ? (
-                <RotateCcw className="h-3.5 w-3.5" />
-              ) : (
-                <Send className="h-3.5 w-3.5" />
-              )}
-              <span>
-                {isDispatching
-                  ? 'Publishing Live...'
-                  : job.status === 'failed'
-                  ? 'Retry Live Publish'
-                  : 'Publish Live Now'}
-              </span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleLivePublish(true)}
+                disabled={isDispatching || connectedAccounts.length === 0}
+                className="flex items-center gap-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] text-white border border-white/[0.1] px-3 py-2 text-xs font-semibold transition active:scale-95 disabled:opacity-50 cursor-pointer shadow-xs"
+                title="Verify end-to-end publishing pipeline to YouTube Shorts or Reels"
+              >
+                <Send className="h-3.5 w-3.5 text-[#FA243C]" />
+                <span>1-Click Test</span>
+              </button>
+              <button
+                onClick={() => handleLivePublish(false)}
+                disabled={isDispatching || connectedAccounts.length === 0}
+                className="flex items-center gap-1.5 rounded-xl bg-[#FA243C] hover:bg-[#e01f35] text-white px-4 py-2 text-xs font-bold transition shadow-sm shadow-[#FA243C]/20 active:scale-95 disabled:opacity-50 cursor-pointer"
+              >
+                {job.status === 'failed' ? (
+                  <RotateCcw className="h-3.5 w-3.5" />
+                ) : (
+                  <Send className="h-3.5 w-3.5" />
+                )}
+                <span>
+                  {isDispatching
+                    ? 'Publishing Live...'
+                    : job.status === 'failed'
+                    ? 'Retry Live Publish'
+                    : 'Publish Live Now'}
+                </span>
+              </button>
+            </div>
           )}
         </div>
       </div>

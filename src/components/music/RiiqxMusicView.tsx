@@ -61,6 +61,7 @@ import {
   Folder,
   Compass,
   History,
+  Clapperboard,
 } from 'lucide-react';
 import { Track, Playlist, Lyrics, EqualizerSettings } from '@/types/music';
 import { INITIAL_TRACKS, INITIAL_PLAYLISTS, FALLBACK_VINYL_ARTWORK } from '@/lib/music/mock-tracks';
@@ -73,6 +74,7 @@ import { RiiqxWaveMark, RiiqxProfileAvatarPill } from '@/components/ui/RiiqxWave
 import { AIThinkingOrb } from '@/components/riiqx/ai/AIThinkingOrb';
 import { AIVideoStudioView } from '@/components/video/AIVideoStudioView';
 import { TwinDecisionsView } from '@/components/twin/TwinDecisionsView';
+import { RiiqxCreatorStudio } from '@/components/riiqx/RiiqxCreatorStudio';
 import {
   saveTrackOffline,
   isTrackSavedOffline,
@@ -238,6 +240,7 @@ export function RiiqxMusicView() {
 
   // Tab routing
   const activeTab = useMemo(() => {
+    if (contextActiveTab === 'creator') return 'creator';
     if (contextActiveTab === 'ai_dj') return 'ai_dj';
     if (contextActiveTab === 'video_studio') return 'video_studio';
     if (contextActiveTab === 'decisions') return 'decisions';
@@ -1347,6 +1350,17 @@ export function RiiqxMusicView() {
             <Video className="w-3 h-3 text-[#FA243C]" />
             <span>Lyric Studio</span>
           </button>
+          <button
+            onClick={() => setContextActiveTab('creator')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'creator'
+                ? 'bg-white text-black font-bold shadow-xs'
+                : 'bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] hover:text-white'
+            }`}
+          >
+            <Clapperboard className="w-3 h-3 text-[#FA243C]" />
+            <span>Creator Studio</span>
+          </button>
         </div>
 
         {/* Global Live Music Search Input & Filter Chips (Screenshot 3) */}
@@ -1900,6 +1914,13 @@ export function RiiqxMusicView() {
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* CREATOR STUDIO 2.0 (PRO) */}
+              {activeTab === 'creator' && (
+                <div className="w-full min-h-[calc(100vh-160px)] rounded-3xl overflow-hidden border border-zinc-200/80 dark:border-white/[0.08] bg-[#0C0C0E] shadow-2xl">
+                  <RiiqxCreatorStudio />
                 </div>
               )}
 
