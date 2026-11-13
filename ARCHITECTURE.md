@@ -1,84 +1,108 @@
-# RIIQX — Master System Architecture
-
-**Product Name:** RIIQX  
-**Tagline:** *One Goal. An AI That Gets It Done.*  
-**Architecture Paradigm:** Online-First • Multi-Model • Autonomous Agentic • Cross-Platform (Web + Android)  
+# RIIQX 2.0 — Master System Architecture
+**Brand:** RIIQX — A New Perspective on Indian Living  
+**Architecture:** Modern Indian Heritage D2C Commerce Platform & Intelligent Autonomous Infrastructure  
+**Core Technologies:** Next.js 14 (App Router), React 18, TypeScript 5.6, Supabase PostgreSQL, Tailwind CSS, Framer Motion, React Native (Expo)  
 
 ---
 
-## 1. High-Level System Architecture
+## 1. End-to-End System Architecture
 
 ```mermaid
 graph TD
-    subgraph ClientLayer["Clients"]
-        WebClient["RIIQX Web Studio<br/>Next.js 14 / React 18"]
-        MobileClient["RIIQX Android App<br/>React Native / Expo 51"]
+    subgraph ClientExperiences["Customer & Merchant Touchpoints"]
+        Storefront["RIIQX Storefront (Next.js 14)<br/>Warm Ivory / Terracotta Editorial"]
+        MobileApp["RIIQX Mobile App (React Native/Expo)<br/>Native iOS & Android Client"]
+        AdminHub["RIIQX Operations OS (/admin)<br/>RBAC Admin Control Center"]
+        MusicStudio["RIIQX Audio & Creator Hub (/music)<br/>Audiophile & Creator Utility"]
     end
 
-    subgraph APILayer["RIIQX Server & Gateway (/api/riiqx)"]
-        AuthService["PBKDF2 Auth & Session Vault"]
-        AgentRouter["Agentic Task Planner & Router"]
-        CreatorAPI["Creator Studio Engine"]
-        AutopilotAPI["Autopilot Queue & Scheduler"]
-        AnalyticsAPI["Hook Retention & Telemetry"]
+    subgraph CommerceOS["RIIQX Commerce OS (Core Backend Engine)"]
+        CatalogEngine["Product Intelligence & Catalog"]
+        PricingEngine["Pricing & Contribution Margin Calculator"]
+        CartCheckout["Cart, Checkout & Inventory Reservation"]
+        OrderLifecycle["Order State Machine & Routing"]
+        ReturnRefund["Returns, QC & Gateway Refund Automation"]
     end
 
-    subgraph OnlineAI["Online Cloud Intelligence (Primary)"]
-        AWSBedrock["AWS Bedrock Runtime (ap-southeast-2)<br/>Claude Sonnet 4 / 3.7"]
-        AgentRouterAI["OpenAI-Compatible / Aggregator<br/>DeepSeek / vLLM"]
+    subgraph SecurityVault["Security & Identity Layer"]
+        SupabaseAuth["Supabase Auth (SSR Cookies & Bearer JWT)"]
+        RLSPolicies["PostgreSQL Row-Level Security"]
+        CryptoVault["AES-256-GCM Token Encryption & HMAC Verification"]
     end
 
-    subgraph LocalFallback["Local Offline Fallback (Optional)"]
-        LocalOllama["Ollama Daemon (localhost:11434)<br/>Qwen 2.5 / Llama 3.2"]
+    subgraph SupplierHub["Supplier Integration Hub (SupplierAdapter)"]
+        AdapterInterface["SupplierAdapter (Common Interface)"]
+        QikinkAdapter["Qikink Adapter (Indian POD)"]
+        PrintroveAdapter["Printrove Adapter (Lifestyle POD)"]
+        CJAdapter["CJ Dropshipping Adapter (Global Warehouses)"]
+        SimulatedAdapter["Simulated Sandbox Adapter (Local Dev & Testing)"]
     end
 
-    subgraph ExternalServices["External Social & Data Providers"]
-        MetaAPI["Meta Graph API v20.0<br/>Instagram Reels (596660929655724)"]
-        YouTubeAPI["YouTube Data API v3<br/>Shorts Automation"]
-        SupabaseDB["Supabase PostgreSQL<br/>Persistent Storage"]
+    subgraph LogisticsPayments["External Logistics & Payment Networks"]
+        PaymentGateways["Razorpay / Cashfree (UPI, Cards, Netbanking)"]
+        Couriers["BlueDart / Delhivery / Ekart API Tracking"]
     end
 
-    WebClient -->|HTTPS / JSON| APILayer
-    MobileClient -->|HTTPS / JSON| APILayer
+    Storefront -->|HTTPS / JSON| CommerceOS
+    MobileApp -->|REST API| CommerceOS
+    AdminHub -->|Server Actions / API| CommerceOS
+    MusicStudio -->|Internal Context| CommerceOS
 
-    AgentRouter -->|ConverseCommand| AWSBedrock
-    AgentRouter -->|ChatCompletions| AgentRouterAI
-    AgentRouter -.->|Optional Local HTTP| LocalOllama
+    CommerceOS --> SecurityVault
+    SecurityVault --> SupabaseAuth
+    SecurityVault --> RLSPolicies
 
-    CreatorAPI -->|Export Video| WebClient
-    CreatorAPI -->|Export Video| MobileClient
+    OrderLifecycle --> AdapterInterface
+    AdapterInterface --> QikinkAdapter
+    AdapterInterface --> PrintroveAdapter
+    AdapterInterface --> CJAdapter
+    AdapterInterface --> SimulatedAdapter
 
-    AutopilotAPI -->|Reels Containers| MetaAPI
-    AutopilotAPI -->|Upload Media| YouTubeAPI
-    AutopilotAPI -->|Sync State| SupabaseDB
+    CartCheckout --> PaymentGateways
+    OrderLifecycle --> Couriers
 ```
 
 ---
 
-## 2. Core Subsystems
+## 2. Core Functional Subsystems
 
-### 2.1 Online-First AI Provider Gateway
-- **Primary Cloud Provider:** AWS Bedrock Runtime in `ap-southeast-2` executing inference on Anthropic Claude Sonnet (`au.anthropic.claude-sonnet-4-6`).
-- **Resilience Policy:** If the cloud provider experiences rate limiting or token exhaustion (`ThrottlingException`), the gateway returns transparent telemetry without crashing or inventing synthetic completions.
-- **Secondary Cloud Provider:** OpenAI-compatible aggregator gateway supporting DeepSeek, vLLM, and LMStudio endpoints.
-- **Local Fallback:** Local Ollama daemon running on `localhost:11434` for offline local development only.
+### 2.1 The `SupplierAdapter` Abstraction
+All supplier integrations adhere strictly to a standardized TypeScript contract:
+```typescript
+export interface SupplierAdapter {
+  id: string;
+  name: string;
+  authenticate(): Promise<boolean>;
+  testConnection(): Promise<{ ok: boolean; latencyMs: number }>;
+  getProducts(params?: CatalogQuery): Promise<SupplierProduct[]>;
+  getProductDetails(externalId: string): Promise<SupplierProductDetail>;
+  getInventory(sku: string): Promise<InventoryLevel>;
+  calculateShipping(params: ShippingCalcParams): Promise<ShippingEstimate>;
+  createOrder(order: InternalOrderPayload): Promise<SupplierOrderResult>;
+  getOrderStatus(supplierOrderId: string): Promise<SupplierOrderStatus>;
+  cancelOrder(supplierOrderId: string, reason: string): Promise<boolean>;
+  getTracking(supplierOrderId: string): Promise<TrackingDetails>;
+  handleWebhook(payload: unknown, signature: string): Promise<WebhookResult>;
+}
+```
 
-### 2.2 Agentic Task Execution Engine
-- **Goal Decomposition:** Breaks complex instructions into discrete, sequential steps with explicit dependencies.
-- **Permission Boundary Gate:** Operations with destructive, financial, or public publishing consequences pause execution and prompt the user with a cryptographic confirmation challenge.
-- **Observability:** Streams real-time step progress, execution logs, and verified tool returns to both Web and Android frontends.
+### 2.2 Order State Machine
+1. `PENDING_PAYMENT` &rarr; Order created, inventory locked in `reserved_stock`.
+2. `PAID` &rarr; Payment gateway HMAC signature verified on server.
+3. `VALIDATING` &rarr; Address validated, pincode serviceability confirmed.
+4. `SUPPLIER_ROUTING` &rarr; Cost, stock, and destination scored; optimal supplier chosen.
+5. `AWAITING_SUPPLIER` &rarr; Order dispatched to partner API.
+6. `SUPPLIER_ACCEPTED` &rarr; Partner confirms manufacturing/dispatch schedule.
+7. `PROCESSING` &rarr; Sourcing/Printing/Packaging in progress.
+8. `SHIPPED` &rarr; Waybill & tracking number generated (BlueDart/Delhivery).
+9. `OUT_FOR_DELIVERY` &rarr; Courier out for final delivery milestone.
+10. `DELIVERED` &rarr; Proof of delivery confirmed.
+11. `REFUND_PENDING` / `REFUNDED` &rarr; Reverse-logistics triggered if requested within 7 days.
 
-### 2.3 RIIQX Creator Studio (Vertical 9:16)
-- **Hook Architecture:** Generates 3 scientifically structured hooks: Pattern Interrupt, Curiosity Gap, and Bold Statistic.
-- **9:16 Safe Zone Overlay:** Visual boundary checking ensures titles, actions, and captions avoid Instagram's 280px top header and 440px bottom UI overlays.
-- **Canvas Video Renderer:** 30 FPS client-side `MediaRecorder` pipeline producing standardized WebM/MP4 exports with dynamic typography and subtitles.
+---
 
-### 2.4 Social Media Autopilot (Level 3 Autonomy)
-- **12-State Machine:** Deterministic queue lifecycle (`queued` -> `researching` -> `scripting` -> `storyboarding` -> `voice_generating` -> `rendering` -> `quality_check` -> `scheduled` -> `publishing` -> `published`).
-- **Emergency STOP:** Instant global circuit breaker halts all in-flight jobs within 50ms.
-- **Adaptive Telemetry:** Calculates 3-second hook retention scores and generates rule-based continuous improvement suggestions.
-
-### 2.5 Native Android Application (`mobile/`)
-- **Technology:** React Native 0.74, Expo SDK 51, Expo Router v3.
-- **Unified Client:** Consumes identical API endpoints (`/api/riiqx/*`) as the web application.
-- **Local Security:** Encrypted credential storage via `expo-secure-store`.
+## 3. Database & Persistence Layer
+Backed by PostgreSQL on Supabase (`ojtngzqsrdralrhipjzt`):
+- All tables protected by strict Row-Level Security (RLS).
+- Customers access only their own orders and cart items.
+- Administrators granted access based on server-verified roles (`admin_roles`, `admin_users`).

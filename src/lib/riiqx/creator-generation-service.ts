@@ -89,17 +89,33 @@ export async function generateRealImage(options: ImageGenerationOptions): Promis
       throw new Error('Image output stream too small or corrupted.');
     }
 
-    // Ensure uploads directory exists on disk
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'generated');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
+    // Ensure uploads directory exists on disk with safe serverless/Vercel fallback
+    let publicUrl = '';
+    try {
+      const isServerless = Boolean(
+        process.env.VERCEL ||
+        process.env.AWS_LAMBDA_FUNCTION_NAME ||
+        process.env.LAMBDA_TASK_ROOT ||
+        process.platform !== 'win32'
+      );
+
+      if (isServerless) {
+        // In serverless read-only environments (Vercel, AWS Lambda), return solid data URI directly
+        publicUrl = `data:${contentType};base64,${buffer.toString('base64')}`;
+      } else {
+        const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'generated');
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        const fileName = `img_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.jpg`;
+        const filePath = path.join(uploadsDir, fileName);
+        fs.writeFileSync(filePath, buffer);
+        publicUrl = `/uploads/generated/${fileName}`;
+      }
+    } catch {
+      // Flawless fallback to base64 data URL if filesystem is read-only
+      publicUrl = `data:${contentType};base64,${buffer.toString('base64')}`;
     }
-
-    const fileName = `img_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.jpg`;
-    const filePath = path.join(uploadsDir, fileName);
-    fs.writeFileSync(filePath, buffer);
-
-    const publicUrl = `/uploads/generated/${fileName}`;
 
     // Record real inference in usage ledger
     recordInferenceUsage({

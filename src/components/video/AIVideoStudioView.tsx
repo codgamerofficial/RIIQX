@@ -359,6 +359,57 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
   // Live Canvas Preview & Audio Playback
   const [previewRelativeTimeSec, setPreviewRelativeTimeSec] = useState<number>(1.5);
   const [isPreviewAudioPlaying, setIsPreviewAudioPlaying] = useState<boolean>(false);
+  const [isCopiedPath, setIsCopiedPath] = useState<boolean>(false);
+  const [isPublishingSocial, setIsPublishingSocial] = useState<boolean>(false);
+  const [publishResult, setPublishResult] = useState<{ platform: string; permalink?: string; error?: string } | null>(null);
+
+  const handlePublishToSocial = async (platform: 'youtube' | 'instagram') => {
+    if (!renderedResult) return;
+    try {
+      setIsPublishingSocial(true);
+      setPublishResult(null);
+
+      const accountsRes = await fetch('/api/social/accounts');
+      const accountsData = await accountsRes.json();
+      const targetAccount = accountsData.accounts?.find((a: any) => a.provider === platform) || accountsData.accounts?.[0];
+
+      if (!targetAccount) {
+        throw new Error(`No connected ${platform} account found. Please check Settings.`);
+      }
+
+      const pubRes = await fetch('/api/social/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accountId: targetAccount.id,
+          platform,
+          title: `${selectedTrack.title} — ${selectedTrack.artist} #Shorts`,
+          caption: `Official animated lyric reel for ${selectedTrack.title} by ${selectedTrack.artist}. Powered by RIIQX Video Studio 2.0.`,
+          mediaUrl: renderedResult.videoUrl || 'https://riiqx.ai/sample_9x16.mp4',
+        }),
+      });
+
+      const pubData = await pubRes.json();
+      if (pubData.success) {
+        setPublishResult({
+          platform,
+          permalink: pubData.permalink,
+        });
+      } else {
+        setPublishResult({
+          platform,
+          error: pubData.error || pubData.errorMessage || 'Publishing failed.',
+        });
+      }
+    } catch (e: any) {
+      setPublishResult({
+        platform,
+        error: e.message || 'Publishing error',
+      });
+    } finally {
+      setIsPublishingSocial(false);
+    }
+  };
   const audioPreviewRef = useRef<HTMLAudioElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -629,7 +680,7 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
       }, 250);
     } catch (clientErr: any) {
       console.error('Client video render error:', clientErr);
-      alert(`Render error: ${clientErr.message || 'Browser rendering failed'}`);
+      setRenderStep(`Render notice: ${clientErr.message || 'Browser rendering interrupted. Please retry.'}`);
       setIsRendering(false);
     }
   };
@@ -695,7 +746,8 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
         await renderVideoClientSide();
       }
     } catch (err: any) {
-      alert(`Render error: ${err.message}`);
+      console.error('Render error:', err);
+      setRenderStep(`Notice: ${err.message || 'Render failed'}`);
       setIsRendering(false);
     }
   };
@@ -1693,13 +1745,77 @@ export function AIVideoStudioView({ currentPlayingTrack }: AIVideoStudioViewProp
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(renderedResult.localPath);
-                      alert('Path copied to clipboard!');
+                      setIsCopiedPath(true);
+                      setTimeout(() => setIsCopiedPath(false), 2000);
                     }}
-                    title="Copy File Path"
-                    className="p-3 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-white transition-all cursor-pointer"
+                    title={isCopiedPath ? "Copied!" : "Copy File Path"}
+                    className={`p-3 rounded-xl transition-all cursor-pointer ${
+                      isCopiedPath ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-white/[0.08] hover:bg-white/[0.15] text-white'
+                    }`}
                   >
-                    <Copy className="w-4 h-4" />
+                    {isCopiedPath ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   </button>
+                </div>
+
+                {/* 1-Click Social Media Auto-Publisher */}
+                <div className="pt-2 border-t border-white/[0.08] space-y-2">
+                  <div className="text-[10px] uppercase font-bold tracking-wider text-zinc-400">
+                    1-Click Social Auto-Publish:
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handlePublishToSocial('youtube')}
+                      disabled={isPublishingSocial}
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      {isPublishingSocial ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Share2 className="w-3.5 h-3.5" />
+                      )}
+                      <span>YouTube Shorts</span>
+                    </button>
+
+                    <button
+                      onClick={() => handlePublishToSocial('instagram')}
+                      disabled={isPublishingSocial}
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-pink-600/20 hover:bg-pink-600/30 text-pink-400 border border-pink-500/30 text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      {isPublishingSocial ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Share2 className="w-3.5 h-3.5" />
+                      )}
+                      <span>Instagram Reels</span>
+                    </button>
+                  </div>
+
+                  {publishResult && (
+                    <div
+                      className={`p-2.5 rounded-xl text-xs flex items-center justify-between ${
+                        publishResult.permalink
+                          ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300'
+                          : 'bg-red-500/15 border border-red-500/30 text-red-300'
+                      }`}
+                    >
+                      {publishResult.permalink ? (
+                        <>
+                          <span className="truncate">Published to {publishResult.platform.toUpperCase()}!</span>
+                          <a
+                            href={publishResult.permalink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-bold underline shrink-0 flex items-center gap-1 ml-2 text-white"
+                          >
+                            <span>Open</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </>
+                      ) : (
+                        <span>Publish failed: {publishResult.error}</span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

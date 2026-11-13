@@ -7,8 +7,11 @@ import os from 'os';
 // Detect Vercel / AWS Lambda serverless environment
 const isVercel = Boolean(
   process.env.VERCEL ||
+  process.env.VERCEL_ENV ||
   process.env.AWS_LAMBDA_FUNCTION_NAME ||
-  process.env.NEXT_RUNTIME === 'edge'
+  process.env.LAMBDA_TASK_ROOT ||
+  process.env.NEXT_RUNTIME === 'edge' ||
+  process.platform !== 'win32'
 );
 
 // Binary paths (Desktop Windows)

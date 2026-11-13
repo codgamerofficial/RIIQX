@@ -98,6 +98,29 @@ const config: Config = {
           darkCard: "#1E293B",
           darkBorder: "#334155",
         },
+        // RIIQX 2.0 Modern Indian Heritage Luxury Palette (Earth, Clay, Stone & Metal)
+        heritage: {
+          ivory: "#FBF9F5",
+          alabaster: "#F5F2EB",
+          sandstone: "#E6DFD5",
+          sandstoneDark: "#C9BEAF",
+          terracotta: "#C2593F",
+          terracottaLight: "#D9775F",
+          terracottaDark: "#9E3E28",
+          olive: "#606C38",
+          oliveLight: "#7A8A48",
+          oliveDark: "#434C24",
+          forest: "#283618",
+          burgundy: "#581845",
+          burgundyLight: "#7D2263",
+          burgundyDark: "#3D1030",
+          charcoal: "#1A1A1A",
+          charcoalMuted: "#2D2D2D",
+          charcoalSubtle: "#404040",
+          brass: "#C5A059",
+          brassLight: "#D8B878",
+          brassDark: "#9E7E3C",
+        },
         // NUVEXA AI Master Color Tokens (Deep Navy, Cyan, Electric Blue, Violet, Magenta)
         nuvexa: {
           bg: "#030712",
@@ -148,6 +171,7 @@ const config: Config = {
       },
       fontFamily: {
         serif: ["var(--font-serif)", "Playfair Display", "Cormorant Garamond", "Georgia", "serif"],
+        editorial: ["'Cormorant Garamond'", "'Playfair Display'", "Georgia", "serif"],
         bengali: ["var(--font-bengali)", "Noto Serif Bengali", "serif"],
         sans: ["var(--font-inter)", "system-ui", "-apple-system", "sans-serif"],
       },

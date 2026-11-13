@@ -39,86 +39,93 @@ export interface RiiqxBrandConfig {
 
 export const riiqxBrand: RiiqxBrandConfig = {
   name: 'RIIQX',
-  tagline: 'One Goal. An AI That Gets It Done.',
-  subheadline: 'The Online-First Agentic AI Platform • Autonomous Creator Studio & Social Autopilot',
-  version: '2.0.0-production',
+  tagline: 'A New Perspective on Indian Living',
+  subheadline: 'Contemporary Lifestyle Objects, Earthy Luxury & Modern Indian Heritage',
+  version: '2.0.0-heritage',
   palette: {
-    bg: '#030712', // Obsidian Black (Legacy Fallback)
-    surface: '#070D1F', // Deep Midnight Navy
-    card: '#0B132B', // Structured Slate
-    cardElevated: '#111C3A', // Elevated Panel
-    border: '#1E2A4A', // Structural Border
-    borderHighlight: '#2A3C6B', // Active Glow Border
-    cyan: '#06B6D4', // Electric Cyan
-    blue: '#3B82F6', // Neon Cobalt
-    violet: '#8B5CF6', // Ultra Violet
-    emerald: '#10B981', // Verified Green
-    amber: '#F59E0B', // Alert Amber
-    rose: '#F43F5E', // Emergency Crimson
-    textPrimary: '#FFFFFF', // High-contrast White
-    textSecondary: '#94A3B8', // Slate Text
-    textMuted: '#64748B', // Muted Commentary
+    bg: '#FBF9F5', // Warm Ivory Canvas
+    surface: '#F5F2EB', // Alabaster Surface
+    card: '#FFFFFF', // Clean White Card
+    cardElevated: '#FFFFFF',
+    border: '#E6DFD5', // Sandstone Border
+    borderHighlight: '#C5A059', // Antique Brass Accent
+    cyan: '#606C38', // Muted Olive
+    blue: '#283618', // Deep Forest Green
+    violet: '#581845', // Royal Burgundy
+    emerald: '#606C38', // Muted Olive
+    amber: '#C5A059', // Antique Brass
+    rose: '#C2593F', // Terracotta
+    textPrimary: '#1A1A1A', // Charcoal Text
+    textSecondary: '#635B5E', // Sandstone Dark Muted
+    textMuted: '#8A8184',
   },
   theme: {
     light: {
-      canvas: '#FAF9F6', // Warm Background
-      canvasSubtle: '#F3F1EC',
-      surface: '#FFFFFF', // White Surface
+      canvas: '#FBF9F5', // Warm Ivory
+      canvasSubtle: '#F5F2EB', // Alabaster
+      surface: '#FFFFFF',
       card: '#FFFFFF',
-      cardHover: '#FAFAF8',
-      border: '#EAE7E1', // Border
-      borderSubtle: '#F3F1EC',
-      borderHighlight: '#FFD43B', // Primary Yellow
-      textPrimary: '#202124', // Primary Text
-      textSecondary: '#737373', // Secondary Text
-      textMuted: '#9E9E9E',
+      cardHover: '#FBF9F5',
+      border: '#E6DFD5', // Sandstone
+      borderSubtle: '#F0ECE4',
+      borderHighlight: '#C5A059', // Antique Brass
+      textPrimary: '#1A1A1A', // Charcoal
+      textSecondary: '#5A5450',
+      textMuted: '#8A817C',
     },
     dark: {
-      canvas: '#151515', // Dark Background
+      canvas: '#141414', // Deep Charcoal
       canvasSubtle: '#0D0D0D',
-      surface: '#202020', // Dark Surface
+      surface: '#1A1A1A', // Matte Obsidian
       card: '#202020',
-      cardHover: '#282828',
-      border: '#2E2E2E', // Dark Border
-      borderSubtle: '#222222',
-      borderHighlight: '#FFD43B', // Primary Yellow
-      textPrimary: '#F7F7F7', // Dark Text
-      textSecondary: '#A3A3A3', // Dark Secondary Text
-      textMuted: '#737373',
+      cardHover: '#262626',
+      border: '#2E2B27', // Muted Sandstone Dark
+      borderSubtle: '#1F1D1A',
+      borderHighlight: '#C5A059', // Antique Brass
+      textPrimary: '#FBF9F5', // Warm Ivory
+      textSecondary: '#B3ACA3',
+      textMuted: '#7D766E',
     },
     accents: {
-      primary: '#FA243C', // Apple Crimson
-      secondary: '#C8102E', // Deep Crimson
-      red: '#FA243C',
-      coral: '#FF3B50',
-      accent: '#FA243C',
-      success: '#10B981',
-      warning: '#F59E0B',
-      error: '#EF4444',
-      amber: '#F59E0B',
-      rose: '#FA243C',
-      yellow: '#FA243C',
-      gradient: 'linear-gradient(135deg, #FA243C 0%, #C8102E 100%)',
-      gradientYellow: 'linear-gradient(135deg, #FA243C 0%, #FF3B50 100%)',
-      gradientRed: 'linear-gradient(135deg, #FA243C 0%, #C8102E 100%)',
+      primary: '#C2593F', // Terracotta
+      secondary: '#C5A059', // Antique Brass
+      terracotta: '#C2593F',
+      brass: '#C5A059',
+      olive: '#606C38',
+      forest: '#283618',
+      burgundy: '#581845',
+      sandstone: '#E6DFD5',
+      charcoal: '#1A1A1A',
+      ivory: '#FBF9F5',
+      red: '#C2593F',
+      coral: '#D9775F',
+      accent: '#C5A059',
+      success: '#606C38',
+      warning: '#C5A059',
+      error: '#C2593F',
+      amber: '#C5A059',
+      rose: '#C2593F',
+      yellow: '#C5A059',
+      gradient: 'linear-gradient(135deg, #C2593F 0%, #C5A059 100%)',
+      gradientYellow: 'linear-gradient(135deg, #C5A059 0%, #E6DFD5 100%)',
+      gradientRed: 'linear-gradient(135deg, #C2593F 0%, #581845 100%)',
     },
   },
 
   seo: {
-    title: 'RIIQX — One Goal. An AI That Gets It Done.',
+    title: 'RIIQX — A New Perspective on Indian Living | Earthy Luxury & Modern Heritage',
     description:
-      'Production-oriented online-first Agentic AI platform with AWS Bedrock intelligence, multi-model agentic automation, and Level 3 Social Media Autopilot.',
+      'RIIQX curates contemporary lifestyle objects, desk essentials, handcrafted living pieces, and conscious design rooted in modern Indian heritage.',
     keywords: [
       'RIIQX',
-      'Agentic AI',
-      'AWS Bedrock',
-      'Claude Sonnet',
-      'AI Video Intelligence',
-      'Instagram Reels Autopilot',
-      'YouTube Shorts AI',
-      'Social Media Automation',
-      'Autonomous Tasks',
-      'Online First AI',
+      'Modern Indian Heritage',
+      'Earthy Luxury',
+      'Indian D2C Lifestyle',
+      'Royal Minimalism',
+      'Brass Desk Accessories',
+      'Contemporary Indian Living',
+      'Conscious Indian Craft',
+      'D2C Lifestyle Brand',
     ],
   },
 };
