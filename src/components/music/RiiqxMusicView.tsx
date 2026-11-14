@@ -1444,7 +1444,7 @@ export function RiiqxMusicView() {
                 <div>
                   <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
                     <span>Results for</span>
-                    <span className="text-[#FA243C]">"{searchQuery}"</span>
+                    <span className="text-[#FA243C]">&ldquo;{searchQuery}&rdquo;</span>
                   </h3>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                     {isSearching
@@ -1477,7 +1477,7 @@ export function RiiqxMusicView() {
               {isSearching ? (
                 <div className="flex flex-col items-center justify-center py-20 text-zinc-400 space-y-3">
                   <Loader2 className="w-8 h-8 text-[#FA243C] animate-spin" />
-                  <span className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Streaming results for "{searchQuery}"...</span>
+                  <span className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Streaming results for &ldquo;{searchQuery}&rdquo;...</span>
                 </div>
               ) : searchResults.length > 0 ? (
                 <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/70 dark:bg-white/[0.02] backdrop-blur-xl p-2 sm:p-3 shadow-sm space-y-1">
@@ -1637,7 +1637,7 @@ export function RiiqxMusicView() {
               ) : (
                 <div className="text-center py-20 text-zinc-400 space-y-3">
                   <FileAudio className="w-10 h-10 mx-auto opacity-40 text-zinc-500" />
-                  <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">No results found for "{searchQuery}".</p>
+                  <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">No results found for &ldquo;{searchQuery}&rdquo;.</p>
                   <p className="text-xs text-zinc-500">Check spelling or try searching another popular artist.</p>
                 </div>
               )}
