@@ -19,9 +19,9 @@ export interface RiiqxUser {
 
 export function getDefaultUser(): RiiqxUser {
   return {
-    id: '',
-    email: '',
-    name: 'RIIQX User',
+    id: 'user_saswata',
+    email: 'saswata@riiqx.com',
+    name: 'Saswata Dey',
     role: 'creator',
     createdAt: new Date().toISOString(),
     preferences: {

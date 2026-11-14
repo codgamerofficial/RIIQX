@@ -2077,11 +2077,11 @@ export function RiiqxMusicView() {
                           <RiiqxWaveMark size={24} color="#FFFFFF" className="opacity-90" />
                         </div>
 
-                        {/* Circular Artist Cutouts */}
+                        {/* Circular Artist Cutouts (Screenshot 1 Parity) */}
                         <div className="flex flex-col items-center my-auto">
                           <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/40 shadow-lg mb-2">
                             <img
-                              src={tracks[0]?.artworkUrl || FALLBACK_ARTWORK}
+                              src="https://c.saavncdn.com/192/1920-Evil-Returns-Hindi-2012-20221203061214-500x500.jpg"
                               alt="Arijit Singh"
                               className="w-full h-full object-cover"
                             />
@@ -2089,14 +2089,14 @@ export function RiiqxMusicView() {
                           <div className="flex items-center gap-2">
                             <div className="w-14 h-14 rounded-full overflow-hidden border border-white/30 shadow-md">
                               <img
-                                src={tracks[1]?.artworkUrl || FALLBACK_ARTWORK}
+                                src="https://c.saavncdn.com/955/Tinka-Lofi-Flip-Hindi-2023-20230509170258-500x500.jpg"
                                 alt="Artist"
                                 className="w-full h-full object-cover"
                               />
                             </div>
                             <div className="w-14 h-14 rounded-full overflow-hidden border border-white/30 shadow-md">
                               <img
-                                src={tracks[2]?.artworkUrl || FALLBACK_ARTWORK}
+                                src="https://c.saavncdn.com/712/Zulfein-Hindi-2023-20230810143809-500x500.jpg"
                                 alt="Artist"
                                 className="w-full h-full object-cover"
                               />
@@ -2209,7 +2209,7 @@ export function RiiqxMusicView() {
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                      {(showAllHeavyRotation ? tracks : tracks.slice(0, 10)).map((track, idx) => {
+                      {(showAllHeavyRotation ? tracks : tracks.slice(0, 25)).map((track, idx) => {
                         const isCurrent = idx === currentTrackIndex;
                         return (
                           <div

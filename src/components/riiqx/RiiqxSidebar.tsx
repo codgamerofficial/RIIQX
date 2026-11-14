@@ -67,7 +67,7 @@ export function RiiqxSidebar() {
     },
   ];
 
-  const resolvedDisplayName = user?.name || 'RIIQX Listener';
+  const resolvedDisplayName = user?.name || 'Saswata Dey';
   const userInitial = resolvedDisplayName.slice(0, 1).toUpperCase();
 
   return (
@@ -107,7 +107,10 @@ export function RiiqxSidebar() {
 
               {section.items.map((item) => {
                 const Icon = item.icon;
-                const isActive = activeTab === item.tab;
+                const isListenNow =
+                  item.tab === 'music' &&
+                  (activeTab === 'music' || activeTab === 'home' || (activeTab as string) === 'listen_now');
+                const isActive = activeTab === item.tab || isListenNow;
 
                 return (
                   <button

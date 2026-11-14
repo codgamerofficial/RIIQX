@@ -138,7 +138,7 @@ interface RiiqxContextType {
 const RiiqxContext = createContext<RiiqxContextType | undefined>(undefined);
 
 export function RiiqxProvider({ children }: { children: ReactNode }) {
-  const [activeTab, setActiveTabState] = useState<RiiqxViewTab>('home');
+  const [activeTab, setActiveTabState] = useState<RiiqxViewTab>('music');
   const setActiveTab = useCallback((tab: RiiqxViewTab) => {
     setActiveTabState(tab);
   }, []);
