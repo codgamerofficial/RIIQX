@@ -58,3 +58,4 @@ Desk aesthetics and home decor are heavily driven by visual search:
 | **Days 1–15** | Store launch, friends/family pilot, 1st 20 orders | ₹30,000 GMV | 100% Prepaid only; 0% debt |
 | **Days 16–45** | Daily 2x Shorts/Reels via RIIQX Video Studio | 50,000 Video Views / month | Organic reach testing |
 | **Days 46–90** | Onboard 25 micro-creators; add 10 new SKUs | ₹1,50,000 Monthly GMV | Reinvest 50% of net margin into inventory buffer |
+

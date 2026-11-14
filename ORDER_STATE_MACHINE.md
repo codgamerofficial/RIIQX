@@ -85,3 +85,4 @@ stateDiagram-v2
 * **Damaged in Transit Protocol:**
   - 48-hour unboxing defect reporting window with photo upload in the support hub.
   - Automated supplier RMA creation for verified courier transit damage.
+

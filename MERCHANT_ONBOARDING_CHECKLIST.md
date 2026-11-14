@@ -74,3 +74,4 @@ Before publishing the first announcement:
 * [ ] Confirm test order appears in [`/admin`](file:///d:/GlowFit%20AI/src/app/admin/page.tsx) under the live orders queue.
 * [ ] Verify that order confirmation SMS / WhatsApp trigger is received.
 * [ ] Confirm that COD remains strictly disabled.
+
