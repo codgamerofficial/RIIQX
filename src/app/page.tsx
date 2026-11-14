@@ -6,16 +6,8 @@
 // =============================================================================
 
 import React from 'react';
-import { useRiiqx } from '@/context/RiiqxContext';
 import { RiiqxMusicView } from '@/components/music/RiiqxMusicView';
-import { TwinDecisionsView } from '@/components/twin/TwinDecisionsView';
 
 export default function RiiqxWorkspacePage() {
-  const { activeTab } = useRiiqx();
-
-  if (activeTab === 'decisions') {
-    return <TwinDecisionsView />;
-  }
-
   return <RiiqxMusicView />;
 }

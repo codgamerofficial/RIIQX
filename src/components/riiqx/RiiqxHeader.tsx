@@ -7,6 +7,7 @@
 // =============================================================================
 
 import React, { useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { useRiiqx } from '@/context/RiiqxContext';
 import { RiiqxLogo } from '@/components/ui/RiiqxLogo';
 import { RiiqxWaveMark, RiiqxProfileAvatarPill } from '@/components/ui/RiiqxWaveMark';
@@ -26,9 +27,15 @@ import {
   Scale,
   Video,
   Compass,
+  ShoppingBag,
+  ShieldCheck,
+  Clapperboard,
 } from 'lucide-react';
 
 export function RiiqxHeader() {
+  const router = useRouter();
+  const pathname = usePathname();
+
   const {
     activeTab,
     setActiveTab,
@@ -41,19 +48,28 @@ export function RiiqxHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  const resolvedDisplayName = user?.name || 'RIIQX Listener';
+  const resolvedDisplayName = user?.name || 'Saswata Dey';
   const userInitial = resolvedDisplayName.slice(0, 1).toUpperCase();
+
+  const navigateToTab = (tabId: string) => {
+    if (pathname !== '/' && pathname !== '/music') {
+      router.push('/');
+    }
+    setActiveTab(tabId as any);
+    setMobileMenuOpen(false);
+  };
 
   const musicNav = [
     { id: 'music', label: 'Listen Now', icon: Radio },
     { id: 'browse', label: 'All Tracks & Search', icon: Compass },
     { id: 'ai_dj', label: 'AI Music DJ & Studio', icon: Sparkles },
     { id: 'video_studio', label: 'Lyric Video Studio', icon: Video, badge: 'PRO' },
-    { id: 'offline', label: 'Downloaded & Offline', icon: HardDriveDownload },
+    { id: 'creator', label: 'Creator Studio 2.0', icon: Clapperboard, badge: 'AI' },
+    { id: 'decisions', label: 'Decisions Lab & Deals', icon: Scale },
     { id: 'playlists', label: 'Playlists', icon: Disc3 },
     { id: 'favorites', label: 'Favorites', icon: Heart },
+    { id: 'offline', label: 'Downloaded & Offline', icon: HardDriveDownload },
     { id: 'equalizer', label: 'Equalizer & DSP', icon: Sliders },
-    { id: 'decisions', label: 'Decisions Lab & Deals', icon: Scale },
     { id: 'settings', label: 'Audio Settings', icon: Settings },
   ];
 
@@ -70,14 +86,14 @@ export function RiiqxHeader() {
 
         <div
           className="cursor-pointer transition-transform duration-150 hover:opacity-95 flex items-center gap-2.5"
-          onClick={() => setActiveTab('music')}
+          onClick={() => navigateToTab('music')}
         >
           <div className="w-8 h-8 rounded-xl bg-white/[0.07] border border-white/10 flex items-center justify-center text-white">
             <RiiqxWaveMark size={22} color="#FFFFFF" />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-black tracking-tight text-white">RIIQX</span>
+              <span className="text-sm font-black tracking-tight text-white font-heading">RIIQX</span>
               <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-[#FA243C]/20 text-[#FA243C] border border-[#FA243C]/30">PRO</span>
             </div>
             <span className="text-[9px] text-zinc-400 font-medium tracking-wider uppercase">Lossless Studio</span>
@@ -96,12 +112,26 @@ export function RiiqxHeader() {
         </span>
       </div>
 
-      {/* Right Controls: AI Video Studio, AI DJ, Theme, Profile */}
+      {/* Right Controls: Store, AI Video Studio, AI DJ, Theme, Profile */}
       <div className="flex items-center gap-2 md:gap-3">
+        {/* Heritage Store Quick Link */}
+        <button
+          onClick={() => router.push('/shop')}
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/[0.05] hover:bg-white/[0.1] text-zinc-300 hover:text-white border border-white/[0.08] transition-all cursor-pointer"
+          title="RIIQX Modern Indian Heritage Store"
+        >
+          <ShoppingBag className="w-3.5 h-3.5 text-[#C5A059]" />
+          <span>Store</span>
+        </button>
+
         {/* Quick Launch AI Video Studio (Pro) */}
         <button
-          onClick={() => setActiveTab('video_studio')}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#FA243C] hover:bg-[#ff3b50] text-white shadow-sm transition-all cursor-pointer"
+          onClick={() => navigateToTab('video_studio')}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-all cursor-pointer ${
+            activeTab === 'video_studio'
+              ? 'bg-[#FA243C] text-white ring-2 ring-[#FA243C]/50 shadow-lg shadow-[#FA243C]/30'
+              : 'bg-[#FA243C] hover:bg-[#ff3b50] text-white'
+          }`}
           title="Create Animated 9:16 / 16:9 Lyric Videos"
         >
           <Video className="w-3.5 h-3.5" />
@@ -113,8 +143,12 @@ export function RiiqxHeader() {
 
         {/* Quick Launch AI DJ */}
         <button
-          onClick={() => setActiveTab('ai_dj' as any)}
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-white/[0.06] hover:bg-white/[0.12] text-zinc-300 hover:text-white border border-white/[0.08] transition-all cursor-pointer"
+          onClick={() => navigateToTab('ai_dj')}
+          className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
+            activeTab === 'ai_dj'
+              ? 'bg-[#FA243C]/20 text-white border-[#FA243C]/50 ring-1 ring-[#FA243C]/30'
+              : 'bg-white/[0.06] hover:bg-white/[0.12] text-zinc-300 hover:text-white border-white/[0.08]'
+          }`}
         >
           <Sparkles className="w-3.5 h-3.5 text-[#FA243C]" />
           <span>AI DJ</span>
@@ -141,12 +175,34 @@ export function RiiqxHeader() {
             <div className="absolute right-0 top-11 w-56 rounded-2xl bg-[#121216]/95 backdrop-blur-2xl border border-white/[0.1] p-2 shadow-2xl z-50 text-white animate-in fade-in slide-in-from-top-2 duration-150">
               <div className="px-3 py-2 border-b border-white/[0.08] mb-1">
                 <p className="text-xs font-bold truncate">{resolvedDisplayName}</p>
-                <p className="text-[10px] text-zinc-400">Lossless 320K Tier</p>
+                <p className="text-[10px] text-zinc-400">Lossless 320K Tier &bull; PRO</p>
               </div>
 
               <button
                 onClick={() => {
-                  setActiveTab('settings');
+                  router.push('/shop');
+                  setUserMenuOpen(false);
+                }}
+                className="flex w-full items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-zinc-300 hover:bg-white/[0.06] hover:text-[#C5A059] transition-colors cursor-pointer"
+              >
+                <ShoppingBag className="w-4 h-4 text-[#C5A059]" />
+                <span>Heritage Store (/shop)</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  router.push('/admin');
+                  setUserMenuOpen(false);
+                }}
+                className="flex w-full items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-zinc-300 hover:bg-white/[0.06] hover:text-emerald-400 transition-colors cursor-pointer"
+              >
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>Commerce OS Admin</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  navigateToTab('settings');
                   setUserMenuOpen(false);
                 }}
                 className="flex w-full items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-zinc-300 hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer"
@@ -191,10 +247,7 @@ export function RiiqxHeader() {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => {
-                      setActiveTab(item.id as any);
-                      setMobileMenuOpen(false);
-                    }}
+                    onClick={() => navigateToTab(item.id)}
                     className={`flex w-full items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                       isActive
                         ? 'bg-[#FA243C] text-white shadow-md'
@@ -205,9 +258,37 @@ export function RiiqxHeader() {
                       <Icon className="w-4 h-4" />
                       <span>{item.label}</span>
                     </div>
+                    {item.badge && (
+                      <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-white/20 text-white">
+                        {item.badge}
+                      </span>
+                    )}
                   </button>
                 );
               })}
+
+              <div className="pt-2 border-t border-white/[0.08] space-y-1">
+                <button
+                  onClick={() => {
+                    router.push('/shop');
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex w-full items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-[#C5A059] hover:bg-white/[0.06] transition-all"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  <span>Heritage Store (/shop)</span>
+                </button>
+                <button
+                  onClick={() => {
+                    router.push('/admin');
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex w-full items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-emerald-400 hover:bg-white/[0.06] transition-all"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Commerce OS Admin</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

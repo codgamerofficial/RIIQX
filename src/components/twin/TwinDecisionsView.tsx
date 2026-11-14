@@ -407,14 +407,25 @@ export function TwinDecisionsView() {
     setLoading(true);
 
     try {
-      const isUrl = q.startsWith('http://') || q.startsWith('https://');
+      let targetUrl = q;
+      const isDomainLike =
+        /^(https?:\/\/)?([a-zA-Z0-9-]+\.)*(amazon|flipkart|myntra|tatacliq|croma|reliance|ajio|nykaa|meesho|reliancedigital|jiomart)\.[a-z.]+/i.test(q) ||
+        /^(https?:\/\/)?dl\.flipkart\.com/i.test(q) ||
+        /^(https?:\/\/)?amzn\.(in|to)/i.test(q);
+
+      let isUrl = q.startsWith('http://') || q.startsWith('https://');
+      if (!isUrl && isDomainLike) {
+        targetUrl = `https://${q}`;
+        isUrl = true;
+      }
+
       const fallbackPrompt = !q && screenshotFileName ? screenshotFileName.replace(/\.[^/.]+$/, '') : q;
       const res = await fetch('/api/twin/decide', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           prompt: isUrl ? undefined : (fallbackPrompt || undefined),
-          productUrl: isUrl ? q : undefined,
+          productUrl: isUrl ? targetUrl : undefined,
           screenshotBase64: screenshotBase64 || undefined,
           screenshotMimeType: screenshotBase64 ? screenshotMimeType : undefined,
           userPreferences,
@@ -769,7 +780,7 @@ export function TwinDecisionsView() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-[#F4F4F6] p-4 sm:p-6 lg:p-8 space-y-8 relative selection:bg-orange-500/30 transition-colors">
+    <div className="w-full pb-36 bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-[#F4F4F6] p-4 sm:p-6 lg:p-8 space-y-8 relative selection:bg-orange-500/30 transition-colors">
       {/* Background Ambient Radial Glow */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
       <div className="absolute top-1/3 right-10 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -1704,7 +1715,7 @@ export function TwinDecisionsView() {
                     <div className="pt-3 border-t border-zinc-200 dark:border-white/[0.08] space-y-2">
                       {offer.directLinkVerified ? (
                         <a
-                          href={offer.purchaseUrl || offer.productUrl}
+                          href={offer.purchaseUrl || offer.productUrl || `https://www.google.com/search?q=${encodeURIComponent((offer.retailerName || '') + ' ' + (result?.report?.identity?.title || result?.bestPick?.title || query || 'product'))}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={() => handleBuyFromStoreClick(offer)}
@@ -1720,7 +1731,7 @@ export function TwinDecisionsView() {
                             <span>Direct purchase link not verified.</span>
                           </span>
                           <a
-                            href={offer.purchaseUrl || offer.productUrl}
+                            href={offer.purchaseUrl || offer.productUrl || `https://www.google.com/search?q=${encodeURIComponent((offer.retailerName || '') + ' ' + (result?.report?.identity?.title || result?.bestPick?.title || query || 'product'))}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={() => handleBuyFromStoreClick(offer)}
